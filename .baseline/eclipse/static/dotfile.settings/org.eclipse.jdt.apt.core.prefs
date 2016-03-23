@@ -1,0 +1,4 @@
+eclipse.preference.version=1
+org.eclipse.jdt.apt.aptEnabled=true
+org.eclipse.jdt.apt.genSrcDir=generated_src
+org.eclipse.jdt.apt.reconcileEnabled=true

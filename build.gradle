@@ -1,0 +1,60 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath 'com.palantir:gradle-baseline-java:0.2.4'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
+    }
+}
+
+plugins {
+    id 'com.palantir.git-version' version '0.4.0'
+    id 'org.inferred.processors' version '1.1.3'
+}
+
+apply plugin: 'java'
+apply plugin: 'com.palantir.baseline-config'
+apply plugin: 'com.palantir.baseline-idea'
+apply plugin: 'org.inferred.processors'
+
+allprojects {
+    version gitVersion()
+    group 'com.palantir.conjure'
+
+    repositories {
+        maven {
+            url 'https://artifactory.palantir.build/artifactory/all-jar/'
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'com.palantir.baseline-checkstyle'
+    apply plugin: 'com.palantir.baseline-eclipse'
+    apply plugin: 'com.palantir.baseline-findbugs'
+    apply plugin: 'com.palantir.baseline-idea'
+    apply plugin: 'org.inferred.processors'
+    apply plugin: 'maven-publish'
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    tasks.jacocoTestReport.dependsOn(tasks.test)
+    tasks.check.dependsOn(tasks.jacocoTestReport)
+    tasks.check.dependsOn(javadoc)
+
+    sourceCompatibility = 1.8
+
+    if (System.env.CIRCLE_TEST_REPORTS) {
+        test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
+    }
+}
+

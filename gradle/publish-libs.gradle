@@ -1,0 +1,43 @@
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    destinationDir rootProject.file("${buildDir}/libs")
+}
+
+tasks.build.dependsOn sourceJar, javadocJar
+
+publishing {
+    publications {
+        artifactory(MavenPublication) {
+            from components.java
+            artifact(sourceJar)
+            artifact(javadocJar)
+        }
+    }
+}
+
+
+artifactory {
+    publish {
+        contextUrl = 'https://artifactory.ci.ptrtech.net/artifactory/'
+        repository {
+            repoKey = (project.version =~ /-/ ? 'internal-jar-snapshot' : 'internal-jar-release')
+            username = System.env.ARTIFACTORY_USERNAME
+            password = System.env.ARTIFACTORY_PASSWORD
+            maven = true
+        }
+        defaults {
+            publications ('artifactory')
+            properties = ['git': project.version.toString()]
+        }
+    }
+}
+artifactoryPublish.dependsOn 'generatePomFileForArtifactoryPublication', 'build'
