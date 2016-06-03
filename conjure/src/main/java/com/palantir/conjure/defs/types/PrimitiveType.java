@@ -4,14 +4,14 @@
 
 package com.palantir.conjure.defs.types;
 
-public enum PrimitiveTypes implements ReferenceType {
+public enum PrimitiveType implements ReferenceType {
     String("String"),
     Integer("Integer"),
     Double("Double");
 
     private final String type;
 
-    PrimitiveTypes(String type) {
+    PrimitiveType(String type) {
         this.type = type;
     }
 

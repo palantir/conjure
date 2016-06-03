@@ -1,15 +1,16 @@
 types:
-  default-package: test.api
-
-  dependencies:
+  imports:
     ResourceIdentifier:
-      external: com.palantir.ri.ResourceIdentifier
-      fallback: String
+      base-type: String
+      external:
+        java: com.palantir.ri.ResourceIdentifier
 
-  definitions:      
-    SimpleObject:
-      fields:
-        stringField: String
+  definitions: 
+    default-package: test.api
+    objects:     
+      SimpleObject:
+        fields:
+          stringField: String
 
 services:
   TestService:
