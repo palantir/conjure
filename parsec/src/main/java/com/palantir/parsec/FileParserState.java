@@ -4,10 +4,10 @@
 
 package com.palantir.parsec;
 
-import com.google.common.base.Charsets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public final class FileParserState implements ParserState {
@@ -16,7 +16,7 @@ public final class FileParserState implements ParserState {
 
     public FileParserState(File in) {
         try {
-            StringBuilder sb = new StringBuilder(new String(Files.readAllBytes(in.toPath()), Charsets.UTF_8));
+            StringBuilder sb = new StringBuilder(new String(Files.readAllBytes(in.toPath()), StandardCharsets.UTF_8));
 
             delegate = new StringParserState(sb);
         } catch (FileNotFoundException e) {
