@@ -1,0 +1,21 @@
+types:
+  default-package: test.api
+
+  dependencies:
+    ResourceIdentifier:
+      external: com.palantir.ri.ResourceIdentifier
+      fallback: String
+
+  definitions:      
+    SimpleObject:
+      fields:
+        stringField: String
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api
+
+    endpoints:
+      get:
+        http: GET /get
