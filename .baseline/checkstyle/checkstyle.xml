@@ -11,26 +11,6 @@
  -->
 
 <module name="Checker">
-
-    <!-- Start Foundry-specific checks -->
-    <module name="RegexpMultiline">
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="@(Before|BeforeClass|After|AfterClass)\s+public\s*void (setUp|setup|init|close)"/>
-        <property name="message" value="JUnit test harness methods shoud be named '@Before before()', '@After after()', '@BeforeClass beforeClass()', and '@AfterClass afterClass()."/>
-    </module>
-    <module name="RegexpSingleline">
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="(\w+)Service (catalogService|nameService|buildService|metadataService|schemaService)( |;)"/>
-        <property name="message" value="Foundry convention: use catalog/names/build/metadata/schemas instead of
-            catalogService/nameService/buildService/metadataService/schemaService"/>
-    </module>
-    <module name="RegexpSingleline">
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="\* @author"/>
-        <property name="message" value="Foundry convention: No Javadoc @author tags"/>
-    </module>
-    <!-- End Foundry-specific checks -->
-
     <property name="charset" value="UTF-8"/>
     <property name="severity" value="error"/>
 
@@ -58,10 +38,15 @@
         <property name="format" value="&gt;&gt;&gt;&gt;&gt;&gt;&gt;"/>
         <property name="message" value="Found (&gt;&gt;&gt;&gt;&gt;&gt;&gt;), so it looks like you had a merge conflict that compiles. Please fix it."/>
     </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Whitespace at end-of-line"/>
+    </module>
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
         <property name="file" value="${samedir}/checkstyle-suppressions.xml"/>
     </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
+    <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
     <module name="TreeWalker">
         <module name="AbbreviationAsWordInName"> <!-- Java Style Guide: Camel case : defined -->
             <property name="ignoreFinal" value="false"/>
@@ -81,10 +66,12 @@
             <property name="allowByTailComment" value="true"/>
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
-        <module name="AvoidNestedBlocks"/> <!-- Java Coding Guidelines: Avoid nested blocks -->
+        <module name="AvoidNestedBlocks"> <!-- Java Coding Guidelines: Avoid nested blocks -->
+            <property name="allowInSwitchCase" value="true"/>
+        </module>
         <module name="AvoidStarImport"/> <!-- Java Style Guide: No wildcard imports -->
         <module name="AvoidStaticImport"> <!-- Java Style Guide: No static imports -->
-            <property name="excludes" value="org.junit.Assert.*,org.hamcrest.Matchers.*,org.mockito.Mockito.*,org.mockito.Matchers.*,org.assertj.core.api.Assertions.*,com.google.common.base.Preconditions.*,org.apache.commons.lang3.Validate.*,com.palantir.foundry.test.Assertions.*,com.palantir.foundry.test.Matchers.*"/>
+            <property name="excludes" value="org.junit.Assert.*,org.junit.Assume.*,org.hamcrest.Matchers.*,org.mockito.Mockito.*,org.mockito.Matchers.*,org.assertj.core.api.Assertions.*,com.google.common.base.Preconditions.*,org.apache.commons.lang3.Validate.*,com.google.common.truth.Truth.*"/>
         </module>
         <module name="ClassTypeParameterName"> <!-- Java Style Guide: Type variable names -->
             <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
@@ -100,11 +87,13 @@
         </module>
         <module name="EmptyForInitializerPad"/> <!-- Java Style Guide: Horizontal whitespace -->
         <module name="EmptyLineSeparator"> <!-- Java Style Guide: Source file structure -->
-            <property name="tokens" value="IMPORT, CLASS_DEF, ENUM_DEF, INTERFACE_DEF, CTOR_DEF, METHOD_DEF, STATIC_INIT, INSTANCE_INIT, VARIABLE_DEF"/>
+            <property name="tokens" value="IMPORT, CLASS_DEF, ENUM_DEF, INTERFACE_DEF, CTOR_DEF, STATIC_INIT, INSTANCE_INIT, VARIABLE_DEF"/>
             <property name="allowNoEmptyLineBetweenFields" value="true"/>
         </module>
         <module name="EmptyStatement"/> <!-- Java Style Guide: One statement per line -->
+        <module name="EqualsHashCode"/>
         <module name="FallThrough"/> <!-- Java Style Guide: Fall-through: commented -->
+        <module name="FileContentsHolder"/> <!-- Required for SuppressionCommentFilter -->
         <module name="FinalClass"/> <!-- Java Coding Guidelines: Private constructors -->
         <module name="GenericWhitespace"> <!-- Java Style Guide: Horizontal whitespace -->
             <message key="ws.followed" value="GenericWhitespace ''{0}'' is followed by whitespace."/>
@@ -118,14 +107,32 @@
             <property name="setterCanReturnItsClass" value="true"/>
         </module>
         <module name="HideUtilityClassConstructor"/> <!-- Java Coding Guidelines: Private constructors -->
+        <module name="IllegalImport"> <!-- Java Coding Guidelines: Use JUnit 4-style test classes and assertions -->
+            <property name="illegalPkgs" value="junit.framework"/>
+            <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
+        </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
-            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, org.elasticsearch.common.joda, jersey.repackaged.com.google.common"/>
+            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, org.elasticsearch.common.joda, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava"/>
+            <message key="import.illegal" value="Must not import repackaged classes."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="org.apache.commons.lang"/>
+            <message key="import.illegal" value="lang is deprecated, use lang3 instead."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="org.apache.commons.math"/>
+            <message key="import.illegal" value="math is deprecated, use math3 instead."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="org.apache.log4j, org.apache.logging.log4j, java.util.logging, ch.qos.logback"/>
+            <message key="import.illegal" value="Use SLF4J instead of a logging framework directly."/>
         </module>
         <module name="IllegalInstantiation"> <!-- Java Coding Guidelines: Never instantiate primitive types -->
             <property name="classes" value="java.lang.Boolean"/>
             <property name="classes" value="java.lang.Byte"/>
             <property name="classes" value="java.lang.Character"/>
             <property name="classes" value="java.lang.Double"/>
+            <property name="classes" value="java.lang.Float"/>
             <property name="classes" value="java.lang.Integer"/>
             <property name="classes" value="java.lang.Long"/>
         </module>
@@ -136,7 +143,7 @@
             <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
         </module>
         <module name="IllegalType"> <!-- Java Coding Guide: Limit coupling on concrete classes -->
-            <property name="memberModifiers" value="LITERAL_PUBLIC, LITERAL_PROTECTED"/>
+            <property name="illegalClassNames" value="java.util.HashSet, java.util.HashMap, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap, com.google.common.collect.ArrayListMultimap, com.google.common.collect.ForwardingListMultimap, com.google.common.collect.ForwardingMultimap, com.google.common.collect.ForwardingSetMultimap, com.google.common.collect.ForwardingSortedSetMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultimap"/>
         </module>
         <module name="ImportOrder"> <!-- Java Style Guide: Ordering and spacing -->
             <property name="groups" value="/.*/"/>
@@ -174,12 +181,12 @@
         <module name="NoClone"/> <!-- Java Coding Guidelines: Never override Object#finalize or Object#clone -->
         <module name="NoFinalizer"/> <!-- Java Coding Guidelines: Never override Object#finalize -->
         <module name="NoLineWrap"/> <!-- Java Style Guide: No line-wrapping -->
-        <module name="NoWhitespaceBefore"> <!-- Java Style Guide: Horizontal whitespace -->
-            <property name="allowLineBreaks" value="true"/>
-        </module>
         <module name="NoWhitespaceAfter"> <!-- Java Style Guide: Horizontal whitespace -->
             <property name="allowLineBreaks" value="false"/>
             <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS"/>
+        </module>
+        <module name="NoWhitespaceBefore"> <!-- Java Style Guide: Horizontal whitespace -->
+            <property name="allowLineBreaks" value="true"/>
         </module>
         <module name="OneStatementPerLine"/> <!-- Java Style Guide: One statement per line -->
         <module name="OneTopLevelClass"/> <!-- Java Style Guide: Exactly one top-level class declaration -->
@@ -215,10 +222,6 @@
             <property name="format" value="assertFalse\(.*[!=]="/>
             <property name="message" value="Use better assertion method(s): assertEquals(), assertNull(), assertSame(), etc."/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Avoid assertNotNull -->
-            <property name="format" value="assertNotNull\("/>
-            <property name="message" value="assertNotNull() almost always shows up in a lazily-written so-called test for coverage. Do something else to validate the expected output: assertEquals(), assertFalse(String.isEmpty()), etc."/>
-        </module>
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Use appropriate assertion methods -->
             <property name="format" value="assertTrue\(!"/>
             <property name="message" value="Use assertFalse()."/>
@@ -247,18 +250,6 @@
             <property name="format" value="CoreMatchers\.notNull"/>
             <property name="message" value="Use better assertion method(s): Assert.assertEquals(), assertNull(), assertSame(), etc."/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Avoid Generics clutter where possible -->
-            <property name="format" value="ImmutableList\.Builder.*new ImmutableList\.Builder"/>
-            <property name="message" value="Use ImmutableList.builder() for variable assignment."/>
-        </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Avoid Generics clutter where possible -->
-            <property name="format" value="ImmutableMap\.Builder.*new ImmutableMap\.Builder"/>
-            <property name="message" value="Use ImmutableMap.builder() for variable assignment."/>
-        </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Avoid Generics clutter where possible -->
-            <property name="format" value="ImmutableSet\.Builder.*new ImmutableSet\.Builder"/>
-            <property name="message" value="Use ImmutableSet.builder() for variable assignment."/>
-        </module>
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
             <property name="format" value="Preconditions\.checkNotNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
             <property name="message" value="Use Preconditions.checkNotNull(Object, String)."/>
@@ -281,15 +272,38 @@
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="\? extends Object\W"/>
-            <property name="message" value="Use ? rather than ? extends Object"/>
+            <property name="message" value="Use ? rather than ? extends Object."/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Libraries -->
-            <property name="format" value="^import org\.apache\.commons\.lang\."/>
-            <property name="message" value="lang is deprecated, use lang3 instead"/>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\bPreconditions\.check.*\{\}"/>
+            <property name="message" value="Use printf-style formatting in Preconditions, not '{}' style formatting."/>
+            <property name="ignoreComments" value="true"/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Libraries -->
-            <property name="format" value="^import org\.apache\.commons\.math\."/>
-            <property name="message" value="math is deprecated, use math3 instead"/>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?i)log(ger)?\.(debug|info|warn|error)\(.*%[sd]"/>
+            <property name="message" value="SLF4J loggers support '{}' style formatting."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\.printStackTrace\(\)"/>
+            <property name="message" value="printStackTrace is not generally allowed."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\bCharset.forName\(|\bCharsets\."/>
+            <property name="message" value="Use JDK StandardCharsets instead of alternatives."/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\bCharset.defaultCharset\("/>
+            <property name="message" value="Use explicit charset (e.g. StandardCharsets.UTF-8) instead of default."/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\bIOUtils\.toString\("/>
+            <property name="message" value="Prefer Guava''s {CharStreams,Files,Resources}.toString to avoid charset/stream closing issues."/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="static enum"/>
+            <property name="message" value="Redundant ''static'' modifier."/>
         </module>
         <module name="RightCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
@@ -308,6 +322,7 @@
         <module name="SimplifyBooleanReturn"/> <!-- Java Coding Guidelines: Keep Boolean expressions simple -->
         <module name="StaticVariableName"/> <!-- Java Style Guide: Naming -->
         <module name="StringLiteralEquality"/> <!-- Java Coding Guidelines: String equality: use String#equals -->
+        <module name="SuperClone"/>
         <module name="SuppressWarnings">
             <property name="format" value="serial"/>
         </module>
@@ -321,9 +336,6 @@
             <property name="processJavadoc" value="true"/>
         </module>
         <module name="UpperEll"/> <!-- Java Style Guide: Numeric Literals -->
-        <module name="VariableDeclarationUsageDistance"> <!-- Java Style Guide: Declared when needed, initialized as soon as possible -->
-            <property name="ignoreVariablePattern" value="stopwatch"/>
-        </module>
         <module name="VisibilityModifier"/> <!-- Java Coding Guidelines: Minimize mutability -->
         <module name="WhitespaceAfter"/> <!-- Java Style Guide: Horizontal whitespace -->
         <module name="WhitespaceAround"> <!-- Java Style Guide: Horizontal whitespace -->
