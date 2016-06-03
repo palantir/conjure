@@ -1,9 +1,5 @@
 <!-- See http://findbugs.sourceforge.net/manual/filter.html for syntax -->
 <FindBugsFilter>
-    <!-- ignore generated code -->
-    <Match>
-        <Class name="~.*\.*Immutable.*" />
-    </Match>
 
     <!-- @NonnullByDefault doesn't play nicely with overriding @Nullable parameters/outputs -->
     <Match>
@@ -19,13 +15,7 @@
             <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/> <!-- if a null is dereferenced, test will fail anyway. Plus assertNotNull() is often a bad pattern. -->
             <Bug pattern="RV_RETURN_VALUE_IGNORED_INFERRED"/> <!-- common in tests to call a method [that has a return value] to deliberately cause an exception, then test that exception -->
             <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/> <!-- ditto above -->
-            <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
-        </Or>
-    </Match>
-    <Match>
-        <Class name="~.*\.*Benchmark.*" />
-        <Or>
-            <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/> <!-- ContiPerf requires a public @Rule object that confuses findbugs -->
+            <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/> <!-- @Rule ivars can be public and unused -->
         </Or>
     </Match>
 </FindBugsFilter>

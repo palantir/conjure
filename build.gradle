@@ -1,18 +1,20 @@
 buildscript {
     repositories {
-        jcenter()
-        maven { url 'https://plugins.gradle.org/m2/' }
+        maven {
+            url 'https://artifactory.palantir.build/artifactory/all-jar/'
+        }
     }
 
     dependencies {
-        classpath 'com.palantir:gradle-baseline-java:0.2.4'
+        classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
+        classpath 'com.palantir:gradle-baseline-java:0.5.0'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
     }
 }
 
 plugins {
-    id 'com.palantir.git-version' version '0.4.0'
-    id 'org.inferred.processors' version '1.1.3'
+    id 'com.palantir.git-version' version '0.5.2'
+    id 'org.inferred.processors' version '1.2.2'
 }
 
 apply plugin: 'java'
@@ -27,6 +29,17 @@ allprojects {
     repositories {
         maven {
             url 'https://artifactory.palantir.build/artifactory/all-jar/'
+        }
+    }
+    apply plugin: 'nebula.dependency-recommender'
+
+    dependencyRecommendations {
+        propertiesFile file: project.rootProject.file('versions.props')
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
         }
     }
 }
