@@ -1,0 +1,76 @@
+types:
+  imports:
+    ResourceIdentifier:
+      base-type: String
+      external: 
+        java: com.palantir.ri.ResourceIdentifier
+    
+    AuthHeader:
+      base-type: String
+      external:
+        java: com.palantir.tokens.AuthHeader
+
+  definitions:
+    default-package: com.palantir.foundry.catalog.api
+    objects:      
+      BackingFileSystem:
+        package: com.palantir.foundry.catalog.api.datasets
+        fields:
+          fileSystemId:
+            type: String
+            docs: The name by which this file system is identified.
+          baseUri: String
+          configuration: Map<String, String>
+  
+      Dataset:
+        package: com.palantir.foundry.catalog.api.datasets
+        fields:
+          fileSystemId: String
+          rid:
+            type: ResourceIdentifier
+            docs: Uniquely identifies this dataset.
+          
+      CreateDatasetRequest:
+        fields:
+          fileSystemId: String
+          path: String
+
+services:
+  TestService:
+    name: Test Service
+    package: com.palantir.foundry.catalog.api
+    base-path: /catalog
+    docs: |
+      A Markdown description of the service.
+
+    endpoints:
+      getFileSystems:
+        http: GET /fileSystems
+        authorization: header
+        returns: Map<String, BackingFileSystem>
+        docs: |
+          Returns a mapping from file system id to backing file system configuration.
+          
+      createDataset:
+        http: POST /datasets
+        authorization: header
+        args:
+          request: CreateDatasetRequest
+        returns: Dataset
+
+      getDataset:
+        http: GET /datasets/{datasetRid}
+        authorization: header
+        args:
+          datasetRid: ResourceIdentifier
+        returns: Optional<Dataset>
+        
+      getBranches:
+        http: GET /datasets/{datasetRid}/branches
+        authorization: header
+        args:
+          datasetRid:
+            type: ResourceIdentifier
+            docs: |
+              A valid dataset resource identifier.
+        returns: Set<String>

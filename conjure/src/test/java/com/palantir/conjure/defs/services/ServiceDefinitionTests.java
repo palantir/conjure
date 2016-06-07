@@ -13,11 +13,13 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition.AuthorizationType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.PrimitiveTypes;
+import com.palantir.conjure.defs.types.PrimitiveType;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
@@ -30,7 +32,7 @@ public final class ServiceDefinitionTests {
     @Test
     public void testArgumentDefinition_fromString() throws IOException {
         assertThat(mapper.readValue("String", ArgumentDefinition.class))
-                .isEqualTo(ArgumentDefinition.of(PrimitiveTypes.String));
+                .isEqualTo(ArgumentDefinition.of(PrimitiveType.String));
     }
 
     @Test
@@ -38,7 +40,7 @@ public final class ServiceDefinitionTests {
         assertThat(mapper.readValue(multiLineString(
                 "type: String",
                 "docs: docs"), ArgumentDefinition.class))
-                .isEqualTo(ArgumentDefinition.of(PrimitiveTypes.String, "docs"));
+                .isEqualTo(ArgumentDefinition.of(PrimitiveType.String, "docs"));
     }
 
     @Test
@@ -62,8 +64,8 @@ public final class ServiceDefinitionTests {
                 .isEqualTo(EndpointDefinition.builder()
                         .http("GET /{arg}")
                         .authorization(AuthorizationType.HEADER)
-                        .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveTypes.String)))
-                        .returns(PrimitiveTypes.String)
+                        .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.String)))
+                        .returns(PrimitiveType.String)
                         .docs("docs")
                         .build());
     }
@@ -74,16 +76,18 @@ public final class ServiceDefinitionTests {
         assertThat(def).isEqualTo(
                 ConjureDefinition.builder()
                 .types(TypesDefinition.builder()
-                        .defaultPackage("test.api")
-                        .putDependencies("ResourceIdentifier",
-                                ExternalTypeDefinition.of("com.palantir.ri.ResourceIdentifier", PrimitiveTypes.String))
-                        .putDefinitions("SimpleObject", ObjectTypeDefinition.builder()
-                                .putFields("stringField", PrimitiveTypes.String)
+                        .putImports("ResourceIdentifier",
+                                ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
+                        .definitions(ObjectsDefinition.builder()
+                                .defaultPackage("test.api")
+                                .putObjects("SimpleObject", ObjectTypeDefinition.builder()
+                                        .putFields("stringField", FieldDefinition.of(PrimitiveType.String))
+                                        .build())
                                 .build())
                         .build())
                 .putServices("TestService", ServiceDefinition.builder()
                         .name("Test Service")
-                        .packageId("test.api")
+                        .packageName("test.api")
                         .putEndpoints("get", EndpointDefinition.builder()
                                 .http("GET /get")
                                 .build())

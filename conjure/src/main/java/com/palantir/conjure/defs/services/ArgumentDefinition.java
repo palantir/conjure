@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.defs.services;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -26,13 +27,54 @@ public interface ArgumentDefinition {
 
     Optional<String> docs();
 
+    Optional<String> paramId();
+
+    @Value.Default
+    default ParamType paramType() {
+        return ParamType.AUTO;
+    }
+
+    enum ParamType {
+        /**
+         * Choose PathParam when this argument appears in the http line, treat as body otherwise.
+         */
+        AUTO,
+        /**
+         * Treat as a PathParam.
+         */
+        PATH,
+        /**
+         * Treat as a QueryParam.
+         */
+        QUERY,
+        /**
+         * Treat as a HeaderParam.
+         */
+        HEADER,
+        /**
+         * Treat as the message body.
+         */
+        BODY;
+
+        @JsonCreator
+        public static ParamType fromString(String val) {
+            return ParamType.valueOf(val.toUpperCase());
+        }
+    }
+
     static ArgumentDefinition of(ConjureType type) {
-        return ImmutableArgumentDefinition.builder().type(type).build();
+        return builder().type(type).build();
     }
 
     static ArgumentDefinition of(ConjureType type, String docs) {
-        return ImmutableArgumentDefinition.builder().type(type).docs(docs).build();
+        return builder().type(type).docs(docs).build();
     }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableArgumentDefinition.Builder {}
 
     // solve Jackson sad-times for multiple parser
     class ArgumentDefinitionDeserializer extends JsonDeserializer<ArgumentDefinition> {
@@ -54,6 +96,5 @@ public interface ArgumentDefinition {
                     parser.readValueAs(ImmutableArgumentDefinition.Json.class));
         }
     }
-
 
 }

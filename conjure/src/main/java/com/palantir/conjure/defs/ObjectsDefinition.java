@@ -6,24 +6,24 @@ package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.palantir.conjure.defs.types.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableTypesDefinition.class)
-@JsonSerialize(as = ImmutableTypesDefinition.class)
+@JsonDeserialize(as = ImmutableObjectsDefinition.class)
+@JsonSerialize(as = ImmutableObjectsDefinition.class)
 @ConjureImmutablesStyle
 @Value.Immutable
-public interface TypesDefinition {
+public interface ObjectsDefinition {
 
-    Map<String, ExternalTypeDefinition> imports();
+    String defaultPackage();
 
-    ObjectsDefinition definitions();
+    Map<String, ObjectTypeDefinition> objects();
 
     static Builder builder() {
         return new Builder();
     }
 
-    class Builder extends ImmutableTypesDefinition.Builder {}
+    class Builder extends ImmutableObjectsDefinition.Builder {}
 
 }

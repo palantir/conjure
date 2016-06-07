@@ -21,9 +21,14 @@ public interface ServiceDefinition {
     String name();
 
     @JsonProperty("package")
-    String packageId();
+    String packageName();
 
     Optional<String> docs();
+
+    @Value.Default
+    default String basePath() {
+        return "/";
+    }
 
     Map<String, EndpointDefinition> endpoints();
 

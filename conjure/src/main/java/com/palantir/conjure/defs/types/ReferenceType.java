@@ -16,11 +16,11 @@ public interface ReferenceType extends ConjureType {
     static ReferenceType of(String type) {
         switch (type) {
             case "String":
-                return PrimitiveTypes.String;
+                return PrimitiveType.String;
             case "Integer":
-                return PrimitiveTypes.Integer;
+                return PrimitiveType.Integer;
             case "Double":
-                return PrimitiveTypes.Double;
+                return PrimitiveType.Double;
             default:
                 return ImmutableReferenceType.builder().type(type).build();
         }

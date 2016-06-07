@@ -6,7 +6,7 @@ package com.palantir.conjure.defs.types;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import java.util.Optional;
+import java.util.Map;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -14,16 +14,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface ExternalTypeDefinition {
 
-    String external();
+    Map<String, String> external();
 
-    Optional<ConjureType> fallback();
-
-    static ExternalTypeDefinition of(String external) {
-        return ImmutableExternalTypeDefinition.builder().external(external).build();
+    @Value.Default
+    default PrimitiveType baseType() {
+        return PrimitiveType.String;
     }
 
-    static ExternalTypeDefinition of(String external, ConjureType fallback) {
-        return ImmutableExternalTypeDefinition.builder().external(external).fallback(fallback).build();
+    static ExternalTypeDefinition javaType(String external) {
+        return ImmutableExternalTypeDefinition.builder().putExternal("java", external).build();
     }
 
 }

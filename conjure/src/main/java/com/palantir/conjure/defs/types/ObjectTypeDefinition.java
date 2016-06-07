@@ -17,9 +17,11 @@ import org.immutables.value.Value;
 public interface ObjectTypeDefinition {
 
     @JsonProperty("package")
-    Optional<String> packageId();
+    Optional<String> packageName();
 
-    Map<String, ConjureType> fields();
+    Map<String, FieldDefinition> fields();
+
+    Optional<String> docs();
 
     static Builder builder() {
         return new Builder();
