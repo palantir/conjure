@@ -1,3 +1,4 @@
 include 'conjure'
+include 'conjure-server-java'
 include 'parsec'
 

@@ -39,6 +39,7 @@ services:
   TestService:
     name: Test Service
     package: com.palantir.foundry.catalog.api
+    default-authz: header
     base-path: /catalog
     docs: |
       A Markdown description of the service.
@@ -46,28 +47,24 @@ services:
     endpoints:
       getFileSystems:
         http: GET /fileSystems
-        authorization: header
         returns: Map<String, BackingFileSystem>
         docs: |
           Returns a mapping from file system id to backing file system configuration.
           
       createDataset:
         http: POST /datasets
-        authorization: header
         args:
           request: CreateDatasetRequest
         returns: Dataset
 
       getDataset:
         http: GET /datasets/{datasetRid}
-        authorization: header
         args:
           datasetRid: ResourceIdentifier
         returns: Optional<Dataset>
         
       getBranches:
         http: GET /datasets/{datasetRid}/branches
-        authorization: header
         args:
           datasetRid:
             type: ResourceIdentifier

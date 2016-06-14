@@ -8,23 +8,21 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public final class JerseyServiceGeneratorTests {
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void smokeTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/test-service2.yml"));
-        JerseyServiceGenerator gen = new JerseyServiceGenerator(conjure.types());
-        gen.generateTypes().forEach(s -> {
-            System.out.println("----------");
-            System.out.println(s);
-        });
-
-        gen.generateServices(conjure.services()).forEach(s -> {
-            System.out.println("----------");
-            System.out.println(s);
-        });
+        JerseyServiceGenerator gen = new JerseyServiceGenerator(conjure);
+        File src = folder.newFolder("src");
+        gen.emit(src);
     }
 
 }

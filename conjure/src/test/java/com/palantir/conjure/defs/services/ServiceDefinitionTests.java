@@ -15,7 +15,6 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.services.EndpointDefinition.AuthorizationType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -55,7 +54,7 @@ public final class ServiceDefinitionTests {
     public void testEndpointDefinition_fullySpecified() throws IOException {
         assertThat(mapper.readValue(multiLineString(
                 "http: GET /{arg}",
-                "authorization: header",
+                "authz: header",
                 "args:",
                 "  arg: String",
                 "returns: String",
@@ -63,7 +62,7 @@ public final class ServiceDefinitionTests {
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
                         .http("GET /{arg}")
-                        .authorization(AuthorizationType.HEADER)
+                        .authz(AuthorizationDefinition.header())
                         .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.String)))
                         .returns(PrimitiveType.String)
                         .docs("docs")
