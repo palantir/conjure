@@ -6,14 +6,10 @@ package com.palantir.conjure.defs.services;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.ConjureType;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -22,9 +18,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface EndpointDefinition {
 
-    Pattern PATH_ARG = Pattern.compile("\\{([^\\}]+)\\}");
-
-    String http();
+    RequestLineDefinition http();
 
     Optional<AuthorizationDefinition> authz();
 
@@ -41,25 +35,5 @@ public interface EndpointDefinition {
     }
 
     class Builder extends ImmutableEndpointDefinition.Builder {}
-
-    @Value.Derived
-    default String method() {
-        return http().substring(0, http().indexOf(' '));
-    }
-
-    @Value.Derived
-    default String path() {
-        return http().substring(http().indexOf(' ') + 1);
-    }
-
-    @Value.Derived
-    default Set<String> pathArgs() {
-        Matcher matcher = PATH_ARG.matcher(http());
-        ImmutableSet.Builder<String> set = ImmutableSet.builder();
-        while (matcher.find()) {
-            set.add(matcher.group(1));
-        }
-        return set.build();
-    }
 
 }

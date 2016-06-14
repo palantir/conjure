@@ -144,16 +144,16 @@ public final class JerseyServiceGenerator {
             AuthorizationDefinition defaultAuthz) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addAnnotation(httpMethodToClassName(endpointDef.method()))
+                .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", endpointDef.path())
+                        .addMember("value", "$S", endpointDef.http().path())
                         .build());
 
         endpointDef.docs().ifPresent(docs -> methodBuilder.addJavadoc("$L", withEndOfLine(docs)));
 
         endpointDef.returns().ifPresent(type -> methodBuilder.returns(conjureTypeToClassName(types, type)));
 
-        Set<String> pathArgs = endpointDef.pathArgs();
+        Set<String> pathArgs = endpointDef.http().pathArgs();
 
         AuthorizationDefinition authz = endpointDef.authz().orElse(defaultAuthz);
         switch (authz.type()) {
