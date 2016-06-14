@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.services;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableSet;
@@ -27,7 +26,7 @@ public interface EndpointDefinition {
 
     String http();
 
-    Optional<AuthorizationType> authorization();
+    Optional<AuthorizationDefinition> authz();
 
     Optional<Map<String, ArgumentDefinition>> args();
 
@@ -39,15 +38,6 @@ public interface EndpointDefinition {
 
     static Builder builder() {
         return new Builder();
-    }
-
-    enum AuthorizationType {
-        HEADER;
-
-        @JsonCreator
-        public static AuthorizationType fromString(String val) {
-            return AuthorizationType.valueOf(val.toUpperCase());
-        }
     }
 
     class Builder extends ImmutableEndpointDefinition.Builder {}

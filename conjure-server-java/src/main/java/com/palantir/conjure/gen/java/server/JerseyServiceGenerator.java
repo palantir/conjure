@@ -6,8 +6,10 @@ package com.palantir.conjure.gen.java.server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
+import com.palantir.conjure.defs.services.AuthorizationDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
@@ -29,25 +31,37 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.io.IOException;
-import java.util.Map;
+import java.io.File;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 
 public final class JerseyServiceGenerator {
 
+    private final ConjureDefinition conjure;
     private final TypesDefinition types;
 
-    public JerseyServiceGenerator(TypesDefinition types) {
-        this.types = types;
+    public JerseyServiceGenerator(ConjureDefinition conjure) {
+        this.conjure = conjure;
+        this.types = conjure.types();
     }
 
     public Set<JavaFile> generateTypes() {
         return types.definitions().objects().entrySet().stream()
                 .map(entry -> generateType(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
+    }
+
+    public void emit(File dir) {
+        Stream.concat(generateTypes().stream(), generateServices().stream()).forEach(t -> {
+            try {
+                t.writeTo(dir);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private JavaFile generateType(String typeName, ObjectTypeDefinition typeDef) {
@@ -97,8 +111,8 @@ public final class JerseyServiceGenerator {
         return in + "\n";
     }
 
-    public Set<JavaFile> generateServices(Map<String, ServiceDefinition> services) throws IOException {
-        return services.entrySet().stream()
+    public Set<JavaFile> generateServices() {
+        return conjure.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
     }
@@ -113,7 +127,10 @@ public final class JerseyServiceGenerator {
         serviceDef.docs().ifPresent(docs -> serviceBuilder.addJavadoc("$L", withEndOfLine(docs)));
 
         serviceBuilder.addMethods(serviceDef.endpoints().entrySet().stream()
-                .map(endpoint -> generateServiceMethod(endpoint.getKey(), endpoint.getValue()))
+                .map(endpoint -> generateServiceMethod(
+                        endpoint.getKey(),
+                        endpoint.getValue(),
+                        serviceDef.defaultAuthz()))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDef.packageName(), serviceBuilder.build())
@@ -121,7 +138,10 @@ public final class JerseyServiceGenerator {
                 .build();
     }
 
-    private MethodSpec generateServiceMethod(String endpointName, EndpointDefinition endpointDef) {
+    private MethodSpec generateServiceMethod(
+            String endpointName,
+            EndpointDefinition endpointDef,
+            AuthorizationDefinition defaultAuthz) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.method()))
@@ -134,15 +154,32 @@ public final class JerseyServiceGenerator {
         endpointDef.returns().ifPresent(type -> methodBuilder.returns(conjureTypeToClassName(types, type)));
 
         Set<String> pathArgs = endpointDef.pathArgs();
-        endpointDef.authorization().ifPresent(auth -> {
-            // only one kind of auth for now
-            methodBuilder.addParameter(
-                    ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
-                            .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
-                                    .addMember("value", "$S", "Authorization")
-                                    .build())
-                            .build());
-        });
+
+        AuthorizationDefinition authz = endpointDef.authz().orElse(defaultAuthz);
+        switch (authz.type()) {
+            case HEADER:
+                methodBuilder.addParameter(
+                        ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
+                                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
+                                        .addMember("value", "$S", authz.id())
+                                        .build())
+                                .build());
+                break;
+            case COOKIE:
+                methodBuilder.addParameter(
+                        ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
+                                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "CookieParam"))
+                                        .addMember("value", "$S", authz.id())
+                                        .build())
+                                .build());
+                break;
+            case NONE:
+                /* do nothing */
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown authorization type: " + authz.type());
+        }
+
         endpointDef.args().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
                 .map(arg -> {
                     ArgumentDefinition def = arg.getValue();
