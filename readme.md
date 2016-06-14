@@ -81,13 +81,17 @@ Each object includes a fields definition block, which is a map of field name to
 a type definition. Simple definitions that omit documentation may simply set
 the value to the type:
 
-    [field]: [type]
+```yaml
+[field]: [type]
+```
 
 Docs may be included on this type by using the long form:
 
-    [field]:
-      type: [type]
-      docs: [docs]
+```yaml
+[field]:
+  type: [type]
+  docs: [docs]
+```
 
 Where docs is a standard string and generally treated throughout rendering as
 Markdown. Use YAML multiline-strings to help with formatting.
@@ -199,13 +203,17 @@ this service.
  * `http`: the request line for a particular endpoint, either in shorthand
    form:
 
-       http: GET /some/path/{someArg}
+   ```yaml
+   http: GET /some/path/{someArg}
+   ```
 
    or in long-form:
 
-       http:
-         method: GET
-         path: /some/path/{someArg}
+   ```yaml
+   http:
+     method: GET
+     path: /some/path/{someArg}
+   ```
 
    where arguments are encapsulated with braces, and must match any path
    arguments found in the later `args` section.
@@ -218,15 +226,19 @@ this service.
  * `args`: a map of argument names (typically in camel case) to argument
    definitions, where an argument may use the short-hand form:
 
-       [arg]: [type]
+   ```yaml
+   [arg]: [type]
+   ```
 
    or longer form:
 
-       [arg]:
-         type: [type]
-         docs: [docs]
-         param-id: [identifier]
-         param-type: (auto|path|body|header|query)
+   ```yaml
+   [arg]:
+     type: [type]
+     docs: [docs]
+     param-id: [identifier]
+     param-type: (auto|path|body|header|query)
+   ```
 
    and for:
     * `type`: a valid Conjure type
@@ -273,6 +285,53 @@ services:
         args:
           datasetRid: ResourceIdentifier
         returns: Optional<Dataset>
+```
+
+### Rendering
+
+#### Java
+
+```java
+package com.palantir.foundry.catalog.api;
+
+import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
+import com.palantir.foundry.catalog.api.datasets.Dataset;
+import com.palantir.ri.ResourceIdentifier;
+import com.palantir.tokens.AuthHeader;
+import java.lang.String;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+/**
+ * A Markdown description of the service.
+ */
+@Path("/catalog")
+public interface TestService {
+    /**
+     * Returns a mapping from file system id to backing file system configuration.
+     */
+    @GET
+    @Path("/fileSystems")
+    Map<String, BackingFileSystem> getFileSystems(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @POST
+    @Path("/datasets")
+    Dataset createDataset(@HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
+
+    @GET
+    @Path("/datasets/{datasetRid}")
+    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/datasets/{datasetRid}/branches")
+    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+}
 ```
 
 Examples
