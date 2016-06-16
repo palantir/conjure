@@ -44,19 +44,21 @@ class ConjureJavaPlugin implements Plugin<Project> {
         this.project = project
         project.pluginManager.apply(JavaPlugin)
         def conjureSourceSet = createConjureSourceSet()
-        def compileConjure = createCompileConjureTask(conjureSourceSet)
+        def compileJavaServerTask = createCompileJavaServerTask(conjureSourceSet)
+        // TODO(rfink) Add client compilation task
         def generatedJavaSourceSet = createJavaSourceSet()
 
-        project.tasks.compileJava.dependsOn compileConjure
+        project.tasks.compileJava.dependsOn compileJavaServerTask
 
         project.dependencies {
             compile generatedJavaSourceSet.output
         }
     }
 
-    def createCompileConjureTask(SourceDirectorySet sourceSet) {
-        ConjureJavaCompileTask task =
-                project.tasks.create("compile" + sourceSet.name.capitalize(), ConjureJavaCompileTask)
+    def createCompileJavaServerTask(SourceDirectorySet sourceSet) {
+        ConjureCompileJavaServerTask task = project.tasks.create(
+                "compile" + sourceSet.name.capitalize() + "JavaServer", ConjureCompileJavaServerTask)
+        println("FOO: " + "compile" + sourceSet.name.capitalize() + "JavaServer")
         task.setSource(sourceSet)
         task.setOutputDirectory(project.projectDir.toPath().resolve(OUTPUT_DIR))
         task

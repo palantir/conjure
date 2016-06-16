@@ -24,7 +24,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
-class ConjureJavaCompileTask extends SourceTask {
+class ConjureCompileJavaServerTask extends SourceTask {
     Path outputDirectory
 
     @OutputDirectory

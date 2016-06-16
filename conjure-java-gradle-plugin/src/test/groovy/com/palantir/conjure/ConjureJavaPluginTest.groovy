@@ -37,20 +37,20 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
 
     def 'compileConjure is up to date when no source files exist'() {
         when:
-        def result = run("compileConjure")
+        def result = run("compileConjureJavaServer")
 
         then:
-        result.task(":compileConjure").outcome == TaskOutcome.UP_TO_DATE
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.UP_TO_DATE
     }
 
     def 'compiles all source files'() {
         when:
         createSourceFile("a.yml", readResource("test-service-a.yml"))
         createSourceFile("b.yml", readResource("test-service-b.yml"))
-        def result = run("compileConjure")
+        def result = run("compileConjureJavaServer")
 
         then:
-        result.task(":compileConjure").outcome == TaskOutcome.SUCCESS
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         compiledFile("test/a/api/TestServiceA.java").text.contains("public interface TestServiceA")
         compiledFile("test/b/api/TestServiceB.java").text.contains("public interface TestServiceB")
     }
@@ -58,10 +58,10 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
     def 'can compile generated Java sourceSet'() {
         when:
         createSourceFile("a.yml", readResource("test-service-a.yml"))
-        def result = run("compileConjure", "compileGeneratedJava")
+        def result = run("compileConjureJavaServer", "compileGeneratedJava")
 
         then:
-        result.task(":compileConjure").outcome == TaskOutcome.SUCCESS
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         result.task(":compileGeneratedJava").outcome == TaskOutcome.SUCCESS
     }
 
@@ -77,7 +77,7 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         def result = run("compileJava")
 
         then:
-        result.task(":compileConjure").outcome == TaskOutcome.SUCCESS
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         result.task(":compileGeneratedJava").outcome == TaskOutcome.SUCCESS
         result.task(":compileJava").outcome == TaskOutcome.SUCCESS
     }
