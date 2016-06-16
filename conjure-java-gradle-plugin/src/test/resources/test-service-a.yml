@@ -1,0 +1,16 @@
+types:
+  definitions:
+    default-package: test.a.api
+    objects:     
+      SimpleObject:
+        fields:
+          stringField: String
+
+services:
+  TestServiceA:
+    name: Test Service A
+    package: test.a.api
+
+    endpoints:
+      get:
+        http: GET /get
