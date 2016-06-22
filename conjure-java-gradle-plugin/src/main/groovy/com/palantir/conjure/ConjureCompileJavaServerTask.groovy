@@ -6,7 +6,9 @@ package com.palantir.conjure
 
 import com.palantir.conjure.defs.Conjure
 import com.palantir.conjure.defs.ConjureDefinition
-import com.palantir.conjure.gen.java.server.JerseyServiceGenerator
+import com.palantir.conjure.gen.java.Generators
+import com.palantir.conjure.gen.java.Settings
+import com.palantir.conjure.gen.java.TypeMapper.OptionalTypeStrategy
 import java.nio.file.Path
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceTask
@@ -34,7 +36,6 @@ class ConjureCompileJavaServerTask extends SourceTask {
         outputDir.mkdirs()
 
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        JerseyServiceGenerator gen = new JerseyServiceGenerator(conjure);
-        gen.emit(outputDir);
+        Generators.generateJerseyServices(conjure, Settings.of(OptionalTypeStrategy.Guava), outputDir);
     }
 }
