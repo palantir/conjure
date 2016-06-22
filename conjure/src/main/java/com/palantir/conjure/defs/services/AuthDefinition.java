@@ -14,57 +14,57 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
-@JsonDeserialize(as = AuthorizationDefinition.class)
-@JsonSerialize(as = AuthorizationDefinition.class)
+@JsonDeserialize(as = AuthDefinition.class)
+@JsonSerialize(as = AuthDefinition.class)
 @Value.Immutable
-public interface AuthorizationDefinition {
+public interface AuthDefinition {
 
-    String HEADER_AUTHORIZATION = "Authorization";
+    String AUTH_HEADER = "Authorization";
 
-    AuthorizationDefinition.AuthorizationType type();
+    AuthDefinition.AuthType type();
 
     String id();
 
-    enum AuthorizationType {
+    enum AuthType {
         NONE,
         HEADER,
         COOKIE;
 
         @JsonCreator
-        public static AuthorizationType fromString(String value) {
-            return AuthorizationType.valueOf(value.toUpperCase());
+        public static AuthType fromString(String value) {
+            return AuthType.valueOf(value.toUpperCase());
         }
     }
 
-    static AuthorizationDefinition none() {
-        return ImmutableAuthorizationDefinition.builder()
-                .type(AuthorizationType.NONE)
+    static AuthDefinition none() {
+        return ImmutableAuthDefinition.builder()
+                .type(AuthType.NONE)
                 .id("NONE")
                 .build();
     }
 
-    static AuthorizationDefinition header() {
-        return ImmutableAuthorizationDefinition.builder()
-                .type(AuthorizationType.HEADER)
-                .id(HEADER_AUTHORIZATION)
+    static AuthDefinition header() {
+        return ImmutableAuthDefinition.builder()
+                .type(AuthType.HEADER)
+                .id(AUTH_HEADER)
                 .build();
     }
 
-    static AuthorizationDefinition cookie(String id) {
-        return ImmutableAuthorizationDefinition.builder()
-                .type(AuthorizationType.COOKIE)
+    static AuthDefinition cookie(String id) {
+        return ImmutableAuthDefinition.builder()
+                .type(AuthType.COOKIE)
                 .id(id)
                 .build();
     }
 
     @JsonCreator
-    static AuthorizationDefinition fromString(String value) {
+    static AuthDefinition fromString(String value) {
         String[] parts = value.split(":", 2);
-        AuthorizationType type = AuthorizationType.fromString(parts[0]);
+        AuthType type = AuthType.fromString(parts[0]);
         String id;
         switch (type) {
             case HEADER:
-                id = HEADER_AUTHORIZATION;
+                id = AUTH_HEADER;
                 break;
             case NONE:
                 id = "NONE";
@@ -76,7 +76,7 @@ public interface AuthorizationDefinition {
             default:
                 throw new IllegalArgumentException("Unknown authorization type: " + type);
         }
-        return ImmutableAuthorizationDefinition.builder().type(type).id(id).build();
+        return ImmutableAuthDefinition.builder().type(type).id(id).build();
     }
 
     @JsonValue

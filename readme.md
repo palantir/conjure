@@ -188,7 +188,7 @@ and rendering:
  * `package`: the package under which to render this service
  * `base-path`: the base HTTP path to serve endpoints on this service (default
    `/`)
- * `default-authz`: the default type of authorization to apply to this service
+ * `default-auth`: the default type of auth to apply to this service
    (default `none`). Options are:
     * `none`: do not apply authorization requirements
     * `header`: apply an `Authorization` header argument/requirement to every
@@ -223,9 +223,9 @@ this service.
 
    HTTP methods need to be supported by the server, presently the server
    implementations allow for `GET`, `POST`, and `DELETE`.
- * `authz`: an optional authorization requirement to override `default-authz`,
-   and with identical options to `default-authz`. To override the default and
-   remove authorization from an endpoint, use `none`.
+ * `auth`: an optional auth requirement to override `default-auth`,
+   and with identical options to `default-auth`. To override the default and
+   remove auth from an endpoint, use `none`.
  * `args`: a map of argument names (typically in camel case) to argument
    definitions, where an argument may use the short-hand form:
 
@@ -267,7 +267,7 @@ services:
     name: Test Service
     package: com.palantir.foundry.catalog.api
     base-path: /catalog
-    default-authz: header
+    default-auth: header
     docs: |
       A Markdown description of the service.
     endpoints:
@@ -382,7 +382,7 @@ services:
     name: Test Service
     package: com.palantir.foundry.catalog.api
     base-path: /catalog
-    default-authz: header
+    default-auth: header
     docs: |
       A Markdown description of the service.
     endpoints:

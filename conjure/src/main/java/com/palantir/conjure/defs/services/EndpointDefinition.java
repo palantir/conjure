@@ -20,7 +20,7 @@ public interface EndpointDefinition {
 
     RequestLineDefinition http();
 
-    Optional<AuthorizationDefinition> authz();
+    Optional<AuthDefinition> auth();
 
     Optional<Map<String, ArgumentDefinition>> args();
 

@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
-import com.palantir.conjure.defs.services.AuthorizationDefinition;
+import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
@@ -130,7 +130,7 @@ public final class JerseyServiceGenerator {
                 .map(endpoint -> generateServiceMethod(
                         endpoint.getKey(),
                         endpoint.getValue(),
-                        serviceDef.defaultAuthz()))
+                        serviceDef.defaultAuth()))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDef.packageName(), serviceBuilder.build())
@@ -141,7 +141,7 @@ public final class JerseyServiceGenerator {
     private MethodSpec generateServiceMethod(
             String endpointName,
             EndpointDefinition endpointDef,
-            AuthorizationDefinition defaultAuthz) {
+            AuthDefinition defaultAuth) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
@@ -155,13 +155,13 @@ public final class JerseyServiceGenerator {
 
         Set<String> pathArgs = endpointDef.http().pathArgs();
 
-        AuthorizationDefinition authz = endpointDef.authz().orElse(defaultAuthz);
-        switch (authz.type()) {
+        AuthDefinition auth = endpointDef.auth().orElse(defaultAuth);
+        switch (auth.type()) {
             case HEADER:
                 methodBuilder.addParameter(
                         ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
                                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
-                                        .addMember("value", "$S", authz.id())
+                                        .addMember("value", "$S", auth.id())
                                         .build())
                                 .build());
                 break;
@@ -169,7 +169,7 @@ public final class JerseyServiceGenerator {
                 methodBuilder.addParameter(
                         ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
                                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "CookieParam"))
-                                        .addMember("value", "$S", authz.id())
+                                        .addMember("value", "$S", auth.id())
                                         .build())
                                 .build());
                 break;
@@ -177,7 +177,7 @@ public final class JerseyServiceGenerator {
                 /* do nothing */
                 break;
             default:
-                throw new IllegalArgumentException("Unknown authorization type: " + authz.type());
+                throw new IllegalArgumentException("Unknown authorization type: " + auth.type());
         }
 
         endpointDef.args().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()

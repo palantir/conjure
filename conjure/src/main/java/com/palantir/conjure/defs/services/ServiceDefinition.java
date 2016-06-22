@@ -26,8 +26,8 @@ public interface ServiceDefinition {
     Optional<String> docs();
 
     @Value.Default
-    default AuthorizationDefinition defaultAuthz() {
-        return AuthorizationDefinition.none();
+    default AuthDefinition defaultAuth() {
+        return AuthDefinition.none();
     }
 
     @Value.Default
