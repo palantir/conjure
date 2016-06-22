@@ -9,6 +9,9 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.gen.java.Generators;
+import com.palantir.conjure.gen.java.Settings;
+import com.palantir.conjure.gen.java.TypeMapper.OptionalTypeStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,9 +27,8 @@ public final class JerseyServiceGeneratorTests {
     @Test
     public void smokeTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/test-service2.yml"));
-        JerseyServiceGenerator gen = new JerseyServiceGenerator(conjure);
         File src = folder.newFolder("src");
-        gen.emit(src);
+        Generators.generateJerseyServices(conjure, Settings.of(OptionalTypeStrategy.Java8), src);
 
         assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
                 .contains("public final class CreateDatasetRequest");
