@@ -18,7 +18,7 @@ public interface ExternalTypeDefinition {
 
     @Value.Default
     default PrimitiveType baseType() {
-        return PrimitiveType.String;
+        return PrimitiveType.STRING;
     }
 
     static ExternalTypeDefinition javaType(String external) {

@@ -1,7 +1,7 @@
 types:
   imports:
     ResourceIdentifier:
-      base-type: String
+      base-type: string
       external:
         java: com.palantir.ri.ResourceIdentifier
 
@@ -10,7 +10,7 @@ types:
     objects:     
       SimpleObject:
         fields:
-          stringField: String
+          stringField: string
 
 services:
   TestService:
