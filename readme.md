@@ -19,24 +19,27 @@ outside of Conjure definition files but declared as explicit imports and given
 'local' names for use in a Conjure file and internal types, which are fully
 defined from other types within a Conjure file, primitives and built-ins.
 
+By convention, all primitive and built-in types use camel case, while all user
+defined types (e.g. imports and object definitions) use pascal case.
+
 ### Primitives
 Base types in the system are:
- * String
- * Integer (32-bit whole numbers)
- * Double (64-bit floating point numbers)
+ * `string`
+ * `integer` (32-bit whole numbers)
+ * `double` (64-bit floating point numbers)
 
 ### Built-Ins
 Conjure offers several built-ins to assist with mapping to existing language
 constructs and to simplify API building. These types are genericized by other
 defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
- * `Map<K, V>`: a map of `K` to `V`; since Conjure generates JSON serializable
-   objects, `K` is generally restricted to `String` (though this is not strictly
+ * `map<K, V>`: a map of `K` to `V`; since Conjure generates JSON serializable
+   objects, `K` is generally restricted to `string` (though this is not strictly
    enforced to allow for external types to be present as a key type).
- * `List<T>`: a list of `T`.
- * `Set<T>`: a set of `T`.
- * `Optional<T>`: an optional type to help prevent nullity. Optional types will
+ * `list<T>`: a list of `T`.
+ * `set<T>`: a set of `T`.
+ * `optional<T>`: an optional type to help prevent nullity. Optional types will
    serialize as null when absent and as a concrete non-null value when present.
-   The empty String and the empty Map/Object are valid non-null values.
+   The empty string and the empty map/object are valid non-null values.
 
 ### External Types (Imports)
 External types, or imports, consist of references to types defined outside
@@ -56,7 +59,7 @@ Type aliases should use Pascal case.
 imports:
   ResourceIdentifier:
     # A primitive type.
-    base-type: String
+    base-type: string
     # A map of language name to a more refined type name (used as a hint)
     # in that language. Renderers may choose to ignore the hint even if
     # it is provided. (By default, Java renderers respect `java` keyed
@@ -120,11 +123,11 @@ definitions:
       fields:
         # example of a field with docs:
         fileSystemId:
-          type: String
+          type: string
           docs: The name by which this file system is identified.
         # example of a simple field:
-        baseUri: String
-        configuration: Map<String, String>
+        baseUri: string
+        configuration: map<string, string>
 ```
 
 ### Rendering
@@ -270,7 +273,7 @@ services:
     endpoints:
       getFileSystems:
         http: GET /fileSystems
-        returns: Map<String, BackingFileSystem>
+        returns: map<string, BackingFileSystem>
         docs: |
           Returns a mapping from file system id to backing file system configuration.
 
@@ -284,7 +287,7 @@ services:
         http: GET /datasets/{datasetRid}
         args:
           datasetRid: ResourceIdentifier
-        returns: Optional<Dataset>
+        returns: optional<Dataset>
 ```
 
 ### Rendering
@@ -298,7 +301,7 @@ import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
 import com.palantir.foundry.catalog.api.datasets.Dataset;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.AuthHeader;
-import java.lang.String;
+import java.lang.string;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -340,12 +343,12 @@ Examples
 types:
   imports:
     ResourceIdentifier:
-      base-type: String
+      base-type: string
       external:
         java: com.palantir.ri.ResourceIdentifier
 
     AuthHeader:
-      base-type: String
+      base-type: string
       external:
         java: com.palantir.tokens.AuthHeader
 
@@ -356,23 +359,23 @@ types:
         package: com.palantir.foundry.catalog.api.datasets
         fields:
           fileSystemId:
-            type: String
+            type: string
             docs: The name by which this file system is identified.
-          baseUri: String
-          configuration: Map<String, String>
+          baseUri: string
+          configuration: map<string, string>
 
       Dataset:
         package: com.palantir.foundry.catalog.api.datasets
         fields:
-          fileSystemId: String
+          fileSystemId: string
           rid:
             type: ResourceIdentifier
             docs: Uniquely identifies this dataset.
 
       CreateDatasetRequest:
         fields:
-          fileSystemId: String
-          path: String
+          fileSystemId: string
+          path: string
 
 services:
   TestService:
@@ -385,7 +388,7 @@ services:
     endpoints:
       getFileSystems:
         http: GET /fileSystems
-        returns: Map<String, BackingFileSystem>
+        returns: map<string, BackingFileSystem>
         docs: |
           Returns a mapping from file system id to backing file system configuration.
       createDataset:
@@ -397,7 +400,7 @@ services:
         http: GET /datasets/{datasetRid}
         args:
           datasetRid: ResourceIdentifier
-        returns: Optional<Dataset>
+        returns: optional<Dataset>
       getBranches:
         http: GET /datasets/{datasetRid}/branches
         args:
@@ -405,5 +408,5 @@ services:
             type: ResourceIdentifier
             docs: |
               A valid dataset resource identifier.
-        returns: Set<String>
+        returns: Set<string>
 ```

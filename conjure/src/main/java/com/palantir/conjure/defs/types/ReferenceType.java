@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.types;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -14,16 +15,11 @@ public interface ReferenceType extends ConjureType {
     String type();
 
     static ReferenceType of(String type) {
-        switch (type) {
-            case "String":
-                return PrimitiveType.String;
-            case "Integer":
-                return PrimitiveType.Integer;
-            case "Double":
-                return PrimitiveType.Double;
-            default:
-                return ImmutableReferenceType.builder().type(type).build();
+        Optional<PrimitiveType> primitiveType = PrimitiveType.fromTypeString(type);
+        if (primitiveType.isPresent()) {
+            return primitiveType.get();
         }
+        return ImmutableReferenceType.builder().type(type).build();
     }
 
 }

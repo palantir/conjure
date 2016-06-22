@@ -270,11 +270,11 @@ public final class JerseyServiceGenerator {
 
     private static TypeName primtiveTypeToClassName(PrimitiveType type) {
         switch (type) {
-            case String:
+            case STRING:
                 return ClassName.get(String.class);
-            case Double:
+            case DOUBLE:
                 return ClassName.get(Double.class);
-            case Integer:
+            case INTEGER:
                 return ClassName.get(Integer.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);

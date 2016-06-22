@@ -30,16 +30,16 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testArgumentDefinition_fromString() throws IOException {
-        assertThat(mapper.readValue("String", ArgumentDefinition.class))
-                .isEqualTo(ArgumentDefinition.of(PrimitiveType.String));
+        assertThat(mapper.readValue("string", ArgumentDefinition.class))
+                .isEqualTo(ArgumentDefinition.of(PrimitiveType.STRING));
     }
 
     @Test
     public void testArgumentDefinition_withDocs() throws IOException {
         assertThat(mapper.readValue(multiLineString(
-                "type: String",
+                "type: string",
                 "docs: docs"), ArgumentDefinition.class))
-                .isEqualTo(ArgumentDefinition.of(PrimitiveType.String, "docs"));
+                .isEqualTo(ArgumentDefinition.of(PrimitiveType.STRING, "docs"));
     }
 
     @Test
@@ -56,15 +56,15 @@ public final class ServiceDefinitionTests {
                 "http: GET /{arg}",
                 "authz: header",
                 "args:",
-                "  arg: String",
-                "returns: String",
+                "  arg: string",
+                "returns: string",
                 "docs: |",
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
                         .http(RequestLineDefinition.of("GET", "/{arg}"))
                         .authz(AuthorizationDefinition.header())
-                        .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.String)))
-                        .returns(PrimitiveType.String)
+                        .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.STRING)))
+                        .returns(PrimitiveType.STRING)
                         .docs("docs")
                         .build());
     }
@@ -80,7 +80,7 @@ public final class ServiceDefinitionTests {
                         .definitions(ObjectsDefinition.builder()
                                 .defaultPackage("test.api")
                                 .putObjects("SimpleObject", ObjectTypeDefinition.builder()
-                                        .putFields("stringField", FieldDefinition.of(PrimitiveType.String))
+                                        .putFields("stringField", FieldDefinition.of(PrimitiveType.STRING))
                                         .build())
                                 .build())
                         .build())

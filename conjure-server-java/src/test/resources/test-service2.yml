@@ -1,12 +1,12 @@
 types:
   imports:
     ResourceIdentifier:
-      base-type: String
+      base-type: string
       external: 
         java: com.palantir.ri.ResourceIdentifier
     
     AuthHeader:
-      base-type: String
+      base-type: string
       external:
         java: com.palantir.tokens.AuthHeader
 
@@ -17,23 +17,23 @@ types:
         package: com.palantir.foundry.catalog.api.datasets
         fields:
           fileSystemId:
-            type: String
+            type: string
             docs: The name by which this file system is identified.
-          baseUri: String
-          configuration: Map<String, String>
+          baseUri: string
+          configuration: map<string, string>
   
       Dataset:
         package: com.palantir.foundry.catalog.api.datasets
         fields:
-          fileSystemId: String
+          fileSystemId: string
           rid:
             type: ResourceIdentifier
             docs: Uniquely identifies this dataset.
           
       CreateDatasetRequest:
         fields:
-          fileSystemId: String
-          path: String
+          fileSystemId: string
+          path: string
 
 services:
   TestService:
@@ -47,7 +47,7 @@ services:
     endpoints:
       getFileSystems:
         http: GET /fileSystems
-        returns: Map<String, BackingFileSystem>
+        returns: map<string, BackingFileSystem>
         docs: |
           Returns a mapping from file system id to backing file system configuration.
           
@@ -61,7 +61,7 @@ services:
         http: GET /datasets/{datasetRid}
         args:
           datasetRid: ResourceIdentifier
-        returns: Optional<Dataset>
+        returns: optional<Dataset>
         
       getBranches:
         http: GET /datasets/{datasetRid}/branches
@@ -70,4 +70,4 @@ services:
             type: ResourceIdentifier
             docs: |
               A valid dataset resource identifier.
-        returns: Set<String>
+        returns: set<string>

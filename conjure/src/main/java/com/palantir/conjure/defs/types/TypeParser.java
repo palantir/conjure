@@ -59,7 +59,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public ListType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("List").parse(input);
+            ExpectationResult result = Parsers.expect("list").parse(input);
             if (Parsers.nullOrUnexpected(result)) {
                 return null;
             }
@@ -74,7 +74,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public SetType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("Set").parse(input);
+            ExpectationResult result = Parsers.expect("set").parse(input);
             if (Parsers.nullOrUnexpected(result)) {
                 return null;
             }
@@ -89,7 +89,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public OptionalType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("Optional").parse(input);
+            ExpectationResult result = Parsers.expect("optional").parse(input);
             if (Parsers.nullOrUnexpected(result)) {
                 return null;
             }
@@ -104,7 +104,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public MapType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("Map").parse(input);
+            ExpectationResult result = Parsers.expect("map").parse(input);
             if (Parsers.nullOrUnexpected(result)) {
                 return null;
             }
