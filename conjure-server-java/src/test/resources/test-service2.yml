@@ -39,7 +39,7 @@ services:
   TestService:
     name: Test Service
     package: com.palantir.foundry.catalog.api
-    default-authz: header
+    default-auth: header
     base-path: /catalog
     docs: |
       A Markdown description of the service.

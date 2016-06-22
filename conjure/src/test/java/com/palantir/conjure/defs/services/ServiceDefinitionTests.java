@@ -54,7 +54,7 @@ public final class ServiceDefinitionTests {
     public void testEndpointDefinition_fullySpecified() throws IOException {
         assertThat(mapper.readValue(multiLineString(
                 "http: GET /{arg}",
-                "authz: header",
+                "auth: header",
                 "args:",
                 "  arg: string",
                 "returns: string",
@@ -62,7 +62,7 @@ public final class ServiceDefinitionTests {
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
                         .http(RequestLineDefinition.of("GET", "/{arg}"))
-                        .authz(AuthorizationDefinition.header())
+                        .auth(AuthDefinition.header())
                         .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.STRING)))
                         .returns(PrimitiveType.STRING)
                         .docs("docs")
