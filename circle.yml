@@ -12,3 +12,11 @@ test:
   override:
     - ./gradlew --parallel build
 
+deployment:
+  snapshots:
+    branch: develop
+    owner: elements
+    commands:
+      - git clean -xfd
+      - |
+          ./gradlew -i artifactoryPublish
