@@ -43,13 +43,15 @@ public final class JerseyServiceGenerator {
     }
 
     public void emit(File outputDir) {
-        generate().forEach(f -> {
-            try {
-                f.writeTo(outputDir);
-            } catch (IOException e) {
-                Throwables.propagate(e);
-            }
-        });
+        services.entrySet().stream()
+                .map(entry -> generateService(entry.getKey(), entry.getValue()))
+                .forEach(f -> {
+                    try {
+                        f.writeTo(outputDir);
+                    } catch (IOException e) {
+                        Throwables.propagate(e);
+                    }
+                });
     }
 
     private JavaFile generateService(String serviceName, ServiceDefinition serviceDef) {

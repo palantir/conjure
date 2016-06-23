@@ -36,4 +36,12 @@ public final class Conjure {
         }
     }
 
+    public static ConjureDefinition parse(String string) {
+        try {
+            return MAPPER.readValue(string, ConjureDefinition.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

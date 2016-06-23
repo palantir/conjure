@@ -36,6 +36,9 @@ class ConjureCompileJavaServerTask extends SourceTask {
         outputDir.mkdirs()
 
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        Generators.generateJerseyServices(conjure, Settings.of(OptionalTypeStrategy.Guava), outputDir);
+        Generators.generateJerseyServices(conjure, Settings.builder()
+            .optionalTypeStrategy(OptionalTypeStrategy.Guava)
+            .ignoreUnknownProperties(false)
+            .build(), outputDir);
     }
 }
