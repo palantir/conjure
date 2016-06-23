@@ -1,7 +1,7 @@
 apply from: "${rootDir}/gradle/publish-libs.gradle"
 
 dependencies {
-    compile project(':conjure')
+    compile project(':conjure-core')
 
     compile 'com.google.guava:guava'
     compile 'com.fasterxml.jackson.core:jackson-databind'
