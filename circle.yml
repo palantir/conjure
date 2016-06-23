@@ -15,7 +15,7 @@ test:
 deployment:
   snapshots:
     branch: develop
-    owner: elements
+    owner: melliot
     commands:
       - git clean -xfd
       - |
