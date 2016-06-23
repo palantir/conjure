@@ -1,43 +1,15 @@
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'nebula.maven-base-publish'
+apply plugin: 'nebula.maven-resolved-dependencies'
+apply plugin: 'nebula.javadoc-jar'
+apply plugin: 'nebula.source-jar'
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-    destinationDir rootProject.file("${buildDir}/libs")
-}
-
-tasks.build.dependsOn sourceJar, javadocJar
-
-publishing {
-    publications {
-        artifactory(MavenPublication) {
-            from components.java
-            artifact(sourceJar)
-            artifact(javadocJar)
-        }
-    }
-}
-
+apply from: "${rootDir}/gradle/publish-artifactory-defaults.gradle"
 
 artifactory {
     publish {
-        contextUrl = 'https://artifactory.ci.ptrtech.net/artifactory/'
-        repository {
-            repoKey = (project.version =~ /-/ ? 'internal-jar-snapshot' : 'internal-jar-release')
-            username = System.env.ARTIFACTORY_USERNAME
-            password = System.env.ARTIFACTORY_PASSWORD
-            maven = true
-        }
         defaults {
-            publications ('artifactory')
-            properties = ['git': project.version.toString()]
+            publications('nebula')
         }
     }
 }
-artifactoryPublish.dependsOn 'generatePomFileForArtifactoryPublication', 'build'
+artifactoryPublish.dependsOn 'generatePomFileForNebulaPublication', 'build'

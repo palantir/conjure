@@ -1,0 +1,17 @@
+apply plugin: 'com.jfrog.artifactory'
+
+def isRelease = (project.version.toString() ==~ /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/)
+artifactory {
+    publish {
+        contextUrl = 'https://artifactory.palantir.build/artifactory/'
+        repository {
+            repoKey = (isRelease ? 'internal-jar-release' : 'internal-jar-snapshot')
+            username = System.env.ARTIFACTORY_USERNAME
+            password = System.env.ARTIFACTORY_PASSWORD
+            maven = true
+        }
+        defaults {
+            properties = ['git': project.version.toString()]
+        }
+    }
+}
