@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure.gen.java.server;
+package com.palantir.conjure.gen.java.service;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -11,7 +11,6 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.Generators;
 import com.palantir.conjure.gen.java.Settings;
-import com.palantir.conjure.gen.java.TypeMapper.OptionalTypeStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +27,7 @@ public final class JerseyServiceGeneratorTests {
     public void smokeTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/test-service2.yml"));
         File src = folder.newFolder("src");
-        Generators.generateJerseyServices(conjure, Settings.of(OptionalTypeStrategy.Java8), src);
+        Generators.generateJerseyServices(conjure, Settings.standard(), src);
 
         assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
                 .contains("public final class CreateDatasetRequest");
