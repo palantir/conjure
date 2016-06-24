@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure.gen.java;
+package com.palantir.conjure.gen.java.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

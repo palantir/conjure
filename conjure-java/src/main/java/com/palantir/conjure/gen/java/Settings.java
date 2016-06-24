@@ -4,28 +4,11 @@
 
 package com.palantir.conjure.gen.java;
 
-import com.palantir.conjure.gen.java.TypeMapper.OptionalTypeStrategy;
-import com.palantir.conjure.gen.java.types.BeanJavaTypeGenerator;
-import com.palantir.conjure.gen.java.types.ImmutablesJavaTypeGenerator;
+import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import org.immutables.value.Value;
 
 @Value.Immutable
 public interface Settings {
-
-    enum TypeGeneratorImpl {
-        Beans(new BeanJavaTypeGenerator()),
-        Immutables(new ImmutablesJavaTypeGenerator());
-
-        private final TypeGenerator generator;
-
-        TypeGeneratorImpl(TypeGenerator generator) {
-            this.generator = generator;
-        }
-
-        public TypeGenerator get() {
-            return generator;
-        }
-    }
 
     @Value.Default
     default OptionalTypeStrategy optionalTypeStrategy() {
@@ -35,11 +18,6 @@ public interface Settings {
     @Value.Default
     default boolean ignoreUnknownProperties() {
         return false;
-    }
-
-    @Value.Default
-    default TypeGeneratorImpl typeGenerator() {
-        return TypeGeneratorImpl.Beans;
     }
 
     static Builder builder() {

@@ -9,9 +9,6 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.gen.java.Settings;
-import com.palantir.conjure.gen.java.StringCleanup;
-import com.palantir.conjure.gen.java.TypeGenerator;
-import com.palantir.conjure.gen.java.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -20,17 +17,23 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Map.Entry;
 import javax.lang.model.element.Modifier;
+import org.apache.commons.lang3.StringUtils;
 
 public final class BeanJavaTypeGenerator implements TypeGenerator {
+
+    private final Settings settings;
+
+    public BeanJavaTypeGenerator(Settings settings) {
+        this.settings = settings;
+    }
 
     @Override
     public JavaFile generateType(
             TypesDefinition types,
-            Settings settings,
-            TypeMapper typeMapper,
             String defaultPackage,
             String typeName,
             ObjectTypeDefinition typeDef) {
+        TypeMapper typeMapper = new TypeMapper(types, settings.optionalTypeStrategy());
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
@@ -40,7 +43,7 @@ public final class BeanJavaTypeGenerator implements TypeGenerator {
                     .build());
         }
 
-        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringCleanup.withEndOfLine(docs)));
+        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
         MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC);
@@ -51,13 +54,13 @@ public final class BeanJavaTypeGenerator implements TypeGenerator {
             FieldSpec field = FieldSpec.builder(type, entry.getKey(),
                     Modifier.PRIVATE, Modifier.FINAL).build();
 
-            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder("get" + StringCleanup.ucfirst(entry.getKey()))
+            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder("get" + StringUtils.capitalize(entry.getKey()))
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return this.$N", field)
                     .returns(type);
 
             entry.getValue().docs().ifPresent(
-                    docs -> getterBuilder.addJavadoc("$L", StringCleanup.withEndOfLine(docs)));
+                    docs -> getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
             typeBuilder.addField(field)
                     .addMethod(getterBuilder.build());

@@ -6,9 +6,11 @@ package com.palantir.conjure
 
 import com.palantir.conjure.defs.Conjure
 import com.palantir.conjure.defs.ConjureDefinition
-import com.palantir.conjure.gen.java.Generators
+import com.palantir.conjure.gen.java.ConjureJavaServiceAndTypeGenerator
 import com.palantir.conjure.gen.java.Settings
-import com.palantir.conjure.gen.java.TypeMapper.OptionalTypeStrategy
+import com.palantir.conjure.gen.java.services.JerseyServiceGenerator
+import com.palantir.conjure.gen.java.types.BeanJavaTypeGenerator
+import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy
 import java.nio.file.Path
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceTask
@@ -32,13 +34,18 @@ class ConjureCompileJavaServerTask extends SourceTask {
     }
 
     def compileFile(Path path) {
+        ConjureDefinition conjure = Conjure.parse(path.toFile());
+
+        Settings settings = Settings.builder()
+                .optionalTypeStrategy(OptionalTypeStrategy.Guava)
+                .ignoreUnknownProperties(false)
+                .build()
+        ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
+                new JerseyServiceGenerator(settings),
+                new BeanJavaTypeGenerator(settings))
+
         File outputDir = getOutputDirectory()
         outputDir.mkdirs()
-
-        ConjureDefinition conjure = Conjure.parse(path.toFile());
-        Generators.generateJerseyServices(conjure, Settings.builder()
-            .optionalTypeStrategy(OptionalTypeStrategy.Guava)
-            .ignoreUnknownProperties(false)
-            .build(), outputDir);
+        generator.emit(conjure, outputDir)
     }
 }

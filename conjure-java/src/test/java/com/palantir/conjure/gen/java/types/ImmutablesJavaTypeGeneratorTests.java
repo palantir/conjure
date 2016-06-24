@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure.gen.java;
+package com.palantir.conjure.gen.java.types;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -10,7 +10,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.gen.java.types.ImmutablesJavaTypeGenerator;
+import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.JavaFile;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,8 +24,8 @@ public final class ImmutablesJavaTypeGeneratorTests {
     public void testImmutablesGenerator() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/SimpleObject.conjure"));
 
-        Set<JavaFile> files = new ImmutablesJavaTypeGenerator()
-                .generate(def.types(), Settings.builder().ignoreUnknownProperties(true).build());
+        Set<JavaFile> files = new ImmutablesJavaTypeGenerator(Settings.builder().ignoreUnknownProperties(true).build())
+                .generate(def.types());
 
         assertThat(files.size()).isEqualTo(1);
         assertThat(Iterables.getFirst(files, null).toString())
