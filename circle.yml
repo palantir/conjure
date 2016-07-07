@@ -6,7 +6,7 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew --parallel testClasses
+    - ./gradlew --parallel resolveConfigurations
 
 test:
   override:
