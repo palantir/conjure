@@ -21,8 +21,17 @@ import org.junit.Test;
 public final class ImmutablesJavaTypeGeneratorTests {
 
     @Test
-    public void testImmutablesGenerator() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/SimpleObject.conjure"));
+    public void testImmutablesGenerator_normalCase() throws IOException {
+        testGeneratedObjectMatchesExpectation("SimpleObject");
+    }
+
+    @Test
+    public void testImmutablesGenerator_kebabCase() throws IOException {
+        testGeneratedObjectMatchesExpectation("KebabCaseObject");
+    }
+
+    private void testGeneratedObjectMatchesExpectation(String testCase) throws IOException {
+        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/" + testCase + ".conjure"));
 
         Set<JavaFile> files = new ImmutablesJavaTypeGenerator(Settings.builder().ignoreUnknownProperties(true).build())
                 .generate(def.types());
@@ -30,7 +39,7 @@ public final class ImmutablesJavaTypeGeneratorTests {
         assertThat(files.size()).isEqualTo(1);
         assertThat(Iterables.getFirst(files, null).toString())
                 .isEqualTo(CharStreams.toString(
-                        new InputStreamReader(getClass().getResourceAsStream("/SimpleObject.java.sample"),
+                        new InputStreamReader(getClass().getResourceAsStream("/" + testCase + ".java.sample"),
                                 StandardCharsets.UTF_8)));
     }
 

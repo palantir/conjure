@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -51,13 +52,22 @@ public final class BeanJavaTypeGenerator implements TypeGenerator {
         for (Entry<String, FieldDefinition> entry : typeDef.fields().entrySet()) {
             TypeName type = typeMapper.getClassName(entry.getValue().type());
 
-            FieldSpec field = FieldSpec.builder(type, entry.getKey(),
+            String fieldName = Fields.toSafeFieldName(entry.getKey());
+
+            FieldSpec field = FieldSpec.builder(type, fieldName,
                     Modifier.PRIVATE, Modifier.FINAL).build();
 
-            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder("get" + StringUtils.capitalize(entry.getKey()))
+            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(
+                    "get" + StringUtils.capitalize(fieldName))
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return this.$N", field)
                     .returns(type);
+
+            if (!fieldName.equals(entry.getKey())) {
+                getterBuilder.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
+                        .addMember("value", "$S", entry.getKey())
+                        .build());
+            }
 
             entry.getValue().docs().ifPresent(
                     docs -> getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
@@ -65,8 +75,8 @@ public final class BeanJavaTypeGenerator implements TypeGenerator {
             typeBuilder.addField(field)
                     .addMethod(getterBuilder.build());
 
-            constructorBuilder.addParameter(type, entry.getKey())
-                    .addStatement("this.$N = $N", field, entry.getKey());
+            constructorBuilder.addParameter(type, fieldName)
+                    .addStatement("this.$N = $N", field, fieldName);
         }
 
         typeBuilder.addMethod(constructorBuilder.build());

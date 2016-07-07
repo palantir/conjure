@@ -106,7 +106,11 @@ Markdown. Use YAML multiline-strings to help with formatting.
 Non-primitive types may include other defined type aliases (aliases may be used
 before definition) or leverage primitives and built-ins.
 
-Field names are typically Camel Case.
+Field names must appear in either camel case or kebab case. Type renderers
+will respect casing for wire format, but may convert case formats to conform
+with language restrictions. As a result, field names must be unique independent
+of case format (e.g. an object may not define both `caseFormat` and
+`case-format` as fields).
 
 #### Object Definitions Example
 

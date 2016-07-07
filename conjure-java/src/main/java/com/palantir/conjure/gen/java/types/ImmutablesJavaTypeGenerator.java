@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.TypesDefinition;
@@ -62,9 +63,18 @@ public final class ImmutablesJavaTypeGenerator implements TypeGenerator {
         for (Entry<String, FieldDefinition> entry : typeDef.fields().entrySet()) {
             TypeName type = typeMapper.getClassName(entry.getValue().type());
 
-            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder("get" + StringUtils.capitalize(entry.getKey()))
+            String fieldName = Fields.toSafeFieldName(entry.getKey());
+
+            MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(
+                    "get" + StringUtils.capitalize(fieldName))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(type);
+
+            if (!fieldName.equals(entry.getKey())) {
+                getterBuilder.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
+                        .addMember("value", "$S", entry.getKey())
+                        .build());
+            }
 
             entry.getValue().docs().ifPresent(
                     docs -> getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
