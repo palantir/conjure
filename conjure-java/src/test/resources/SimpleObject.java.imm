@@ -3,7 +3,9 @@ package test.api;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.lang.Integer;
 import java.lang.String;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @JsonDeserialize(
@@ -21,4 +23,6 @@ import org.immutables.value.Value;
 )
 public interface SimpleObject {
     String getStringField();
+
+    Optional<Integer> getOptionalField();
 }

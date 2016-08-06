@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.Test;
 
-public final class ImmutablesJavaTypeGeneratorTests {
+public final class BeanJavaTypeGeneratorTests {
 
     @Test
     public void testImmutablesGenerator_normalCase() throws IOException {
@@ -33,13 +33,13 @@ public final class ImmutablesJavaTypeGeneratorTests {
     private void testGeneratedObjectMatchesExpectation(String testCase) throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/" + testCase + ".conjure"));
 
-        Set<JavaFile> files = new ImmutablesJavaTypeGenerator(Settings.builder().ignoreUnknownProperties(true).build())
+        Set<JavaFile> files = new BeanJavaTypeGenerator(Settings.builder().ignoreUnknownProperties(true).build())
                 .generate(def.types());
 
         assertThat(files.size()).isEqualTo(1);
         assertThat(Iterables.getFirst(files, null).toString())
                 .isEqualTo(CharStreams.toString(
-                        new InputStreamReader(getClass().getResourceAsStream("/" + testCase + ".java.imm"),
+                        new InputStreamReader(getClass().getResourceAsStream("/" + testCase + ".java.bean"),
                                 StandardCharsets.UTF_8)));
     }
 

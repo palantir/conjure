@@ -5,3 +5,4 @@ types:
       SimpleObject:
         fields:
           stringField: string
+          optionalField: optional<integer>

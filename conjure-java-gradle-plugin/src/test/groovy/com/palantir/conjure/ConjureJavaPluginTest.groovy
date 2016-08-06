@@ -18,6 +18,7 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         repositories { jcenter() }
 
         dependencies {
+            generatedCompile "com.fasterxml.jackson.core:jackson-databind:2.7.4"
             generatedCompile "javax.ws.rs:javax.ws.rs-api:2.0.1"
         }
         """
