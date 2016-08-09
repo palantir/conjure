@@ -4,17 +4,18 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.gen.java.types.BeanGenerator.EnrichedField;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.util.List;
-import java.util.Map.Entry;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 
 public final class BeanBuilderGenerator {
@@ -24,44 +25,56 @@ public final class BeanBuilderGenerator {
     public static TypeSpec generate(
             TypeMapper typeMapper,
             String defaultPackage,
-            String typeName,
+            ClassName objectClass,
             ObjectTypeDefinition typeDef) {
-        String typePackage = typeDef.packageName().orElse(defaultPackage);
-        ClassName objectClass = ClassName.get(typePackage, typeName);
-        ClassName builderClass = ClassName.get(typePackage, typeName, "Builder");
+        ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder("Builder")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
+        Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
+        Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
 
-        List<FieldSpec> fields = Lists.newArrayListWithCapacity(typeDef.fields().size());
+        return TypeSpec.classBuilder("Builder")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                .addFields(poetFields)
+                .addMethods(createSetters(builderClass, fields))
+                .addMethod(createBuild(objectClass, poetFields))
+                .build();
+    }
 
-        for (Entry<String, FieldDefinition> entry : typeDef.fields().entrySet()) {
-            TypeName type = typeMapper.getClassName(entry.getValue().type());
-            String jsonName = entry.getKey();
-            FieldSpec field = FieldSpec.builder(type, Fields.toSafeFieldName(jsonName), Modifier.PRIVATE).build();
-            fields.add(field);
+    private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
+        return fields.entrySet().stream()
+                .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
+                            typeMapper.getClassName(e.getValue().type()),
+                            Fields.toSafeFieldName(e.getKey()),
+                            Modifier.PRIVATE)
+                        .build()))
+                .collect(Collectors.toList());
+    }
 
-            typeBuilder.addField(field);
+    private static Collection<MethodSpec> createSetters(ClassName builderClass, Collection<EnrichedField> fields) {
+        return fields.stream()
+                .map(f -> createSetter(builderClass, f.poetSpec(), f.conjureDef().docs()))
+                .collect(Collectors.toList());
+    }
 
-            typeBuilder.addMethod(MethodSpec.methodBuilder(field.name)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addParameter(ParameterSpec.builder(field.type, field.name).build())
-                    .returns(builderClass)
-                    .beginControlFlow("if ($N == null)", field.name)
-                        .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
-                    .endControlFlow()
-                    .addStatement("this.$1N = $1N", field.name)
-                    .addStatement("return this")
-                    .build());
-        }
+    private static MethodSpec createSetter(ClassName builderClass, FieldSpec field, Optional<String> docs) {
+        return MethodSpec.methodBuilder(field.name)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ParameterSpec.builder(field.type, field.name).build())
+                .returns(builderClass)
+                .beginControlFlow("if ($N == null)", field.name)
+                    .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
+                .endControlFlow()
+                .addStatement("this.$1N = $1N", field.name)
+                .addStatement("return this")
+                .build();
+    }
 
-        typeBuilder.addMethod(MethodSpec.methodBuilder("build")
+    private static MethodSpec createBuild(ClassName objectClass, Collection<FieldSpec> fields) {
+        return MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(objectClass)
                 .addStatement("return new $L", Expressions.constructorCall(objectClass, fields))
-                .build());
-
-        return typeBuilder.build();
+                .build();
     }
 
 }

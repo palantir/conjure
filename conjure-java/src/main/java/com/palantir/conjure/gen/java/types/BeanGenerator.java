@@ -7,7 +7,6 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -33,12 +32,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
+import org.immutables.value.Value;
 
 public final class BeanGenerator implements TypeGenerator {
 
@@ -59,22 +59,20 @@ public final class BeanGenerator implements TypeGenerator {
         String typePackage = typeDef.packageName().orElse(defaultPackage);
         ClassName thisClass = ClassName.get(typePackage, typeName);
 
-        List<FieldSpec> fields = Lists.newArrayListWithCapacity(typeDef.fields().size());
-        List<MethodSpec> getters = Lists.newArrayListWithCapacity(typeDef.fields().size());
-
-        for (Entry<String, FieldDefinition> entry : typeDef.fields().entrySet()) {
-            TypeName type = typeMapper.getClassName(entry.getValue().type());
-            String jsonName = entry.getKey();
-
-            FieldSpec field = FieldSpec.builder(type, Fields.toSafeFieldName(jsonName),
-                    Modifier.PRIVATE, Modifier.FINAL).build();
-            fields.add(field);
-
-            getters.add(createGetter(type, field, entry.getValue().docs()));
-        }
+        Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
+        Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addFields(poetFields)
+                .addMethod(createConstructor(typeMapper, fields))
+                .addMethods(createGetters(typeMapper, fields))
+                .addMethod(createEquals(thisClass))
+                .addMethod(createEqualTo(thisClass, poetFields))
+                .addMethod(createHashCode(poetFields))
+                .addMethod(createValidateFields(poetFields))
+                .addMethod(createAddFieldIfMissing(fields.size()))
+                .addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, thisClass, typeDef));
 
         if (settings.ignoreUnknownProperties()) {
             typeBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnoreProperties.class)
@@ -86,74 +84,76 @@ public final class BeanGenerator implements TypeGenerator {
             typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
         }
 
-        typeBuilder.addFields(fields);
-        typeBuilder.addMethod(createConstructor(typeMapper, typeDef.fields()));
-        typeBuilder.addMethods(getters);
-        typeBuilder.addMethod(createEquals(thisClass));
-        typeBuilder.addMethod(createEqualTo(thisClass, fields));
-        typeBuilder.addMethod(createHashCode(fields));
-        typeBuilder.addMethod(createValidateFields(fields));
-        typeBuilder.addMethod(createAddFieldIfMissing(fields.size()));
-        typeBuilder.addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, typeName, typeDef));
-
         return JavaFile.builder(typePackage, typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
     }
 
-    private static ParameterSpec createConstructorParam(TypeName type, String fieldKey, String fieldName) {
-        return ParameterSpec.builder(type, fieldName)
-                .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                        .addMember("value", "$S", fieldKey)
-                        .build())
-                .build();
+    private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
+        return fields.entrySet().stream()
+                .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
+                            typeMapper.getClassName(e.getValue().type()),
+                            Fields.toSafeFieldName(e.getKey()),
+                            Modifier.PRIVATE, Modifier.FINAL)
+                        .build()))
+                .collect(Collectors.toList());
     }
 
-    private static MethodSpec createConstructor(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
+    private static MethodSpec createConstructor(TypeMapper typeMapper, Collection<EnrichedField> fields) {
         MethodSpec.Builder builder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC);
 
-        List<String> fieldNames = Lists.newArrayListWithCapacity(fields.size());
-
         CodeBlock.Builder body = CodeBlock.builder();
 
-        for (Entry<String, FieldDefinition> entry : fields.entrySet()) {
-            TypeName type = typeMapper.getClassName(entry.getValue().type());
-            String fieldKey = entry.getKey();
-            String fieldName = Fields.toSafeFieldName(fieldKey);
-            fieldNames.add(fieldName);
+        for (EnrichedField field : fields) {
+            FieldSpec spec = field.poetSpec();
 
-            builder.addParameter(createConstructorParam(type, fieldKey, fieldName));
+            builder.addParameter(createConstructorParam(field.poetSpec(), field.jsonKey()));
 
-            if (entry.getValue().type() instanceof ListType) {
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", type, fieldName, ArrayList.class);
-                body.addStatement("__$1N.addAll($1N)", fieldName);
-                body.addStatement("this.$1N = $2T.unmodifiableList(__$1N)", fieldName, Collections.class);
-            } else if (entry.getValue().type() instanceof SetType) {
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", type, fieldName, LinkedHashSet.class);
-                body.addStatement("__$1N.addAll($1N)", fieldName);
-                body.addStatement("this.$1N = $2T.unmodifiableSet(__$1N)", fieldName, Collections.class);
-            } else if (entry.getValue().type() instanceof MapType) {
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", type, fieldName, LinkedHashMap.class);
-                body.addStatement("__$1N.putAll($1N)", fieldName);
-                body.addStatement("this.$1N = $2T.unmodifiableMap(__$1N)", fieldName, Map.class);
+            if (field.conjureDef().type() instanceof ListType) {
+                // TODO contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
+                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, ArrayList.class)
+                        .addStatement("__$1N.addAll($1N)", field.poetSpec())
+                        .addStatement("this.$1N = $2T.unmodifiableList(__$1N)", spec, Collections.class);
+            } else if (field.conjureDef().type() instanceof SetType) {
+                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, LinkedHashSet.class)
+                        .addStatement("__$1N.addAll($1N)", spec.name)
+                        .addStatement("this.$1N = $2T.unmodifiableSet(__$1N)", spec, Collections.class);
+            } else if (field.conjureDef().type() instanceof MapType) {
+                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, LinkedHashMap.class)
+                        .addStatement("__$1N.putAll($1N)", spec.name)
+                        .addStatement("this.$1N = $2T.unmodifiableMap(__$1N)", spec, Collections.class);
             } else {
-                body.addStatement("this.$1N = $1N", fieldName);
+                body.addStatement("this.$1N = $1N", spec);
             }
         }
 
-        builder.addStatement("$L", Expressions.localMethodCall("validateFields", fieldNames));
-        builder.addCode(body.build());
+        builder.addStatement("$L", Expressions.localMethodCall("validateFields", EnrichedField.toPoetSpecs(fields)))
+                .addCode(body.build());
 
         return builder.build();
     }
 
-    private static MethodSpec createGetter(TypeName returnType, FieldSpec field, Optional<String> docs) {
+    private static ParameterSpec createConstructorParam(FieldSpec field, String jsonKey) {
+        return ParameterSpec.builder(field.type, field.name)
+                .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
+                        .addMember("value", "$S", jsonKey)
+                        .build())
+                .build();
+    }
+
+    private static Collection<MethodSpec> createGetters(TypeMapper typeMapper, Collection<EnrichedField> fields) {
+        return fields.stream()
+                .map(f -> createGetter(f.poetSpec(), f.conjureDef().docs()))
+                .collect(Collectors.toList());
+    }
+
+    private static MethodSpec createGetter(FieldSpec field, Optional<String> docs) {
         MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.name))
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement("return this.$N", field)
-                .returns(returnType);
+                .addStatement("return this.$N", field.name)
+                .returns(field.type);
 
         if (docs.isPresent()) {
             getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n"));
@@ -241,6 +241,26 @@ public final class BeanGenerator implements TypeGenerator {
 
     private static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
+    }
+
+    @Value.Immutable
+    interface EnrichedField {
+        @Value.Parameter
+        String jsonKey();
+
+        @Value.Parameter
+        FieldDefinition conjureDef();
+
+        @Value.Parameter
+        FieldSpec poetSpec();
+
+        static EnrichedField of(String jsonKey, FieldDefinition conjureDef, FieldSpec poetSpec) {
+            return ImmutableEnrichedField.of(jsonKey, conjureDef, poetSpec);
+        }
+
+        static Collection<FieldSpec> toPoetSpecs(Collection<EnrichedField> fields) {
+            return fields.stream().map(EnrichedField::poetSpec).collect(Collectors.toList());
+        }
     }
 
 }

@@ -37,7 +37,7 @@ public final class ManyFieldExample {
         this.items = Collections.unmodifiableList(__items);
         Map<String, String> __map = new LinkedHashMap<>(map.size());
         __map.putAll(map);
-        this.map = Map.unmodifiableMap(__map);
+        this.map = Collections.unmodifiableMap(__map);
     }
 
     public String getString() {
