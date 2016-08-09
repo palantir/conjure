@@ -1,0 +1,73 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class OptionalExample {
+    private final Optional<String> item;
+
+    public OptionalExample(@JsonProperty("item") Optional<String> item) {
+        validateFields(item);
+        this.item = item;
+    }
+
+    public Optional<String> getItem() {
+        return this.item;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof OptionalExample && equalTo((OptionalExample) other));
+    }
+
+    private boolean equalTo(OptionalExample other) {
+        return this.item.equals(other.item);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(item);
+    }
+
+    private static void validateFields(Optional<String> item) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, item, "item");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private Optional<String> item;
+
+        public Builder item(Optional<String> item) {
+            if (item == null) {
+                throw new IllegalArgumentException("item cannot be null");
+            }
+            this.item = item;
+            return this;
+        }
+
+        public OptionalExample build() {
+            return new OptionalExample(item);
+        }
+    }
+}

@@ -16,16 +16,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public final class ImmutablesJavaTypeGeneratorTests {
 
     @Test
+    @Ignore
     public void testImmutablesGenerator_normalCase() throws IOException {
         testGeneratedObjectMatchesExpectation("SimpleObject");
     }
 
     @Test
+    @Ignore
     public void testImmutablesGenerator_kebabCase() throws IOException {
         testGeneratedObjectMatchesExpectation("KebabCaseObject");
     }

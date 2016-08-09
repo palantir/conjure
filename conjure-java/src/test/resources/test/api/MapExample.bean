@@ -1,0 +1,76 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class MapExample {
+    private final Map<String, String> items;
+
+    public MapExample(@JsonProperty("items") Map<String, String> items) {
+        validateFields(items);
+        Map<String, String> __items = new LinkedHashMap<>(items.size());
+        __items.putAll(items);
+        this.items = Map.unmodifiableMap(__items);
+    }
+
+    public Map<String, String> getItems() {
+        return this.items;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof MapExample && equalTo((MapExample) other));
+    }
+
+    private boolean equalTo(MapExample other) {
+        return this.items.equals(other.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items);
+    }
+
+    private static void validateFields(Map<String, String> items) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, items, "items");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private Map<String, String> items;
+
+        public Builder items(Map<String, String> items) {
+            if (items == null) {
+                throw new IllegalArgumentException("items cannot be null");
+            }
+            this.items = items;
+            return this;
+        }
+
+        public MapExample build() {
+            return new MapExample(items);
+        }
+    }
+}

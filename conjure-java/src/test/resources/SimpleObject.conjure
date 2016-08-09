@@ -1,8 +1,0 @@
-types:
-  definitions: 
-    default-package: test.api
-    objects:     
-      SimpleObject:
-        fields:
-          stringField: string
-          optionalField: optional<integer>

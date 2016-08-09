@@ -1,0 +1,72 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class StringExample {
+    private final String string;
+
+    public StringExample(@JsonProperty("string") String string) {
+        validateFields(string);
+        this.string = string;
+    }
+
+    public String getString() {
+        return this.string;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof StringExample && equalTo((StringExample) other));
+    }
+
+    private boolean equalTo(StringExample other) {
+        return this.string.equals(other.string);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(string);
+    }
+
+    private static void validateFields(String string) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, string, "string");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private String string;
+
+        public Builder string(String string) {
+            if (string == null) {
+                throw new IllegalArgumentException("string cannot be null");
+            }
+            this.string = string;
+            return this;
+        }
+
+        public StringExample build() {
+            return new StringExample(string);
+        }
+    }
+}

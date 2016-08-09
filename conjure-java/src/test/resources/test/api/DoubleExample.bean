@@ -1,0 +1,72 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class DoubleExample {
+    private final Double doubleValue;
+
+    public DoubleExample(@JsonProperty("doubleValue") Double doubleValue) {
+        validateFields(doubleValue);
+        this.doubleValue = doubleValue;
+    }
+
+    public Double getDoubleValue() {
+        return this.doubleValue;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof DoubleExample && equalTo((DoubleExample) other));
+    }
+
+    private boolean equalTo(DoubleExample other) {
+        return this.doubleValue.equals(other.doubleValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(doubleValue);
+    }
+
+    private static void validateFields(Double doubleValue) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, doubleValue, "doubleValue");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private Double doubleValue;
+
+        public Builder doubleValue(Double doubleValue) {
+            if (doubleValue == null) {
+                throw new IllegalArgumentException("doubleValue cannot be null");
+            }
+            this.doubleValue = doubleValue;
+            return this;
+        }
+
+        public DoubleExample build() {
+            return new DoubleExample(doubleValue);
+        }
+    }
+}

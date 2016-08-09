@@ -14,7 +14,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
-import com.palantir.conjure.gen.java.types.BeanJavaTypeGenerator;
+import com.palantir.conjure.gen.java.types.BeanGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -52,12 +52,12 @@ public final class ConjureJavaServiceAndTypeGeneratorTest {
 
     @Test
     public void smokeTest() throws IOException {
-        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/test-service2.yml"));
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-service.yml"));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
-                new BeanJavaTypeGenerator(settings));
+                new BeanGenerator(settings));
         generator.emit(conjure, src);
 
         assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))

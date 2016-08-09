@@ -1,0 +1,75 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class ListExample {
+    private final List<String> items;
+
+    public ListExample(@JsonProperty("items") List<String> items) {
+        validateFields(items);
+        List<String> __items = new ArrayList<>(items.size());
+        __items.addAll(items);
+        this.items = Collections.unmodifiableList(__items);
+    }
+
+    public List<String> getItems() {
+        return this.items;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof ListExample && equalTo((ListExample) other));
+    }
+
+    private boolean equalTo(ListExample other) {
+        return this.items.equals(other.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(items);
+    }
+
+    private static void validateFields(List<String> items) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, items, "items");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private List<String> items;
+
+        public Builder items(List<String> items) {
+            if (items == null) {
+                throw new IllegalArgumentException("items cannot be null");
+            }
+            this.items = items;
+            return this;
+        }
+
+        public ListExample build() {
+            return new ListExample(items);
+        }
+    }
+}

@@ -9,7 +9,7 @@ import com.palantir.conjure.defs.ConjureDefinition
 import com.palantir.conjure.gen.java.ConjureJavaServiceAndTypeGenerator
 import com.palantir.conjure.gen.java.Settings
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator
-import com.palantir.conjure.gen.java.types.BeanJavaTypeGenerator
+import com.palantir.conjure.gen.java.types.BeanGenerator
 import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy
 import java.nio.file.Path
 import org.gradle.api.tasks.OutputDirectory
@@ -42,7 +42,7 @@ class ConjureCompileJavaServerTask extends SourceTask {
                 .build()
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
-                new BeanJavaTypeGenerator(settings))
+                new BeanGenerator(settings))
 
         File outputDir = getOutputDirectory()
         outputDir.mkdirs()

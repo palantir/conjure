@@ -1,0 +1,170 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class ManyFieldExample {
+    private final String string;
+
+    private final Integer integer;
+
+    private final Double doubleValue;
+
+    private final Optional<String> optionalItem;
+
+    private final List<String> items;
+
+    private final Map<String, String> map;
+
+    public ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") Integer integer, @JsonProperty("doubleValue") Double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("map") Map<String, String> map) {
+        validateFields(string, integer, doubleValue, optionalItem, items, map);
+        this.string = string;
+        this.integer = integer;
+        this.doubleValue = doubleValue;
+        this.optionalItem = optionalItem;
+        List<String> __items = new ArrayList<>(items.size());
+        __items.addAll(items);
+        this.items = Collections.unmodifiableList(__items);
+        Map<String, String> __map = new LinkedHashMap<>(map.size());
+        __map.putAll(map);
+        this.map = Map.unmodifiableMap(__map);
+    }
+
+    public String getString() {
+        return this.string;
+    }
+
+    public Integer getInteger() {
+        return this.integer;
+    }
+
+    public Double getDoubleValue() {
+        return this.doubleValue;
+    }
+
+    public Optional<String> getOptionalItem() {
+        return this.optionalItem;
+    }
+
+    public List<String> getItems() {
+        return this.items;
+    }
+
+    public Map<String, String> getMap() {
+        return this.map;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof ManyFieldExample && equalTo((ManyFieldExample) other));
+    }
+
+    private boolean equalTo(ManyFieldExample other) {
+        return this.string.equals(other.string) && this.integer.equals(other.integer) && this.doubleValue.equals(other.doubleValue) && this.optionalItem.equals(other.optionalItem) && this.items.equals(other.items) && this.map.equals(other.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(string, integer, doubleValue, optionalItem, items, map);
+    }
+
+    private static void validateFields(String string, Integer integer, Double doubleValue, Optional<String> optionalItem, List<String> items, Map<String, String> map) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, string, "string");
+        missingFields = addFieldIfMissing(missingFields, integer, "integer");
+        missingFields = addFieldIfMissing(missingFields, doubleValue, "doubleValue");
+        missingFields = addFieldIfMissing(missingFields, optionalItem, "optionalItem");
+        missingFields = addFieldIfMissing(missingFields, items, "items");
+        missingFields = addFieldIfMissing(missingFields, map, "map");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(6);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static final class Builder {
+        private String string;
+
+        private Integer integer;
+
+        private Double doubleValue;
+
+        private Optional<String> optionalItem;
+
+        private List<String> items;
+
+        private Map<String, String> map;
+
+        public Builder string(String string) {
+            if (string == null) {
+                throw new IllegalArgumentException("string cannot be null");
+            }
+            this.string = string;
+            return this;
+        }
+
+        public Builder integer(Integer integer) {
+            if (integer == null) {
+                throw new IllegalArgumentException("integer cannot be null");
+            }
+            this.integer = integer;
+            return this;
+        }
+
+        public Builder doubleValue(Double doubleValue) {
+            if (doubleValue == null) {
+                throw new IllegalArgumentException("doubleValue cannot be null");
+            }
+            this.doubleValue = doubleValue;
+            return this;
+        }
+
+        public Builder optionalItem(Optional<String> optionalItem) {
+            if (optionalItem == null) {
+                throw new IllegalArgumentException("optionalItem cannot be null");
+            }
+            this.optionalItem = optionalItem;
+            return this;
+        }
+
+        public Builder items(List<String> items) {
+            if (items == null) {
+                throw new IllegalArgumentException("items cannot be null");
+            }
+            this.items = items;
+            return this;
+        }
+
+        public Builder map(Map<String, String> map) {
+            if (map == null) {
+                throw new IllegalArgumentException("map cannot be null");
+            }
+            this.map = map;
+            return this;
+        }
+
+        public ManyFieldExample build() {
+            return new ManyFieldExample(string, integer, doubleValue, optionalItem, items, map);
+        }
+    }
+}

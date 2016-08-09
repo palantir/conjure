@@ -10,6 +10,7 @@ import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public interface TypeGenerator {
                         types.definitions().defaultPackage(),
                         type.getKey(),
                         type.getValue()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     JavaFile generateType(TypesDefinition types, String defaultPackage, String typeName, ObjectTypeDefinition typeDef);
