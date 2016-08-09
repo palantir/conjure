@@ -176,11 +176,24 @@ public final class ManyFieldExample {
             return this;
         }
 
+        public Builder optionalItem(String optionalItem) {
+            if (optionalItem == null) {
+                throw new IllegalArgumentException("optionalItem cannot be null");
+            }
+            this.optionalItem = Optional.of(optionalItem);
+            return this;
+        }
+
         public Builder items(List<String> items) {
             if (items == null) {
                 throw new IllegalArgumentException("items cannot be null");
             }
             this.items.addAll(items);
+            return this;
+        }
+
+        public Builder items(String items) {
+            this.items.add(items);
             return this;
         }
 
@@ -192,11 +205,21 @@ public final class ManyFieldExample {
             return this;
         }
 
+        public Builder set(String set) {
+            this.set.add(set);
+            return this;
+        }
+
         public Builder map(Map<String, String> map) {
             if (map == null) {
                 throw new IllegalArgumentException("map cannot be null");
             }
             this.map.putAll(map);
+            return this;
+        }
+
+        public Builder map(String key, String value) {
+            this.map.put(key, value);
             return this;
         }
 

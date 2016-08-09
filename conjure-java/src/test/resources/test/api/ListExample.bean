@@ -77,6 +77,11 @@ public final class ListExample {
             return this;
         }
 
+        public Builder items(String items) {
+            this.items.add(items);
+            return this;
+        }
+
         public ListExample build() {
             return new ListExample(items);
         }

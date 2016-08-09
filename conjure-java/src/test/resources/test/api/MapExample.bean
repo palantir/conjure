@@ -79,6 +79,11 @@ public final class MapExample {
             return this;
         }
 
+        public Builder items(String key, String value) {
+            this.items.put(key, value);
+            return this;
+        }
+
         public MapExample build() {
             return new MapExample(items);
         }

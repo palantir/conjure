@@ -70,6 +70,10 @@ public final class TypeMapper {
         }
     }
 
+    public ClassName getOptionalType() {
+        return optionalTypeStrategy.getClassName();
+    }
+
     public CodeBlock absentOptional() {
         return CodeBlock.of("$T.$N()", optionalTypeStrategy.getClassName(), optionalTypeStrategy.getAbsentMethodName());
     }

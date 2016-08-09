@@ -79,6 +79,11 @@ public final class SetExample {
             return this;
         }
 
+        public Builder items(String items) {
+            this.items.add(items);
+            return this;
+        }
+
         public SetExample build() {
             return new SetExample(items);
         }

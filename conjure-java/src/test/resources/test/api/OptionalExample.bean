@@ -75,6 +75,14 @@ public final class OptionalExample {
             return this;
         }
 
+        public Builder item(String item) {
+            if (item == null) {
+                throw new IllegalArgumentException("item cannot be null");
+            }
+            this.item = Optional.of(item);
+            return this;
+        }
+
         public OptionalExample build() {
             return new OptionalExample(item);
         }

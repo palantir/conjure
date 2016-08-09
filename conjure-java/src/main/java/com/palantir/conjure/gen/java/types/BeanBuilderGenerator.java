@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -17,13 +18,13 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 
@@ -44,7 +45,7 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                 .addFields(poetFields)
                 .addMethod(createFromObject(builderClass, objectClass, fields))
-                .addMethods(createSetters(builderClass, fields))
+                .addMethods(createSetters(builderClass, typeMapper, fields))
                 .addMethod(createBuild(objectClass, poetFields))
                 .build();
     }
@@ -77,6 +78,7 @@ public final class BeanBuilderGenerator {
                 typeMapper.getClassName(field.type()),
                 Fields.toSafeFieldName(jsonKey),
                 Modifier.PRIVATE);
+
         if (field.type() instanceof ListType) {
             spec.initializer("new $T<>()", ArrayList.class);
         } else if (field.type() instanceof SetType) {
@@ -86,17 +88,28 @@ public final class BeanBuilderGenerator {
         } else if (field.type() instanceof OptionalType) {
             spec.initializer(typeMapper.absentOptional());
         }
+        // else no initializer
+
         return EnrichedField.of(jsonKey, field, spec.build());
     }
 
-    private static Iterable<MethodSpec> createSetters(ClassName builderClass, Collection<EnrichedField> fields) {
-        return Iterables.transform(fields, f -> createSetter(builderClass, f.poetSpec(), f.conjureDef().type()));
+    private static Iterable<MethodSpec> createSetters(
+            ClassName builderClass,
+            TypeMapper typeMapper,
+            Collection<EnrichedField> fields) {
+        Collection<MethodSpec> setters = Lists.newArrayListWithExpectedSize(fields.size());
+        for (EnrichedField field : fields) {
+            setters.add(createSetter(builderClass, field.poetSpec(), field.conjureDef().type()));
+            createAuxiliarySetter(builderClass, typeMapper, field.poetSpec(), field.conjureDef().type())
+                .ifPresent(setters::add);
+        }
+        return setters;
     }
 
     private static MethodSpec createSetter(ClassName builderClass, FieldSpec field, ConjureType type) {
         return MethodSpec.methodBuilder(field.name)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ParameterSpec.builder(field.type, field.name).build())
+                .addParameter(field.type, field.name)
                 .returns(builderClass)
                 .beginControlFlow("if ($N == null)", field.name)
                     .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
@@ -113,6 +126,69 @@ public final class BeanBuilderGenerator {
         } else {
             return CodeBlocks.statement("this.$1N = $1N", spec.name);
         }
+    }
+
+    private static Optional<MethodSpec> createAuxiliarySetter(
+            ClassName builderClass,
+            TypeMapper typeMapper,
+            FieldSpec field,
+            ConjureType type) {
+        if (type instanceof ListType) {
+            return Optional.of(createItemSetter(builderClass, typeMapper, field, ((ListType) type).itemType()));
+        } else if (type instanceof SetType) {
+            return Optional.of(createItemSetter(builderClass, typeMapper, field, ((SetType) type).itemType()));
+        } else if (type instanceof MapType) {
+            return Optional.of(createMapSetter(builderClass, typeMapper, field, (MapType) type));
+        } else if (type instanceof OptionalType) {
+            return Optional.of(createOptionalSetter(builderClass, typeMapper, field, (OptionalType) type));
+        }
+        return Optional.empty();
+    }
+
+    private static MethodSpec createOptionalSetter(
+            ClassName builderClass,
+            TypeMapper typeMapper,
+            FieldSpec field,
+            OptionalType type) {
+        return MethodSpec.methodBuilder(field.name)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(typeMapper.getClassName(type.itemType()), field.name)
+                .returns(builderClass)
+                .beginControlFlow("if ($N == null)", field.name)
+                    .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
+                .endControlFlow()
+                .addStatement("this.$1N = $2T.of($1N)", field.name, typeMapper.getOptionalType())
+                .addStatement("return this")
+                .build();
+    }
+
+    private static MethodSpec createItemSetter(
+            ClassName builderClass,
+            TypeMapper typeMapper,
+            FieldSpec field,
+            ConjureType type) {
+        return MethodSpec.methodBuilder(field.name)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(typeMapper.getClassName(type), field.name)
+                .returns(builderClass)
+                .addStatement("this.$1N.add($1N)", field.name)
+                .addStatement("return this")
+                .build();
+    }
+
+    private static MethodSpec createMapSetter(
+            ClassName builderClass,
+            TypeMapper typeMapper,
+            FieldSpec field,
+            MapType type) {
+        return MethodSpec.methodBuilder(field.name)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(typeMapper.getClassName(type.keyType()), "key")
+                .addParameter(typeMapper.getClassName(type.valueType()), "value")
+                .returns(builderClass)
+                .addStatement("this.$1N.put(key, value)", field.name)
+                .addStatement("return this")
+                .build();
     }
 
     private static MethodSpec createBuild(ClassName objectClass, Collection<FieldSpec> fields) {
