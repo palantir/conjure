@@ -17,23 +17,30 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SetType;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
 public final class TypeMapper {
 
     public enum OptionalTypeStrategy {
-        Java8(java.util.Optional.class),
-        Guava(com.google.common.base.Optional.class);
+        Java8(java.util.Optional.class, "empty"),
+        Guava(com.google.common.base.Optional.class, "absent");
 
         private ClassName clazz;
+        private String absentMethodName;
 
-        OptionalTypeStrategy(Class<?> clazz) {
+        OptionalTypeStrategy(Class<?> clazz, String absentMethodName) {
             this.clazz = ClassName.get(clazz);
+            this.absentMethodName = absentMethodName;
         }
 
         public ClassName getClassName() {
             return clazz;
+        }
+
+        public String getAbsentMethodName() {
+            return absentMethodName;
         }
     }
 
@@ -61,6 +68,10 @@ public final class TypeMapper {
         } else {
             throw new IllegalStateException("Unexpected type " + type.getClass());
         }
+    }
+
+    public CodeBlock absentOptional() {
+        return CodeBlock.of("$T.$N()", optionalTypeStrategy.getClassName(), optionalTypeStrategy.getAbsentMethodName());
     }
 
     private TypeName getClassNameForMapType(MapType type) {

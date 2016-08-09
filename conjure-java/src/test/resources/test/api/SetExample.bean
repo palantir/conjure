@@ -59,14 +59,23 @@ public final class SetExample {
         return missingFields;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
-        private Set<String> items;
+        private Set<String> items = new LinkedHashSet<>();
+
+        public Builder from(SetExample other) {
+            items(other.getItems());
+            return this;
+        }
 
         public Builder items(Set<String> items) {
             if (items == null) {
                 throw new IllegalArgumentException("items cannot be null");
             }
-            this.items = items;
+            this.items.addAll(items);
             return this;
         }
 

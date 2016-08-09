@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
@@ -24,10 +26,12 @@ public final class ManyFieldExample {
 
     private final List<String> items;
 
+    private final Set<String> set;
+
     private final Map<String, String> map;
 
-    public ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") Integer integer, @JsonProperty("doubleValue") Double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("map") Map<String, String> map) {
-        validateFields(string, integer, doubleValue, optionalItem, items, map);
+    public ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") Integer integer, @JsonProperty("doubleValue") Double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("set") Set<String> set, @JsonProperty("map") Map<String, String> map) {
+        validateFields(string, integer, doubleValue, optionalItem, items, set, map);
         this.string = string;
         this.integer = integer;
         this.doubleValue = doubleValue;
@@ -35,6 +39,9 @@ public final class ManyFieldExample {
         List<String> __items = new ArrayList<>(items.size());
         __items.addAll(items);
         this.items = Collections.unmodifiableList(__items);
+        Set<String> __set = new LinkedHashSet<>(set.size());
+        __set.addAll(set);
+        this.set = Collections.unmodifiableSet(__set);
         Map<String, String> __map = new LinkedHashMap<>(map.size());
         __map.putAll(map);
         this.map = Collections.unmodifiableMap(__map);
@@ -60,6 +67,10 @@ public final class ManyFieldExample {
         return this.items;
     }
 
+    public Set<String> getSet() {
+        return this.set;
+    }
+
     public Map<String, String> getMap() {
         return this.map;
     }
@@ -70,21 +81,22 @@ public final class ManyFieldExample {
     }
 
     private boolean equalTo(ManyFieldExample other) {
-        return this.string.equals(other.string) && this.integer.equals(other.integer) && this.doubleValue.equals(other.doubleValue) && this.optionalItem.equals(other.optionalItem) && this.items.equals(other.items) && this.map.equals(other.map);
+        return this.string.equals(other.string) && this.integer.equals(other.integer) && this.doubleValue.equals(other.doubleValue) && this.optionalItem.equals(other.optionalItem) && this.items.equals(other.items) && this.set.equals(other.set) && this.map.equals(other.map);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(string, integer, doubleValue, optionalItem, items, map);
+        return Objects.hash(string, integer, doubleValue, optionalItem, items, set, map);
     }
 
-    private static void validateFields(String string, Integer integer, Double doubleValue, Optional<String> optionalItem, List<String> items, Map<String, String> map) {
+    private static void validateFields(String string, Integer integer, Double doubleValue, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");
         missingFields = addFieldIfMissing(missingFields, integer, "integer");
         missingFields = addFieldIfMissing(missingFields, doubleValue, "doubleValue");
         missingFields = addFieldIfMissing(missingFields, optionalItem, "optionalItem");
         missingFields = addFieldIfMissing(missingFields, items, "items");
+        missingFields = addFieldIfMissing(missingFields, set, "set");
         missingFields = addFieldIfMissing(missingFields, map, "map");
         if (missingFields != null) {
             throw new IllegalStateException("Some required fields have not been set: " + missingFields);
@@ -95,11 +107,15 @@ public final class ManyFieldExample {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(6);
+                missingFields = new ArrayList<>(7);
             }
             missingFields.add(fieldName);
         }
         return missingFields;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static final class Builder {
@@ -109,11 +125,24 @@ public final class ManyFieldExample {
 
         private Double doubleValue;
 
-        private Optional<String> optionalItem;
+        private Optional<String> optionalItem = Optional.empty();
 
-        private List<String> items;
+        private List<String> items = new ArrayList<>();
 
-        private Map<String, String> map;
+        private Set<String> set = new LinkedHashSet<>();
+
+        private Map<String, String> map = new LinkedHashMap<>();
+
+        public Builder from(ManyFieldExample other) {
+            string(other.getString());
+            integer(other.getInteger());
+            doubleValue(other.getDoubleValue());
+            optionalItem(other.getOptionalItem());
+            items(other.getItems());
+            set(other.getSet());
+            map(other.getMap());
+            return this;
+        }
 
         public Builder string(String string) {
             if (string == null) {
@@ -151,7 +180,15 @@ public final class ManyFieldExample {
             if (items == null) {
                 throw new IllegalArgumentException("items cannot be null");
             }
-            this.items = items;
+            this.items.addAll(items);
+            return this;
+        }
+
+        public Builder set(Set<String> set) {
+            if (set == null) {
+                throw new IllegalArgumentException("set cannot be null");
+            }
+            this.set.addAll(set);
             return this;
         }
 
@@ -159,12 +196,12 @@ public final class ManyFieldExample {
             if (map == null) {
                 throw new IllegalArgumentException("map cannot be null");
             }
-            this.map = map;
+            this.map.putAll(map);
             return this;
         }
 
         public ManyFieldExample build() {
-            return new ManyFieldExample(string, integer, doubleValue, optionalItem, items, map);
+            return new ManyFieldExample(string, integer, doubleValue, optionalItem, items, set, map);
         }
     }
 }

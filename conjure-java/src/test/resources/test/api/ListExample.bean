@@ -57,14 +57,23 @@ public final class ListExample {
         return missingFields;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
-        private List<String> items;
+        private List<String> items = new ArrayList<>();
+
+        public Builder from(ListExample other) {
+            items(other.getItems());
+            return this;
+        }
 
         public Builder items(List<String> items) {
             if (items == null) {
                 throw new IllegalArgumentException("items cannot be null");
             }
-            this.items = items;
+            this.items.addAll(items);
             return this;
         }
 

@@ -54,8 +54,17 @@ public final class IntegerExample {
         return missingFields;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private Integer integer;
+
+        public Builder from(IntegerExample other) {
+            integer(other.getInteger());
+            return this;
+        }
 
         public Builder integer(Integer integer) {
             if (integer == null) {

@@ -57,7 +57,8 @@ public final class BeanGenerator implements TypeGenerator {
         TypeMapper typeMapper = new TypeMapper(types, settings.optionalTypeStrategy());
 
         String typePackage = typeDef.packageName().orElse(defaultPackage);
-        ClassName thisClass = ClassName.get(typePackage, typeName);
+        ClassName objectClass = ClassName.get(typePackage, typeName);
+        ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
@@ -67,12 +68,13 @@ public final class BeanGenerator implements TypeGenerator {
                 .addFields(poetFields)
                 .addMethod(createConstructor(typeMapper, fields))
                 .addMethods(createGetters(typeMapper, fields))
-                .addMethod(createEquals(thisClass))
-                .addMethod(createEqualTo(thisClass, poetFields))
+                .addMethod(createEquals(objectClass))
+                .addMethod(createEqualTo(objectClass, poetFields))
                 .addMethod(createHashCode(poetFields))
                 .addMethod(createValidateFields(poetFields))
                 .addMethod(createAddFieldIfMissing(fields.size()))
-                .addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, thisClass, typeDef));
+                .addMethod(createBuilder(builderClass))
+                .addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, objectClass, builderClass, typeDef));
 
         if (settings.ignoreUnknownProperties()) {
             typeBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnoreProperties.class)
@@ -109,7 +111,11 @@ public final class BeanGenerator implements TypeGenerator {
         for (EnrichedField field : fields) {
             FieldSpec spec = field.poetSpec();
 
-            builder.addParameter(createConstructorParam(field.poetSpec(), field.jsonKey()));
+            builder.addParameter(ParameterSpec.builder(spec.type, spec.name)
+                    .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
+                        .addMember("value", "$S", field.jsonKey())
+                        .build())
+                    .build());
 
             if (field.conjureDef().type() instanceof ListType) {
                 // TODO contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
@@ -133,14 +139,6 @@ public final class BeanGenerator implements TypeGenerator {
                 .addCode(body.build());
 
         return builder.build();
-    }
-
-    private static ParameterSpec createConstructorParam(FieldSpec field, String jsonKey) {
-        return ParameterSpec.builder(field.type, field.name)
-                .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                        .addMember("value", "$S", jsonKey)
-                        .build())
-                .build();
     }
 
     private static Collection<MethodSpec> createGetters(TypeMapper typeMapper, Collection<EnrichedField> fields) {
@@ -235,11 +233,19 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
+    private static MethodSpec createBuilder(ClassName builderClass) {
+        return MethodSpec.methodBuilder("builder")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(builderClass)
+                .addStatement("return new $T()", builderClass)
+                .build();
+    }
+
     private static Iterator<String> indexStringInRange(String format, int lower, int upper) {
         return IntStream.range(lower, upper).mapToObj(i -> String.format(format, i)).iterator();
     }
 
-    private static String generateGetterName(String fieldName) {
+    public static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
     }
 

@@ -54,8 +54,17 @@ public final class DoubleExample {
         return missingFields;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private Double doubleValue;
+
+        public Builder from(DoubleExample other) {
+            doubleValue(other.getDoubleValue());
+            return this;
+        }
 
         public Builder doubleValue(Double doubleValue) {
             if (doubleValue == null) {

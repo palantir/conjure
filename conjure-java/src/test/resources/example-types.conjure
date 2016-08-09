@@ -30,4 +30,5 @@ types:
           doubleValue: double
           optionalItem: optional<string>
           items: list<string>
+          set: set<string>
           map: map<string, string>

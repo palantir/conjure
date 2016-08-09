@@ -55,8 +55,17 @@ public final class OptionalExample {
         return missingFields;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
-        private Optional<String> item;
+        private Optional<String> item = Optional.empty();
+
+        public Builder from(OptionalExample other) {
+            item(other.getItem());
+            return this;
+        }
 
         public Builder item(Optional<String> item) {
             if (item == null) {
