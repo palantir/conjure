@@ -9,6 +9,7 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     compile 'com.squareup:javapoet'
     compile 'org.apache.commons:commons-lang3'
+    compile 'org.slf4j:slf4j-api'
 
     testCompile 'com.google.truth:truth'
     testCompile 'junit:junit'

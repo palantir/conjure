@@ -38,7 +38,7 @@ types:
 services:
   TestService:
     name: Test Service
-    package: com.palantir.foundry.catalog.api
+    package: test.api
     default-auth: header
     base-path: /catalog
     docs: |

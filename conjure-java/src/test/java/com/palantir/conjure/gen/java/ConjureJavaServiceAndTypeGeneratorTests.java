@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public final class ConjureJavaServiceAndTypeGeneratorTest {
+public final class ConjureJavaServiceAndTypeGeneratorTests {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -66,7 +66,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTest {
                 .contains("public final class BackingFileSystem");
         assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/datasets/Dataset.java"))
                 .contains("public final class Dataset");
-        assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/TestService.java"))
+        assertThat(compiledFile(src, "test/api/TestService.java"))
                 .contains("public interface TestService");
     }
 
