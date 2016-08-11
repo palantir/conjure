@@ -23,15 +23,15 @@ public interface TestService {
     /**
      * Returns a mapping from file system id to backing file system configuration.
      */
-    @GET("/fileSystems")
+    @GET("/catalog/fileSystems")
     Call<Map<String, BackingFileSystem>> getFileSystems(@Header("Authorization") AuthHeader authHeader);
 
-    @POST("/datasets")
+    @POST("/catalog/datasets")
     Call<Dataset> createDataset(@Header("Authorization") AuthHeader authHeader, @Body CreateDatasetRequest request);
 
-    @GET("/datasets/{datasetRid}")
+    @GET("/catalog/datasets/{datasetRid}")
     Call<Optional<Dataset>> getDataset(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @GET("/datasets/{datasetRid}/branches")
+    @GET("/catalog/datasets/{datasetRid}/branches")
     Call<Set<String>> getBranches(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
 }

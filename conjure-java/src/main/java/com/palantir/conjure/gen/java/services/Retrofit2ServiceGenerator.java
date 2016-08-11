@@ -58,7 +58,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .map(endpoint -> generateServiceMethod(
                         endpoint.getKey(),
                         endpoint.getValue(),
-                        serviceDefinition.defaultAuth(), typeMapper))
+                        serviceDefinition.basePath(),
+                        serviceDefinition.defaultAuth(),
+                        typeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.packageName(), serviceBuilder.build())
@@ -69,11 +71,13 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     private MethodSpec generateServiceMethod(
             String endpointName,
             EndpointDefinition endpointDef,
-            AuthDefinition defaultAuth, TypeMapper typeMapper) {
+            String basePath,
+            AuthDefinition defaultAuth,
+            TypeMapper typeMapper) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
-                        .addMember("value", "$S", endpointDef.http().path())
+                        .addMember("value", "$S", constructPath(basePath, endpointDef.http().path()))
                         .build());
 
         endpointDef.docs().ifPresent(docs -> methodBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
@@ -94,6 +98,10 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toList())));
 
         return methodBuilder.build();
+    }
+
+    private String constructPath(String basePath, String endpointPath) {
+        return basePath + StringUtils.prependIfMissing(endpointPath, "/");
     }
 
     private ParameterSpec createEndpointParameter(TypeMapper typeMapper, Set<String> pathArgs,
