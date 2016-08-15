@@ -68,8 +68,14 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
+                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Consumes"))
+                        .addMember("value", "$S", "application/json")
+                        .build())
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", endpointDef.http().path())
+                        .build())
+                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
+                        .addMember("value", "$S", "application/json")
                         .build());
 
         endpointDef.docs().ifPresent(docs -> methodBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
