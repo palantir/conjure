@@ -21,6 +21,27 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
             generatedCompile "com.fasterxml.jackson.core:jackson-databind:2.7.4"
             generatedCompile "javax.ws.rs:javax.ws.rs-api:2.0.1"
         }
+
+        // Work-around to trust all HTTPS hosts.
+        import javax.net.ssl.HostnameVerifier
+        import javax.net.ssl.HttpsURLConnection
+        import javax.net.ssl.SSLContext
+        import javax.net.ssl.TrustManager
+        import javax.net.ssl.X509TrustManager
+        def nullTrustManager = [
+                checkClientTrusted: { chain, authType ->  },
+                checkServerTrusted: { chain, authType ->  },
+                getAcceptedIssuers: { null }
+        ]
+
+        def nullHostnameVerifier = [
+                verify: { hostname, session -> true }
+        ]
+
+        SSLContext sc = SSLContext.getInstance("SSL")
+        sc.init(null, [nullTrustManager as X509TrustManager] as TrustManager[], null)
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+        HttpsURLConnection.setDefaultHostnameVerifier(nullHostnameVerifier as HostnameVerifier)
         """
     }
 
@@ -69,6 +90,21 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         result.task(":compileGeneratedJava").outcome == TaskOutcome.SUCCESS
         result.task(":compileJava").outcome == TaskOutcome.SUCCESS
+    }
+
+    def 'uses correct AuthHeader package'() {
+        when:
+        buildFile << """
+            dependencies {
+                generatedCompile 'com.palantir.tokens:auth-tokens:0.3.1'
+            }
+        """.stripIndent()
+        createSourceFile("a.yml", readResource("test-service-with-auth.yml"))
+        def result = run("compileConjureJavaServer", "compileGeneratedJava")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+        result.task(":compileGeneratedJava").outcome == TaskOutcome.SUCCESS
     }
 
     def createSourceFile(String fileName, String text) {
