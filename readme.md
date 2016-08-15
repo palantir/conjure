@@ -308,7 +308,7 @@ package com.palantir.foundry.catalog.api;
 import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
 import com.palantir.foundry.catalog.api.datasets.Dataset;
 import com.palantir.ri.ResourceIdentifier;
-import com.palantir.tokens.AuthHeader;
+import com.palantir.tokens.auth.AuthHeader;
 import java.lang.string;
 import java.util.Map;
 import java.util.Optional;
@@ -358,7 +358,7 @@ types:
     AuthHeader:
       base-type: string
       external:
-        java: com.palantir.tokens.AuthHeader
+        java: com.palantir.tokens.auth.AuthHeader
 
   definitions:
     default-package: com.palantir.foundry.catalog.api

@@ -144,7 +144,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         switch (auth.type()) {
             case HEADER:
                 return Optional.of(
-                        ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
+                        ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
                                 .addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
                                         .addMember("value", "$S", auth.id())
                                         .build())

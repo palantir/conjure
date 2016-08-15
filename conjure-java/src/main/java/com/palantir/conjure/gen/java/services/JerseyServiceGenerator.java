@@ -82,7 +82,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         switch (auth.type()) {
             case HEADER:
                 methodBuilder.addParameter(
-                        ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
+                        ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
                                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
                                         .addMember("value", "$S", auth.id())
                                         .build())
@@ -90,7 +90,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 break;
             case COOKIE:
                 methodBuilder.addParameter(
-                        ParameterSpec.builder(ClassName.get("com.palantir.tokens", "AuthHeader"), "authHeader")
+                        ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
                                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "CookieParam"))
                                         .addMember("value", "$S", auth.id())
                                         .build())

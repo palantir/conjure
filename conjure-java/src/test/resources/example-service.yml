@@ -8,7 +8,7 @@ types:
     AuthHeader:
       base-type: string
       external:
-        java: com.palantir.tokens.AuthHeader
+        java: com.palantir.tokens.auth.AuthHeader
 
   definitions:
     default-package: com.palantir.foundry.catalog.api
