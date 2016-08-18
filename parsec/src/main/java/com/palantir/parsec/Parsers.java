@@ -26,7 +26,12 @@ public final class Parsers {
     });
 
     /**
-     * Runs the prefix parser a, followed by the `parser`, returning result of the latter.
+     * Runs the prefix parser, followed by the `parser`, returning result of the latter.
+     *
+     * @param <T>     the type the target parser returns
+     * @param prefix  a parser to consume some prefix
+     * @param parser  the target parser to run
+     * @return the specified parser
      */
     public static <T> Parser<T> prefix(final Parser<?> prefix, final Parser<T> parser) {
         return new Parser<T>() {
@@ -45,6 +50,8 @@ public final class Parsers {
 
     /**
      * Returns a whitespace parser.
+     *
+     * @return canonical whitespace parser
      */
     public static Parser<String> whitespace() {
         return WHITESPACE;
@@ -52,6 +59,10 @@ public final class Parsers {
 
     /**
      * Runs the whitespace parser followed by `parser`, returning result of the latter.
+     *
+     * @param <T>     the type the target parser returns
+     * @param parser  the target parser to run
+     * @return the specified parser
      */
     public static <T> Parser<T> whitespace(Parser<T> parser) {
         return prefix(whitespace(), parser);
@@ -60,6 +71,10 @@ public final class Parsers {
     /**
      * Attempts to parse using parser; if the parser returns null or is a expectant parser and returns false, then the
      * CompilerInput state is reset. Otherwise, the state remains unchanged.
+     *
+     * @param <T>     the type the target parser returns
+     * @param parser  the target parser to run
+     * @return the specified parser
      */
     public static <T> Parser<T> gingerly(final Parser<T> parser) {
         return new Parser<T>() {
@@ -67,11 +82,6 @@ public final class Parsers {
             public T parse(ParserState input) throws ParseException {
                 input.mark();
                 T result = parser.parse(input);
-//                try {
-//                    result = ;
-//                } catch (ParseException e) {
-//                    // eat the exception
-//                }
 
                 if (!nullOrUnexpected(result)) {
                     input.release();
@@ -84,7 +94,12 @@ public final class Parsers {
     }
 
     /**
-     * Parse either 'a' or 'b' and return result.
+     * Parse either firstOption or iterate through otherOptions and return result.
+     *
+     * @param <T>           the type the parsers return
+     * @param firstOption   the first parser to try
+     * @param otherOptions  additional parsers to try
+     * @return the specified parser
      */
     @SafeVarargs
     public static <T> Parser<T> or(final Parser<? extends T> firstOption, final Parser<? extends T>... otherOptions) {
@@ -123,7 +138,10 @@ public final class Parsers {
     }
 
     /**
-     * Returns true when the argument is null or is a ExpectationResult and Incorrect.
+     * Returns true when the argument is null or is equal to {@link ExpectationResult#INCORRECT}.
+     *
+     * @param obj  object to compare
+     * @return true when the argument is null or is equal to {@link ExpectationResult#INCORRECT}
      */
     public static boolean nullOrUnexpected(Object obj) {
         return obj == null || ExpectationResult.INCORRECT.equals(obj);
@@ -131,6 +149,9 @@ public final class Parsers {
 
     /**
      * Returns true when the argument is null or is a String and is empty.
+     *
+     * @param string  the string to test
+     * @return true when {@code string} is null or empty
      */
     public static boolean nullOrEmpty(String string) {
         return string == null || string.isEmpty();
