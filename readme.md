@@ -18,10 +18,10 @@ use in client creation.
 
 Types
 -----
-Conjure's type system deals with two modes of types, external types, defined
+Conjure's type system deals with two modes of types, imported types, defined
 outside of Conjure definition files but declared as explicit imports and given
-'local' names for use in a Conjure file and internal types, which are fully
-defined from other types within a Conjure file, primitives and built-ins.
+'local' names for use in a Conjure file and defined types, which are fully
+specified by other types within a Conjure file, primitives and built-ins.
 
 By convention, all primitive and built-in types use camel case, while all user
 defined types (e.g. imports and object definitions) use pascal case.
@@ -45,7 +45,7 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
    serialize as null when absent and as a concrete non-null value when present.
    The empty string and the empty map/object are valid non-null values.
 
-### External Types (Imports)
+### Imported Types
 External types, or imports, consist of references to types defined outside
 the context of a Conjure file (possibly in other Conjure files, possibly
 in external systems). A base-type is provided as a hint to generators how
@@ -72,9 +72,9 @@ imports:
       java: com.palantir.ri.ResourceIdentifier
 ```
 
-### Internal Types
-Internal types consist of objects completely defined within the context of a 
-Conjure file (possibly referencing other type aliases, primitive types, 
+### Defined Types
+Defined types consist of objects completely specified within the context of a
+Conjure file (possibly referencing other type aliases, primitive types,
 and built-ins). These types are either *Object Definitions* or *Enum Definitions*.
 Both types of objects consist of, minimally, a type alias, an optional
 package name and optional documentation.
@@ -86,7 +86,7 @@ definitions-wide default package.
 Type aliases, as above, should use Pascal case.
 
 #### Object Definitions
-Each object definition consists of a type alias, an optional package, and a 
+Each object definition consists of a type alias, an optional package, and a
 map of field names to field definitions.
 
 Each object includes a fields definition block, which is a map of field name to
@@ -134,7 +134,10 @@ values:
  - [another value]
 ```
 
-#### Internal Definitions Example
+#### Examples
+See also:
+ * [Example Type Definitions](conjure-java/src/test/resources/example-types.conjure)
+ * [Example Generated Java Code](conjure-java/src/test/resources/test/api)
 
 ```yaml
 # Definitions for object types to render as part of code generation.
@@ -149,6 +152,9 @@ definitions:
       # Override the default package specified at the definitions level.
       package: com.palantir.foundry.catalog.api.datasets
 
+      # Optional Docs
+      docs: Optional Docs
+
       # A map of field name to a type definition.
       fields:
         # example of a field with docs:
@@ -157,59 +163,14 @@ definitions:
           docs: The name by which this file system is identified.
         # example of a simple field:
         baseUri: string
+        # parameterizing a built-in generic
         configuration: map<string, string>
 
     ExampleEnumeration:
-      docs: Optional Docs
-
-      # a list of valid values for this enum
+      # enumerations have a values block instead of a fields block
       values:
         - A
         - B
-```
-
-### Rendering
-
-#### Java
-Conjure's Java type renderer emits concrete final bean-pattern objects based on
-provided definitions and will include as much Javadoc as provided. Objects are
-emitted as public and defined one per file.
-
-An example rendering of the `BackingFileSystem` type defined above:
-```java
-package com.palantir.foundry.catalog.api.datasets;
-
-import java.lang.String;
-import java.util.Map;
-
-public final class BackingFileSystem {
-    private final String fileSystemId;
-
-    private final String baseUri;
-
-    private final Map<String, String> configuration;
-
-    public BackingFileSystem(String fileSystemId, String baseUri, Map<String, String> configuration) {
-        this.fileSystemId = fileSystemId;
-        this.baseUri = baseUri;
-        this.configuration = configuration;
-    }
-
-    /**
-     * The name by which this file system is identified.
-     */
-    public String getFileSystemId() {
-        return this.fileSystemId;
-    }
-
-    public String getBaseUri() {
-        return this.baseUri;
-    }
-
-    public Map<String, String> getConfiguration() {
-        return this.configuration;
-    }
-}
 ```
 
 Services
@@ -298,6 +259,9 @@ this service.
          between braces in the request line and as a body argument otherwise.
 
 ### Service Example
+See also:
+ * [Example Service Definition](conjure-java/src/test/resources/example-service.yml)
+ * [Example Generated Java Code](conjure-java/src/test/resources/test/api/TestService.serv)
 
 ```yaml
 services:
@@ -328,55 +292,11 @@ services:
         returns: optional<Dataset>
 ```
 
-### Rendering
+Full Example
+------------
+A complete definition might look something like this excerpt from the Foundry
+Catalog API.
 
-#### Java
-
-```java
-package com.palantir.foundry.catalog.api;
-
-import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
-import com.palantir.foundry.catalog.api.datasets.Dataset;
-import com.palantir.ri.ResourceIdentifier;
-import com.palantir.tokens.auth.AuthHeader;
-import java.lang.string;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
-/**
- * A Markdown description of the service.
- */
-@Path("/catalog")
-public interface TestService {
-    /**
-     * Returns a mapping from file system id to backing file system configuration.
-     */
-    @GET
-    @Path("/fileSystems")
-    Map<String, BackingFileSystem> getFileSystems(@HeaderParam("Authorization") AuthHeader authHeader);
-
-    @POST
-    @Path("/datasets")
-    Dataset createDataset(@HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
-
-    @GET
-    @Path("/datasets/{datasetRid}")
-    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
-
-    @GET
-    @Path("/datasets/{datasetRid}/branches")
-    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
-}
-```
-
-Examples
---------
 ```yaml
 types:
   imports:
@@ -446,5 +366,5 @@ services:
             type: ResourceIdentifier
             docs: |
               A valid dataset resource identifier.
-        returns: Set<string>
+        returns: set<string>
 ```
