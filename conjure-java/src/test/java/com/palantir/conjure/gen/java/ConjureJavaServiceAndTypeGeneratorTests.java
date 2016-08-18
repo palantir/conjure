@@ -68,10 +68,6 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
                 .contains("public final class Dataset");
         assertThat(compiledFile(src, "test/api/TestService.java"))
                 .contains("public interface TestService");
-        assertThat(compiledFile(src, "test/api/TestService.java"))
-                .contains("@Consumes(\"application/json\")");
-        assertThat(compiledFile(src, "test/api/TestService.java"))
-                .contains("@Produces(\"application/json\")");
     }
 
     private static String compiledFile(File srcDir, String clazz) throws IOException {

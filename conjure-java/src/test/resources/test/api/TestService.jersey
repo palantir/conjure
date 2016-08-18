@@ -1,0 +1,46 @@
+package test.api;
+
+import com.palantir.foundry.catalog.api.CreateDatasetRequest;
+import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
+import com.palantir.foundry.catalog.api.datasets.Dataset;
+import com.palantir.ri.ResourceIdentifier;
+import com.palantir.tokens.auth.AuthHeader;
+import java.lang.String;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+/**
+ * A Markdown description of the service.
+ */
+@Path("/catalog")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public interface TestService {
+    /**
+     * Returns a mapping from file system id to backing file system configuration.
+     */
+    @GET
+    @Path("/fileSystems")
+    Map<String, BackingFileSystem> getFileSystems(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @POST
+    @Path("/datasets")
+    Dataset createDataset(@HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
+
+    @GET
+    @Path("/datasets/{datasetRid}")
+    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/datasets/{datasetRid}/branches")
+    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+}

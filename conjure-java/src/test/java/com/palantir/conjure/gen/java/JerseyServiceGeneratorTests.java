@@ -9,7 +9,7 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.io.CharStreams;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
+import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.squareup.javapoet.JavaFile;
@@ -19,12 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.Test;
 
-public final class Retrofit2ServiceGeneratorTests {
+public final class JerseyServiceGeneratorTests {
     @Test
     public void testComposition() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-service.yml"));
 
-        ServiceGenerator gen = new Retrofit2ServiceGenerator(Settings.builder()
+        ServiceGenerator gen = new JerseyServiceGenerator(Settings.builder()
                 .ignoreUnknownProperties(false)
                 .optionalTypeStrategy(OptionalTypeStrategy.Java8)
                 .build());
@@ -34,7 +34,7 @@ public final class Retrofit2ServiceGeneratorTests {
         for (JavaFile file : files) {
             assertThat(file.toString()).isEqualTo(CharStreams.toString(
                     new InputStreamReader(
-                            getClass().getResourceAsStream("/test/api/" + file.typeSpec.name + ".retrofit"),
+                            getClass().getResourceAsStream("/test/api/" + file.typeSpec.name + ".jersey"),
                             StandardCharsets.UTF_8)));
         }
 
