@@ -1,0 +1,11 @@
+types:
+  definitions:
+    default-package: package
+    objects:
+      X:
+        fields:
+          fstring: string
+          fmap: map<string, string>
+          finteger: integer
+          fdouble: double
+          foptional: optional<string>

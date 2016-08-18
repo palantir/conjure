@@ -1,0 +1,17 @@
+types:
+  definitions: 
+    default-package: package1
+    objects:
+      X:
+        fields:
+          fx: X
+          fy: Y
+          fz: Z
+      Y:
+        package: package1/folder
+        fields:
+          fstring: string
+      Z:
+        package: package2/folder
+        fields:
+          fstring: string

@@ -1,0 +1,15 @@
+apply from: "${rootDir}/gradle/publish-libs.gradle"
+
+dependencies {
+    compile project(':conjure-core')
+
+    compile 'com.google.guava:guava'
+    compile 'org.apache.commons:commons-lang3'
+
+    testCompile 'com.google.truth:truth'
+    testCompile 'junit:junit'
+    testCompile 'org.hamcrest:hamcrest-core'
+    testCompile 'org.mockito:mockito-core'
+
+    processor 'org.immutables:value'
+}

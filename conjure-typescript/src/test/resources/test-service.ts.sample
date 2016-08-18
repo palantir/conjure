@@ -1,0 +1,16 @@
+import { ICreateDatasetRequest } from "./createDatasetRequest";
+import { IBackingFileSystem } from "./datasets/backingFileSystem";
+import { IDataset } from "./datasets/dataset";
+
+export interface ITestService {
+    createDataset(
+        request: ICreateDatasetRequest
+    ): Promise<IDataset>;
+    getBranches(
+        datasetRid: string
+    ): Promise<string[]>;
+    getDataset(
+        datasetRid: string
+    ): Promise<IDataset>;
+    getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;
+}
