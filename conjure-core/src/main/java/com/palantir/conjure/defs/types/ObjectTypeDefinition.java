@@ -4,24 +4,17 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.Map;
-import java.util.Optional;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
 @JsonDeserialize(as = ImmutableObjectTypeDefinition.class)
 @Value.Immutable
-public interface ObjectTypeDefinition {
-
-    @JsonProperty("package")
-    Optional<String> packageName();
+public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
 
     Map<String, FieldDefinition> fields();
-
-    Optional<String> docs();
 
     static Builder builder() {
         return new Builder();

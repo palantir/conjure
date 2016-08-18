@@ -6,7 +6,7 @@ package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -18,7 +18,7 @@ public interface ObjectsDefinition {
 
     String defaultPackage();
 
-    Map<String, ObjectTypeDefinition> objects();
+    Map<String, BaseObjectTypeDefinition> objects();
 
     static Builder builder() {
         return new Builder();

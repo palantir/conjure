@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.gen.java.Settings;
@@ -32,6 +34,19 @@ public final class ImmutablesJavaTypeGenerator implements TypeGenerator {
 
     @Override
     public JavaFile generateType(
+            TypesDefinition types,
+            String defaultPackage,
+            String typeName,
+            BaseObjectTypeDefinition typeDef) {
+        if (typeDef instanceof ObjectTypeDefinition) {
+            return generateImmutableType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
+        } else if (typeDef instanceof EnumTypeDefinition) {
+            return EnumGenerator.generateEnumType(types, defaultPackage, typeName, (EnumTypeDefinition) typeDef);
+        }
+        throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
+    }
+
+    public JavaFile generateImmutableType(
             TypesDefinition types,
             String defaultPackage,
             String typeName,
@@ -87,4 +102,5 @@ public final class ImmutablesJavaTypeGenerator implements TypeGenerator {
                 .indent("    ")
                 .build();
     }
+
 }

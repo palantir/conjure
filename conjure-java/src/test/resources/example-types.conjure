@@ -23,6 +23,10 @@ types:
       MapExample:
         fields:
           items: map<string, string>
+      EnumExample:
+        values:
+          - ONE
+          - TWO
       ManyFieldExample:
         fields:
           string: string

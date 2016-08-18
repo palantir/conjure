@@ -7,11 +7,11 @@ package com.palantir.conjure.gen.java.types;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
@@ -98,7 +98,7 @@ public final class TypeMapper {
     }
 
     private TypeName referenceTypeToClassName(ReferenceType refType) {
-        ObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
+        BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
         if (defType != null) {
             String packageName = defType.packageName().orElse(types.definitions().defaultPackage());
             return ClassName.get(packageName, refType.type());

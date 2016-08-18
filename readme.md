@@ -72,17 +72,22 @@ imports:
       java: com.palantir.ri.ResourceIdentifier
 ```
 
-### Internal Types (Object Definitions)
-Internal types, or object definitions, consist of objects completely defined
-within the context of a Conjure file (possibly referencing other type aliases,
-primitive types, and built-ins). Each object definition consists of a type
-alias, an optional package, and a map of field names to field definitions.
+### Internal Types
+Internal types consist of objects completely defined within the context of a 
+Conjure file (possibly referencing other type aliases, primitive types, 
+and built-ins). These types are either *Object Definitions* or *Enum Definitions*.
+Both types of objects consist of, minimally, a type alias, an optional
+package name and optional documentation.
 
 Conjure renderers will use the type alias as the object name, and will emit
 the object definition in the defined package or fall-back to the
 definitions-wide default package.
 
 Type aliases, as above, should use Pascal case.
+
+#### Object Definitions
+Each object definition consists of a type alias, an optional package, and a 
+map of field names to field definitions.
 
 Each object includes a fields definition block, which is a map of field name to
 a type definition. Simple definitions that omit documentation may simply set
@@ -112,7 +117,24 @@ with language restrictions. As a result, field names must be unique independent
 of case format (e.g. an object may not define both `caseFormat` and
 `case-format` as fields).
 
-#### Object Definitions Example
+#### Enum Definitions
+Each enum definition consists of a type alias, an optional package, and a list
+of valid enumeration values. Values _must not_ include the special value `UNKNOWN`,
+which is reserved to represent an enumeration value that was found but unexpected
+in generated object code.
+
+Enum values must be uppercase words separated by underscores.
+
+Each enum includes a values definition block, which is a list of the valid
+values:
+
+```yaml
+values:
+ - [value]
+ - [another value]
+```
+
+#### Internal Definitions Example
 
 ```yaml
 # Definitions for object types to render as part of code generation.
@@ -136,6 +158,14 @@ definitions:
         # example of a simple field:
         baseUri: string
         configuration: map<string, string>
+
+    ExampleEnumeration:
+      docs: Optional Docs
+
+      # a list of valid values for this enum
+      values:
+        - A
+        - B
 ```
 
 ### Rendering

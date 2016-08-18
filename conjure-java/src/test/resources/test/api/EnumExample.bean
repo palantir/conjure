@@ -1,0 +1,58 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public final class EnumExample {
+    public static final EnumExample ONE = new EnumExample(Value.ONE.name());
+
+    public static final EnumExample TWO = new EnumExample(Value.TWO.name());
+
+    private final Value value;
+
+    private final String string;
+
+    @JsonCreator
+    public EnumExample(String enumExample) {
+        if (enumExample == null) {
+            throw new IllegalArgumentException("enumExample cannot be null");
+        }
+        Value parsed;
+        try {
+            parsed = Value.valueOf(enumExample);
+        }
+        catch (IllegalArgumentException e) {
+            parsed = Value.UNKNOWN;
+        }
+        this.value = parsed;
+        this.string = enumExample;
+    }
+
+    public Value get() {
+        return this.value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+        return this.string;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (this == other) || (other instanceof EnumExample && this.string.equals(((EnumExample) other).string));
+    }
+
+    @Override
+    public int hashCode() {
+        return this.string.hashCode();
+    }
+
+    public enum Value {
+        ONE,
+
+        TWO,
+
+        UNKNOWN
+    }
+}

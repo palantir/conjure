@@ -6,7 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +36,10 @@ public interface TypeGenerator {
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
-    JavaFile generateType(TypesDefinition types, String defaultPackage, String typeName, ObjectTypeDefinition typeDef);
+    JavaFile generateType(
+            TypesDefinition types,
+            String defaultPackage,
+            String typeName,
+            BaseObjectTypeDefinition typeDef);
 
 }

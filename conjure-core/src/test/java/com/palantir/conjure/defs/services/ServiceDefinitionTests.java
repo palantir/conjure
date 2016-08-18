@@ -15,6 +15,8 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -67,6 +69,65 @@ public final class ServiceDefinitionTests {
                         .returns(PrimitiveType.STRING)
                         .docs("docs")
                         .build());
+    }
+
+    @Test
+    public void testParseEnum_baseCase() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "values:",
+                " - A",
+                " - B"), BaseObjectTypeDefinition.class))
+                .isEqualTo(EnumTypeDefinition.builder()
+                        .addValues("A", "B")
+                        .build());
+    }
+
+    @Test
+    public void testParseEnum_empty() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "values:"), BaseObjectTypeDefinition.class))
+                .isEqualTo(EnumTypeDefinition.builder().build());
+    }
+
+    @Test
+    public void testParseEnum_withDocs() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "docs: Test",
+                "values:",
+                " - A",
+                " - B"), BaseObjectTypeDefinition.class))
+                .isEqualTo(EnumTypeDefinition.builder()
+                        .addValues("A", "B")
+                        .docs("Test")
+                        .build());
+    }
+
+    @Test
+    public void testParseEnum_usesUnknown() throws IOException {
+        try {
+            mapper.readValue(multiLineString(
+                    "values:",
+                    " - A",
+                    " - Unknown"), BaseObjectTypeDefinition.class);
+        } catch (IllegalArgumentException e) {
+            assertThat(e).hasMessage("UNKNOWN is a reserved enumeration value");
+        }
+    }
+
+    @Test
+    public void testParseEnum_illegalFormat() throws IOException {
+        try {
+            mapper.readValue(multiLineString(
+                    "values:",
+                    " - a",
+                    " - a_b",
+                    " - A__B",
+                    " - _A",
+                    " - A_"), BaseObjectTypeDefinition.class);
+        } catch (IllegalArgumentException e) {
+            assertThat(e).hasMessage("Enumeration values must have format [A-Z]+(_[A-Z]+)*, illegal values: "
+                    + "[a, _A, a_b, A_, A__B]");
+        }
     }
 
     @Test

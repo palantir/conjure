@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -50,6 +52,19 @@ public final class BeanGenerator implements TypeGenerator {
 
     @Override
     public JavaFile generateType(
+            TypesDefinition types,
+            String defaultPackage,
+            String typeName,
+            BaseObjectTypeDefinition typeDef) {
+        if (typeDef instanceof ObjectTypeDefinition) {
+            return generateBeanType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
+        } else if (typeDef instanceof EnumTypeDefinition) {
+            return EnumGenerator.generateEnumType(types, defaultPackage, typeName, (EnumTypeDefinition) typeDef);
+        }
+        throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
+    }
+
+    private JavaFile generateBeanType(
             TypesDefinition types,
             String defaultPackage,
             String typeName,
