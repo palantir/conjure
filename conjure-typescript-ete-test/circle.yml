@@ -1,0 +1,31 @@
+machine:
+  java:
+    version: oraclejdk8
+  environment:
+    TERM: dumb
+
+dependencies:
+  override:
+    - ./gradlew resolveConfigurations
+
+test:
+  override:
+    - ./scripts/verify.sh
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/.*TEST.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+
+# Reach out to RAINBOW for access to publish. For CircleCI info, see: https://circleci.com/docs/configuration#deployment
+# ---
+# deployment:
+#   snapshot:
+#     branch: develop
+#     # owner: <github org>
+#     commands:
+#       - ./gradlew -is --continue publish
+#
+#   release:
+#     tag: /[0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)*/
+#     # owner: <github org>
+#     commands:
+#       - ./gradlew -is --continue publish

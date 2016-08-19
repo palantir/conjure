@@ -1,0 +1,8 @@
+{
+  "resolution": "browser",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/94d4f0e96e5b11f49708fb3fbce6b5c91e33d52d/react-redux/react-redux.d.ts",
+    "raw": "registry:dt/react-redux#4.4.0+20160724070751",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/94d4f0e96e5b11f49708fb3fbce6b5c91e33d52d/react-redux/react-redux.d.ts"
+  }
+}

@@ -13,10 +13,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface TypescriptClass extends Emittable {
     List<AssignStatement> fields();
-    @Value.Default
-    default Optional<TypescriptConstructor> constructor() {
-        return Optional.absent();
-    }
+    Optional<TypescriptConstructor> constructor();
     List<TypescriptFunction> methods();
     String name();
 

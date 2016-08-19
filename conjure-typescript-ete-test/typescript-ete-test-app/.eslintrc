@@ -1,0 +1,14 @@
+extends: "./node_modules/eslint-config-palantir/.eslintrc.yml"
+
+# Prevent parent configurations from getting applied
+root: true
+
+env:
+  es6: true
+  node: true
+
+## Add overrides and additional rules here
+#
+# rules:
+#   no-console:
+#     - 1

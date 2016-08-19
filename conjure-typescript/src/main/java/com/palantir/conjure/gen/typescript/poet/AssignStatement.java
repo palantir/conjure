@@ -12,10 +12,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface AssignStatement extends TypescriptStatement {
     String lhs();
-    @Value.Default
-    default Optional<String> rhs() {
-        return Optional.absent();
-    }
+    Optional<String> rhs();
 
     @Override
     default void emit(TypescriptPoetWriter writer) {

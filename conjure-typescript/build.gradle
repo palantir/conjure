@@ -13,3 +13,11 @@ dependencies {
 
     processor 'org.immutables:value'
 }
+
+task(generateTypescript, dependsOn: jar, type: JavaExec) {
+    main = "com.palantir.conjure.gen.typescript.ConjureTypescriptClientGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    if (project.hasProperty('javaArgs')) {
+        args(javaArgs.split(','))
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-react"
+  ],
+  "rules": {
+    "jsx-alignment": true,
+    "jsx-no-lambda": true,
+    "jsx-no-string-ref": true
+  }
+}

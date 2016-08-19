@@ -1,0 +1,90 @@
+default_conf:
+  ENV:
+    JAVA_OPTS: "-Djavax.net.ssl.trustStore={{ssl.truststore_path}}"
+  instance: "main"
+  serverConfig:
+    # Authentication is provided by the dropwizard-multipass bundle.
+    # See for details: https://rtfm.yojoe.local/docs/multipass/en/latest/development/dropwizard-multipass.html
+    # The settings below configure the dropwizard-multipass bundle. To enable auth, uncomment
+    # the section below. Note that Multipass will only respond to requests over HTTPS, so you
+    # should stop serving over HTTP if you enable Multipass.
+    #
+    #auth:
+    #  multipass:
+    #    security:
+    #      trustStorePath: "{{ssl.truststore_path}}"
+    #    uris:
+    #      - "{{discover_all(role:'multipass-api', select: 'uri')}}"
+    #  oauth2:
+    #    id: highline
+    #    secret: highline-secret
+    #    clientRedirectEndpoint: "{{self(role:'typescript-ete-test').external_uri}}/redirect"
+    #    endpoint: "{{discover(role:'multipass-api').external_uri}}"
+    #  legacyModeEnabled: false
+
+    server:
+      rootPath: /api/*
+      applicationContextPath: /typescript-ete-test
+      applicationConnectors:
+        - type: https
+          port: 8443
+          excludedProtocols: [SSLv3]
+          supportedProtocols: [TLSv1, TLSv1.1, TLSv1.2]
+          keyStorePath: "{{ssl.keystore_path}}"
+          keyStorePassword: "{{ssl.keystore_password}}"
+          validateCerts: false
+          supportedCipherSuites:
+            - TLS_RSA_WITH_AES_256_CBC_SHA256
+            - TLS_RSA_WITH_AES_256_CBC_SHA
+            - TLS_RSA_WITH_3DES_EDE_CBC_SHA
+            - TLS_RSA_WITH_AES_128_CBC_SHA256
+            - TLS_RSA_WITH_AES_128_CBC_SHA
+            - TLS_RSA_WITH_AES_256_GCM_SHA384
+            - TLS_RSA_WITH_AES_128_GCM_SHA256
+            - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+            - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+            - TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+            - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+            - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+            - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+            - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+            - TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+            - TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+
+      requestLog:
+        appenders:
+          - type: file
+            archive: true
+            archivedFileCount: 15
+            archivedLogFilenamePattern: "{{service_home}}/var/log/typescript-ete-test-request-%d.log.gz"
+            currentLogFilename: "{{service_home}}/var/log/typescript-ete-test-request.log"
+
+    logging:
+      level: INFO
+      appenders:
+        - type: file
+          archive: true
+          archivedFileCount: 50
+          archivedLogFilenamePattern: "{{service_home}}/var/log/typescript-ete-test-%d.log.gz"
+          currentLogFilename: "{{service_home}}/var/log/typescript-ete-test.log"
+          logFormat: "%-5p [%d{\"yyyy-MM-dd''T''HH:mm:ss,SSSXXX\",UTC}] traceId=%X{traceId} %c: %m%n%rEx"
+
+default_roles:
+  # See https://rtfm.yojoe.local/docs/skylab/en/latest/forDevs/pages/productConfig.html#roles-service-registry
+  typescript-ete-test:
+    port: "{{conf.serverConfig.server.applicationConnectors[0].port}}"
+    scheme: "{{conf.serverConfig.server.applicationConnectors[0].type}}"
+    path: "{{conf.serverConfig.server.applicationContextPath}}"
+    external_hostname: "{{conf.external_hostname}}"
+  caelum-servicelogger:
+    defaultprofile: dropwizard:v1
+  #multipass-oauth-client:
+  #  client:
+  #    id: "{{conf.serverConfig.auth.oauth2.id}}"
+  #    authorizedGrantTypes: [authorization_code]
+  #    redirectUris:
+  #      - "{{conf.serverConfig.auth.oauth2.clientRedirectEndpoint}}"
+  #    secret: "{{conf.serverConfig.auth.oauth2.secret}}"
+
+managed_files:
+  var/conf/server.yml: serverConfig

@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "../build/tmp",
+        "removeComments": false,
+        "sourceMap": true,
+        "target": "ES5"
+    },
+    "filesGlob": [
+        "../typings/index.d.ts",
+        "../src/**/*.ts{,x}",
+        "typings/index.d.ts",
+        "src/**/*.ts{,x}"
+    ],
+    "files": [
+        "../typings/index.d.ts",
+        "typings/index.d.ts",
+        "../src/app.tsx",
+        "../src/conjure/com/palantir/typescriptetetest/api/calculatorService.ts",
+        "../src/conjure/com/palantir/typescriptetetest/api/calculatorServiceImpl.ts",
+        "../src/conjure/com/palantir/typescriptetetest/api/identitiesResponse.ts",
+        "../src/conjure/com/palantir/typescriptetetest/api/pingResponse.ts",
+        "../src/conjure/static/httpApiBridge.ts",
+        "../src/conjure/static/httpApiBridgeImpl.ts",
+        "../src/conjure/static/utils.ts",
+        "src/eteTests.ts",
+        "src/index.ts"
+    ],
+    "compileOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}

@@ -1,0 +1,5 @@
+rootProject.name = 'typescript-ete-test'
+
+include 'typescript-ete-test-api'
+include 'typescript-ete-test-app'
+include 'typescript-ete-test-server'

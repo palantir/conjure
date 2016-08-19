@@ -37,17 +37,14 @@ public final class ConjureTypescriptClientGenerator {
     }
 
     public static void main(String[] args) {
-        String outputAbsPath = args[0];
-        File folder = new File(outputAbsPath);
-        if (!folder.exists()) {
-            throw new RuntimeException("First arg should be a folder that exists");
+        if (args.length != 2) {
+            throw new RuntimeException("Expected 2 args, got " + args.length);
         }
-
-        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/test-service.conjure"));
-        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
-                new DefaultServiceGenerator(),
-                new StaticGenerator(),
-                new DefaultTypeGenerator());
-        generator.emit(conjure, folder);
+        File conjureFile = new File(args[0]);
+        File outputDir = new File(args[1]);
+        ConjureDefinition definition = Conjure.parse(conjureFile);
+        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(new DefaultServiceGenerator(),
+                new StaticGenerator(), new DefaultTypeGenerator());
+        generator.emit(definition, outputDir);
     }
 }

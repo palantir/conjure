@@ -1,0 +1,21 @@
+<!-- See http://findbugs.sourceforge.net/manual/filter.html for syntax -->
+<FindBugsFilter>
+
+    <!-- @NonnullByDefault doesn't play nicely with overriding @Nullable parameters/outputs -->
+    <Match>
+        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
+    </Match>
+
+    <!-- Ignore the following bug patterns in test code -->
+    <!-- (i.e., classes ending in 'Test' or 'Tests', and inner classes of same) -->
+    <Match>
+        <Class name="~.*\.*Tests?(\$.*)?" />
+        <Or>
+            <Bug pattern="NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/> <!-- common in tests to have non-final variables instantiated in @Before methods, which FindBugs can't detect -->
+            <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/> <!-- if a null is dereferenced, test will fail anyway. Plus assertNotNull() is often a bad pattern. -->
+            <Bug pattern="RV_RETURN_VALUE_IGNORED_INFERRED"/> <!-- common in tests to call a method [that has a return value] to deliberately cause an exception, then test that exception -->
+            <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/> <!-- ditto above -->
+            <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/> <!-- @Rule ivars can be public and unused -->
+        </Or>
+    </Match>
+</FindBugsFilter>

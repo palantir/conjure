@@ -1,0 +1,10 @@
+apply plugin: 'com.palantir.baseline-idea'
+apply plugin: 'com.palantir.baseline-eclipse'
+apply plugin: 'com.palantir.npm-run'
+
+node {
+    version = project.ext.nodeVersion
+    npmVersion = project.ext.npmVersion
+    distBaseUrl = 'https://artifactory.palantir.build/artifactory/external-dist-nodejs'
+    download = true
+}
