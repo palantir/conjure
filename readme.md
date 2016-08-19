@@ -138,6 +138,7 @@ values:
 See also:
  * [Example Type Definitions](conjure-java/src/test/resources/example-types.conjure)
  * [Example Generated Java Code](conjure-java/src/test/resources/test/api)
+ * [Example Generated TypeScript Code](conjure-typescript/src/test/resources/types)
 
 ```yaml
 # Definitions for object types to render as part of code generation.
@@ -263,6 +264,7 @@ See also:
  * [Example Service Definition](conjure-java/src/test/resources/example-service.yml)
  * [Example Generated Jersey Service Code](conjure-java/src/test/resources/test/api/TestService.jersey)
  * [Example Generated Retrofit Client Code](conjure-java/src/test/resources/test/api/TestService.retrofit)
+ * [Example Generated TypeScript Client Code](conjure-typescript/src/test/resources/services)
 
 ```yaml
 services:
