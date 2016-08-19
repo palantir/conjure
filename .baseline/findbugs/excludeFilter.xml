@@ -18,4 +18,11 @@
             <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/> <!-- @Rule ivars can be public and unused -->
         </Or>
     </Match>
+
+    <Match>
+        <Source name="~.*\.groovy" />
+        <And>
+            <Bug pattern="SE_NO_SERIALVERSIONID"/> <!-- FB doesn't understand Groovy closures -->
+        </And>
+    </Match>
 </FindBugsFilter>
