@@ -28,6 +28,8 @@ public interface EndpointDefinition {
 
     Optional<String> docs();
 
+    Optional<String> deprecated();
+
     // TODO(melliot) verify args and request line match
 
     static Builder builder() {

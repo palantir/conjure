@@ -247,6 +247,8 @@ this service.
     * `type`: a valid Conjure type
     * (optional) `docs`: a standard string and generally treated throughout
       rendering as Markdown.
+    * (optional) `deprecated`: a string that indicates that this endpoint
+      is deprecated and describes why
     * (optional) `param-id`: an identifier to use as a parameter value (e.g.
       if this is a header parameter, `param-id` defines the header key); by
       default the argument name is used as the `param-id`.

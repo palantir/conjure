@@ -5,6 +5,7 @@ import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
 import com.palantir.foundry.catalog.api.datasets.Dataset;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
+import java.lang.Deprecated;
 import java.lang.String;
 import java.util.Map;
 import java.util.Optional;
@@ -34,4 +35,12 @@ public interface TestService {
 
     @GET("/catalog/datasets/{datasetRid}/branches")
     Call<Set<String>> getBranches(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    /**
+     * Gets all branches of this dataset.
+     * @deprecated use getBranches instead
+     */
+    @GET("/catalog/datasets/{datasetRid}/branchesDeprecated")
+    @Deprecated
+    Call<Set<String>> getBranchesDeprecated(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
 }

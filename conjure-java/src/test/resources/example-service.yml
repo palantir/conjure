@@ -71,3 +71,15 @@ services:
             docs: |
               A valid dataset resource identifier.
         returns: set<string>
+      getBranchesDeprecated:
+        http: GET /datasets/{datasetRid}/branchesDeprecated
+        args:
+          datasetRid:
+            type: ResourceIdentifier
+            docs: |
+              A valid dataset resource identifier.
+        returns: set<string>
+        docs: |
+          Gets all branches of this dataset.
+        deprecated: use getBranches instead
+
