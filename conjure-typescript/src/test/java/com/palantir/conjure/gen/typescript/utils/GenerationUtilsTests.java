@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public final class UtilsTests {
+public final class GenerationUtilsTests {
 
     @Test
     public void relativePathsTest() {

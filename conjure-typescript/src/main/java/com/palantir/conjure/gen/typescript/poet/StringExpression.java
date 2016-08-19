@@ -14,7 +14,11 @@ public interface StringExpression extends TypescriptExpression {
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        writer.write("\"").write(content().replaceAll("\"", "\\\"")).write("\"");
+        writer.write(emitToString());
+    }
+
+    default String emitToString() {
+        return "\"" + content().replaceAll("\"", "\\\"") + "\"";
     }
 
     static StringExpression of(String content) {

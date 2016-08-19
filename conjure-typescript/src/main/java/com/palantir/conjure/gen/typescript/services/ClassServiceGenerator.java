@@ -55,7 +55,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         String packageLocation = serviceDef.packageName();
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
-                AssignStatement.builder().lhs("this.bridge").rhs(Optional.of("getHttpApiBridge(url)")).build()).build();
+                AssignStatement.builder().lhs("this.bridge").rhs(
+                        RawExpression.of("getHttpApiBridge(url)")).build()).build();
         TypescriptConstructor constructor = TypescriptConstructor.builder()
                 .addParameters(TypescriptTypeSignature.builder().name("url").typescriptType(
                         TypescriptType.builder().name("string").build()).build())

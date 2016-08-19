@@ -1,0 +1,38 @@
+types:
+  definitions:
+    default-package: test.api
+    objects:
+      StringExample:
+        fields:
+          string: string
+      IntegerExample:
+        fields:
+          integer: integer
+      DoubleExample:
+        fields:
+          doubleValue: double
+      OptionalExample:
+        fields:
+          item: optional<string>
+      ListExample:
+        fields:
+          items: list<string>
+      SetExample:
+        fields:
+          items: set<string>
+      MapExample:
+        fields:
+          items: map<string, string>
+      EnumExample:
+        values:
+          - ONE
+          - TWO
+      ManyFieldExample:
+        fields:
+          string: string
+          integer: integer
+          doubleValue: double
+          optionalItem: optional<string>
+          items: list<string>
+          set: set<string>
+          map: map<string, string>

@@ -12,14 +12,14 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface AssignStatement extends TypescriptStatement {
     String lhs();
-    Optional<String> rhs();
+    Optional<TypescriptExpression> rhs();
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
         writer.writeIndented(lhs());
         if (rhs().isPresent()) {
             writer.write(" = ");
-            writer.write(rhs().get());
+            writer.emit(rhs().get());
         }
         writer.writeLine(";");
     }

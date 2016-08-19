@@ -75,21 +75,6 @@ public final class ConjureTypescriptClientGeneratorTest {
                 .contains("import { IZ } from \"../package2/folder/z\"");
     }
 
-    @Test
-    public void interfaceServiceTest() throws IOException {
-        String testCase = "src/test/resources/test-service";
-        ConjureDefinition conjure = Conjure.parse(new File(testCase + ".conjure"));
-        File src = folder.newFolder("src");
-        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
-                new DefaultServiceGenerator(),
-                new StaticGenerator(),
-                new DefaultTypeGenerator());
-        generator.emit(conjure, src);
-        String testServiceFile = "com/palantir/foundry/catalog/api/testService.ts";
-        assertThat(compiledFile(src, testServiceFile)).isEqualTo(
-                GenerationUtils.getCharSource(new File(testCase + ".ts.sample")));
-    }
-
     private static String compiledFile(File srcDir, String clazz) throws IOException {
         return GenerationUtils.getCharSource(new File(srcDir, clazz));
     }

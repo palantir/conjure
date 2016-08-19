@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,13 +39,25 @@ public interface TypescriptFile {
         }
         try (PrintStream output = new PrintStream(new BufferedOutputStream(new FileOutputStream(thisFile)),
                 false, StandardCharsets.UTF_8.name())) {
-            TypescriptPoetWriter writer = new TypescriptPoetWriter(output);
-            imports().stream().sorted().forEach(emittable -> emittable.emit(writer));
-            if (!imports().isEmpty()) {
-                writer.writeLine();
-            }
-            emittables().forEach(emittable -> emittable.emit(writer));
+            writeTo(output);
         }
+    }
+
+    default void writeTo(PrintStream output) {
+        TypescriptPoetWriter writer = new TypescriptPoetWriter(output);
+        imports().stream().sorted().forEach(emittable -> emittable.emit(writer));
+        if (!imports().isEmpty()) {
+            writer.writeLine();
+        }
+        emittables().forEach(emittable -> emittable.emit(writer));
+    }
+
+    default String writeToString() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PrintStream output = new PrintStream(baos, false, StandardCharsets.UTF_8.name())) {
+            writeTo(output);
+        }
+        return baos.toString(StandardCharsets.UTF_8.name());
     }
 
     static ImmutableTypescriptFile.Builder builder() {
