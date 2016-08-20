@@ -80,9 +80,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                         .addMember("value", "$S", constructPath(basePath, endpointDef.http().path()))
                         .build());
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
-                AnnotationSpec.builder(ClassName.get("java.lang", "Deprecated")).build()));
+                ClassName.get("java.lang", "Deprecated")));
 
-        ServiceGeneratorUtils.getJavaDoc(endpointDef).ifPresent(
+        ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
                 content -> methodBuilder.addJavadoc("$L", content.toString()));
 
         if (endpointDef.returns().isPresent()) {

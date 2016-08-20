@@ -6,10 +6,13 @@ package com.palantir.conjure.gen.java.services;
 
 import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public interface ServiceGenerator {
 
@@ -29,4 +32,18 @@ public interface ServiceGenerator {
             }
         });
     }
+
+    static Optional<String> getJavaDoc(EndpointDefinition endpointDef) {
+        Optional<String> depr = endpointDef.deprecated()
+                .map(v -> StringUtils.appendIfMissing("@deprecated " + v, "\n"));
+
+        Optional<String> docs = endpointDef.docs()
+                .map(v -> StringUtils.appendIfMissing(v, "\n"));
+
+        StringBuilder sb = new StringBuilder();
+        docs.ifPresent(sb::append);
+        depr.ifPresent(sb::append);
+        return sb.length() > 0 ? Optional.of(sb.toString()) : Optional.empty();
+    }
+
 }

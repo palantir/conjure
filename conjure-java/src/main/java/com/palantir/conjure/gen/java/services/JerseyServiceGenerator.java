@@ -78,9 +78,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         .addMember("value", "$S", endpointDef.http().path())
                         .build());
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
-                AnnotationSpec.builder(ClassName.get("java.lang", "Deprecated")).build()));
+                ClassName.get("java.lang", "Deprecated")));
 
-        ServiceGeneratorUtils.getJavaDoc(endpointDef).ifPresent(
+        ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
                 content -> methodBuilder.addJavadoc("$L", content.toString()));
 
         endpointDef.returns().ifPresent(type -> methodBuilder.returns(typeMapper.getClassName(type)));
