@@ -67,10 +67,7 @@ public final class IntegerExample {
         }
 
         public Builder integer(Integer integer) {
-            if (integer == null) {
-                throw new IllegalArgumentException("integer cannot be null");
-            }
-            this.integer = integer;
+            this.integer = Objects.requireNonNull(integer, "integer cannot be null");
             return this;
         }
 

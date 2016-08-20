@@ -68,18 +68,12 @@ public final class OptionalExample {
         }
 
         public Builder item(Optional<String> item) {
-            if (item == null) {
-                throw new IllegalArgumentException("item cannot be null");
-            }
-            this.item = item;
+            this.item = Objects.requireNonNull(item, "item cannot be null");
             return this;
         }
 
         public Builder item(String item) {
-            if (item == null) {
-                throw new IllegalArgumentException("item cannot be null");
-            }
-            this.item = Optional.of(item);
+            this.item = Optional.of(Objects.requireNonNull(item, "item cannot be null"));
             return this;
         }
 

@@ -17,9 +17,7 @@ public final class MapExample {
 
     public MapExample(@JsonProperty("items") Map<String, String> items) {
         validateFields(items);
-        Map<String, String> __items = new LinkedHashMap<>(items.size());
-        __items.putAll(items);
-        this.items = Collections.unmodifiableMap(__items);
+        this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
     }
 
     public Map<String, String> getItems() {
@@ -72,10 +70,7 @@ public final class MapExample {
         }
 
         public Builder items(Map<String, String> items) {
-            if (items == null) {
-                throw new IllegalArgumentException("items cannot be null");
-            }
-            this.items.putAll(items);
+            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 

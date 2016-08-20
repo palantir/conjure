@@ -67,10 +67,7 @@ public final class StringExample {
         }
 
         public Builder string(String string) {
-            if (string == null) {
-                throw new IllegalArgumentException("string cannot be null");
-            }
-            this.string = string;
+            this.string = Objects.requireNonNull(string, "string cannot be null");
             return this;
         }
 

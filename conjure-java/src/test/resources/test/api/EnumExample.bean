@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Objects;
 
 public final class EnumExample {
     public static final EnumExample ONE = new EnumExample(Value.ONE.name());
@@ -14,9 +15,7 @@ public final class EnumExample {
 
     @JsonCreator
     public EnumExample(String enumExample) {
-        if (enumExample == null) {
-            throw new IllegalArgumentException("enumExample cannot be null");
-        }
+        Objects.requireNonNull(enumExample, "enumExample cannot be null");
         Value parsed;
         try {
             parsed = Value.valueOf(enumExample);

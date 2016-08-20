@@ -67,10 +67,7 @@ public final class DoubleExample {
         }
 
         public Builder doubleValue(Double doubleValue) {
-            if (doubleValue == null) {
-                throw new IllegalArgumentException("doubleValue cannot be null");
-            }
-            this.doubleValue = doubleValue;
+            this.doubleValue = Objects.requireNonNull(doubleValue, "doubleValue cannot be null");
             return this;
         }
 

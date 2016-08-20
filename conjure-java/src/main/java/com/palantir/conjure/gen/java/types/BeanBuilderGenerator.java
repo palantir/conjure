@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -111,20 +112,20 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(field.type, field.name)
                 .returns(builderClass)
-                .beginControlFlow("if ($N == null)", field.name)
-                    .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
-                .endControlFlow()
                 .addCode(typeAwareSet(field, type))
                 .addStatement("return this").build();
     }
 
     private static CodeBlock typeAwareSet(FieldSpec spec, ConjureType type) {
         if (type instanceof ListType || type instanceof SetType) {
-            return CodeBlocks.statement("this.$1N.addAll($1N)", spec.name);
+            return CodeBlocks.statement("this.$1N.addAll($2T.requireNonNull($1N, \"$1N cannot be null\"))",
+                    spec.name, Objects.class);
         } else if (type instanceof MapType) {
-            return CodeBlocks.statement("this.$1N.putAll($1N)", spec.name);
+            return CodeBlocks.statement("this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))",
+                    spec.name, Objects.class);
         } else {
-            return CodeBlocks.statement("this.$1N = $1N", spec.name);
+            return CodeBlocks.statement("this.$1N = $2T.requireNonNull($1N, \"$1N cannot be null\")",
+                    spec.name, Objects.class);
         }
     }
 
@@ -154,10 +155,8 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(typeMapper.getClassName(type.itemType()), field.name)
                 .returns(builderClass)
-                .beginControlFlow("if ($N == null)", field.name)
-                    .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, field.name)
-                .endControlFlow()
-                .addStatement("this.$1N = $2T.of($1N)", field.name, typeMapper.getOptionalType())
+                .addStatement("this.$1N = $2T.of($3T.requireNonNull($1N, \"$1N cannot be null\"))",
+                        field.name, typeMapper.getOptionalType(), Objects.class)
                 .addStatement("return this")
                 .build();
     }

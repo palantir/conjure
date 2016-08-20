@@ -17,6 +17,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import java.util.Objects;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -94,9 +95,7 @@ public final class EnumGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(JsonCreator.class)
                 .addParameter(param)
-                .beginControlFlow("if ($N == null)", param)
-                    .addStatement("throw new $T(\"$N cannot be null\")", IllegalArgumentException.class, param)
-                .endControlFlow()
+                .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
                 .addStatement("$T parsed", enumClass)
                 .addCode(CodeBlock.builder()
                         .beginControlFlow("try")

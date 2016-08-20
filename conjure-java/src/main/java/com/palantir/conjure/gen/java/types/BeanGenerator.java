@@ -134,17 +134,14 @@ public final class BeanGenerator implements TypeGenerator {
 
             if (field.conjureDef().type() instanceof ListType) {
                 // TODO contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, ArrayList.class)
-                        .addStatement("__$1N.addAll($1N)", field.poetSpec())
-                        .addStatement("this.$1N = $2T.unmodifiableList(__$1N)", spec, Collections.class);
+                body.addStatement("this.$1N = $2T.unmodifiableList(new $3T<>($1N))",
+                        spec, Collections.class, ArrayList.class);
             } else if (field.conjureDef().type() instanceof SetType) {
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, LinkedHashSet.class)
-                        .addStatement("__$1N.addAll($1N)", spec.name)
-                        .addStatement("this.$1N = $2T.unmodifiableSet(__$1N)", spec, Collections.class);
+                body.addStatement("this.$1N = $2T.unmodifiableSet(new $3T<>($1N))",
+                        spec, Collections.class, LinkedHashSet.class);
             } else if (field.conjureDef().type() instanceof MapType) {
-                body.addStatement("$1T __$2N = new $3T<>($2N.size())", spec.type, spec, LinkedHashMap.class)
-                        .addStatement("__$1N.putAll($1N)", spec.name)
-                        .addStatement("this.$1N = $2T.unmodifiableMap(__$1N)", spec, Collections.class);
+                body.addStatement("this.$1N = $2T.unmodifiableMap(new $3T<>($1N))",
+                        spec, Collections.class, LinkedHashMap.class);
             } else {
                 body.addStatement("this.$1N = $1N", spec);
             }

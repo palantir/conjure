@@ -36,15 +36,9 @@ public final class ManyFieldExample {
         this.integer = integer;
         this.doubleValue = doubleValue;
         this.optionalItem = optionalItem;
-        List<String> __items = new ArrayList<>(items.size());
-        __items.addAll(items);
-        this.items = Collections.unmodifiableList(__items);
-        Set<String> __set = new LinkedHashSet<>(set.size());
-        __set.addAll(set);
-        this.set = Collections.unmodifiableSet(__set);
-        Map<String, String> __map = new LinkedHashMap<>(map.size());
-        __map.putAll(map);
-        this.map = Collections.unmodifiableMap(__map);
+        this.items = Collections.unmodifiableList(new ArrayList<>(items));
+        this.set = Collections.unmodifiableSet(new LinkedHashSet<>(set));
+        this.map = Collections.unmodifiableMap(new LinkedHashMap<>(map));
     }
 
     public String getString() {
@@ -145,50 +139,32 @@ public final class ManyFieldExample {
         }
 
         public Builder string(String string) {
-            if (string == null) {
-                throw new IllegalArgumentException("string cannot be null");
-            }
-            this.string = string;
+            this.string = Objects.requireNonNull(string, "string cannot be null");
             return this;
         }
 
         public Builder integer(Integer integer) {
-            if (integer == null) {
-                throw new IllegalArgumentException("integer cannot be null");
-            }
-            this.integer = integer;
+            this.integer = Objects.requireNonNull(integer, "integer cannot be null");
             return this;
         }
 
         public Builder doubleValue(Double doubleValue) {
-            if (doubleValue == null) {
-                throw new IllegalArgumentException("doubleValue cannot be null");
-            }
-            this.doubleValue = doubleValue;
+            this.doubleValue = Objects.requireNonNull(doubleValue, "doubleValue cannot be null");
             return this;
         }
 
         public Builder optionalItem(Optional<String> optionalItem) {
-            if (optionalItem == null) {
-                throw new IllegalArgumentException("optionalItem cannot be null");
-            }
-            this.optionalItem = optionalItem;
+            this.optionalItem = Objects.requireNonNull(optionalItem, "optionalItem cannot be null");
             return this;
         }
 
         public Builder optionalItem(String optionalItem) {
-            if (optionalItem == null) {
-                throw new IllegalArgumentException("optionalItem cannot be null");
-            }
-            this.optionalItem = Optional.of(optionalItem);
+            this.optionalItem = Optional.of(Objects.requireNonNull(optionalItem, "optionalItem cannot be null"));
             return this;
         }
 
         public Builder items(List<String> items) {
-            if (items == null) {
-                throw new IllegalArgumentException("items cannot be null");
-            }
-            this.items.addAll(items);
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
@@ -198,10 +174,7 @@ public final class ManyFieldExample {
         }
 
         public Builder set(Set<String> set) {
-            if (set == null) {
-                throw new IllegalArgumentException("set cannot be null");
-            }
-            this.set.addAll(set);
+            this.set.addAll(Objects.requireNonNull(set, "set cannot be null"));
             return this;
         }
 
@@ -211,10 +184,7 @@ public final class ManyFieldExample {
         }
 
         public Builder map(Map<String, String> map) {
-            if (map == null) {
-                throw new IllegalArgumentException("map cannot be null");
-            }
-            this.map.putAll(map);
+            this.map.putAll(Objects.requireNonNull(map, "map cannot be null"));
             return this;
         }
 

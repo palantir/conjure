@@ -15,9 +15,7 @@ public final class ListExample {
 
     public ListExample(@JsonProperty("items") List<String> items) {
         validateFields(items);
-        List<String> __items = new ArrayList<>(items.size());
-        __items.addAll(items);
-        this.items = Collections.unmodifiableList(__items);
+        this.items = Collections.unmodifiableList(new ArrayList<>(items));
     }
 
     public List<String> getItems() {
@@ -70,10 +68,7 @@ public final class ListExample {
         }
 
         public Builder items(List<String> items) {
-            if (items == null) {
-                throw new IllegalArgumentException("items cannot be null");
-            }
-            this.items.addAll(items);
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 

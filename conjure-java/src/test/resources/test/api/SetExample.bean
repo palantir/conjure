@@ -17,9 +17,7 @@ public final class SetExample {
 
     public SetExample(@JsonProperty("items") Set<String> items) {
         validateFields(items);
-        Set<String> __items = new LinkedHashSet<>(items.size());
-        __items.addAll(items);
-        this.items = Collections.unmodifiableSet(__items);
+        this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
     }
 
     public Set<String> getItems() {
@@ -72,10 +70,7 @@ public final class SetExample {
         }
 
         public Builder items(Set<String> items) {
-            if (items == null) {
-                throw new IllegalArgumentException("items cannot be null");
-            }
-            this.items.addAll(items);
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
