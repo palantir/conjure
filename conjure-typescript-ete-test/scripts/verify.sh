@@ -27,5 +27,7 @@ waitforservice () {
 waitforservice https://localhost:8553/typescript-ete-test/api/calculator/ping
 cd typescript-ete-test-app
 npm run etetest
+EXIT_CODE=$?
 
 kill $!
+exit $EXIT_CODE

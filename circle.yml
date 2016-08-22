@@ -3,14 +3,29 @@ machine:
     version: oraclejdk8
   environment:
     TERM: dumb
+  node:
+    version: 6.3.1
 
 dependencies:
   override:
     - ./gradlew --parallel resolveConfigurations
-
 test:
   override:
-    - ./gradlew --parallel build
+    - ? |
+          set -eu
+          set -o pipefail
+
+          case $CIRCLE_NODE_INDEX in
+          0)
+            ./gradlew --parallel build
+            ;;
+          1)
+            cd conjure-typescript-ete-test && bash -x ./scripts/verify.sh && cd ..
+            ;;
+          esac
+      :
+        parallel: true
+        timeout: 1200
 
 deployment:
   snapshots:
