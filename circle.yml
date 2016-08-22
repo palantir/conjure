@@ -9,6 +9,10 @@ machine:
 dependencies:
   override:
     - ./gradlew --parallel resolveConfigurations
+    - cd conjure-typescript-ete-test && ./gradlew --parallel resolveConfigurations && cd ..
+  cache_directories:
+    - ./conjure-typescript-ete-test/.gradle
+    - ./conjure-typescript-ete-test/typescript-ete-test-app/node_modules
 test:
   override:
     - ? |
@@ -20,7 +24,7 @@ test:
             ./gradlew --parallel build
             ;;
           1)
-            cd conjure-typescript-ete-test && bash -x ./scripts/verify.sh && cd ..
+            cd conjure-typescript-ete-test && bash ./scripts/verify.sh && cd ..
             ;;
           esac
       :

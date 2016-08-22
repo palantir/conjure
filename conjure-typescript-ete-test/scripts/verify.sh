@@ -18,7 +18,6 @@ waitforservice () {
     echo "Waiting for $URL"
     while ! curl -s -k $URL
     do
-        echo "$(date) - still trying $URL"
         sleep 1
     done
     echo "$(date) - connected successfully"
