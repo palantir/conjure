@@ -28,6 +28,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
                 OptionalTypeParser.INSTANCE,
+                AnyTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
         return parser.parse(input);
     }
@@ -51,6 +52,19 @@ public enum TypeParser implements Parser<ConjureType> {
         @Override
         public ReferenceType parse(ParserState input) throws ParseException {
             return ReferenceType.of(REF_PARSER.parse(input));
+        }
+    }
+
+    private enum AnyTypeParser implements Parser<AnyType> {
+        INSTANCE;
+
+        @Override
+        public AnyType parse(ParserState input) throws ParseException {
+            ExpectationResult result = Parsers.expect("any").parse(input);
+            if (Parsers.nullOrUnexpected(result)) {
+                return null;
+            }
+            return AnyType.of();
         }
     }
 

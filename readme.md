@@ -31,6 +31,8 @@ Base types in the system are:
  * `string`
  * `integer` (32-bit whole numbers)
  * `double` (64-bit floating point numbers)
+ * `boolean` `(true|false)`
+ * `any` (unknown placeholder type)
 
 ### Built-Ins
 Conjure offers several built-ins to assist with mapping to existing language

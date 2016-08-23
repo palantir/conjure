@@ -1,0 +1,78 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@JsonIgnoreProperties(
+        ignoreUnknown = true
+)
+public final class BooleanExample {
+    private final Boolean coin;
+
+    public BooleanExample(@JsonProperty("coin") Boolean coin) {
+        validateFields(coin);
+        this.coin = coin;
+    }
+
+    public Boolean getCoin() {
+        return this.coin;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof BooleanExample && equalTo((BooleanExample) other));
+    }
+
+    private boolean equalTo(BooleanExample other) {
+        return this.coin.equals(other.coin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(coin);
+    }
+
+    private static void validateFields(Boolean coin) {
+        List<String> missingFields = null;
+        missingFields = addFieldIfMissing(missingFields, coin, "coin");
+        if (missingFields != null) {
+            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+        }
+    }
+
+    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+        List<String> missingFields = prev;
+        if (fieldValue == null) {
+            if (missingFields == null) {
+                missingFields = new ArrayList<>(1);
+            }
+            missingFields.add(fieldName);
+        }
+        return missingFields;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private Boolean coin;
+
+        public Builder from(BooleanExample other) {
+            coin(other.getCoin());
+            return this;
+        }
+
+        public Builder coin(Boolean coin) {
+            this.coin = Objects.requireNonNull(coin, "coin cannot be null");
+            return this;
+        }
+
+        public BooleanExample build() {
+            return new BooleanExample(coin);
+        }
+    }
+}

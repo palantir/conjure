@@ -1,6 +1,10 @@
 <!-- See http://findbugs.sourceforge.net/manual/filter.html for syntax -->
 <FindBugsFilter>
 
+    <Match>
+        <Source name="~.*\.scala" />
+    </Match>
+
     <!-- @NonnullByDefault doesn't play nicely with overriding @Nullable parameters/outputs -->
     <Match>
         <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
@@ -17,6 +21,11 @@
             <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/> <!-- ditto above -->
             <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/> <!-- @Rule ivars can be public and unused -->
         </Or>
+    </Match>
+
+    <Match>
+        <!-- patterns -->
+        <Bug pattern="PT_FINAL_TYPE_CONSTRUCTOR,PT_FINAL_TYPE_PARAM,PT_FINAL_TYPE_RETURN,PT_EXTENDS_CONCRETE_TYPE" />
     </Match>
 
     <Match>

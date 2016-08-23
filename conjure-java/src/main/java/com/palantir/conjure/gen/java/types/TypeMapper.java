@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.java.types;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
@@ -65,9 +66,10 @@ public final class TypeMapper {
             return primtiveTypeToClassName((PrimitiveType) type);
         } else if (type instanceof ReferenceType) {
             return referenceTypeToClassName((ReferenceType) type);
-        } else {
-            throw new IllegalStateException("Unexpected type " + type.getClass());
+        } else if (type instanceof AnyType) {
+            return ClassName.get(Object.class);
         }
+        throw new IllegalStateException("Unexpected type " + type.getClass());
     }
 
     public ClassName getOptionalType() {
@@ -117,6 +119,8 @@ public final class TypeMapper {
                 return ClassName.get(Double.class);
             case INTEGER:
                 return ClassName.get(Integer.class);
+            case BOOLEAN:
+                return ClassName.get(Boolean.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }

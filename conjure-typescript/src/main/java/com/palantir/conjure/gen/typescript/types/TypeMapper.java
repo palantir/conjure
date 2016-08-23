@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
@@ -37,6 +38,7 @@ public final class TypeMapper {
         return TypescriptType.builder().name(getTypeNameFromConjureType(conjureType)).build();
     }
 
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public Set<ReferenceType> getReferencedConjureNames(ConjureType conjureType) {
         ImmutableSet.Builder<ReferenceType> result = ImmutableSet.builder();
         Stack<ConjureType> stack = new Stack<>();
@@ -61,6 +63,8 @@ public final class TypeMapper {
                     result.add((ReferenceType) poppedConjureType);
                 } else if (poppedConjureType instanceof SetType) {
                     stack.add(((SetType) poppedConjureType).itemType());
+                } else if (poppedConjureType instanceof AnyType) {
+                    // no-op
                 } else {
                     throw new IllegalArgumentException("Unknown conjure type: " + poppedConjureType);
                 }
@@ -100,18 +104,21 @@ public final class TypeMapper {
             return referenceTypeToName((ReferenceType) conjureType);
         } else if (conjureType instanceof SetType) {
             return getTypeNameFromConjureType(((SetType) conjureType).itemType()) + "[]";
-        } else {
-            throw new IllegalArgumentException("Unknown conjure type: " + conjureType);
+        } else if (conjureType instanceof AnyType) {
+            return "any";
         }
+        throw new IllegalArgumentException("Unknown conjure type: " + conjureType);
     }
 
     private String getPrimitiveTypeName(PrimitiveType conjureType) {
-        switch ((PrimitiveType) conjureType) {
+        switch (conjureType) {
             case DOUBLE:
             case INTEGER:
                 return "number";
             case STRING:
                 return "string";
+            case BOOLEAN:
+                return "boolean";
             default:
                 throw new IllegalArgumentException("Unknown primitive type" + conjureType);
         }

@@ -27,6 +27,15 @@ types:
         values:
           - ONE
           - TWO
+      BooleanExample:
+        fields:
+          coin: boolean
+      AnyExample:
+        fields:
+          any: any
+      AnyMapExample:
+        fields:
+          items: map<string, any>
       ManyFieldExample:
         fields:
           string: string

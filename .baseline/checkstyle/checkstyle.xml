@@ -112,7 +112,7 @@
             <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
         </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
-            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, org.elasticsearch.common.joda, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava"/>
+            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava"/>
             <message key="import.illegal" value="Must not import repackaged classes."/>
         </module>
         <module name="IllegalImport">
@@ -290,7 +290,7 @@
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="\bCharset.forName\(|\bCharsets\."/>
+            <property name="format" value="\bCharsets\."/>
             <property name="message" value="Use JDK StandardCharsets instead of alternatives."/>
         </module>
         <module name="RegexpSinglelineJava">
@@ -299,7 +299,7 @@
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="\bIOUtils\.toString\("/>
-            <property name="message" value="Prefer Guava''s {CharStreams,Files,Resources}.toString to avoid charset/stream closing issues."/>
+            <property name="message" value="Prefer Guava''s [CharStreams,Files,Resources].toString to avoid charset/stream closing issues."/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="static enum"/>

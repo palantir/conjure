@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 public enum PrimitiveType implements ReferenceType {
     STRING("string"),
     INTEGER("integer"),
-    DOUBLE("double");
+    DOUBLE("double"),
+    BOOLEAN("boolean");
 
     private static final Map<String, PrimitiveType> types =
             EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(PrimitiveType::type, t -> t));

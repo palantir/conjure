@@ -14,9 +14,39 @@ import org.junit.Test;
 public final class ConjureTypeParserTests {
 
     @Test
-    public void testParser_refType() throws ParseException {
+    public void testParser_stringType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("string"))
-                .isEqualTo(ReferenceType.of("string"));
+                .isEqualTo(PrimitiveType.STRING);
+    }
+
+    @Test
+    public void testParser_integerType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("integer"))
+                .isEqualTo(PrimitiveType.INTEGER);
+    }
+
+    @Test
+    public void testParser_doubleType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("double"))
+                .isEqualTo(PrimitiveType.DOUBLE);
+    }
+
+    @Test
+    public void testParser_booleanType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("boolean"))
+                .isEqualTo(PrimitiveType.BOOLEAN);
+    }
+
+    @Test
+    public void testParser_refType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("ref"))
+                .isEqualTo(ReferenceType.of("ref"));
+    }
+
+    @Test
+    public void testParser_anyType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("any"))
+                .isEqualTo(AnyType.of());
     }
 
     @Test
@@ -72,7 +102,15 @@ public final class ConjureTypeParserTests {
     }
 
     @Test
-    public void testDeserializer_rawType() throws IOException {
+    public void testParser_anyMapType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("map<string, any>"))
+                .isEqualTo(MapType.of(
+                        PrimitiveType.STRING,
+                        AnyType.of()));
+    }
+
+    @Test
+    public void testDeserializer_stringType() throws IOException {
         assertThat(new ObjectMapper().readValue("\"string\"", ConjureType.class))
                 .isEqualTo(PrimitiveType.STRING);
     }
