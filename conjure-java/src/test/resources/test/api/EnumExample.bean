@@ -13,7 +13,6 @@ public final class EnumExample {
 
     private final String string;
 
-    @JsonCreator
     public EnumExample(String enumExample) {
         Objects.requireNonNull(enumExample, "enumExample cannot be null");
         Value parsed;
@@ -45,6 +44,11 @@ public final class EnumExample {
     @Override
     public int hashCode() {
         return this.string.hashCode();
+    }
+
+    @JsonCreator
+    public static EnumExample valueOf(String value) {
+        return new EnumExample(value);
     }
 
     public enum Value {

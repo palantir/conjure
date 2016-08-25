@@ -56,7 +56,14 @@ public final class EnumGenerator {
                         .addStatement("return this.string")
                         .build())
                 .addMethod(createEquals(thisClass))
-                .addMethod(createHashCode());
+                .addMethod(createHashCode())
+                .addMethod(MethodSpec.methodBuilder("valueOf")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addAnnotation(JsonCreator.class)
+                        .addParameter(ClassName.get(String.class), "value")
+                        .addStatement("return new $T(value)", thisClass)
+                        .returns(thisClass)
+                        .build());
 
         if (typeDef.docs().isPresent()) {
             wrapper.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
@@ -105,7 +112,6 @@ public final class EnumGenerator {
 
         return MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(JsonCreator.class)
                 .addParameter(param)
                 .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
                 .addStatement("$T parsed", enumClass)
