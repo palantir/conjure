@@ -22,16 +22,20 @@ public interface EnumTypeDefinition extends BaseObjectTypeDefinition {
 
     Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z]+(_[A-Z]+)*");
 
-    Set<String> values();
+    Set<EnumValueDefinition> values();
 
+    // we keep this check instead of pushing it down to EnumValueDefinition for better errors
     @Value.Check
     default void validate() {
-        checkArgument(!Iterables.any(values(), s -> s.equalsIgnoreCase("UNKNOWN")),
+        checkArgument(!Iterables.any(values(), s -> s.value().equalsIgnoreCase("UNKNOWN")),
                 "UNKNOWN is a reserved enumeration value");
 
-        Collection<String> invalidValues = Collections2.filter(values(), s -> !REQUIRED_FORMAT.matcher(s).matches());
+        Collection<EnumValueDefinition> invalidValues = Collections2.filter(values(),
+                s -> !REQUIRED_FORMAT.matcher(s.value()).matches());
         checkArgument(invalidValues.isEmpty(),
-                "Enumeration values must have format %s, illegal values: %s", REQUIRED_FORMAT, invalidValues);
+                "Enumeration values must have format %s, illegal values: %s",
+                REQUIRED_FORMAT,
+                Iterables.transform(invalidValues, s -> s.value()));
     }
 
     static Builder builder() {

@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.services;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -17,6 +18,7 @@ import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -78,7 +80,8 @@ public final class ServiceDefinitionTests {
                 " - A",
                 " - B"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder()
-                        .addValues("A", "B")
+                        .addValues(EnumValueDefinition.builder().value("A").build())
+                        .addValues(EnumValueDefinition.builder().value("B").build())
                         .build());
     }
 
@@ -90,14 +93,30 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    public void testParseEnum_withDocs() throws IOException {
+    public void testParseEnum_withObjectDocs() throws IOException {
         assertThat(mapper.readValue(multiLineString(
                 "docs: Test",
                 "values:",
                 " - A",
                 " - B"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder()
-                        .addValues("A", "B")
+                        .addValues(EnumValueDefinition.builder().value("A").build())
+                        .addValues(EnumValueDefinition.builder().value("B").build())
+                        .docs("Test")
+                        .build());
+    }
+
+    @Test
+    public void testParseEnum_withValueDocs() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "docs: Test",
+                "values:",
+                " - value: A",
+                "   docs: A docs",
+                " - B"), BaseObjectTypeDefinition.class))
+                .isEqualTo(EnumTypeDefinition.builder()
+                        .addValues(EnumValueDefinition.builder().value("A").docs("A docs").build())
+                        .addValues(EnumValueDefinition.builder().value("B").build())
                         .docs("Test")
                         .build());
     }
@@ -124,6 +143,7 @@ public final class ServiceDefinitionTests {
                     " - A__B",
                     " - _A",
                     " - A_"), BaseObjectTypeDefinition.class);
+            fail();
         } catch (IllegalArgumentException e) {
             assertThat(e).hasMessage("Enumeration values must have format [A-Z]+(_[A-Z]+)*, illegal values: "
                     + "[a, _A, a_b, A_, A__B]");

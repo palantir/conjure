@@ -72,11 +72,15 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     private static TypescriptFile generateEnumFile(String typeName, EnumTypeDefinition typeDef,
             String packageLocation, String parentFolderPath, TypeMapper mapper) {
         RawExpression typeRhs = RawExpression.of(Joiner.on(" | ").join(
-                typeDef.values().stream().map(value -> StringExpression.of(value).emitToString()).collect(
+                typeDef.values().stream().map(value -> StringExpression.of(value.value()).emitToString()).collect(
                         Collectors.toList())));
         AssignStatement type = AssignStatement.builder().lhs("export type " + typeName).rhs(typeRhs).build();
-        Map<String, TypescriptExpression> jsonMap = typeDef.values().stream().collect(Collectors.toMap(value -> value,
-                value -> CastExpression.builder().expression(StringExpression.of(value)).type(typeName).build()));
+        Map<String, TypescriptExpression> jsonMap = typeDef.values().stream().collect(Collectors.toMap(
+                value -> value.value(),
+                value -> CastExpression.builder()
+                        .expression(StringExpression.of(value.value()))
+                        .type(typeName)
+                        .build()));
         JsonExpression constantRhs = JsonExpression.builder().putAllKeyValues(jsonMap).build();
         AssignStatement constant = AssignStatement.builder().lhs("export const " + typeName).rhs(constantRhs).build();
         return TypescriptFile.builder().name(typeName).addEmittables(type).addEmittables(constant).parentFolderPath(

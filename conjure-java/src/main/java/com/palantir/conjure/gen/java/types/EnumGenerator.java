@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Iterables;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -67,18 +68,29 @@ public final class EnumGenerator {
                 .build();
     }
 
-    private static Iterable<FieldSpec> createConstants(Set<String> values, ClassName thisClass, ClassName enumClass) {
+    private static Iterable<FieldSpec> createConstants(Set<EnumValueDefinition> values,
+            ClassName thisClass, ClassName enumClass) {
         return Iterables.transform(values,
-                v -> FieldSpec.builder(thisClass, v, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                        .initializer(CodeBlock.of("new $1T($2T.$3N.name())", thisClass, enumClass, v))
-                        .build());
+                v -> {
+                    FieldSpec.Builder fieldSpec = FieldSpec.builder(thisClass, v.value(),
+                            Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer(CodeBlock.of("new $1T($2T.$3N.name())", thisClass, enumClass, v.value()));
+                    if (v.docs().isPresent()) {
+                        fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(v.docs().get(), "\n"));
+                    }
+                    return fieldSpec.build();
+                });
     }
 
-    private static TypeSpec createEnum(Set<String> values) {
+    private static TypeSpec createEnum(Set<EnumValueDefinition> values) {
         TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder("Value")
                 .addModifiers(Modifier.PUBLIC);
-        for (String value : values) {
-            enumBuilder.addEnumConstant(value);
+        for (EnumValueDefinition value : values) {
+            TypeSpec.Builder enumClass = TypeSpec.anonymousClassBuilder("");
+            if (value.docs().isPresent()) {
+                enumClass.addJavadoc("$L", StringUtils.appendIfMissing(value.docs().get(), "\n"));
+            }
+            enumBuilder.addEnumConstant(value.value(), enumClass.build());
         }
         enumBuilder.addEnumConstant("UNKNOWN");
 
