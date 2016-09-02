@@ -1,4 +1,5 @@
 export interface IManyFieldExample {
+    alias: string;
     doubleValue: number;
     integer: number;
     items: string[];

@@ -85,7 +85,7 @@ Conjure renderers will use the type alias as the object name, and will emit
 the object definition in the defined package or fall-back to the
 definitions-wide default package.
 
-Type aliases, as above, should use Pascal case.
+Type names, as above, should use Pascal case.
 
 #### Object Definitions
 Each object definition consists of a type alias, an optional package, and a
@@ -136,6 +136,20 @@ values:
  - [another value]
 ```
 
+#### Alias Definitions
+As a convenience, Conjure offers the ability to alias primitive types so that
+stronger types may be carried throughout generated code, though not all generators
+support this feature, and will fallback to replacing the aliased type with its
+concrete type.
+
+Each alias type appears in the definitions block and may include an optional
+docs block and a mandatory alias type:
+
+```yaml
+alias: <primitive type>
+docs: optional docs
+```
+
 #### Examples
 See also:
  * [Example Type Definitions](conjure-java/src/test/resources/example-types.conjure)
@@ -174,6 +188,10 @@ definitions:
       values:
         - A
         - B
+
+    ExampleAlias:
+      # alias types have an alias block instead of values or fields
+      alias: string
 ```
 
 Services

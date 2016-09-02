@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
@@ -57,18 +58,23 @@ public final class BeanGenerator implements TypeGenerator {
             String typeName,
             BaseObjectTypeDefinition typeDef) {
         if (typeDef instanceof ObjectTypeDefinition) {
-            return generateBeanType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
+            return generateBeanType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef, settings);
         } else if (typeDef instanceof EnumTypeDefinition) {
-            return EnumGenerator.generateEnumType(types, defaultPackage, typeName, (EnumTypeDefinition) typeDef);
+            return EnumGenerator.generateEnumType(
+                    types, defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings);
+        } else if (typeDef instanceof AliasTypeDefinition) {
+            return AliasGenerator.generateAliasType(
+                    types, defaultPackage, typeName, (AliasTypeDefinition) typeDef, settings);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
     }
 
-    private JavaFile generateBeanType(
+    private static JavaFile generateBeanType(
             TypesDefinition types,
             String defaultPackage,
             String typeName,
-            ObjectTypeDefinition typeDef) {
+            ObjectTypeDefinition typeDef,
+            Settings settings) {
         TypeMapper typeMapper = new TypeMapper(types, settings.optionalTypeStrategy());
 
         String typePackage = typeDef.packageName().orElse(defaultPackage);

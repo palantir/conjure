@@ -1,0 +1,39 @@
+package test.api;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Objects;
+
+public final class AliasExample {
+    private final String value;
+
+    private AliasExample(String value) {
+        Objects.requireNonNull(value, "value cannot be null");
+        this.value = value;
+    }
+
+    public String get() {
+        return value;
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+        return value.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof AliasExample && this.value.equals(((AliasExample) other).value);
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @JsonCreator
+    public static AliasExample valueOf(String value) {
+        return new AliasExample(value);
+    }
+}

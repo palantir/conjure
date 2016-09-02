@@ -9,9 +9,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -77,11 +79,13 @@ public final class TypeMapper {
     public String getContainingPackage(ReferenceType name) {
         BaseObjectTypeDefinition defType = types.definitions().objects().get(name.type());
         if (defType != null) {
-            return defType.packageName().orElse(defaultPackage);
-        } else {
-            // TODO for now assume to generate primitive types for external definitions
-            return null;
+            if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
+                return defType.packageName().orElse(defaultPackage);
+            }
+            // primitive types for aliases
         }
+        // TODO for now assume to generate primitive types for external definitions
+        return null;
     }
 
     private String getTypeNameFromConjureType(ConjureType conjureType) {
@@ -127,7 +131,13 @@ public final class TypeMapper {
     private String referenceTypeToName(ReferenceType refType) {
         BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
         if (defType != null) {
-            return "I" + refType.type();
+            if (defType instanceof AliasTypeDefinition) {
+                // in typescript we collapse alias types to concrete types
+                return getPrimitiveTypeName(((AliasTypeDefinition) defType).alias());
+            } else {
+                // Enum or Object
+                return "I" + refType.type();
+            }
         } else {
             ExternalTypeDefinition depType = types.imports().get(refType.type());
             checkNotNull(depType, "Unable to resolve type %s", refType.type());

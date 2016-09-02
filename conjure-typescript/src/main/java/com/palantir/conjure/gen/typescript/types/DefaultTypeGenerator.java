@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
@@ -39,10 +40,14 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return generateEnumFile(typeName, (EnumTypeDefinition) baseTypeDef, packageLocation, parentFolderPath,
                     mapper);
-        } else {
+        } else if (baseTypeDef instanceof ObjectTypeDefinition) {
             return generateObjectFile(typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath,
                     mapper);
+        } else if (baseTypeDef instanceof AliasTypeDefinition) {
+            // in typescript we do nothing with this
+            return null;
         }
+        throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
     }
 
     private static TypescriptFile generateObjectFile(String typeName, ObjectTypeDefinition typeDef,

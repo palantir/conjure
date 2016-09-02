@@ -7,6 +7,7 @@ package com.palantir.conjure.defs.services;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -16,6 +17,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
@@ -130,6 +132,25 @@ public final class ServiceDefinitionTests {
                     " - Unknown"), BaseObjectTypeDefinition.class);
         } catch (IllegalArgumentException e) {
             assertThat(e).hasMessage("UNKNOWN is a reserved enumeration value");
+        }
+    }
+
+    @Test
+    public void testParseAlias_validPrimitiveType() throws IOException {
+        assertThat(mapper.readValue("alias: string", BaseObjectTypeDefinition.class))
+                .isEqualTo(AliasTypeDefinition.builder().alias(PrimitiveType.STRING).build());
+    }
+
+    @Test
+    public void testParseAlias_notAPrimitiveType() throws IOException {
+        try {
+            mapper.readValue("alias: bummer", BaseObjectTypeDefinition.class);
+            fail();
+        } catch (JsonMappingException e) {
+            // TODO(melliot) improve error reporting
+            assertThat(e.getMessage()).startsWith(
+                    "Can not construct instance of com.palantir.conjure.defs.types.PrimitiveType, "
+                            + "problem: Unknown primitive type: bummer");
         }
     }
 

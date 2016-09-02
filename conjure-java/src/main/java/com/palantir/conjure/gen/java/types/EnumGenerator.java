@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
+import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -31,7 +32,8 @@ public final class EnumGenerator {
             TypesDefinition types,
             String defaultPackage,
             String typeName,
-            EnumTypeDefinition typeDef) {
+            EnumTypeDefinition typeDef,
+            Settings settings) {
         String typePackage = typeDef.packageName().orElse(defaultPackage);
         ClassName thisClass = ClassName.get(typePackage, typeName);
         ClassName enumClass = ClassName.get(typePackage, typeName, "Value");

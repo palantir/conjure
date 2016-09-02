@@ -32,6 +32,7 @@ public interface TypeGenerator {
                         types.definitions().defaultPackage(),
                         type.getKey(),
                         type.getValue()))
+                .filter(x -> x != null) // TODO(melliot) consider optional
                 .collect(Collectors.toSet());
     }
 

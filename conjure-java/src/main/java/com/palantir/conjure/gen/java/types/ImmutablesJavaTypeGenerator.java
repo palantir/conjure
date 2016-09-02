@@ -41,7 +41,8 @@ public final class ImmutablesJavaTypeGenerator implements TypeGenerator {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateImmutableType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
-            return EnumGenerator.generateEnumType(types, defaultPackage, typeName, (EnumTypeDefinition) typeDef);
+            return EnumGenerator.generateEnumType(types, defaultPackage, typeName, (EnumTypeDefinition) typeDef,
+                    settings);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
     }

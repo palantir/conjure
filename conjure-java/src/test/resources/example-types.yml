@@ -36,6 +36,8 @@ types:
       AnyMapExample:
         fields:
           items: map<string, any>
+      AliasExample:
+        alias: string
       ManyFieldExample:
         fields:
           string: string
@@ -45,3 +47,4 @@ types:
           items: list<string>
           set: set<string>
           map: map<string, string>
+          alias: AliasExample
