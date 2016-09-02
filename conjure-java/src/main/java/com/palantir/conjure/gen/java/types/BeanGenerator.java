@@ -125,7 +125,7 @@ public final class BeanGenerator implements TypeGenerator {
 
     private static MethodSpec createConstructor(TypeMapper typeMapper, Collection<EnrichedField> fields) {
         MethodSpec.Builder builder = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC);
+                .addModifiers(Modifier.PRIVATE);
 
         CodeBlock.Builder body = CodeBlock.builder();
 

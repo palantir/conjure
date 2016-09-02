@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class DoubleExample {
     private final Double doubleValue;
 
-    public DoubleExample(@JsonProperty("doubleValue") Double doubleValue) {
+    private DoubleExample(@JsonProperty("doubleValue") Double doubleValue) {
         validateFields(doubleValue);
         this.doubleValue = doubleValue;
     }

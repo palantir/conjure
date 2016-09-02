@@ -13,7 +13,7 @@ import java.util.Optional;
 public final class OptionalExample {
     private final Optional<String> item;
 
-    public OptionalExample(@JsonProperty("item") Optional<String> item) {
+    private OptionalExample(@JsonProperty("item") Optional<String> item) {
         validateFields(item);
         this.item = item;
     }

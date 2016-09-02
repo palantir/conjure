@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class BooleanExample {
     private final Boolean coin;
 
-    public BooleanExample(@JsonProperty("coin") Boolean coin) {
+    private BooleanExample(@JsonProperty("coin") Boolean coin) {
         validateFields(coin);
         this.coin = coin;
     }

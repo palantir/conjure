@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class AnyExample {
     private final Object any;
 
-    public AnyExample(@JsonProperty("any") Object any) {
+    private AnyExample(@JsonProperty("any") Object any) {
         validateFields(any);
         this.any = any;
     }

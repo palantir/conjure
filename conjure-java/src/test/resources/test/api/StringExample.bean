@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class StringExample {
     private final String string;
 
-    public StringExample(@JsonProperty("string") String string) {
+    private StringExample(@JsonProperty("string") String string) {
         validateFields(string);
         this.string = string;
     }

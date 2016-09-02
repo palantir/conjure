@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class IntegerExample {
     private final Integer integer;
 
-    public IntegerExample(@JsonProperty("integer") Integer integer) {
+    private IntegerExample(@JsonProperty("integer") Integer integer) {
         validateFields(integer);
         this.integer = integer;
     }

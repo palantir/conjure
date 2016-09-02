@@ -81,7 +81,7 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         createFile("src/main/java/Foo.java").text = """
             import test.a.api.SimpleObject;
             public class Foo {
-                SimpleObject var = new SimpleObject("foo");
+                SimpleObject var = SimpleObject.builder().stringField("foo").build();
             }
         """
         def result = run("compileJava")

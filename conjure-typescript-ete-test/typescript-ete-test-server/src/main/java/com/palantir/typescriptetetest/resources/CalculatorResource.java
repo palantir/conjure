@@ -14,12 +14,12 @@ public final class CalculatorResource implements CalculatorService {
     @Override
     public IdentitiesResponse getIdentities(AuthHeader authHeader) {
         validateToken(authHeader);
-        return new IdentitiesResponse(1, 0);
+        return IdentitiesResponse.builder().multiplicative(1).additive(0).build();
     }
 
     @Override
     public PingResponse ping(AuthHeader authHeader) {
-        return new PingResponse("pong");
+        return PingResponse.builder().payload("pong").build();
     }
 
     private static void validateToken(AuthHeader authHeader) {

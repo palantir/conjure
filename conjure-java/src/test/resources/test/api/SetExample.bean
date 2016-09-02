@@ -15,7 +15,7 @@ import java.util.Set;
 public final class SetExample {
     private final Set<String> items;
 
-    public SetExample(@JsonProperty("items") Set<String> items) {
+    private SetExample(@JsonProperty("items") Set<String> items) {
         validateFields(items);
         this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
     }
