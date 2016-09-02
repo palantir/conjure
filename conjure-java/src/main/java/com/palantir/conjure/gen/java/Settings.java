@@ -20,6 +20,11 @@ public interface Settings {
         return false;
     }
 
+    @Value.Default
+    default boolean supportUnknownEnumValues() {
+        return true;
+    }
+
     static Builder builder() {
         return new Builder();
     }

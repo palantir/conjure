@@ -1,0 +1,10 @@
+package test.api;
+
+/**
+ * An enum that's just an enum.
+ */
+public enum BareEnumExample {
+    ONE,
+
+    TWO
+}

@@ -26,11 +26,33 @@ public final class BeanJavaTypeGeneratorTests {
         Set<JavaFile> files = new BeanGenerator(Settings.builder().ignoreUnknownProperties(true).build())
                 .generate(def.types());
 
+        assertThatFilesAreTheSame(files);
+    }
+
+    @Test
+    public void testEnumJavaGenerator_withNoUnknown() throws IOException {
+        ConjureDefinition def = Conjure.parse(
+                "types:\n"
+                + "  definitions:\n"
+                + "    default-package: test.api\n"
+                + "    objects:\n"
+                + "      BareEnumExample:\n"
+                + "        docs: An enum that's just an enum.\n"
+                + "        values:\n"
+                + "          - ONE\n"
+                + "          - TWO\n");
+
+        Set<JavaFile> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
+                .generate(def.types());
+
+        assertThatFilesAreTheSame(files);
+    }
+
+    private void assertThatFilesAreTheSame(Set<JavaFile> files) throws IOException {
         for (JavaFile file : files) {
             assertThat(file.toString()).isEqualTo(CharStreams.toString(
                     new InputStreamReader(getClass().getResourceAsStream("/test/api/" + file.typeSpec.name + ".bean"),
                             StandardCharsets.UTF_8)));
         }
     }
-
 }

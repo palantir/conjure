@@ -38,9 +38,28 @@ public final class EnumGenerator {
         ClassName thisClass = ClassName.get(typePackage, typeName);
         ClassName enumClass = ClassName.get(typePackage, typeName, "Value");
 
+        TypeSpec spec;
+        if (settings.supportUnknownEnumValues()) {
+            spec = createSafeEnum(typeName, typeDef, thisClass, enumClass);
+        } else {
+            spec = createEnum(typeName, typeDef.values(), false);
+            if (typeDef.docs().isPresent()) {
+                spec = spec.toBuilder()
+                        .addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n")).build();
+            }
+        }
+
+        return JavaFile.builder(typePackage, spec)
+                .skipJavaLangImports(true)
+                .indent("    ")
+                .build();
+    }
+
+    private static TypeSpec createSafeEnum(String typeName, EnumTypeDefinition typeDef, ClassName thisClass,
+            ClassName enumClass) {
         TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addType(createEnum(typeDef.values()))
+                .addType(createEnum(enumClass.simpleName(), typeDef.values(), true))
                 .addField(enumClass, "value", Modifier.PRIVATE, Modifier.FINAL)
                 .addField(ClassName.get(String.class), "string", Modifier.PRIVATE, Modifier.FINAL)
                 .addFields(createConstants(typeDef.values(), thisClass, enumClass))
@@ -66,10 +85,7 @@ public final class EnumGenerator {
             wrapper.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
         }
 
-        return JavaFile.builder(typePackage, wrapper.build())
-                .skipJavaLangImports(true)
-                .indent("    ")
-                .build();
+        return wrapper.build();
     }
 
     private static Iterable<FieldSpec> createConstants(Set<EnumValueDefinition> values,
@@ -86,8 +102,8 @@ public final class EnumGenerator {
                 });
     }
 
-    private static TypeSpec createEnum(Set<EnumValueDefinition> values) {
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder("Value")
+    private static TypeSpec createEnum(String typeName, Set<EnumValueDefinition> values, boolean withUnknown) {
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC);
         for (EnumValueDefinition value : values) {
             TypeSpec.Builder enumClass = TypeSpec.anonymousClassBuilder("");
@@ -96,8 +112,9 @@ public final class EnumGenerator {
             }
             enumBuilder.addEnumConstant(value.value(), enumClass.build());
         }
-        enumBuilder.addEnumConstant("UNKNOWN");
-
+        if (withUnknown) {
+            enumBuilder.addEnumConstant("UNKNOWN");
+        }
         return enumBuilder.build();
     }
 
