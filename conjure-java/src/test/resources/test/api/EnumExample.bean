@@ -5,25 +5,22 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
 
 public final class EnumExample {
-    public static final EnumExample ONE = new EnumExample(Value.ONE.name());
+    public static final EnumExample ONE = new EnumExample(Value.ONE);
 
-    public static final EnumExample TWO = new EnumExample(Value.TWO.name());
+    public static final EnumExample TWO = new EnumExample(Value.TWO);
 
     private final Value value;
 
     private final String string;
 
-    public EnumExample(String enumExample) {
-        Objects.requireNonNull(enumExample, "enumExample cannot be null");
-        Value parsed;
-        try {
-            parsed = Value.valueOf(enumExample);
-        }
-        catch (IllegalArgumentException e) {
-            parsed = Value.UNKNOWN;
-        }
-        this.value = parsed;
-        this.string = enumExample;
+    private EnumExample(Value value) {
+        this.value = value;
+        this.string = value.name();
+    }
+
+    private EnumExample(String string) {
+        this.value = Value.UNKNOWN;
+        this.string = string;
     }
 
     public Value get() {
@@ -48,7 +45,15 @@ public final class EnumExample {
 
     @JsonCreator
     public static EnumExample valueOf(String value) {
-        return new EnumExample(value);
+        Objects.requireNonNull(value, "value cannot be null");
+        switch (value) {
+            case "ONE":
+                return ONE;
+            case "TWO":
+                return TWO;
+            default:
+                return new EnumExample(value);
+        }
     }
 
     public enum Value {

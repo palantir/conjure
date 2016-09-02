@@ -42,7 +42,8 @@ public final class EnumGenerator {
                 .addField(enumClass, "value", Modifier.PRIVATE, Modifier.FINAL)
                 .addField(ClassName.get(String.class), "string", Modifier.PRIVATE, Modifier.FINAL)
                 .addFields(createConstants(typeDef.values(), thisClass, enumClass))
-                .addMethod(createConstructor(enumClass, typeName))
+                .addMethod(createValueConstructor(enumClass))
+                .addMethod(createStringConstructor(enumClass))
                 .addMethod(MethodSpec.methodBuilder("get")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(enumClass)
@@ -57,13 +58,7 @@ public final class EnumGenerator {
                         .build())
                 .addMethod(createEquals(thisClass))
                 .addMethod(createHashCode())
-                .addMethod(MethodSpec.methodBuilder("valueOf")
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addAnnotation(JsonCreator.class)
-                        .addParameter(ClassName.get(String.class), "value")
-                        .addStatement("return new $T(value)", thisClass)
-                        .returns(thisClass)
-                        .build());
+                .addMethod(createValueOf(thisClass, typeDef.values()));
 
         if (typeDef.docs().isPresent()) {
             wrapper.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
@@ -81,7 +76,7 @@ public final class EnumGenerator {
                 v -> {
                     FieldSpec.Builder fieldSpec = FieldSpec.builder(thisClass, v.value(),
                             Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                            .initializer(CodeBlock.of("new $1T($2T.$3N.name())", thisClass, enumClass, v.value()));
+                            .initializer(CodeBlock.of("new $1T($2T.$3N)", thisClass, enumClass, v.value()));
                     if (v.docs().isPresent()) {
                         fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(v.docs().get(), "\n"));
                     }
@@ -104,27 +99,48 @@ public final class EnumGenerator {
         return enumBuilder.build();
     }
 
-    private static MethodSpec createConstructor(ClassName enumClass, String typeName) {
-        ParameterSpec param = ParameterSpec.builder(
-                ClassName.get(String.class),
-                StringUtils.uncapitalize(typeName))
-                .build();
-
+    private static MethodSpec createValueConstructor(ClassName enumClass) {
         return MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(enumClass, "value")
+                .addStatement("this.value = value")
+                .addStatement("this.string = value.name()")
+                .build();
+    }
+
+    private static MethodSpec createStringConstructor(ClassName enumClass) {
+        return MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(ClassName.get(String.class), "string")
+                .addStatement("this.value = $T.UNKNOWN", enumClass)
+                .addStatement("this.string = string")
+                .build();
+    }
+
+    private static MethodSpec createValueOf(ClassName thisClass, Set<EnumValueDefinition> values) {
+        ParameterSpec param = ParameterSpec.builder(ClassName.get(String.class), "value").build();
+
+        CodeBlock.Builder parser = CodeBlock.builder()
+                .beginControlFlow("switch ($N)", param);
+        for (EnumValueDefinition value : values) {
+            parser.add("case $S:\n", value.value())
+                    .indent()
+                        .addStatement("return $L", value.value())
+                    .unindent();
+        }
+        parser.add("default:\n")
+                .indent()
+                    .addStatement("return new $T($N)", thisClass, param)
+                .unindent()
+                .endControlFlow();
+
+        return MethodSpec.methodBuilder("valueOf")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(thisClass)
+                .addAnnotation(JsonCreator.class)
                 .addParameter(param)
                 .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
-                .addStatement("$T parsed", enumClass)
-                .addCode(CodeBlock.builder()
-                        .beginControlFlow("try")
-                            .addStatement("parsed = $T.valueOf($N)", enumClass, param)
-                        .endControlFlow()
-                        .beginControlFlow("catch ($T e)", IllegalArgumentException.class)
-                            .addStatement("parsed = $T.UNKNOWN", enumClass)
-                        .endControlFlow()
-                        .addStatement("this.value = parsed")
-                        .addStatement("this.string = $N", param)
-                        .build())
+                .addCode(parser.build())
                 .build();
     }
 
