@@ -2,22 +2,19 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 public final class IntegerExample {
-    private final Integer integer;
+    private final int integer;
 
-    private IntegerExample(@JsonProperty("integer") Integer integer) {
-        validateFields(integer);
+    private IntegerExample(@JsonProperty("integer") int integer) {
         this.integer = integer;
     }
 
-    public Integer getInteger() {
+    public int getInteger() {
         return this.integer;
     }
 
@@ -27,7 +24,7 @@ public final class IntegerExample {
     }
 
     private boolean equalTo(IntegerExample other) {
-        return this.integer.equals(other.integer);
+        return this.integer == other.integer;
     }
 
     @Override
@@ -35,39 +32,20 @@ public final class IntegerExample {
         return Objects.hash(integer);
     }
 
-    private static void validateFields(Integer integer) {
-        List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, integer, "integer");
-        if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
-        }
-    }
-
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
-        List<String> missingFields = prev;
-        if (fieldValue == null) {
-            if (missingFields == null) {
-                missingFields = new ArrayList<>(1);
-            }
-            missingFields.add(fieldName);
-        }
-        return missingFields;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
-        private Integer integer;
+        private int integer;
 
         public Builder from(IntegerExample other) {
             integer(other.getInteger());
             return this;
         }
 
-        public Builder integer(Integer integer) {
-            this.integer = Objects.requireNonNull(integer, "integer cannot be null");
+        public Builder integer(int integer) {
+            this.integer = integer;
             return this;
         }
 

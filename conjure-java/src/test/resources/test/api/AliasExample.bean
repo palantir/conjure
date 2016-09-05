@@ -24,7 +24,7 @@ public final class AliasExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof AliasExample && this.value.equals(((AliasExample) other).value);
+        return this == other || (other instanceof AliasExample && this.value.equals(((AliasExample) other).value));
     }
 
     @Override

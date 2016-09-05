@@ -3,6 +3,7 @@ package test.api;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -67,7 +68,7 @@ public final class ListExample {
             return this;
         }
 
-        public Builder items(List<String> items) {
+        public Builder items(Collection<String> items) {
             this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }

@@ -38,7 +38,7 @@ public interface BaseObjectTypeDefinition {
                         parser.getCodec().treeToValue(tree, ImmutableAliasTypeDefinition.Json.class));
             } else {
                 throw new IllegalArgumentException(
-                        "Unrecognized definition, objects must have either fields or values defined.");
+                        "Unrecognized definition, objects must have either fields, values or an alias defined.");
             }
         }
     }

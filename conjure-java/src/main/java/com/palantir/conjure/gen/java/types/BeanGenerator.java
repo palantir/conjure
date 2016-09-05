@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -83,17 +84,24 @@ public final class BeanGenerator implements TypeGenerator {
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
+        Collection<FieldSpec> nonPrimitivePoetFields = Collections2.filter(poetFields, f -> !f.type.isPrimitive());
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(poetFields)
-                .addMethod(createConstructor(typeMapper, fields))
+                .addMethod(createConstructor(typeMapper, fields, nonPrimitivePoetFields))
                 .addMethods(createGetters(typeMapper, fields))
                 .addMethod(createEquals(objectClass))
                 .addMethod(createEqualTo(objectClass, poetFields))
-                .addMethod(createHashCode(poetFields))
-                .addMethod(createValidateFields(poetFields))
-                .addMethod(createAddFieldIfMissing(fields.size()))
+                .addMethod(createHashCode(poetFields));
+
+        if (!nonPrimitivePoetFields.isEmpty()) {
+            typeBuilder
+                    .addMethod(createValidateFields(nonPrimitivePoetFields))
+                    .addMethod(createAddFieldIfMissing(nonPrimitivePoetFields.size()));
+        }
+
+        typeBuilder
                 .addMethod(createBuilder(builderClass))
                 .addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, objectClass, builderClass, typeDef));
 
@@ -123,12 +131,17 @@ public final class BeanGenerator implements TypeGenerator {
                 .collect(Collectors.toList());
     }
 
-    private static MethodSpec createConstructor(TypeMapper typeMapper, Collection<EnrichedField> fields) {
+    private static MethodSpec createConstructor(TypeMapper typeMapper,
+            Collection<EnrichedField> fields,
+            Collection<FieldSpec> nonPrimitivePoetFields) {
         MethodSpec.Builder builder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE);
 
-        CodeBlock.Builder body = CodeBlock.builder();
+        if (!nonPrimitivePoetFields.isEmpty()) {
+            builder.addStatement("$L", Expressions.localMethodCall("validateFields", nonPrimitivePoetFields));
+        }
 
+        CodeBlock.Builder body = CodeBlock.builder();
         for (EnrichedField field : fields) {
             FieldSpec spec = field.poetSpec();
 
@@ -153,8 +166,7 @@ public final class BeanGenerator implements TypeGenerator {
             }
         }
 
-        builder.addStatement("$L", Expressions.localMethodCall("validateFields", EnrichedField.toPoetSpecs(fields)))
-                .addCode(body.build());
+        builder.addCode(body.build());
 
         return builder.build();
     }
@@ -190,8 +202,17 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     private static MethodSpec createEqualTo(TypeName thisClass, Collection<FieldSpec> fields) {
-        String equalsExpression = Joiner.on(" && ")
-                .join(indexStringInRange("this.$%1$dN.equals(other.$%1$dN)", 1, fields.size() + 1));
+        List<String> comparisons = new ArrayList<>(fields.size());
+        int fieldNumber = 1;
+        for (FieldSpec spec : fields) {
+            if (spec.type.isPrimitive()) {
+                comparisons.add(String.format("this.$%1$dN == other.$%1$dN", fieldNumber));
+            } else {
+                comparisons.add(String.format("this.$%1$dN.equals(other.$%1$dN)", fieldNumber));
+            }
+            fieldNumber = fieldNumber + 1;
+        }
+        String equalsExpression = Joiner.on(" && ").join(comparisons);
 
         return MethodSpec.methodBuilder("equalTo")
                 .addModifiers(Modifier.PRIVATE)
@@ -211,13 +232,16 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
+        // TODO(melliot) don't produce this if it's empty
         MethodSpec.Builder builder = MethodSpec.methodBuilder("validateFields")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
 
         builder.addStatement("$T missingFields = null", ParameterizedTypeName.get(List.class, String.class));
         for (FieldSpec spec : fields) {
-            builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
-            builder.addStatement("missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, spec.name);
+            if (!spec.type.isPrimitive()) {
+                builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
+                builder.addStatement("missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, spec.name);
+            }
         }
 
         builder

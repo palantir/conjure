@@ -2,22 +2,19 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 public final class DoubleExample {
-    private final Double doubleValue;
+    private final double doubleValue;
 
-    private DoubleExample(@JsonProperty("doubleValue") Double doubleValue) {
-        validateFields(doubleValue);
+    private DoubleExample(@JsonProperty("doubleValue") double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
-    public Double getDoubleValue() {
+    public double getDoubleValue() {
         return this.doubleValue;
     }
 
@@ -27,7 +24,7 @@ public final class DoubleExample {
     }
 
     private boolean equalTo(DoubleExample other) {
-        return this.doubleValue.equals(other.doubleValue);
+        return this.doubleValue == other.doubleValue;
     }
 
     @Override
@@ -35,39 +32,20 @@ public final class DoubleExample {
         return Objects.hash(doubleValue);
     }
 
-    private static void validateFields(Double doubleValue) {
-        List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, doubleValue, "doubleValue");
-        if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
-        }
-    }
-
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
-        List<String> missingFields = prev;
-        if (fieldValue == null) {
-            if (missingFields == null) {
-                missingFields = new ArrayList<>(1);
-            }
-            missingFields.add(fieldName);
-        }
-        return missingFields;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
-        private Double doubleValue;
+        private double doubleValue;
 
         public Builder from(DoubleExample other) {
             doubleValue(other.getDoubleValue());
             return this;
         }
 
-        public Builder doubleValue(Double doubleValue) {
-            this.doubleValue = Objects.requireNonNull(doubleValue, "doubleValue cannot be null");
+        public Builder doubleValue(double doubleValue) {
+            this.doubleValue = doubleValue;
             return this;
         }
 

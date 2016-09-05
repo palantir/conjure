@@ -18,9 +18,10 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SetType;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 
 public final class TypeMapper {
 
@@ -76,27 +77,44 @@ public final class TypeMapper {
         return optionalTypeStrategy.getClassName();
     }
 
-    public CodeBlock absentOptional() {
-        return CodeBlock.of("$T.$N()", optionalTypeStrategy.getClassName(), optionalTypeStrategy.getAbsentMethodName());
+    public String getAbsentMethodName() {
+        return optionalTypeStrategy.getAbsentMethodName();
     }
 
     private TypeName getClassNameForMapType(MapType type) {
         return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
-                getClassName(type.keyType()),
-                getClassName(type.valueType()));
+                boxIfPrimitive(getClassName(type.keyType())),
+                boxIfPrimitive(getClassName(type.valueType())));
     }
 
     private TypeName getClassNameForListType(ListType type) {
-        TypeName innerType = getClassName(type.itemType());
-        return ParameterizedTypeName.get(ClassName.get(java.util.List.class), innerType);
+        TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
+        return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
     }
 
     private TypeName getClassNameForSetType(SetType type) {
-        return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), getClassName(type.itemType()));
+        TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
+        return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
     }
 
     private TypeName getClassNameForOptionalType(OptionalType type) {
-        return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), getClassName(type.itemType()));
+        if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.Java8) {
+            // special handling for primitive optionals with Java 8
+            switch ((PrimitiveType) type.itemType()) {
+                case DOUBLE:
+                    return ClassName.get(OptionalDouble.class);
+                case INTEGER:
+                    return ClassName.get(OptionalInt.class);
+                case BOOLEAN:
+                    // no OptionalBoolean type
+                    return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), ClassName.get(Boolean.class));
+                case STRING:
+                default:
+                    // treat normally
+            }
+        }
+        TypeName itemType = getClassName(type.itemType());
+        return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), itemType);
     }
 
     private TypeName referenceTypeToClassName(ReferenceType refType) {
@@ -116,14 +134,21 @@ public final class TypeMapper {
             case STRING:
                 return ClassName.get(String.class);
             case DOUBLE:
-                return ClassName.get(Double.class);
+                return TypeName.DOUBLE;
             case INTEGER:
-                return ClassName.get(Integer.class);
+                return TypeName.INT;
             case BOOLEAN:
-                return ClassName.get(Boolean.class);
+                return TypeName.BOOLEAN;
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }
+    }
+
+    private static TypeName boxIfPrimitive(TypeName type) {
+        if (type.isPrimitive()) {
+            return type.box();
+        }
+        return type;
     }
 
 }

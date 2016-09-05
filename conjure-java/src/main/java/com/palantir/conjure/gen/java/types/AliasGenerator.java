@@ -61,7 +61,7 @@ public final class AliasGenerator {
                         .addParameter(TypeName.OBJECT, "other")
                         .returns(TypeName.BOOLEAN)
                         .addStatement("return this == other || "
-                                + "(other instanceof $1T && this.value.equals((($1T) other).value)", thisClass)
+                                + "(other instanceof $1T && this.value.equals((($1T) other).value))", thisClass)
                         .build())
                 .addMethod(MethodSpec.methodBuilder("hashCode")
                         .addModifiers(Modifier.PUBLIC)
