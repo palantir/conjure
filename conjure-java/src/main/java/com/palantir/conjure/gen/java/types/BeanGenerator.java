@@ -31,7 +31,6 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,7 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.immutables.value.Value;
@@ -89,8 +87,8 @@ public final class BeanGenerator implements TypeGenerator {
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(poetFields)
-                .addMethod(createConstructor(typeMapper, fields, nonPrimitivePoetFields))
-                .addMethods(createGetters(typeMapper, fields))
+                .addMethod(createConstructor(fields, nonPrimitivePoetFields))
+                .addMethods(createGetters(fields))
                 .addMethod(createEquals(objectClass))
                 .addMethod(createEqualTo(objectClass, poetFields))
                 .addMethod(createHashCode(poetFields));
@@ -131,7 +129,7 @@ public final class BeanGenerator implements TypeGenerator {
                 .collect(Collectors.toList());
     }
 
-    private static MethodSpec createConstructor(TypeMapper typeMapper,
+    private static MethodSpec createConstructor(
             Collection<EnrichedField> fields,
             Collection<FieldSpec> nonPrimitivePoetFields) {
         MethodSpec.Builder builder = MethodSpec.constructorBuilder()
@@ -171,7 +169,7 @@ public final class BeanGenerator implements TypeGenerator {
         return builder.build();
     }
 
-    private static Collection<MethodSpec> createGetters(TypeMapper typeMapper, Collection<EnrichedField> fields) {
+    private static Collection<MethodSpec> createGetters(Collection<EnrichedField> fields) {
         return fields.stream()
                 .map(f -> createGetter(f.poetSpec(), f.conjureDef().docs()))
                 .collect(Collectors.toList());
@@ -232,16 +230,13 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
-        // TODO(melliot) don't produce this if it's empty
         MethodSpec.Builder builder = MethodSpec.methodBuilder("validateFields")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
 
         builder.addStatement("$T missingFields = null", ParameterizedTypeName.get(List.class, String.class));
         for (FieldSpec spec : fields) {
-            if (!spec.type.isPrimitive()) {
-                builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
-                builder.addStatement("missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, spec.name);
-            }
+            builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
+            builder.addStatement("missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, spec.name);
         }
 
         builder
@@ -281,10 +276,6 @@ public final class BeanGenerator implements TypeGenerator {
                 .returns(builderClass)
                 .addStatement("return new $T()", builderClass)
                 .build();
-    }
-
-    private static Iterator<String> indexStringInRange(String format, int lower, int upper) {
-        return IntStream.range(lower, upper).mapToObj(i -> String.format(format, i)).iterator();
     }
 
     public static String generateGetterName(String fieldName) {

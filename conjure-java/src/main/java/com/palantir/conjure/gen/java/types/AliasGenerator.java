@@ -10,6 +10,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -37,12 +38,7 @@ public final class AliasGenerator {
         TypeSpec.Builder spec = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(aliasType, "value", Modifier.PRIVATE, Modifier.FINAL)
-                .addMethod(MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PRIVATE)
-                        .addParameter(aliasType, "value")
-                        .addStatement("$T.requireNonNull(value, \"value cannot be null\")", Objects.class)
-                        .addStatement("this.value = value")
-                        .build())
+                .addMethod(createConstructor(aliasType))
                 .addMethod(MethodSpec.methodBuilder("get")
                         .addModifiers(Modifier.PUBLIC)
                         .returns(aliasType)
@@ -53,26 +49,25 @@ public final class AliasGenerator {
                         .addAnnotation(Override.class)
                         .addAnnotation(JsonValue.class)
                         .returns(aliasType)
-                        .addStatement("return value.toString()")
+                        .addCode(primitiveSafeToString(aliasType))
                         .build())
                 .addMethod(MethodSpec.methodBuilder("equals")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .addParameter(TypeName.OBJECT, "other")
                         .returns(TypeName.BOOLEAN)
-                        .addStatement("return this == other || "
-                                + "(other instanceof $1T && this.value.equals((($1T) other).value))", thisClass)
+                        .addCode(primitiveSafeEquality(thisClass, aliasType))
                         .build())
                 .addMethod(MethodSpec.methodBuilder("hashCode")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .returns(TypeName.INT)
-                        .addStatement("return value.hashCode()")
+                        .addCode(primitiveSafeHashCode(aliasType))
                         .build())
                 .addMethod(MethodSpec.methodBuilder("valueOf")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .addAnnotation(JsonCreator.class)
-                        .addParameter(ClassName.get(String.class), "value")
+                        .addParameter(aliasType, "value")
                         .returns(thisClass)
                         .addStatement("return new $T(value)", thisClass)
                         .build());
@@ -85,6 +80,43 @@ public final class AliasGenerator {
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
+    }
+
+    private static MethodSpec createConstructor(TypeName aliasType) {
+        MethodSpec.Builder builder = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(aliasType, "value");
+        if (!aliasType.isPrimitive()) {
+            builder.addStatement("$T.requireNonNull(value, \"value cannot be null\")", Objects.class);
+        }
+        return builder
+                .addStatement("this.value = value")
+                .build();
+    }
+
+    private static CodeBlock primitiveSafeEquality(ClassName thisClass, TypeName fieldType) {
+        if (fieldType.isPrimitive()) {
+            return CodeBlocks.statement(
+                    "return this == other || (other instanceof $1T && this.value == (($1T) other).value)",
+                    thisClass);
+        }
+        return CodeBlocks.statement(
+                "return this == other || (other instanceof $1T && this.value.equals((($1T) other).value))",
+                thisClass);
+    }
+
+    private static CodeBlock primitiveSafeToString(TypeName fieldType) {
+        if (fieldType.isPrimitive()) {
+            return CodeBlocks.statement("return $T.valueOf(value)", String.class);
+        }
+        return CodeBlocks.statement("return value.toString()");
+    }
+
+    private static CodeBlock primitiveSafeHashCode(TypeName fieldType) {
+        if (fieldType.isPrimitive()) {
+            return CodeBlocks.statement("return $T.hashCode(value)", fieldType.box());
+        }
+        return CodeBlocks.statement("return value.hashCode()");
     }
 
 }

@@ -62,13 +62,11 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(objectClass, "other")
                 .returns(builderClass)
-                .addCode(CodeBlocks.of(Iterables.transform(fields, f -> setWithGetter(f.poetSpec().name))))
+                .addCode(CodeBlocks.of(Iterables.transform(fields,
+                        f -> CodeBlocks.statement("$1N(other.$2N())",
+                                f.poetSpec().name, BeanGenerator.generateGetterName(f.poetSpec().name)))))
                 .addStatement("return this")
                 .build();
-    }
-
-    private static CodeBlock setWithGetter(String name) {
-        return CodeBlocks.statement("$1N(other.$2N())", name, BeanGenerator.generateGetterName(name));
     }
 
     private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
@@ -97,13 +95,6 @@ public final class BeanBuilderGenerator {
         // else no initializer
 
         return EnrichedField.of(jsonKey, field, spec.build());
-    }
-
-    private static TypeName asRawType(TypeName type) {
-        if (type instanceof ParameterizedTypeName) {
-            return ((ParameterizedTypeName) type).rawType;
-        }
-        return type;
     }
 
     private static Iterable<MethodSpec> createSetters(
@@ -151,7 +142,7 @@ public final class BeanBuilderGenerator {
             return CodeBlocks.statement("this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))",
                     spec.name, Objects.class);
         } else if (spec.type.isPrimitive()) {
-            // primitive type non-nullity is enforced by runtime
+            // primitive type non-nullity already enforced
             return CodeBlocks.statement("this.$1N = $1N", spec.name);
         } else {
             return CodeBlocks.statement("this.$1N = $2T.requireNonNull($1N, \"$1N cannot be null\")",
@@ -181,12 +172,11 @@ public final class BeanBuilderGenerator {
             TypeMapper typeMapper,
             FieldSpec field,
             OptionalType type) {
-        CodeBlock assignment = optionalAssignmentStatement(typeMapper, field, type);
         return MethodSpec.methodBuilder(field.name)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(typeMapper.getClassName(type.itemType()), field.name)
                 .returns(builderClass)
-                .addCode(assignment)
+                .addCode(optionalAssignmentStatement(typeMapper, field, type))
                 .addStatement("return this")
                 .build();
     }
@@ -196,9 +186,9 @@ public final class BeanBuilderGenerator {
             switch ((PrimitiveType) type.itemType()) {
                 case INTEGER:
                 case DOUBLE:
-                    return CodeBlocks.statement("this.$1N = $2T.of($1N)", field.name, typeMapper.getClassName(type));
                 case BOOLEAN:
-                    return CodeBlocks.statement("this.$1N = $2T.of($1N)", field.name, typeMapper.getOptionalType());
+                    return CodeBlocks.statement("this.$1N = $2T.of($1N)",
+                            field.name, asRawType(typeMapper.getClassName(type)));
                 case STRING:
                 default:
                     // not special
@@ -243,6 +233,13 @@ public final class BeanBuilderGenerator {
                 .returns(objectClass)
                 .addStatement("return new $L", Expressions.constructorCall(objectClass, fields))
                 .build();
+    }
+
+    private static TypeName asRawType(TypeName type) {
+        if (type instanceof ParameterizedTypeName) {
+            return ((ParameterizedTypeName) type).rawType;
+        }
+        return type;
     }
 
 }
