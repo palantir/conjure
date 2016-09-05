@@ -38,6 +38,8 @@ types:
           items: map<string, any>
       AliasExample:
         alias: string
+      DoubleAliasExample:
+        alias: double
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>

@@ -12,12 +12,12 @@ public final class AliasExample {
         this.value = value;
     }
 
+    @JsonValue
     public String get() {
         return value;
     }
 
     @Override
-    @JsonValue
     public String toString() {
         return value.toString();
     }
