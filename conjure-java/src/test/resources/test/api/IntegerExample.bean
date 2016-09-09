@@ -32,6 +32,14 @@ public final class IntegerExample {
         return Objects.hash(integer);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("IntegerExample").append("{")
+                .append("integer").append(": ").append(integer)
+            .append("}")
+            .toString();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

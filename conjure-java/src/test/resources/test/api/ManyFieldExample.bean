@@ -91,6 +91,21 @@ public final class ManyFieldExample {
         return Objects.hash(string, integer, doubleValue, optionalItem, items, set, map, alias);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("ManyFieldExample").append("{")
+                .append("string").append(": ").append(string)
+                .append(", ").append("integer").append(": ").append(integer)
+                .append(", ").append("doubleValue").append(": ").append(doubleValue)
+                .append(", ").append("optionalItem").append(": ").append(optionalItem)
+                .append(", ").append("items").append(": ").append(items)
+                .append(", ").append("set").append(": ").append(set)
+                .append(", ").append("map").append(": ").append(map)
+                .append(", ").append("alias").append(": ").append(alias)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(String string, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, AliasExample alias) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");

@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.defs.services;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.JsonMappingException;

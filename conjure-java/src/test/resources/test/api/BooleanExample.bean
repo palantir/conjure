@@ -32,6 +32,14 @@ public final class BooleanExample {
         return Objects.hash(coin);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("BooleanExample").append("{")
+                .append("coin").append(": ").append(coin)
+            .append("}")
+            .toString();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

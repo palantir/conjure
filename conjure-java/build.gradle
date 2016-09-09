@@ -11,8 +11,8 @@ dependencies {
     compile 'org.apache.commons:commons-lang3'
     compile 'org.slf4j:slf4j-api'
 
-    testCompile 'com.google.truth:truth'
     testCompile 'junit:junit'
+    testCompile 'org.assertj:assertj-core'
     testCompile 'org.hamcrest:hamcrest-core'
     testCompile 'org.mockito:mockito-core'
 

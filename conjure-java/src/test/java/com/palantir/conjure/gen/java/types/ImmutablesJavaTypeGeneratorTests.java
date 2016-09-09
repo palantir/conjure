@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;

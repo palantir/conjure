@@ -36,6 +36,14 @@ public final class OptionalExample {
         return Objects.hash(item);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("OptionalExample").append("{")
+                .append("item").append(": ").append(item)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(Optional<String> item) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, item, "item");

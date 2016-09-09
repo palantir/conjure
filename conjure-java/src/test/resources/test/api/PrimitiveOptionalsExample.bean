@@ -52,6 +52,16 @@ public final class PrimitiveOptionalsExample {
         return Objects.hash(num, bool, integer);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("PrimitiveOptionalsExample").append("{")
+                .append("num").append(": ").append(num)
+                .append(", ").append("bool").append(": ").append(bool)
+                .append(", ").append("integer").append(": ").append(integer)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");

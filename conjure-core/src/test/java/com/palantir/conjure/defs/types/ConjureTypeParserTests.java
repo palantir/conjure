@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.parsec.ParseException;

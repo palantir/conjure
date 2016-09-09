@@ -38,6 +38,14 @@ public final class MapExample {
         return Objects.hash(items);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("MapExample").append("{")
+                .append("items").append(": ").append(items)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(Map<String, String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");

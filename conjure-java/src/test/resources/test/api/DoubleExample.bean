@@ -32,6 +32,14 @@ public final class DoubleExample {
         return Objects.hash(doubleValue);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("DoubleExample").append("{")
+                .append("doubleValue").append(": ").append(doubleValue)
+            .append("}")
+            .toString();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

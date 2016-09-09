@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +92,8 @@ public final class BeanGenerator implements TypeGenerator {
                 .addMethods(createGetters(fields))
                 .addMethod(createEquals(objectClass))
                 .addMethod(createEqualTo(objectClass, poetFields))
-                .addMethod(createHashCode(poetFields));
+                .addMethod(createHashCode(poetFields))
+                .addMethod(createToString(typeName, poetFields));
 
         if (!nonPrimitivePoetFields.isEmpty()) {
             typeBuilder
@@ -229,6 +231,28 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
+    private static MethodSpec createToString(String thisClassName, Collection<FieldSpec> poetFields) {
+        CodeBlock returnStatement = CodeBlock.builder()
+                .add("return new $T($S).append(\"{\")\n", StringBuilder.class, thisClassName)
+                .indent()
+                    .indent()
+                        .add(CodeBlocks.of(poetFields.stream()
+                            .map(f -> CodeBlock.of(".append($1S).append(\": \").append($1N)\n", f.name))
+                            .collect(joining(CodeBlock.of(".append(\", \")")))))
+                    .unindent()
+                    .add(".append(\"}\")\n")
+                    .addStatement(".toString()")
+                .unindent()
+                .build();
+
+        return MethodSpec.methodBuilder("toString")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(String.class))
+                .addCode(returnStatement)
+                .build();
+    }
+
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("validateFields")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
@@ -280,6 +304,23 @@ public final class BeanGenerator implements TypeGenerator {
 
     public static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
+    }
+
+    private static <T> Collector<T, ArrayList<T>, ArrayList<T>> joining(T delim) {
+        return Collector.of(ArrayList::new,
+                (list, element) -> {
+                    if (!list.isEmpty()) {
+                        list.add(delim);
+                    }
+                    list.add(element);
+                },
+                (list1, list2) -> {
+                    if (!list1.isEmpty()) {
+                        list1.add(delim);
+                    }
+                    list1.addAll(list2);
+                    return list1;
+                });
     }
 
     @Value.Immutable

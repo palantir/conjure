@@ -35,6 +35,14 @@ public final class StringExample {
         return Objects.hash(string);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("StringExample").append("{")
+                .append("string").append(": ").append(string)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(String string) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");

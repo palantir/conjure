@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.gen.typescript.services;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.CharStreams;
 import com.palantir.conjure.defs.Conjure;

@@ -35,6 +35,14 @@ public final class AnyExample {
         return Objects.hash(any);
     }
 
+    @Override
+    public String toString() {
+        return new StringBuilder("AnyExample").append("{")
+                .append("any").append(": ").append(any)
+            .append("}")
+            .toString();
+    }
+
     private static void validateFields(Object any) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, any, "any");

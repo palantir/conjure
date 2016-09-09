@@ -6,8 +6,8 @@ dependencies {
     compile 'com.google.guava:guava'
     compile 'org.apache.commons:commons-lang3'
 
-    testCompile 'com.google.truth:truth'
     testCompile 'junit:junit'
+    testCompile 'org.assertj:assertj-core'
     testCompile 'org.hamcrest:hamcrest-core'
     testCompile 'org.mockito:mockito-core'
 

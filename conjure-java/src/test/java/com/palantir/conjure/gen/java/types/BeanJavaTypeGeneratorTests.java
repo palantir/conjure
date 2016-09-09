@@ -4,16 +4,16 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.io.CharStreams;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.JavaFile;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Set;
 import org.junit.Test;
 
@@ -50,9 +50,15 @@ public final class BeanJavaTypeGeneratorTests {
 
     private void assertThatFilesAreTheSame(Set<JavaFile> files) throws IOException {
         for (JavaFile file : files) {
-            assertThat(file.toString()).isEqualTo(CharStreams.toString(
-                    new InputStreamReader(getClass().getResourceAsStream("/test/api/" + file.typeSpec.name + ".bean"),
-                            StandardCharsets.UTF_8)));
+            File expectedFile = new File("src/test/resources/test/api/" + file.typeSpec.name + ".bean");
+            if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
+                // help make shrink-wrapping output sane
+                if (!expectedFile.exists()) {
+                    Files.write(expectedFile.toPath(), file.toString().getBytes(StandardCharsets.UTF_8));
+                }
+            }
+            assertThat(file.toString())
+                    .isEqualTo(new String(Files.readAllBytes(expectedFile.toPath()), StandardCharsets.UTF_8));
         }
     }
 }
