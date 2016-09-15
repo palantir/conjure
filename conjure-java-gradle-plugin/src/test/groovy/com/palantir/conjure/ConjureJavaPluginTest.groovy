@@ -53,6 +53,17 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.UP_TO_DATE
     }
 
+    def 'compileJava causes full task hierarchy to execute' () {
+        when:
+        def result = run("compileJava")
+
+        then:
+        result.task(":cleanGeneratedCode").outcome == TaskOutcome.UP_TO_DATE
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.UP_TO_DATE
+        result.task(":compileGeneratedJava").outcome == TaskOutcome.UP_TO_DATE
+        result.task(":compileJava").outcome == TaskOutcome.UP_TO_DATE
+    }
+
     def 'compiles all source files'() {
         when:
         createSourceFile("a.yml", readResource("test-service-a.yml"))
