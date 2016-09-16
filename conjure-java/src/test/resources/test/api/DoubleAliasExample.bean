@@ -2,7 +2,9 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import javax.annotation.Generated;
 
+@Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
 public final class DoubleAliasExample {
     private final double value;
 

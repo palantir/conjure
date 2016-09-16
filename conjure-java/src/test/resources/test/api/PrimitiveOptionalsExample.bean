@@ -8,10 +8,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import javax.annotation.Generated;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
+@Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class PrimitiveOptionalsExample {
     private final OptionalDouble num;
 

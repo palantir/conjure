@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -110,6 +111,8 @@ public final class BeanGenerator implements TypeGenerator {
                     .addMember("ignoreUnknown", "$L", true)
                     .build());
         }
+
+        typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 
         if (typeDef.docs().isPresent()) {
             typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));

@@ -9,10 +9,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Generated;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
+@Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class SetExample {
     private final Set<String> items;
 

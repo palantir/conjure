@@ -3,7 +3,9 @@ package test.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
+import javax.annotation.Generated;
 
+@Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
 public final class EnumExample {
     public static final EnumExample ONE = new EnumExample(Value.ONE);
 
@@ -56,6 +58,7 @@ public final class EnumExample {
         }
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
     public enum Value {
         ONE,
 

@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
+import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -58,6 +59,7 @@ public final class EnumGenerator {
     private static TypeSpec createSafeEnum(String typeName, EnumTypeDefinition typeDef, ClassName thisClass,
             ClassName enumClass) {
         TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName)
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addType(createEnum(enumClass.simpleName(), typeDef.values(), true))
                 .addField(enumClass, "value", Modifier.PRIVATE, Modifier.FINAL)
@@ -104,6 +106,7 @@ public final class EnumGenerator {
 
     private static TypeSpec createEnum(String typeName, Set<EnumValueDefinition> values, boolean withUnknown) {
         TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(typeName)
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC);
         for (EnumValueDefinition value : values) {
             TypeSpec.Builder enumClass = TypeSpec.anonymousClassBuilder("");

@@ -1,8 +1,11 @@
 package test.api;
 
+import javax.annotation.Generated;
+
 /**
  * An enum that's just an enum.
  */
+@Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
 public enum BareEnumExample {
     ONE,
 

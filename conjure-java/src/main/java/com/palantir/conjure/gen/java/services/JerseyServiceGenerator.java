@@ -9,6 +9,7 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.types.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
@@ -49,7 +50,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         .build())
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
                         .addMember("value", "$T.APPLICATION_JSON", ClassName.get("javax.ws.rs.core", "MediaType"))
-                        .build());
+                        .build())
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(JerseyServiceGenerator.class));
 
         serviceDefinition.docs().ifPresent(docs ->
                 serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));

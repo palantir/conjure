@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Generated;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
+@Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class OptionalExample {
     private final Optional<String> item;
 

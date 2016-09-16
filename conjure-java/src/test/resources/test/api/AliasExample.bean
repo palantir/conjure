@@ -3,7 +3,9 @@ package test.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
+import javax.annotation.Generated;
 
+@Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
 public final class AliasExample {
     private final String value;
 

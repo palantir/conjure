@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
+import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -36,6 +37,7 @@ public final class AliasGenerator {
         ClassName thisClass = ClassName.get(typePackage, typeName);
 
         TypeSpec.Builder spec = TypeSpec.classBuilder(typeName)
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(AliasGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(aliasType, "value", Modifier.PRIVATE, Modifier.FINAL)
                 .addMethod(createConstructor(aliasType))

@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -56,6 +57,7 @@ public final class ImmutablesJavaTypeGenerator implements TypeGenerator {
         String packageName = typeDef.packageName().orElse(types.definitions().defaultPackage());
         TypeSpec.Builder typeBuilder = TypeSpec.interfaceBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(ImmutablesJavaTypeGenerator.class))
                 .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
                         .addMember("as", "$T.class", ClassName.get(packageName, "Immutable" + typeName)).build())
                 .addAnnotation(AnnotationSpec.builder(JsonSerialize.class)

@@ -10,6 +10,7 @@ import java.lang.String;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Generated;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/catalog")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
 public interface TestService {
     /**
      * Returns a mapping from file system id to backing file system configuration.

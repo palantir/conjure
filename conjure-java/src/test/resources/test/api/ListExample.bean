@@ -7,10 +7,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Generated;
 
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
+@Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class ListExample {
     private final List<String> items;
 
