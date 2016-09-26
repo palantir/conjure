@@ -1,6 +1,6 @@
 types:
   definitions:
-    default-package: test.api
+    default-package: com.palantir.test.api
     objects:
       StringExample:
         fields:

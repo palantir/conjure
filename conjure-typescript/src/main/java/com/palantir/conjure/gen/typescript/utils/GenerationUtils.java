@@ -5,7 +5,8 @@
 package com.palantir.conjure.gen.typescript.utils;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
@@ -16,17 +17,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public final class GenerationUtils {
 
-    private GenerationUtils() {
-        // No
-    }
+    private static final Pattern PACKAGE_BASE = Pattern.compile("^[^.]+\\.[^.]+\\.");
+    private static final Pattern PACKAGE = Pattern.compile(PACKAGE_BASE.pattern() + "[^.]+.*");
+
+    private GenerationUtils() {}
 
     public static String packageNameToFolderPath(String packageName) {
-        return packageName.replace(".", "/");
+        Preconditions.checkArgument(PACKAGE.matcher(packageName).matches(), "packages should have at least 3 segments");
+        return PACKAGE_BASE.matcher(packageName).replaceAll("").replace(".", "/");
     }
 
     @VisibleForTesting
@@ -57,31 +61,32 @@ public final class GenerationUtils {
         return result.toString();
     }
 
-    public static ImportStatement createImportStatement(TypescriptType typescriptType, String currentPackage,
-            String currentName, String packageName, String name) {
-        return createImportStatement(Sets.newHashSet(typescriptType), currentPackage, currentName, packageName, name);
+    public static ImportStatement createImportStatement(TypescriptType typescriptType, String sourcePath,
+            String destPath) {
+        return createImportStatement(ImmutableSet.of(typescriptType), sourcePath, destPath);
     }
 
-    public static ImportStatement createImportStatement(Set<TypescriptType> typescriptType, String currentPackage,
-            String currentName, String packageName, String name) {
-        String sourcePath =  packageNameToFolderPath(currentPackage) + "/" + StringUtils.uncapitalize(currentName);
-        String destpath = packageNameToFolderPath(packageName) + "/" + StringUtils.uncapitalize(name);
-        return ImportStatement.builder().filepathToImport(getRelativePath(sourcePath, destpath)).addAllNamesToImport(
+    public static ImportStatement createImportStatement(Set<TypescriptType> typescriptType, String sourcePath,
+            String destPath) {
+        return ImportStatement.builder().filepathToImport(getRelativePath(sourcePath, destPath)).addAllNamesToImport(
                 typescriptType.stream().map(type -> type.name()).collect(Collectors.toList())).build();
 
     }
 
     public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
-            String currentName, String packageLocation, TypeMapper mapper) {
+            String sourceName, String sourcePackage, TypeMapper mapper) {
+        String folderLocation = GenerationUtils.packageNameToFolderPath(sourcePackage);
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
-                .filter(conjureType -> !conjureType.equals(currentName))
+                .filter(conjureType -> !conjureType.equals(sourceName))
                 .map(conjureType -> {
-                    String packageName = mapper.getContainingPackage(conjureType);
-                    if (packageName != null) {
+                    String destName = mapper.getContainingPackage(conjureType);
+                    if (destName != null) {
+                        String destFolder = GenerationUtils.packageNameToFolderPath(destName);
                         return GenerationUtils.createImportStatement(mapper.getTypescriptType(conjureType),
-                                packageLocation, currentName, packageName, conjureType.type());
+                                getTypescriptFilePath(folderLocation, sourceName),
+                                getTypescriptFilePath(destFolder, conjureType.type()));
                     } else {
                         return null;
                     }
@@ -92,5 +97,9 @@ public final class GenerationUtils {
 
     public static String getCharSource(File file) throws IOException {
         return Files.asCharSource(file, StandardCharsets.UTF_8).read();
+    }
+
+    public static String getTypescriptFilePath(String parentFolder, String name) {
+        return parentFolder + "/" + StringUtils.uncapitalize(name);
     }
 }

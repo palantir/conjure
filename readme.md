@@ -74,6 +74,17 @@ imports:
       java: com.palantir.ri.ResourceIdentifier
 ```
 
+### Packages
+Conjure supports packages, which are namespaces for objects. Package names 
+should follow the Java style naming convention: `com.example.name`
+
+This manifests in the generated languages as follows:
+
+* Java - the Conjure package name is the Java package name
+* TypeScript - the folder containing the object is the Conjure pakcage
+name with the first two segments removed (this is done for brevity). 
+For example: `com.example.folder1.folder2 -> folder1/folder2`
+
 ### Defined Types
 Defined types consist of objects completely specified within the context of a
 Conjure file (possibly referencing other type aliases, primitive types,

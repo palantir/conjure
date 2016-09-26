@@ -1,6 +1,6 @@
 types:
   definitions:
-    default-package: package
+    default-package: com.palantir.package
     objects:
       X:
         fields:

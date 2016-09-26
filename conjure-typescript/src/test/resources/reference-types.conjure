@@ -1,6 +1,6 @@
 types:
   definitions: 
-    default-package: package1
+    default-package: com.palantir.package1
     objects:
       X:
         fields:
@@ -8,10 +8,10 @@ types:
           fy: Y
           fz: Z
       Y:
-        package: package1/folder
+        package: com.palantir.package1.folder
         fields:
           fstring: string
       Z:
-        package: package2/folder
+        package: com.palantir.package2.folder
         fields:
           fstring: string

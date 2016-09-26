@@ -31,8 +31,9 @@ public final class StaticGenerator {
                     TypescriptType.builder().name("IHttpEndpointOptions").build());
             TypescriptFile httpApiBridgeImplFile = TypescriptFile.builder()
                     .name("httpApiBridgeImpl")
-                    .addImports(GenerationUtils.createImportStatement(typesToImport, "static", "httpApiBridgeImpl",
-                            "static", "httpApiBridge"))
+                    .addImports(GenerationUtils.createImportStatement(typesToImport,
+                            GenerationUtils.getTypescriptFilePath("static", "httpApiBridgeImpl"),
+                            GenerationUtils.getTypescriptFilePath("static", "httpApiBridge")))
                     .addEmittables(RawEmittable.builder().content(httpApiBridgeImpl).build())
                     .parentFolderPath("static")
                     .build();

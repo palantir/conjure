@@ -84,11 +84,13 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         return TypescriptFile.builder()
                 .addEmittables(typescriptClass)
                 .imports(ServiceUtils.generateImportStatements(serviceDef, clazz, packageLocation, typeMapper))
-                .addImports(GenerationUtils.createImportStatement(typesToImport, packageLocation, clazz, "static",
-                        "httpApiBridge"))
+                .addImports(GenerationUtils.createImportStatement(typesToImport,
+                        GenerationUtils.getTypescriptFilePath(parentFolderPath, clazz),
+                        GenerationUtils.getTypescriptFilePath("static", "httpApiBridge")))
                 .addImports(
                         GenerationUtils.createImportStatement(TypescriptType.builder().name("getHttpApiBridge").build(),
-                                packageLocation, clazz, "static", "utils"))
+                                GenerationUtils.getTypescriptFilePath(parentFolderPath, clazz),
+                                GenerationUtils.getTypescriptFilePath("static", "utils")))
                 .name(clazz + "Impl")
                 .parentFolderPath(parentFolderPath)
                 .build();

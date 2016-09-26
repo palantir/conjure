@@ -1,5 +1,5 @@
-import { IHttpApiBridge } from "../../../../../static/httpApiBridge";
-import { getHttpApiBridge } from "../../../../../static/utils";
+import { IHttpApiBridge } from "../../../static/httpApiBridge";
+import { getHttpApiBridge } from "../../../static/utils";
 import { ICreateDatasetRequest } from "./createDatasetRequest";
 import { IBackingFileSystem } from "./datasets/backingFileSystem";
 import { IDataset } from "./datasets/dataset";

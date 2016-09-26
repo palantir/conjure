@@ -4,9 +4,9 @@
 
 import { assert } from "chai";
 
-import { ICalculatorService } from "../../src/conjure/com/palantir/typescriptetetest/api/calculatorService";
-import { CalculatorService } from "../../src/conjure/com/palantir/typescriptetetest/api/calculatorServiceImpl";
 import { setApiToken } from "../../src/conjure/static/utils";
+import { ICalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorService";
+import { CalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorServiceImpl";
 
 describe.only("End to end calculator service tests", () => {
     let service: ICalculatorService;
