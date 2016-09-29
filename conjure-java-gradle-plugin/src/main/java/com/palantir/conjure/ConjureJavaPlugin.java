@@ -13,8 +13,11 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.quality.Checkstyle;
+import org.gradle.api.plugins.quality.FindBugs;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskCollection;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
@@ -75,5 +78,15 @@ public class ConjureJavaPlugin implements Plugin<Project> {
             IdeaModel idea = project.getExtensions().getByType(IdeaModel.class);
             idea.getModule().getSourceDirs().addAll(generatedSourceSet.getAllSource().getSrcDirs());
         });
+
+        // exclude checkstyle + findbugs
+        TaskCollection<Checkstyle> checkstyles = project.getTasks().withType(Checkstyle.class);
+        if (!checkstyles.isEmpty()) {
+            checkstyles.getByName("checkstyleGenerated").setEnabled(false);
+        }
+        TaskCollection<FindBugs> findbugs = project.getTasks().withType(FindBugs.class);
+        if (!findbugs.isEmpty()) {
+            findbugs.getByName("findbugsGenerated").setEnabled(false);
+        }
     }
 }

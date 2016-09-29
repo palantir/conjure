@@ -13,6 +13,8 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         buildFile << """
         plugins {
             id 'com.palantir.gradle-conjure-java'
+            id 'findbugs'
+            id 'checkstyle'
         }
 
         repositories { jcenter() }
@@ -116,6 +118,17 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         then:
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         result.task(":compileGeneratedJava").outcome == TaskOutcome.SUCCESS
+    }
+
+    def 'findbugs and checkstyle skipped for generated source set'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-a.yml"))
+        def result = run("build", "--stacktrace")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+        result.task(":checkstyleGenerated").outcome == TaskOutcome.SKIPPED
+        result.task(":findbugsGenerated").outcome == TaskOutcome.SKIPPED
     }
 
     def createSourceFile(String fileName, String text) {
