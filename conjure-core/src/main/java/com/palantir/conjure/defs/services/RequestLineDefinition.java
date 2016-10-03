@@ -11,13 +11,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.services.RequestLineDefinition.RequestLineDefinitionDeserializer;
 import java.io.IOException;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.glassfish.jersey.uri.UriTemplate;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -25,20 +24,14 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface RequestLineDefinition {
 
-    Pattern PATH_ARG = Pattern.compile("\\{([^\\}]+)\\}");
-
     String method();
 
     String path();
 
     @Value.Derived
     default Set<String> pathArgs() {
-        Matcher matcher = PATH_ARG.matcher(path());
-        ImmutableSet.Builder<String> set = ImmutableSet.builder();
-        while (matcher.find()) {
-            set.add(matcher.group(1));
-        }
-        return set.build();
+        UriTemplate uriTemplate = new UriTemplate(path());
+        return uriTemplate.getTemplateVariables().stream().collect(Collectors.toSet());
     }
 
     static RequestLineDefinition of(String method, String path) {

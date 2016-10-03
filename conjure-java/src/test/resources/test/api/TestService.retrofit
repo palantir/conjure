@@ -45,4 +45,7 @@ public interface TestService {
     @GET("/catalog/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
     Call<Set<String>> getBranchesDeprecated(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET("/catalog/datasets/{datasetRid}/branches/{branch}/resolve")
+    Call<Optional<String>> resolveBranch(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid, @Path(value = "branch", encoded = true) String branch);
 }

@@ -55,4 +55,8 @@ public interface TestService {
     @Path("/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
     Set<String> getBranchesDeprecated(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/datasets/{datasetRid}/branches/{branch:.+}/resolve")
+    Optional<String> resolveBranch(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid, @PathParam("branch") String branch);
 }

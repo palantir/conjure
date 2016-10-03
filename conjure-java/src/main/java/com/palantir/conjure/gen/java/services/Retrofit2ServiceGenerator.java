@@ -4,6 +4,8 @@
 
 package com.palantir.conjure.gen.java.services;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
@@ -19,8 +21,11 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -76,10 +81,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             String basePath,
             AuthDefinition defaultAuth,
             TypeMapper typeMapper) {
+        Set<String> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
-                        .addMember("value", "$S", constructPath(basePath, endpointDef.http().path()))
+                        .addMember("value", "$S", constructPath(basePath, endpointDef.http().path(), encodedPathArgs))
                         .build());
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
                 ClassName.get("java.lang", "Deprecated")));
@@ -99,18 +105,44 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         getAuthParameter(methodBuilder, endpointDef.auth().orElse(defaultAuth)).ifPresent(methodBuilder::addParameter);
 
         endpointDef.args().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
-                .map(arg -> createEndpointParameter(typeMapper, pathArgs, arg.getKey(), arg.getValue()))
+                .map(arg -> createEndpointParameter(
+                        typeMapper, pathArgs, encodedPathArgs, arg.getKey(), arg.getValue()))
                 .collect(Collectors.toList())));
 
         return methodBuilder.build();
     }
 
-    private String constructPath(String basePath, String endpointPath) {
-        return basePath + StringUtils.prependIfMissing(endpointPath, "/");
+    private Set<String> extractEncodedPathArgs(String path) {
+        Pattern pathArg = Pattern.compile("\\{([^\\}]+)\\}");
+        Matcher matcher = pathArg.matcher(path);
+        ImmutableSet.Builder<String> encodedArgs = ImmutableSet.builder();
+        while (matcher.find()) {
+            String arg = matcher.group(1);
+            if (arg.contains(":")) {
+                // Strip everything after first colon
+                encodedArgs.add(arg.substring(0, arg.indexOf(':')));
+            }
+        }
+        return encodedArgs.build();
+    }
+
+    private String constructPath(String basePath, String endpointPath, Set<String> encodedPathArgs) {
+        // For encoded arguments, strip everything after argument name in endpointPath
+        String purifiedEndpointPath = replaceEncodedPathArgs(endpointPath, 0, Lists.newArrayList(encodedPathArgs));
+        return basePath + StringUtils.prependIfMissing(purifiedEndpointPath, "/");
+    }
+
+    private String replaceEncodedPathArgs(String path, int currentArg, List<String> encodedPathArgs) {
+        if (currentArg >= encodedPathArgs.size()) {
+            return path;
+        }
+        String pattern = String.format("\\{%s([^\\}]+)\\}", encodedPathArgs.get(currentArg));
+        String replacement = String.format("{%s}", encodedPathArgs.get(currentArg));
+        return replaceEncodedPathArgs(path.replaceFirst(pattern, replacement), currentArg + 1, encodedPathArgs);
     }
 
     private ParameterSpec createEndpointParameter(TypeMapper typeMapper, Set<String> pathArgs,
-            String paramKey, ArgumentDefinition def) {
+            Set<String> encodedPathArgs, String paramKey, ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
                 typeMapper.getClassName(def.type()),
                 paramKey);
@@ -119,9 +151,12 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             case AUTO:
             case PATH:
                 if (pathArgs.contains(paramKey)) {
-                    param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                            .addMember("value", "$S", def.paramId().orElse(paramKey))
-                            .build());
+                    AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
+                            .addMember("value", "$S", def.paramId().orElse(paramKey));
+                    if (encodedPathArgs.contains(paramKey)) {
+                        builder.addMember("encoded", "$L", true);
+                    }
+                    param.addAnnotation(builder.build());
                 } else {
                     param.addAnnotation(ClassName.get("retrofit2.http", "Body"));
                 }

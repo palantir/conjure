@@ -3,10 +3,11 @@ apply from: "${rootDir}/gradle/publish-libs.gradle"
 dependencies {
     compile project(':parsec')
 
-    compile 'com.google.guava:guava'
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    compile 'com.google.guava:guava'
+    compile 'org.glassfish.jersey.core:jersey-common'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'

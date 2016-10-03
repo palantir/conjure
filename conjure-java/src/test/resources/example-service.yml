@@ -83,3 +83,9 @@ services:
           Gets all branches of this dataset.
         deprecated: use getBranches instead
 
+      resolveBranch:
+        http: GET /datasets/{datasetRid}/branches/{branch:.+}/resolve
+        args:
+          datasetRid: ResourceIdentifier
+          branch: string
+        returns: optional<string>
