@@ -9,12 +9,17 @@ import java.nio.charset.Charset
 import org.gradle.testkit.runner.TaskOutcome
 
 public class ConjureJavaPluginTest extends GradleTestSpec {
+
+    private static final String FAIL_ECLIPSE_CONTAINS_RESOURCES_GENERATED_FOLDER =
+            "FAIL: Eclipse classpath contains build/resources/generated folder";
+
     def setup() {
         buildFile << """
         plugins {
             id 'com.palantir.gradle-conjure-java'
             id 'findbugs'
             id 'checkstyle'
+            id 'eclipse'
         }
 
         repositories { jcenter() }
@@ -44,6 +49,14 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         sc.init(null, [nullTrustManager as X509TrustManager] as TrustManager[], null)
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
         HttpsURLConnection.setDefaultHostnameVerifier(nullHostnameVerifier as HostnameVerifier)
+
+        afterEvaluate {
+            sourceSets.generated.runtimeClasspath.each {
+                if (it.toString().contains("build/resources/generated")) {
+                    println "${FAIL_ECLIPSE_CONTAINS_RESOURCES_GENERATED_FOLDER}"
+                }
+            }
+        }
         """
     }
 
@@ -129,6 +142,16 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         result.task(":checkstyleGenerated").outcome == TaskOutcome.SKIPPED
         result.task(":findbugsGenerated").outcome == TaskOutcome.SKIPPED
+    }
+
+    def 'eclipse does not include build/resources/generated as a classpath entry'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-a.yml"))
+        def result = run("eclipse", "--stacktrace")
+
+        then:
+        result.task(":eclipse").outcome == TaskOutcome.SUCCESS
+        !result.output.contains(FAIL_ECLIPSE_CONTAINS_RESOURCES_GENERATED_FOLDER)
     }
 
     def createSourceFile(String fileName, String text) {

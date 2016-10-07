@@ -38,6 +38,10 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         SourceSet generatedSourceSet = project.getConvention().getPlugin(JavaPluginConvention.class)
                 .getSourceSets().create("generated");
 
+        // generated sources will not have resources, so disable the resource dir output to stop weird
+        // eclipse classpath problems
+        generatedSourceSet.getOutput().setResourcesDir(null);
+
         // conjure code source set
         SourceDirectorySet conjureSourceSet = sourceDirectorySetFactory.create("conjure");
         conjureSourceSet.setSrcDirs(Collections.singleton("src/main/conjure"));
@@ -82,11 +86,11 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         // exclude checkstyle + findbugs
         TaskCollection<Checkstyle> checkstyles = project.getTasks().withType(Checkstyle.class);
         if (!checkstyles.isEmpty()) {
-            checkstyles.getByName("checkstyleGenerated").setEnabled(false);
+            checkstyles.getByName(generatedSourceSet.getTaskName("checkstyle", "")).setEnabled(false);
         }
         TaskCollection<FindBugs> findbugs = project.getTasks().withType(FindBugs.class);
         if (!findbugs.isEmpty()) {
-            findbugs.getByName("findbugsGenerated").setEnabled(false);
+            findbugs.getByName(generatedSourceSet.getTaskName("findbugs", "")).setEnabled(false);
         }
     }
 }
