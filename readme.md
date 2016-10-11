@@ -163,7 +163,7 @@ docs: optional docs
 
 #### Examples
 See also:
- * [Example Type Definitions](conjure-java/src/test/resources/example-types.conjure)
+ * [Example Type Definitions](conjure-java/src/test/resources/example-types.yml)
  * [Example Generated Java Code](conjure-java/src/test/resources/test/api)
  * [Example Generated TypeScript Code](conjure-typescript/src/test/resources/types)
 
