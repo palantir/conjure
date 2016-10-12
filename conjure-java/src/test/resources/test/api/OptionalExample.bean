@@ -72,6 +72,9 @@ public final class OptionalExample {
     public static final class Builder {
         private Optional<String> item = Optional.empty();
 
+        private Builder() {
+        }
+
         public Builder from(OptionalExample other) {
             item(other.getItem());
             return this;

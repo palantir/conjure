@@ -96,6 +96,9 @@ public final class PrimitiveOptionalsExample {
 
         private OptionalInt integer = OptionalInt.empty();
 
+        private Builder() {
+        }
+
         public Builder from(PrimitiveOptionalsExample other) {
             num(other.getNum());
             bool(other.getBool());

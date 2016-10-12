@@ -49,6 +49,9 @@ public final class DoubleExample {
     public static final class Builder {
         private double doubleValue;
 
+        private Builder() {
+        }
+
         public Builder from(DoubleExample other) {
             doubleValue(other.getDoubleValue());
             return this;

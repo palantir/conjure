@@ -75,6 +75,9 @@ public final class SetExample {
     public static final class Builder {
         private Set<String> items = new LinkedHashSet<>();
 
+        private Builder() {
+        }
+
         public Builder from(SetExample other) {
             items(other.getItems());
             return this;

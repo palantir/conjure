@@ -71,6 +71,9 @@ public final class AnyExample {
     public static final class Builder {
         private Object any;
 
+        private Builder() {
+        }
+
         public Builder from(AnyExample other) {
             any(other.getAny());
             return this;

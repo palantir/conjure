@@ -48,10 +48,15 @@ public final class BeanBuilderGenerator {
         return TypeSpec.classBuilder("Builder")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                 .addFields(poetFields)
+                .addMethod(createConstructor())
                 .addMethod(createFromObject(builderClass, objectClass, fields))
                 .addMethods(createSetters(builderClass, typeMapper, fields))
                 .addMethod(createBuild(objectClass, poetFields))
                 .build();
+    }
+
+    private static MethodSpec createConstructor() {
+        return MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE).build();
     }
 
     private static MethodSpec createFromObject(

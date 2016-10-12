@@ -73,6 +73,9 @@ public final class ListExample {
     public static final class Builder {
         private List<String> items = new ArrayList<>();
 
+        private Builder() {
+        }
+
         public Builder from(ListExample other) {
             items(other.getItems());
             return this;

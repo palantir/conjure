@@ -49,6 +49,9 @@ public final class IntegerExample {
     public static final class Builder {
         private int integer;
 
+        private Builder() {
+        }
+
         public Builder from(IntegerExample other) {
             integer(other.getInteger());
             return this;

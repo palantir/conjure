@@ -71,6 +71,9 @@ public final class StringExample {
     public static final class Builder {
         private String string;
 
+        private Builder() {
+        }
+
         public Builder from(StringExample other) {
             string(other.getString());
             return this;

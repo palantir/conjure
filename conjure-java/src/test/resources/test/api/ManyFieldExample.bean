@@ -153,6 +153,9 @@ public final class ManyFieldExample {
 
         private AliasExample alias;
 
+        private Builder() {
+        }
+
         public Builder from(ManyFieldExample other) {
             string(other.getString());
             integer(other.getInteger());

@@ -49,6 +49,9 @@ public final class BooleanExample {
     public static final class Builder {
         private boolean coin;
 
+        private Builder() {
+        }
+
         public Builder from(BooleanExample other) {
             coin(other.getCoin());
             return this;

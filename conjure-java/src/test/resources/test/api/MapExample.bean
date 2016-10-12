@@ -74,6 +74,9 @@ public final class MapExample {
     public static final class Builder {
         private Map<String, String> items = new LinkedHashMap<>();
 
+        private Builder() {
+        }
+
         public Builder from(MapExample other) {
             items(other.getItems());
             return this;
