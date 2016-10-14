@@ -9,14 +9,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @JsonDeserialize(as = AuthDefinition.class)
-@JsonSerialize(as = AuthDefinition.class)
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface AuthDefinition {
 
     String AUTH_HEADER = "Authorization";

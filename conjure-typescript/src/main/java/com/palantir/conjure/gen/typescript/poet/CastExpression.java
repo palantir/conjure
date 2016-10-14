@@ -18,7 +18,9 @@ public interface CastExpression extends TypescriptExpression {
         writer.emit(expression()).write(" as ").write(type());
     }
 
-    static ImmutableCastExpression.Builder builder() {
-        return ImmutableCastExpression.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableCastExpression.Builder {}
 }

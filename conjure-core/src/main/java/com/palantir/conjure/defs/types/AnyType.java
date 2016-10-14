@@ -7,8 +7,8 @@ package com.palantir.conjure.defs.types;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface AnyType extends ConjureType {
 
     // marker interface

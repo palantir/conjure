@@ -60,7 +60,9 @@ public interface TypescriptFile {
         return baos.toString(StandardCharsets.UTF_8.name());
     }
 
-    static ImmutableTypescriptFile.Builder builder() {
-        return ImmutableTypescriptFile.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableTypescriptFile.Builder {}
 }

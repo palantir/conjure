@@ -24,7 +24,9 @@ public interface FunctionCallExpression extends TypescriptExpression {
         writer.write(")");
     }
 
-    static ImmutableFunctionCallExpression.Builder builder() {
-        return ImmutableFunctionCallExpression.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableFunctionCallExpression.Builder {}
 }

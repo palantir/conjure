@@ -25,8 +25,10 @@ public interface TypescriptConstructor extends Emittable {
         writer.emit(functionBody());
     }
 
-    static ImmutableTypescriptConstructor.Builder builder() {
-        return ImmutableTypescriptConstructor.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableTypescriptConstructor.Builder {}
 }
 

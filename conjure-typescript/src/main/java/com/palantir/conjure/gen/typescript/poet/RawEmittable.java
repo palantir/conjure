@@ -17,7 +17,9 @@ public interface RawEmittable extends Emittable {
         writer.write(content());
     }
 
-    static ImmutableRawEmittable.Builder builder() {
-        return ImmutableRawEmittable.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableRawEmittable.Builder {}
 }

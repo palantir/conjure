@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -16,13 +17,15 @@ import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @JsonDeserialize(using = FieldDefinitionDeserializer.class)
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface FieldDefinition {
 
+    @JsonProperty("type")
     ConjureType type();
 
+    @JsonProperty("docs")
     Optional<String> docs();
 
     static FieldDefinition of(ConjureType type) {

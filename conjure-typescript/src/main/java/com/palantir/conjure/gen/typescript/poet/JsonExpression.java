@@ -23,7 +23,9 @@ public interface JsonExpression extends TypescriptExpression {
         writer.writeIndented("}");
     }
 
-    static ImmutableJsonExpression.Builder builder() {
-        return ImmutableJsonExpression.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableJsonExpression.Builder {}
 }

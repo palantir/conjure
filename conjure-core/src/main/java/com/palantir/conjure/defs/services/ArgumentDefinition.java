@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.services;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -18,17 +19,21 @@ import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @JsonDeserialize(using = ArgumentDefinitionDeserializer.class)
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface ArgumentDefinition {
 
+    @JsonProperty("type")
     ConjureType type();
 
+    @JsonProperty("docs")
     Optional<String> docs();
 
+    @JsonProperty("param-id")
     Optional<String> paramId();
 
+    @JsonProperty("param-type")
     @Value.Default
     default ParamType paramType() {
         return ParamType.AUTO;

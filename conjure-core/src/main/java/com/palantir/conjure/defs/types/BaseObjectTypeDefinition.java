@@ -20,6 +20,7 @@ public interface BaseObjectTypeDefinition {
     @JsonProperty("package")
     Optional<String> packageName();
 
+    @JsonProperty("docs")
     Optional<String> docs();
 
     class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {

@@ -21,10 +21,6 @@ public interface ImportStatement extends Comparable<ImportStatement>, Emittable 
                 "import { " + Joiner.on(", ").join(namesToImport()) + " } from \"" + filepathToImport() + "\";");
     }
 
-    static ImmutableImportStatement.Builder builder() {
-        return ImmutableImportStatement.builder();
-    }
-
     @Override
     default int compareTo(ImportStatement other) {
         int pathCompare = this.filepathToImport().compareTo(other.filepathToImport());
@@ -41,4 +37,10 @@ public interface ImportStatement extends Comparable<ImportStatement>, Emittable 
             return pathCompare;
         }
     }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableImportStatement.Builder {}
 }

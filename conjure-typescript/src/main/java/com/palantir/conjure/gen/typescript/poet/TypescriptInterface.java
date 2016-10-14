@@ -45,7 +45,9 @@ public interface TypescriptInterface extends Emittable {
         writer.decreaseIndent().writeIndentedLine("}");
     }
 
-    static ImmutableTypescriptInterface.Builder builder() {
-        return ImmutableTypescriptInterface.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableTypescriptInterface.Builder {}
 }

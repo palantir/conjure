@@ -21,7 +21,9 @@ public interface TypescriptFunction extends Emittable {
         functionBody().emit(writer);
     }
 
-    static ImmutableTypescriptFunction.Builder builder() {
-        return ImmutableTypescriptFunction.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableTypescriptFunction.Builder {}
 }

@@ -18,10 +18,6 @@ public interface TypescriptTypeSignature extends Comparable<TypescriptTypeSignat
     String name();
     TypescriptType typescriptType();
 
-    static ImmutableTypescriptTypeSignature.Builder builder() {
-        return ImmutableTypescriptTypeSignature.builder();
-    }
-
     @Override
     default void emit(TypescriptPoetWriter writer) {
         writer.write(name());
@@ -40,4 +36,10 @@ public interface TypescriptTypeSignature extends Comparable<TypescriptTypeSignat
             return this.isOptional() ? 1 : -1;
         }
     }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableTypescriptTypeSignature.Builder {}
 }

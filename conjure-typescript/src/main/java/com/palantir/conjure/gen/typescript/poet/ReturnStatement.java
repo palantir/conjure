@@ -19,7 +19,9 @@ public interface ReturnStatement extends TypescriptStatement {
         writer.writeLine(";");
     }
 
-    static ImmutableReturnStatement.Builder builder() {
-        return ImmutableReturnStatement.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableReturnStatement.Builder {}
 }

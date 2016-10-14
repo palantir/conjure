@@ -24,7 +24,9 @@ public interface AssignStatement extends TypescriptStatement {
         writer.writeLine(";");
     }
 
-    static ImmutableAssignStatement.Builder builder() {
-        return ImmutableAssignStatement.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableAssignStatement.Builder {}
 }

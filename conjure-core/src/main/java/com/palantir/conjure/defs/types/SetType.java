@@ -4,13 +4,15 @@
 
 package com.palantir.conjure.defs.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface SetType extends ConjureType {
 
+    @JsonProperty("item-type")
     ConjureType itemType();
 
     static SetType of(ConjureType itemType) {

@@ -17,10 +17,6 @@ public interface TypescriptFunctionSignature extends Comparable<TypescriptFuncti
     List<TypescriptTypeSignature> parameters();
     Optional<TypescriptType> returnType();
 
-    static ImmutableTypescriptFunctionSignature.Builder builder() {
-        return ImmutableTypescriptFunctionSignature.builder();
-    }
-
     @Override
     default int compareTo(TypescriptFunctionSignature other) {
         return this.name().compareTo(other.name());
@@ -50,4 +46,10 @@ public interface TypescriptFunctionSignature extends Comparable<TypescriptFuncti
             returnType().get().emit(writer);
         }
     }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableTypescriptFunctionSignature.Builder {}
 }

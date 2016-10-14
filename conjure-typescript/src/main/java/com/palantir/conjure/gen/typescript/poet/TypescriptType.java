@@ -12,12 +12,14 @@ import org.immutables.value.Value;
 public interface TypescriptType extends Emittable {
     String name();
 
-    static ImmutableTypescriptType.Builder builder() {
-        return ImmutableTypescriptType.builder();
-    }
-
     @Override
     default void emit(TypescriptPoetWriter writer) {
         writer.write(name());
     }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableTypescriptType.Builder {}
 }

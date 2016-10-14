@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @JsonDeserialize(using = EnumValueDeserializer.class)
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface EnumValueDefinition {
 
     String value();

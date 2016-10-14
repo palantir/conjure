@@ -22,7 +22,9 @@ public interface TypescriptFunctionBody extends Emittable {
         writer.writeIndentedLine("}");
     }
 
-    static ImmutableTypescriptFunctionBody.Builder builder() {
-        return ImmutableTypescriptFunctionBody.builder();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableTypescriptFunctionBody.Builder {}
 }

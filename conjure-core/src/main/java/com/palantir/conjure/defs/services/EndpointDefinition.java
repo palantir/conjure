@@ -4,30 +4,35 @@
 
 package com.palantir.conjure.defs.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.ConjureType;
 import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@ConjureImmutablesStyle
 @JsonDeserialize(as = ImmutableEndpointDefinition.class)
-@JsonSerialize(as = ImmutableEndpointDefinition.class)
 @Value.Immutable
+@ConjureImmutablesStyle
 public interface EndpointDefinition {
 
+    @JsonProperty("http")
     RequestLineDefinition http();
 
+    @JsonProperty("auth")
     Optional<AuthDefinition> auth();
 
+    @JsonProperty("args")
     Optional<Map<String, ArgumentDefinition>> args();
 
+    @JsonProperty("returns")
     Optional<ConjureType> returns();
 
+    @JsonProperty("docs")
     Optional<String> docs();
 
+    @JsonProperty("deprecated")
     Optional<String> deprecated();
 
     // TODO(melliot) verify args and request line match
