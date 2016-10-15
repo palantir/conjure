@@ -107,13 +107,16 @@ public final class TypeMapper {
                     return ClassName.get(OptionalInt.class);
                 case BOOLEAN:
                     // no OptionalBoolean type
-                    return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), ClassName.get(Boolean.class));
                 case STRING:
                 default:
                     // treat normally
             }
         }
         TypeName itemType = getClassName(type.itemType());
+        if (itemType.isPrimitive()) {
+            // safe for primitives (Guava case or Booleans with Java 8)
+            itemType = itemType.box();
+        }
         return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), itemType);
     }
 
