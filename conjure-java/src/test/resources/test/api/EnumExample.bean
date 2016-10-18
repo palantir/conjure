@@ -48,13 +48,14 @@ public final class EnumExample {
     @JsonCreator
     public static EnumExample valueOf(String value) {
         Objects.requireNonNull(value, "value cannot be null");
-        switch (value) {
+        String upperCasedValue = value.toUpperCase();
+        switch (upperCasedValue) {
             case "ONE":
                 return ONE;
             case "TWO":
                 return TWO;
             default:
-                return new EnumExample(value);
+                return new EnumExample(upperCasedValue);
         }
     }
 

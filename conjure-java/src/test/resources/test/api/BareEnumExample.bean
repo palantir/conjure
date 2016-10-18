@@ -1,5 +1,6 @@
 package test.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import javax.annotation.Generated;
 
 /**
@@ -9,5 +10,13 @@ import javax.annotation.Generated;
 public enum BareEnumExample {
     ONE,
 
-    TWO
+    TWO;
+
+    /**
+     * Preferred, case-insensitive constructor for string-to-enum conversion.
+     */
+    @JsonCreator
+    public static BareEnumExample fromString(String value) {
+        return BareEnumExample.valueOf(value.toUpperCase());
+    }
 }

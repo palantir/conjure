@@ -43,7 +43,7 @@ public final class EnumGenerator {
         if (settings.supportUnknownEnumValues()) {
             spec = createSafeEnum(typeName, typeDef, thisClass, enumClass);
         } else {
-            spec = createEnum(typeName, typeDef.values(), false);
+            spec = createEnum(thisClass, typeDef.values(), false);
             if (typeDef.docs().isPresent()) {
                 spec = spec.toBuilder()
                         .addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n")).build();
@@ -61,7 +61,7 @@ public final class EnumGenerator {
         TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addType(createEnum(enumClass.simpleName(), typeDef.values(), true))
+                .addType(createEnum(enumClass, typeDef.values(), true))
                 .addField(enumClass, "value", Modifier.PRIVATE, Modifier.FINAL)
                 .addField(ClassName.get(String.class), "string", Modifier.PRIVATE, Modifier.FINAL)
                 .addFields(createConstants(typeDef.values(), thisClass, enumClass))
@@ -104,19 +104,28 @@ public final class EnumGenerator {
                 });
     }
 
-    private static TypeSpec createEnum(String typeName, Set<EnumValueDefinition> values, boolean withUnknown) {
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(typeName)
+    private static TypeSpec createEnum(ClassName enumClass, Set<EnumValueDefinition> values, boolean withUnknown) {
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(enumClass.simpleName())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC);
         for (EnumValueDefinition value : values) {
-            TypeSpec.Builder enumClass = TypeSpec.anonymousClassBuilder("");
+            TypeSpec.Builder anonymousClassBuilder = TypeSpec.anonymousClassBuilder("");
             if (value.docs().isPresent()) {
-                enumClass.addJavadoc("$L", StringUtils.appendIfMissing(value.docs().get(), "\n"));
+                anonymousClassBuilder.addJavadoc("$L", StringUtils.appendIfMissing(value.docs().get(), "\n"));
             }
-            enumBuilder.addEnumConstant(value.value(), enumClass.build());
+            enumBuilder.addEnumConstant(value.value(), anonymousClassBuilder.build());
         }
         if (withUnknown) {
             enumBuilder.addEnumConstant("UNKNOWN");
+        } else {
+            enumBuilder.addMethod(MethodSpec.methodBuilder("fromString")
+                    .addJavadoc("$L", "Preferred, case-insensitive constructor for string-to-enum conversion.\n")
+                    .addAnnotation(JsonCreator.class)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addParameter(ClassName.get(String.class), "value")
+                    .addStatement("return $T.valueOf(value.toUpperCase())", enumClass)
+                    .returns(enumClass)
+                    .build());
         }
         return enumBuilder.build();
     }
@@ -143,7 +152,7 @@ public final class EnumGenerator {
         ParameterSpec param = ParameterSpec.builder(ClassName.get(String.class), "value").build();
 
         CodeBlock.Builder parser = CodeBlock.builder()
-                .beginControlFlow("switch ($N)", param);
+                .beginControlFlow("switch (upperCasedValue)");
         for (EnumValueDefinition value : values) {
             parser.add("case $S:\n", value.value())
                     .indent()
@@ -152,7 +161,7 @@ public final class EnumGenerator {
         }
         parser.add("default:\n")
                 .indent()
-                    .addStatement("return new $T($N)", thisClass, param)
+                    .addStatement("return new $T(upperCasedValue)", thisClass)
                 .unindent()
                 .endControlFlow();
 
@@ -162,6 +171,8 @@ public final class EnumGenerator {
                 .addAnnotation(JsonCreator.class)
                 .addParameter(param)
                 .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
+                // uppercase param for backwards compatibility
+                .addStatement("String upperCasedValue = $N.toUpperCase()", param)
                 .addCode(parser.build())
                 .build();
     }
