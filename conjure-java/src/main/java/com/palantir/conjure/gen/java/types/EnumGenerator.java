@@ -84,8 +84,22 @@ public final class EnumGenerator {
                 .addMethod(createValueOf(thisClass, typeDef.values()));
 
         if (typeDef.docs().isPresent()) {
-            wrapper.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
+            wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
         }
+
+        wrapper.addJavadoc(
+                "This class is used instead of a native enum to support unknown values.\n"
+                        + "Rather than throw an exception, the {@link $1T#valueOf} method defaults to a new "
+                        + "instantiation of\n{@link $1T} where {@link $1T#get} will return {@link $2T#UNKNOWN}.\n"
+                        + "<p>\n"
+                        + "For example, {@code $1T.valueOf(\"corrupted value\").get()} will return "
+                        + "{@link $2T#UNKNOWN},\nbut {@link $1T#toString} will return \"corrupted value\".\n"
+                        + "<p>\n"
+                        + "There is no method to access all instantiations of this class, since they cannot be known "
+                        + "at compile time.\n",
+                thisClass,
+                enumClass
+        );
 
         return wrapper.build();
     }

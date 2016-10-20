@@ -1,7 +1,7 @@
 types:
-  definitions: 
+  definitions:
     default-package: test.api
-    objects:     
+    objects:
       StringExample:
         fields:
           string: string
@@ -24,6 +24,8 @@ types:
         fields:
           items: map<string, string>
       EnumExample:
+        docs: |
+          This enumerates the numbers 1:2.
         values:
           - ONE
           - TWO
