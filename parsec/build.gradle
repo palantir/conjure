@@ -4,5 +4,4 @@ dependencies {
     compile 'com.google.guava:guava'
 
     testCompile 'junit:junit'
-    testCompile 'org.hamcrest:hamcrest-core'
 }
