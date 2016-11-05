@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.types.ConjureType;
@@ -26,11 +27,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
+import org.apache.commons.lang3.StringUtils;
 
 public final class BeanBuilderGenerator {
 
@@ -108,23 +111,29 @@ public final class BeanBuilderGenerator {
             Collection<EnrichedField> fields) {
         Collection<MethodSpec> setters = Lists.newArrayListWithExpectedSize(fields.size());
         for (EnrichedField field : fields) {
-            setters.add(createSetter(builderClass, field.poetSpec(), field.conjureDef().type(), typeMapper));
-            createAuxiliarySetter(builderClass, typeMapper, field.poetSpec(), field.conjureDef().type())
-                .ifPresent(setters::add);
+            setters.add(createSetter(builderClass, Optional.empty(), field.poetSpec(), field.conjureDef().type(),
+                    typeMapper, /* shouldClearFirst */ true));
+            setters.addAll(createAuxiliarySetters(builderClass, typeMapper, field.poetSpec(),
+                    field.conjureDef().type()));
         }
         return setters;
     }
 
     private static MethodSpec createSetter(
             ClassName builderClass,
+            Optional<String> methodNamePrefix,
             FieldSpec field,
             ConjureType type,
-            TypeMapper typeMapper) {
-        return MethodSpec.methodBuilder(field.name)
+            TypeMapper typeMapper,
+            boolean shouldClearFirst) {
+        String methodName = methodNamePrefix.isPresent()
+                ? methodNamePrefix.get() + StringUtils.capitalize(field.name)
+                : field.name;
+        return MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(widenToCollectionIfPossible(field.type, type, typeMapper), field.name)
                 .returns(builderClass)
-                .addCode(typeAwareSet(field, type))
+                .addCode(typeAwareSet(field, type, shouldClearFirst))
                 .addStatement("return this").build();
     }
 
@@ -139,13 +148,17 @@ public final class BeanBuilderGenerator {
         return current;
     }
 
-    private static CodeBlock typeAwareSet(FieldSpec spec, ConjureType type) {
+    private static CodeBlock typeAwareSet(FieldSpec spec, ConjureType type, boolean shouldClearFirst) {
         if (type instanceof ListType || type instanceof SetType) {
-            return CodeBlocks.statement("this.$1N.addAll($2T.requireNonNull($1N, \"$1N cannot be null\"))",
-                    spec.name, Objects.class);
+            CodeBlock addStatement = CodeBlocks.statement(
+                    "this.$1N.addAll($2T.requireNonNull($1N, \"$1N cannot be null\"))", spec.name, Objects.class);
+            return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
+                    : addStatement;
         } else if (type instanceof MapType) {
-            return CodeBlocks.statement("this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))",
-                    spec.name, Objects.class);
+            CodeBlock addStatement = CodeBlocks.statement(
+                    "this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))", spec.name, Objects.class);
+            return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
+                    : addStatement;
         } else if (spec.type.isPrimitive()) {
             // primitive type non-nullity already enforced
             return CodeBlocks.statement("this.$1N = $1N", spec.name);
@@ -155,21 +168,27 @@ public final class BeanBuilderGenerator {
         }
     }
 
-    private static Optional<MethodSpec> createAuxiliarySetter(
+    private static List<MethodSpec> createAuxiliarySetters(
             ClassName builderClass,
             TypeMapper typeMapper,
             FieldSpec field,
             ConjureType type) {
         if (type instanceof ListType) {
-            return Optional.of(createItemSetter(builderClass, typeMapper, field, ((ListType) type).itemType()));
+            return ImmutableList.of(createSetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
+                    /* shouldClearFirst */ false),
+                    createItemSetter(builderClass, typeMapper, field, ((ListType) type).itemType()));
         } else if (type instanceof SetType) {
-            return Optional.of(createItemSetter(builderClass, typeMapper, field, ((SetType) type).itemType()));
+            return ImmutableList.of(createSetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
+                    /* shouldClearFirst */ false),
+                    createItemSetter(builderClass, typeMapper, field, ((SetType) type).itemType()));
         } else if (type instanceof MapType) {
-            return Optional.of(createMapSetter(builderClass, typeMapper, field, (MapType) type));
+            return ImmutableList.of(createSetter(builderClass, Optional.of("putAll"), field, type, typeMapper,
+                    /* shouldClearFirst */ false),
+                    createMapSetter(builderClass, typeMapper, field, (MapType) type));
         } else if (type instanceof OptionalType) {
-            return Optional.of(createOptionalSetter(builderClass, typeMapper, field, (OptionalType) type));
+            return ImmutableList.of(createOptionalSetter(builderClass, typeMapper, field, (OptionalType) type));
         }
-        return Optional.empty();
+        return ImmutableList.of();
     }
 
     private static MethodSpec createOptionalSetter(

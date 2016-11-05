@@ -83,6 +83,12 @@ public final class AnyMapExample {
         }
 
         public Builder items(Map<String, Object> items) {
+            this.items.clear();
+            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
+            return this;
+        }
+
+        public Builder putAllItems(Map<String, Object> items) {
             this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }

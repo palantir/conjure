@@ -84,6 +84,12 @@ public final class SetExample {
         }
 
         public Builder items(Collection<String> items) {
+            this.items.clear();
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+            return this;
+        }
+
+        public Builder addAllItems(Collection<String> items) {
             this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }

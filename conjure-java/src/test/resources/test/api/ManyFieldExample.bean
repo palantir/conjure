@@ -194,6 +194,12 @@ public final class ManyFieldExample {
         }
 
         public Builder items(Collection<String> items) {
+            this.items.clear();
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+            return this;
+        }
+
+        public Builder addAllItems(Collection<String> items) {
             this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
@@ -204,6 +210,12 @@ public final class ManyFieldExample {
         }
 
         public Builder set(Collection<String> set) {
+            this.set.clear();
+            this.set.addAll(Objects.requireNonNull(set, "set cannot be null"));
+            return this;
+        }
+
+        public Builder addAllSet(Collection<String> set) {
             this.set.addAll(Objects.requireNonNull(set, "set cannot be null"));
             return this;
         }
@@ -214,6 +226,12 @@ public final class ManyFieldExample {
         }
 
         public Builder map(Map<String, String> map) {
+            this.map.clear();
+            this.map.putAll(Objects.requireNonNull(map, "map cannot be null"));
+            return this;
+        }
+
+        public Builder putAllMap(Map<String, String> map) {
             this.map.putAll(Objects.requireNonNull(map, "map cannot be null"));
             return this;
         }
