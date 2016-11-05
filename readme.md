@@ -293,8 +293,9 @@ this service.
        * `query`: defined as a querystring parameter.
        * (default) `auto`: argument is treated as a path parameter if it appears
          between braces in the request line and as a body argument otherwise.
-    * (optional) `markers`: the list of markers to add to this argument.
-       These are valid Conjure types (default `[]`).
+    * (optional) `markers`: markers are typed labels added used to hint generators
+      to add language-specific typed labels to generated methods. Only imported
+      types are supported.
 
 ### Service Example
 See also:

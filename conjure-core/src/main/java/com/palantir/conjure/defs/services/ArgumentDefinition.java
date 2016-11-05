@@ -16,8 +16,8 @@ import com.palantir.conjure.defs.services.ArgumentDefinition.ArgumentDefinitionD
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.immutables.value.Value;
 
 @JsonDeserialize(using = ArgumentDefinitionDeserializer.class)
@@ -41,7 +41,7 @@ public interface ArgumentDefinition {
     }
 
     @JsonProperty("markers")
-    List<ConjureType> markers();
+    Set<ConjureType> markers();
 
     enum ParamType {
         /**

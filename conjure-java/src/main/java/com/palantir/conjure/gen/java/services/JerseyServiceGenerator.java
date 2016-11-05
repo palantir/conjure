@@ -4,6 +4,8 @@
 
 package com.palantir.conjure.gen.java.services;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
@@ -23,7 +25,6 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -80,13 +81,14 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             EndpointDefinition endpointDef,
             AuthDefinition defaultAuth,
             TypeMapper typeMapper) {
-
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", endpointDef.http().path())
-                        .build());
+                        .build())
+                .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, typeMapper));
+
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
                 ClassName.get("java.lang", "Deprecated")));
 
@@ -95,70 +97,59 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
         endpointDef.returns().ifPresent(type -> methodBuilder.returns(typeMapper.getClassName(type)));
 
-        methodBuilder.addParameters(createParameterSpecs(endpointDef, defaultAuth, typeMapper));
-
         return methodBuilder.build();
     }
 
-    private static List<ParameterSpec> createParameterSpecs(
+    private static List<ParameterSpec> createServiceMethodParameters(
             EndpointDefinition endpointDef,
             AuthDefinition defaultAuth,
             TypeMapper typeMapper) {
         List<ParameterSpec> parameterSpecs = new ArrayList<>();
+
         AuthDefinition auth = endpointDef.auth().orElse(defaultAuth);
+        createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
-        Optional<ParameterSpec> authParameterSpec = createAuthParameterSpec(auth);
-
-        Set<String> pathArgs = endpointDef.http().pathArgs();
-        Optional<List<ParameterSpec>> otherParameterSpecs = endpointDef.args().map(
-                args -> createOtherParameterSpecs(typeMapper, pathArgs, args));
-
-        authParameterSpec.ifPresent(parameterSpecs::add);
-        otherParameterSpecs.ifPresent(parameterSpecs::addAll);
+        if (endpointDef.args().isPresent()) {
+            Set<String> pathArgs = endpointDef.http().pathArgs();
+            endpointDef.args().get().forEach((name, def) -> {
+                parameterSpecs.add(createServiceMethodParameterArg(typeMapper, pathArgs, name, def));
+            });
+        }
         return ImmutableList.copyOf(parameterSpecs);
     }
 
-    private static Optional<ParameterSpec> createAuthParameterSpec(AuthDefinition auth) {
-        Optional<String> annotationName = authTypeToAnnotationName(auth.type());
-        return annotationName.map(name ->
+    private static ParameterSpec createServiceMethodParameterArg(
+            TypeMapper typeMapper,
+            Set<String> pathArgs,
+            String argumentName,
+            ArgumentDefinition def) {
+        ParameterSpec.Builder param = ParameterSpec.builder(typeMapper.getClassName(def.type()), argumentName);
+        getParamTypeAnnotation(argumentName, def, pathArgs).ifPresent(param::addAnnotation);
+
+        param.addAnnotations(createMarkers(typeMapper, def.markers()));
+        return param.build();
+    }
+
+    private static Optional<ParameterSpec> createAuthParameter(AuthDefinition auth) {
+        ClassName className;
+        switch (auth.type()) {
+            case HEADER:
+                className = ClassName.get("javax.ws.rs", "HeaderParam");
+                break;
+            case COOKIE:
+                className = ClassName.get("javax.ws.rs", "CookieParam");
+                break;
+            case NONE:
+            default:
+                return Optional.empty();
+        }
+        return Optional.of(
                 ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
-                        .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", name))
-                                .addMember("value", "$S", auth.id())
-                                .build())
+                        .addAnnotation(AnnotationSpec.builder(className).addMember("value", "$S", auth.id()).build())
                         .build());
     }
 
-    private static Optional<String> authTypeToAnnotationName(AuthDefinition.AuthType authType) {
-        switch (authType) {
-            case HEADER:
-                return Optional.of("HeaderParam");
-            case COOKIE:
-                return Optional.of("CookieParam");
-            case NONE:
-                return Optional.empty();
-            default:
-                throw new IllegalArgumentException("Unknown authorization type: " + authType);
-        }
-    }
-
-    private static List<ParameterSpec> createOtherParameterSpecs(
-            TypeMapper typeMapper,
-            Set<String> pathArgs,
-            Map<String, ArgumentDefinition> args) {
-        return args.entrySet().stream().map(arg -> {
-            String argName = arg.getKey();
-            ArgumentDefinition def = arg.getValue();
-            ParameterSpec.Builder param = ParameterSpec.builder(
-                    typeMapper.getClassName(def.type()),
-                    arg.getKey());
-            createParamTypeAnnotation(argName, def, pathArgs).ifPresent(param::addAnnotation);
-            List<AnnotationSpec> markers = createMarkers(typeMapper, def.markers());
-            markers.forEach(param::addAnnotation);
-            return param.build();
-        }).collect(Collectors.toList());
-    }
-
-    private static Optional<AnnotationSpec> createParamTypeAnnotation(
+    private static Optional<AnnotationSpec> getParamTypeAnnotation(
             String argName,
             ArgumentDefinition def,
             Set<String> pathArgs) {
@@ -188,20 +179,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .build());
     }
 
-    private static List<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<ConjureType> markers) {
-        List<ConjureType> nonReferenceTypes = markers.stream()
-                .filter(type -> !(type instanceof ReferenceType))
-                .collect(Collectors.toList());
-        if (!nonReferenceTypes.isEmpty()) {
-            throw new IllegalArgumentException("markers cannot contain non-reference types. Found: "
-                    + nonReferenceTypes);
-        }
+    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, Set<ConjureType> markers) {
+        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
+                "Markers must refer to reference types.");
         return markers.stream()
                 .map(typeMapper::getClassName)
                 .map(ClassName.class::cast)
                 .map(AnnotationSpec::builder)
                 .map(AnnotationSpec.Builder::build)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     private static ClassName httpMethodToClassName(String method) {
