@@ -3,6 +3,7 @@ package test.api;
 import com.palantir.foundry.catalog.api.CreateDatasetRequest;
 import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
 import com.palantir.foundry.catalog.api.datasets.Dataset;
+import com.palantir.redaction.Safe;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
 import java.lang.Deprecated;
@@ -41,11 +42,11 @@ public interface TestService {
 
     @GET
     @Path("/datasets/{datasetRid}")
-    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches")
-    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     /**
      * Gets all branches of this dataset.
@@ -54,9 +55,9 @@ public interface TestService {
     @GET
     @Path("/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
-    Set<String> getBranchesDeprecated(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid);
+    Set<String> getBranchesDeprecated(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches/{branch:.+}/resolve")
-    Optional<String> resolveBranch(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") ResourceIdentifier datasetRid, @PathParam("branch") String branch);
+    Optional<String> resolveBranch(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid, @PathParam("branch") String branch);
 }

@@ -272,6 +272,8 @@ this service.
      docs: [docs]
      param-id: [identifier]
      param-type: (auto|path|body|header|query)
+     markers:
+      - [type]
    ```
 
    and for:
@@ -291,6 +293,8 @@ this service.
        * `query`: defined as a querystring parameter.
        * (default) `auto`: argument is treated as a path parameter if it appears
          between braces in the request line and as a body argument otherwise.
+    * (optional) `markers`: the list of markers to add to this argument.
+       These are valid Conjure types (default `[]`).
 
 ### Service Example
 See also:

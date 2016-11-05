@@ -25,6 +25,7 @@ import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.PrimitiveType;
+import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
@@ -57,19 +58,28 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    public void testEndpointDefinition_fullySpecified() throws IOException {
+    public void testEndpointDefinition_fullySpecified() throws IOException, ParseException {
         assertThat(mapper.readValue(multiLineString(
                 "http: GET /{arg}",
                 "auth: header",
                 "args:",
-                "  arg: string",
+                "  arg:",
+                "    type: string",
+                "    docs: foo-docs",
+                "    param-id: foo",
+                "    param-type: path",
                 "returns: string",
                 "docs: |",
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
                         .http(RequestLineDefinition.of("GET", "/{arg}"))
                         .auth(AuthDefinition.header())
-                        .args(ImmutableMap.of("arg", ArgumentDefinition.of(PrimitiveType.STRING)))
+                        .args(ImmutableMap.of("arg", ArgumentDefinition.builder()
+                                .type(PrimitiveType.STRING)
+                                .docs("foo-docs")
+                                .paramId("foo")
+                                .paramType(ArgumentDefinition.ParamType.PATH)
+                                .build()))
                         .returns(PrimitiveType.STRING)
                         .docs("docs")
                         .build());

@@ -16,6 +16,7 @@ import com.palantir.conjure.defs.services.ArgumentDefinition.ArgumentDefinitionD
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import org.immutables.value.Value;
 
@@ -38,6 +39,9 @@ public interface ArgumentDefinition {
     default ParamType paramType() {
         return ParamType.AUTO;
     }
+
+    @JsonProperty("markers")
+    List<ConjureType> markers();
 
     enum ParamType {
         /**

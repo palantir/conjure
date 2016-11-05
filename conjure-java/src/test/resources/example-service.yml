@@ -10,6 +10,10 @@ types:
       external:
         java: com.palantir.tokens.auth.AuthHeader
 
+    Safe:
+      external:
+        java: com.palantir.redaction.Safe
+
   definitions:
     default-package: com.palantir.foundry.catalog.api
     objects:      
@@ -60,7 +64,10 @@ services:
       getDataset:
         http: GET /datasets/{datasetRid}
         args:
-          datasetRid: ResourceIdentifier
+          datasetRid:
+            type: ResourceIdentifier
+            markers:
+             - Safe
         returns: optional<Dataset>
         
       getBranches:
@@ -70,6 +77,8 @@ services:
             type: ResourceIdentifier
             docs: |
               A valid dataset resource identifier.
+            markers:
+             - Safe
         returns: set<string>
       getBranchesDeprecated:
         http: GET /datasets/{datasetRid}/branchesDeprecated
@@ -78,6 +87,8 @@ services:
             type: ResourceIdentifier
             docs: |
               A valid dataset resource identifier.
+            markers:
+             - Safe
         returns: set<string>
         docs: |
           Gets all branches of this dataset.
@@ -86,6 +97,9 @@ services:
       resolveBranch:
         http: GET /datasets/{datasetRid}/branches/{branch:.+}/resolve
         args:
-          datasetRid: ResourceIdentifier
+          datasetRid:
+            type: ResourceIdentifier
+            markers:
+             - Safe
           branch: string
         returns: optional<string>
