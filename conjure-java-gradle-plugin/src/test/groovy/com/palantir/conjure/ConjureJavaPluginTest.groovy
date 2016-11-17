@@ -20,6 +20,8 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
             id 'findbugs'
             id 'checkstyle'
             id 'eclipse'
+
+            id 'nebula.source-jar' version '4.9.1'
         }
 
         repositories { jcenter() }
@@ -89,6 +91,16 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
         compiledFile("test/a/api/TestServiceA.java").text.contains("public interface TestServiceA")
         compiledFile("test/b/api/TestServiceB.java").text.contains("public interface TestServiceB")
+    }
+
+    def 'includes generated sources in sourceJar'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-a.yml"))
+        createSourceFile("b.yml", readResource("test-service-b.yml"))
+        def result = run("sourceJar")
+
+        then:
+        result.task(":sourceJar").outcome == TaskOutcome.SUCCESS
     }
 
     def 'can compile generated Java sourceSet'() {

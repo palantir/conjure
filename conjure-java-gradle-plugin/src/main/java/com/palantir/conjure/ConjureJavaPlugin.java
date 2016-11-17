@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.UnknownTaskException;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.plugins.JavaPlugin;
@@ -76,6 +77,14 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         Jar jar = (Jar) project.getTasks().getByName("jar");
         jar.from(generatedSourceSet.getOutput());
         jar.dependsOn(compileGeneratedJavaTask);
+
+        try {
+            Jar sourceJar = (Jar) project.getTasks().getByName("sourceJar");
+            sourceJar.from(generatedSourceSet.getAllSource());
+            sourceJar.dependsOn(compileConjureJavaServerTask);
+        } catch (UnknownTaskException e) {
+            // meh
+        }
 
         // fix source dirs for idea
         project.getPlugins().withType(IdeaPlugin.class, plugin -> {
