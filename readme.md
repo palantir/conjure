@@ -16,6 +16,36 @@ than renderable interfaces for consumer services to use, its goal is to remain
 agnostic to client implementations while providing general language bindings for
 use in client creation.
 
+Why?
+----
+The rationale for maintaining Conjure rather than picking an existing IDL (e.g., Swagger) for Elements (and other)
+products is as follows. For the first handful of Elements projects (in particular, Gatekeeper, Compass, Foundry), we
+picked JAX-RS as the API contract between servers (Jersey) and clients (Feign) since it offered the best compromise
+between usability (simple Java proxies, straight-forward server implementations), dependency management (separation
+between API definitions and their implementations), and interoperability (JSON as the lingua franca for both
+backend-to-backend and frontend-to-backend communication, and the ability to interrogate with services via different
+languages or even cURL). The idiosyncratic specifics of our interpretation of JAX-RS contracts are encoded in the
+`http-remoting` libraries.
+
+Given what we have since learned about the disadvantages of JAX-RS and the advantages of alternative RPC mechanisms
+(e.g., gRPC), one may be inclined to consider this a historic mistake, at least for backend RPC; on the other hand, it
+has allowed us to make swift progress on frontends and it has opened the door for simple service composition, in
+particular for non-Elements and non-Java projects such as Foundry Mobile. Either way, it is the status quo. Since major
+API breaks are currently a deal-breaker, we are effectively presented with two choices: either continue to specify APIs
+in a Java-centric way via JAX-RS, or retrofit an IDL to our particular interpretation of the JAX-RS wire format. Conjure
+is an experiment towards the latter choice and has the following advantages:
+
+- Conjure simplifies non-Java implementations of API servers and clients. The TypeScript bindings are a great example.
+- Conjure allows us to specify the wire format independently of existing client/server libraries (e.g., Jersey).
+- Conjure reduces the binary coupling to particular Java features. For example, a Conjure API can be compiled into
+  Java7-compatible client code with Guava Optional types, or into Java8 code with Java8 Optionals.
+- Value types are very simple to specify.
+- Conjure can act as a bridge format to some other IDL we may eventually want to use. For example, Conjure can likely 
+  be compiled into Protobuf if we ever wanted to move our service implementations to gRPC.
+
+Of course there are downsides. To mention just two, you cannot Google for Conjure problems, and someone has to maintain
+Conjure and keep up with feature requests and bug fixes.
+
 Types
 -----
 Conjure's type system deals with two modes of types, imported types, defined
