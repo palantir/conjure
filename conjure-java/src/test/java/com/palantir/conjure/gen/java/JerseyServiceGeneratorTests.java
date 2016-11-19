@@ -21,8 +21,17 @@ import org.junit.Test;
 
 public final class JerseyServiceGeneratorTests {
     @Test
-    public void testComposition() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-service.yml"));
+    public void testServiceGeneration_exampleService() throws IOException {
+        testServiceGeneration("/example-service.yml");
+    }
+
+    @Test
+    public void testServiceGeneration_cookieService() throws IOException {
+        testServiceGeneration("/cookie-service.yml");
+    }
+
+    private void testServiceGeneration(String resource) throws IOException {
+        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream(resource));
 
         ServiceGenerator gen = new JerseyServiceGenerator(Settings.builder()
                 .ignoreUnknownProperties(false)
@@ -37,6 +46,5 @@ public final class JerseyServiceGeneratorTests {
                             getClass().getResourceAsStream("/test/api/" + file.typeSpec.name + ".jersey"),
                             StandardCharsets.UTF_8)));
         }
-
     }
 }

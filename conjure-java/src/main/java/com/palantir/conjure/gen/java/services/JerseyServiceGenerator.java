@@ -131,21 +131,28 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     }
 
     private static Optional<ParameterSpec> createAuthParameter(AuthDefinition auth) {
-        ClassName className;
+        ClassName annotationClassName;
+        ClassName tokenClassName;
+        String paramName;
         switch (auth.type()) {
             case HEADER:
-                className = ClassName.get("javax.ws.rs", "HeaderParam");
+                annotationClassName = ClassName.get("javax.ws.rs", "HeaderParam");
+                tokenClassName = ClassName.get("com.palantir.tokens.auth", "AuthHeader");
+                paramName = "authHeader";
                 break;
             case COOKIE:
-                className = ClassName.get("javax.ws.rs", "CookieParam");
+                annotationClassName = ClassName.get("javax.ws.rs", "CookieParam");
+                tokenClassName = ClassName.get("com.palantir.tokens.auth", "BearerToken");
+                paramName = "token";
                 break;
             case NONE:
             default:
                 return Optional.empty();
         }
         return Optional.of(
-                ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
-                        .addAnnotation(AnnotationSpec.builder(className).addMember("value", "$S", auth.id()).build())
+                ParameterSpec.builder(tokenClassName, paramName)
+                        .addAnnotation(AnnotationSpec.builder(annotationClassName)
+                                .addMember("value", "$S", auth.id()).build())
                         .build());
     }
 

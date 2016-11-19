@@ -1,0 +1,20 @@
+package test.api;
+
+import com.palantir.tokens.auth.BearerToken;
+import javax.annotation.Generated;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/cookies")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
+public interface CookieService {
+    @GET
+    @Path("/")
+    void eatCookies(@CookieParam("PALANTIR_TOKEN") BearerToken token);
+}

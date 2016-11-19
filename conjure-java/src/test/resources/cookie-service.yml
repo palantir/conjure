@@ -1,0 +1,19 @@
+types:
+  imports:
+    BearerToken:
+      base-type: string
+      external:
+        java: com.palantir.tokens.auth.BearerToken
+
+  definitions:
+    default-package: null.null
+
+services:
+  CookieService:
+    name: Cookie Service
+    package: test.api
+    default-auth: cookie:PALANTIR_TOKEN
+    base-path: /cookies
+    endpoints:
+      eatCookies:
+        http: GET /
