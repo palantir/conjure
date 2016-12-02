@@ -21,6 +21,7 @@ public final class ListExample {
         this.items = Collections.unmodifiableList(new ArrayList<>(items));
     }
 
+    @JsonProperty("items")
     public List<String> getItems() {
         return this.items;
     }

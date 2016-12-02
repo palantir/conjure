@@ -16,6 +16,7 @@ public final class IntegerExample {
         this.integer = integer;
     }
 
+    @JsonProperty("integer")
     public int getInteger() {
         return this.integer;
     }

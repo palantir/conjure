@@ -22,6 +22,7 @@ public final class MapExample {
         this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
     }
 
+    @JsonProperty("items")
     public Map<String, String> getItems() {
         return this.items;
     }

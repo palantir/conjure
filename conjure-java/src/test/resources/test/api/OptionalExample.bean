@@ -20,6 +20,7 @@ public final class OptionalExample {
         this.item = item;
     }
 
+    @JsonProperty("item")
     public Optional<String> getItem() {
         return this.item;
     }

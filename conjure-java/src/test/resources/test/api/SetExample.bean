@@ -23,6 +23,7 @@ public final class SetExample {
         this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
     }
 
+    @JsonProperty("items")
     public Set<String> getItems() {
         return this.items;
     }

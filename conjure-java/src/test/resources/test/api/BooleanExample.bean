@@ -16,6 +16,7 @@ public final class BooleanExample {
         this.coin = coin;
     }
 
+    @JsonProperty("coin")
     public boolean getCoin() {
         return this.coin;
     }

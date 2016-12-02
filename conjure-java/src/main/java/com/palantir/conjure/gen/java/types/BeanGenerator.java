@@ -37,7 +37,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -176,18 +175,21 @@ public final class BeanGenerator implements TypeGenerator {
 
     private static Collection<MethodSpec> createGetters(Collection<EnrichedField> fields) {
         return fields.stream()
-                .map(f -> createGetter(f.poetSpec(), f.conjureDef().docs()))
+                .map(f -> createGetter(f))
                 .collect(Collectors.toList());
     }
 
-    private static MethodSpec createGetter(FieldSpec field, Optional<String> docs) {
-        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.name))
+    private static MethodSpec createGetter(EnrichedField field) {
+        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.poetSpec().name))
                 .addModifiers(Modifier.PUBLIC)
-                .addStatement("return this.$N", field.name)
-                .returns(field.type);
+                .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
+                        .addMember("value", "$S", field.jsonKey())
+                        .build())
+                .addStatement("return this.$N", field.poetSpec().name)
+                .returns(field.poetSpec().type);
 
-        if (docs.isPresent()) {
-            getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n"));
+        if (field.conjureDef().docs().isPresent()) {
+            getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(field.conjureDef().docs().get(), "\n"));
         }
         return getterBuilder.build();
     }

@@ -28,14 +28,17 @@ public final class PrimitiveOptionalsExample {
         this.integer = integer;
     }
 
+    @JsonProperty("num")
     public OptionalDouble getNum() {
         return this.num;
     }
 
+    @JsonProperty("bool")
     public Optional<Boolean> getBool() {
         return this.bool;
     }
 
+    @JsonProperty("integer")
     public OptionalInt getInteger() {
         return this.integer;
     }

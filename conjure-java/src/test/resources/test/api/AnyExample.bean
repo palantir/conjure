@@ -19,6 +19,7 @@ public final class AnyExample {
         this.any = any;
     }
 
+    @JsonProperty("any")
     public Object getAny() {
         return this.any;
     }

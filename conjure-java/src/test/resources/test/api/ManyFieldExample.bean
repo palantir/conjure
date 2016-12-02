@@ -47,34 +47,42 @@ public final class ManyFieldExample {
         this.alias = alias;
     }
 
+    @JsonProperty("string")
     public String getString() {
         return this.string;
     }
 
+    @JsonProperty("integer")
     public int getInteger() {
         return this.integer;
     }
 
+    @JsonProperty("doubleValue")
     public double getDoubleValue() {
         return this.doubleValue;
     }
 
+    @JsonProperty("optionalItem")
     public Optional<String> getOptionalItem() {
         return this.optionalItem;
     }
 
+    @JsonProperty("items")
     public List<String> getItems() {
         return this.items;
     }
 
+    @JsonProperty("set")
     public Set<String> getSet() {
         return this.set;
     }
 
+    @JsonProperty("map")
     public Map<String, String> getMap() {
         return this.map;
     }
 
+    @JsonProperty("alias")
     public AliasExample getAlias() {
         return this.alias;
     }
