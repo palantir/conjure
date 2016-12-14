@@ -1,7 +1,7 @@
 import { ICreateDatasetRequest } from "./createDatasetRequest";
 import { IBackingFileSystem } from "./datasets/backingFileSystem";
 import { IDataset } from "./datasets/dataset";
-import { IHttpApiBridge } from "@elements/conjure";
+import { IHttpApiBridge } from "@elements/conjure-fe-lib";
 
 export class TestService {
     private bridge: IHttpApiBridge;

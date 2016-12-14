@@ -88,7 +88,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .imports(ServiceUtils.generateImportStatements(serviceDef, clazz, packageLocation, typeMapper))
                 .addImports(ImportStatement.builder()
                         .addNamesToImport("IHttpApiBridge")
-                        .filepathToImport("@elements/conjure")
+                        .filepathToImport("@elements/conjure-fe-lib")
                         .build())
                 .name(clazz + "Impl")
                 .parentFolderPath(parentFolderPath)

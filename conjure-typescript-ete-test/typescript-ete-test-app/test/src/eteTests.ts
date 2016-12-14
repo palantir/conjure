@@ -4,7 +4,7 @@
 
 import { assert } from "chai";
 
-import { DefaultHttpApiBridge } from "@elements/conjure";
+import { DefaultHttpApiBridge } from "@elements/conjure-fe-lib";
 
 import { ICalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorService";
 import { CalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorServiceImpl";
