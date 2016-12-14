@@ -1,16 +1,15 @@
-import { IHttpApiBridge } from "../../../static/httpApiBridge";
-import { getHttpApiBridge } from "../../../static/utils";
 import { ICreateDatasetRequest } from "./createDatasetRequest";
 import { IBackingFileSystem } from "./datasets/backingFileSystem";
 import { IDataset } from "./datasets/dataset";
+import { IHttpApiBridge } from "@elements/conjure";
 
 export class TestService {
     private bridge: IHttpApiBridge;
 
     constructor(
-        url: string
+        bridge: IHttpApiBridge
     ) {
-        this.bridge = getHttpApiBridge(url);
+        this.bridge = bridge;
     }
 
     public createDataset(

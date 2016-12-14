@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
@@ -19,6 +18,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.FunctionCallExpression;
+import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
 import com.palantir.conjure.gen.typescript.poet.RawExpression;
 import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
@@ -55,11 +55,14 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         String packageLocation = serviceDef.packageName();
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
-                AssignStatement.builder().lhs("this.bridge").rhs(
-                        RawExpression.of("getHttpApiBridge(url)")).build()).build();
+                AssignStatement.builder()
+                        .lhs("this.bridge")
+                        .rhs(RawExpression.of("bridge"))
+                        .build())
+                .build();
+        TypescriptType bridgeType = TypescriptType.builder().name("IHttpApiBridge").build();
         TypescriptConstructor constructor = TypescriptConstructor.builder()
-                .addParameters(TypescriptTypeSignature.builder().name("url").typescriptType(
-                        TypescriptType.builder().name("string").build()).build())
+                .addParameters(TypescriptTypeSignature.builder().name("bridge").typescriptType(bridgeType).build())
                 .functionBody(constructorBody).build();
         Set<TypescriptFunction> methods = serviceDef.endpoints().entrySet()
                 .stream()
@@ -80,17 +83,13 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .name(clazz)
                 .methods(methods)
                 .build();
-        Set<TypescriptType> typesToImport = Sets.newHashSet(TypescriptType.builder().name("IHttpApiBridge").build());
         return TypescriptFile.builder()
                 .addEmittables(typescriptClass)
                 .imports(ServiceUtils.generateImportStatements(serviceDef, clazz, packageLocation, typeMapper))
-                .addImports(GenerationUtils.createImportStatement(typesToImport,
-                        GenerationUtils.getTypescriptFilePath(parentFolderPath, clazz),
-                        GenerationUtils.getTypescriptFilePath("static", "httpApiBridge")))
-                .addImports(
-                        GenerationUtils.createImportStatement(TypescriptType.builder().name("getHttpApiBridge").build(),
-                                GenerationUtils.getTypescriptFilePath(parentFolderPath, clazz),
-                                GenerationUtils.getTypescriptFilePath("static", "utils")))
+                .addImports(ImportStatement.builder()
+                        .addNamesToImport("IHttpApiBridge")
+                        .filepathToImport("@elements/conjure")
+                        .build())
                 .name(clazz + "Impl")
                 .parentFolderPath(parentFolderPath)
                 .build();
