@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
-import com.palantir.conjure.gen.typescript.staticgen.StaticGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.io.File;
@@ -29,7 +28,6 @@ public final class ConjureTypescriptClientGeneratorTest {
         File src = folder.newFolder("src");
         ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
                 new DefaultServiceGenerator(),
-                new StaticGenerator(),
                 new DefaultTypeGenerator());
         generator.emit(conjure, src);
         String xfile = "package/x.ts";
@@ -53,7 +51,6 @@ public final class ConjureTypescriptClientGeneratorTest {
         File src = folder.newFolder("src");
         ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
                 new DefaultServiceGenerator(),
-                new StaticGenerator(),
                 new DefaultTypeGenerator());
         generator.emit(conjure, src);
         String xfile = "package1/x.ts";
