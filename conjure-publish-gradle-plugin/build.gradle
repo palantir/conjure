@@ -1,0 +1,13 @@
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+
+apply from: "${rootDir}/gradle/publish-libs.gradle"
+
+dependencies {
+    compile project(':conjure-typescript')
+    compile 'com.github.jknack:handlebars:4.0.6'
+    compile 'commons-io:commons-io:2.5'
+
+    testCompile gradleTestKit()
+    testCompile 'com.netflix.nebula:nebula-test:4.0.0'  // for better temporary folder junit rule
+}
