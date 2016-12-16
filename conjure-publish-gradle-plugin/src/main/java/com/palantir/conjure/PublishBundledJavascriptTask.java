@@ -43,6 +43,10 @@ public class PublishBundledJavascriptTask extends ConventionTask {
         ConjurePublishPlugin.copyFromResource("publish.sh", publishFile);
         publishFile.setExecutable(true);
 
+        // Copy package.json
+        ConjurePublishPlugin.copyFile(new File(getInputDirectory(), "package.json"),
+                new File(publishWorkingDirectory, "package.json"));
+
         // Execute publish script
         getProject().exec(execSpec -> {
             execSpec.commandLine("./scripts/publish.sh");

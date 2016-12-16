@@ -108,4 +108,12 @@ public class ConjurePublishPlugin implements Plugin<Project> {
             throw new RuntimeException(e);
         }
     }
+
+    public static void copyFile(File source, File dest) {
+        try {
+            FileUtils.copyFile(source, dest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
