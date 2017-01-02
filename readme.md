@@ -283,7 +283,7 @@ this service.
    arguments found in the later `args` section.
 
    HTTP methods need to be supported by the server, presently the server
-   implementations allow for `GET`, `POST`, and `DELETE`.
+   implementations allow for `GET`, `POST`, `PUT` and `DELETE`.
  * `auth`: an optional auth requirement to override `default-auth`,
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
