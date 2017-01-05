@@ -52,8 +52,8 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         project.getDependencies().add("compile", generatedSourceSet.getOutput());
 
         Delete cleanGeneratedCodeTask = project.getTasks().create("cleanGeneratedCode", Delete.class);
-        cleanGeneratedCodeTask.getInputs().dir(conjureSourceSet.getSrcDirs());
-        cleanGeneratedCodeTask.getOutputs().dir(generatedSourceSet.getAllSource().getSrcDirs());
+        conjureSourceSet.getSrcDirs().forEach(it -> cleanGeneratedCodeTask.getInputs().dir(it));
+        generatedSourceSet.getAllSource().forEach(it -> cleanGeneratedCodeTask.getOutputs().dir(it));
         cleanGeneratedCodeTask.delete(generatedSourceSet.getAllSource().getSrcDirs());
 
         CompileConjureJavaServerTask compileConjureJavaServerTask = project.getTasks()
