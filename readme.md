@@ -1,4 +1,4 @@
-[![Circle CI](https://circle.palantir.build/gh/melliot/conjure.svg?style=svg)](https://circle.palantir.build/gh/melliot/conjure)
+[![Circle CI](https://circle.palantir.build/gh/melliot/conjure.svg?style=shield)](https://circle.palantir.build/gh/melliot/conjure)
 [![Release](https://shields.palantir.build/artifactory/internal-jar-release/release/com.palantir.conjure/conjure-core/svg)](https://artifactory.palantir.build/artifactory/webapp/#/artifacts/browse/tree/General/internal-jar-release/com/palantir/conjure)
 [![Snapshot](https://shields.palantir.build/artifactory/internal-jar-snapshot/snapshot/com.palantir.conjure/conjure-core/svg)](https://artifactory.palantir.build/artifactory/webapp/#/artifacts/browse/tree/General/internal-jar-snapshot/com/palantir/conjure)
 
