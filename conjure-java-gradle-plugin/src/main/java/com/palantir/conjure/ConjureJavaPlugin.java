@@ -64,10 +64,13 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         Task compileGeneratedJavaTask = project.getTasks()
                 .getByName(generatedSourceSet.getCompileJavaTaskName());
 
-        // task hierarchy (compileJava -> compileGeneratedJava -> compileConjure* -> cleanGenerated)
+        // task hierarchies:
+        // compileJava -> compileGeneratedJava -> compileConjure* -> cleanGeneratedCode
+        // clean -> cleanGeneratedCode
         compileConjureJavaServerTask.dependsOn(cleanGeneratedCodeTask);
         compileGeneratedJavaTask.dependsOn(compileConjureJavaServerTask);
         project.getTasks().getByName("compileJava").dependsOn(compileGeneratedJavaTask);
+        project.getTasks().getByName("clean").dependsOn(cleanGeneratedCodeTask);
 
         // dependency cleanup
         project.getConfigurations().getByName("compile").extendsFrom(
