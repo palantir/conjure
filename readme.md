@@ -440,16 +440,24 @@ services:
         returns: set<string>
 ```
 
-Gradle Plugin Usage
+Gradle Plugins Usage
 -------------------
-Currently, the best way to use Conjure is to apply the Conjure gradle plugin. 
-
-To add the plugin, depend on it in your root project `build.gradle`:
+Conjure supports two gradle plugins. To use either, ensure you have the following added to your root project `build.gradle`:
 ```gradle
 buildscript {
     repositories {
         maven { url 'https://artifactory.palantir.build/artifactory/all-jar' }
     }
+}
+```
+
+### Conjure Java Gradle Plugin
+
+Currently, the best way to use Conjure for java projects is to apply the Conjure gradle plugin. 
+
+To add the plugin, depend on it in your root project `build.gradle`:
+```gradle
+buildscript {
     dependencies {
         classpath "com.palantir.conjure:conjure-java-gradle-plugin:${conjureVersion}"
     }
@@ -466,3 +474,26 @@ Then, add a `src/main/conjure` folder and author your Conjure files (typically w
 To generate code, run the `compileConjureJavaServer` task. Generated code -- today, the Gradle plugin
 only generates Java -- will be placed in `src/generated/java`. Note that generated code currently biases
 towards server-styled defaults.
+
+### Conjure Publish Gradle Plugin
+
+This plugin allows publishing artifacts from projects using conjure. The plugin publishes artifacts intended for languages supported by conjure. Currently the only language for which artifacts are published is Typescript.
+
+* Tyepscript publishing
+    * An npm package is published at the location `@elements/${projectName}-conjure`
+
+To add the plugin, depend on it in your root project `build.gradle`:
+```gradle
+buildscript {
+    dependencies {
+        classpath "com.palantir.conjure:conjure-publish-gradle-plugin:${conjureVersion}"
+    }
+}
+```
+
+...and apply the plugin on any projects that have Conjure files:
+```gradle
+apply plugin: 'com.palantir.gradle-conjure-publish'
+```
+
+To publish, run the `conjurePublish` task.
