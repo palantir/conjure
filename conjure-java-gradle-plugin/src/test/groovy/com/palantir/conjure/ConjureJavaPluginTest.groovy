@@ -20,6 +20,7 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
             id 'findbugs'
             id 'checkstyle'
             id 'eclipse'
+            id 'idea'
 
             id 'nebula.source-jar' version '4.9.1'
         }
@@ -164,6 +165,24 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         then:
         result.task(":eclipse").outcome == TaskOutcome.SUCCESS
         !result.output.contains(FAIL_ECLIPSE_CONTAINS_RESOURCES_GENERATED_FOLDER)
+    }
+
+    def 'eclipse task depends on compileConjureJavaServer task'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-a.yml"))
+        def result = run("eclipse")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+    }
+
+    def 'idea task depends on compileConjureJavaServer task'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-a.yml"))
+        def result = run("idea")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
     }
 
     def createSourceFile(String fileName, String text) {

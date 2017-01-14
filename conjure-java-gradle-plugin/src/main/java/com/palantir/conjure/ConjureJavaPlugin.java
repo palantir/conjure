@@ -64,13 +64,22 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         Task compileGeneratedJavaTask = project.getTasks()
                 .getByName(generatedSourceSet.getCompileJavaTaskName());
 
-        // task hierarchies:
+        // Task dependencies:
         // compileJava -> compileGeneratedJava -> compileConjure* -> cleanGeneratedCode
         // clean -> cleanGeneratedCode
+        // {idea, eclipse} -> compileConjureJavaServer
         compileConjureJavaServerTask.dependsOn(cleanGeneratedCodeTask);
         compileGeneratedJavaTask.dependsOn(compileConjureJavaServerTask);
         project.getTasks().getByName("compileJava").dependsOn(compileGeneratedJavaTask);
         project.getTasks().getByName("clean").dependsOn(cleanGeneratedCodeTask);
+        project.afterEvaluate(p -> {  // eclipse/idea plugins may get applied after conjure; hence afterEvaluate
+            for (String taskName : new String[] {"idea", "eclipse"}) {
+                Task task = p.getTasks().findByName(taskName);
+                if (task != null) {
+                    task.dependsOn(compileConjureJavaServerTask);
+                }
+            }
+        });
 
         // dependency cleanup
         project.getConfigurations().getByName("compile").extendsFrom(
