@@ -43,6 +43,12 @@ public final class BooleanExample {
             .toString();
     }
 
+    public static BooleanExample of(boolean coin) {
+        return builder()
+            .coin(coin)
+            .build();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

@@ -49,6 +49,12 @@ public final class MapExample {
             .toString();
     }
 
+    public static MapExample of(Map<String, String> items) {
+        return builder()
+            .items(items)
+            .build();
+    }
+
     private static void validateFields(Map<String, String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");

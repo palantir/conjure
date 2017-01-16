@@ -47,6 +47,12 @@ public final class OptionalExample {
             .toString();
     }
 
+    public static OptionalExample of(String item) {
+        return builder()
+            .item(Optional.of(item))
+            .build();
+    }
+
     private static void validateFields(Optional<String> item) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, item, "item");

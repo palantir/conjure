@@ -43,6 +43,12 @@ public final class IntegerExample {
             .toString();
     }
 
+    public static IntegerExample of(int integer) {
+        return builder()
+            .integer(integer)
+            .build();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

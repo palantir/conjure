@@ -47,6 +47,9 @@ public final class BeanGenerator implements TypeGenerator {
 
     private final Settings settings;
 
+    // the static factory creation method gets unwieldy with more than 3 parameters.
+    private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
+
     public BeanGenerator(Settings settings) {
         this.settings = settings;
     }
@@ -94,6 +97,10 @@ public final class BeanGenerator implements TypeGenerator {
                 .addMethod(createEqualTo(objectClass, poetFields))
                 .addMethod(createHashCode(poetFields))
                 .addMethod(createToString(typeName, poetFields));
+
+        if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
+            typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
+        }
 
         if (!nonPrimitivePoetFields.isEmpty()) {
             typeBuilder
@@ -276,6 +283,24 @@ public final class BeanGenerator implements TypeGenerator {
         return builder.build();
     }
 
+    private static MethodSpec createStaticFactoryMethod(Collection<FieldSpec> fields, ClassName objectClass) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("of")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(objectClass);
+
+        builder.addCode("return builder()");
+        for (FieldSpec spec : fields) {
+            if (isOptional(spec)) {
+                builder.addCode("\n    .$L(Optional.of($L))", spec.name, spec.name);
+            } else {
+                builder.addCode("\n    .$L($L)", spec.name, spec.name);
+            }
+            builder.addParameter(ParameterSpec.builder(getTypeNameWithoutOptional(spec), spec.name).build());
+        }
+        builder.addCode("\n    .build();\n");
+        return builder.build();
+    }
+
     private static MethodSpec createAddFieldIfMissing(int fieldCount) {
         ParameterizedTypeName listOfStringType = ParameterizedTypeName.get(List.class, String.class);
         ParameterSpec listParam = ParameterSpec.builder(listOfStringType, "prev").build();
@@ -326,6 +351,21 @@ public final class BeanGenerator implements TypeGenerator {
                     list1.addAll(list2);
                     return list1;
                 });
+    }
+
+    private static TypeName getTypeNameWithoutOptional(FieldSpec spec) {
+        if (!isOptional(spec)) {
+            return spec.type;
+        }
+        return ((ParameterizedTypeName) spec.type).typeArguments.get(0);
+    }
+
+    private static boolean isOptional(FieldSpec spec) {
+        if (!(spec.type instanceof ParameterizedTypeName)) {
+            // spec isn't a wrapper class
+            return false;
+        }
+        return ((ParameterizedTypeName) spec.type).rawType.simpleName().equals("Optional");
     }
 
     @Value.Immutable

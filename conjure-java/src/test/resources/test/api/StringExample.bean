@@ -46,6 +46,12 @@ public final class StringExample {
             .toString();
     }
 
+    public static StringExample of(String string) {
+        return builder()
+            .string(string)
+            .build();
+    }
+
     private static void validateFields(String string) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");

@@ -49,6 +49,12 @@ public final class AnyMapExample {
             .toString();
     }
 
+    public static AnyMapExample of(Map<String, Object> items) {
+        return builder()
+            .items(items)
+            .build();
+    }
+
     private static void validateFields(Map<String, Object> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");

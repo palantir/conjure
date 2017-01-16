@@ -43,6 +43,12 @@ public final class DoubleExample {
             .toString();
     }
 
+    public static DoubleExample of(double doubleValue) {
+        return builder()
+            .doubleValue(doubleValue)
+            .build();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

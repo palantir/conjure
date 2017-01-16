@@ -50,6 +50,12 @@ public final class SetExample {
             .toString();
     }
 
+    public static SetExample of(Set<String> items) {
+        return builder()
+            .items(items)
+            .build();
+    }
+
     private static void validateFields(Set<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");

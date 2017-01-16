@@ -46,6 +46,12 @@ public final class AnyExample {
             .toString();
     }
 
+    public static AnyExample of(Object any) {
+        return builder()
+            .any(any)
+            .build();
+    }
+
     private static void validateFields(Object any) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, any, "any");

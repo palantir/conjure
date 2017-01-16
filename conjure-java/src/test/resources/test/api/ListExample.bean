@@ -48,6 +48,12 @@ public final class ListExample {
             .toString();
     }
 
+    public static ListExample of(List<String> items) {
+        return builder()
+            .items(items)
+            .build();
+    }
+
     private static void validateFields(List<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");

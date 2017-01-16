@@ -67,6 +67,14 @@ public final class PrimitiveOptionalsExample {
             .toString();
     }
 
+    public static PrimitiveOptionalsExample of(OptionalDouble num, Boolean bool, OptionalInt integer) {
+        return builder()
+            .num(num)
+            .bool(Optional.of(bool))
+            .integer(integer)
+            .build();
+    }
+
     private static void validateFields(OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");
