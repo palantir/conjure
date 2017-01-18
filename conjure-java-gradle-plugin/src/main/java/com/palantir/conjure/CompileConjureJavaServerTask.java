@@ -47,7 +47,7 @@ public class CompileConjureJavaServerTask extends SourceTask {
 
         Settings settings = Settings.builder()
                 .optionalTypeStrategy(TypeMapper.OptionalTypeStrategy.Guava)
-                .ignoreUnknownProperties(false)
+                .ignoreUnknownProperties(true)
                 .build();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
