@@ -496,4 +496,4 @@ buildscript {
 apply plugin: 'com.palantir.gradle-conjure-publish'
 ```
 
-To publish, run the `conjurePublish` task.
+To publish, run the `publishConjure` task.
