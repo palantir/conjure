@@ -134,8 +134,10 @@ public final class TypeMapper {
             if (defType instanceof AliasTypeDefinition) {
                 // in typescript we collapse alias types to concrete types
                 return getPrimitiveTypeName(((AliasTypeDefinition) defType).alias());
+            } else if (defType instanceof EnumTypeDefinition) {
+                return refType.type();
             } else {
-                // Enum or Object
+                // Interfaces are prepended with "I"
                 return "I" + refType.type();
             }
         } else {

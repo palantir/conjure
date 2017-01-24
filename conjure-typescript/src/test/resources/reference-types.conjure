@@ -7,6 +7,7 @@ types:
           fx: X
           fy: Y
           fz: Z
+          fe: EnumObject
       Y:
         package: com.palantir.package1.folder
         fields:
@@ -15,3 +16,7 @@ types:
         package: com.palantir.package2.folder
         fields:
           fstring: string
+      EnumObject:
+        values:
+          - VALUE_ONE
+          - VALUE_TWO

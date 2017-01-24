@@ -65,11 +65,13 @@ public final class ConjureTypescriptClientGeneratorTest {
         assertThat(compiledFile(src, zfile))
                 .contains("interface IZ");
 
-        // Assert expected references to Y and Z from X
+        // Assert expected references to Y, Z, and EnumObject from X
         assertThat(compiledFile(src, xfile))
                 .contains("import { IY } from \"./folder/y\"");
         assertThat(compiledFile(src, xfile))
                 .contains("import { IZ } from \"../package2/folder/z\"");
+        assertThat(compiledFile(src, xfile))
+                .contains("import { EnumObject } from \"./enumObject\"");
     }
 
     private static String compiledFile(File srcDir, String clazz) throws IOException {
