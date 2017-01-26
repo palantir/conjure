@@ -453,7 +453,7 @@ buildscript {
 
 ### Conjure Java Gradle Plugin
 
-Currently, the best way to use Conjure for java projects is to apply the Conjure gradle plugin. 
+Currently, the best way to use Conjure for java projects is to apply the Conjure Gradle plugin. 
 
 To add the plugin, depend on it in your root project `build.gradle`:
 ```gradle
@@ -464,7 +464,7 @@ buildscript {
 }
 ```
 
-...and apply the plugin on any projects that will have Conjure files:
+... and apply the plugin on any projects that will have Conjure files:
 ```gradle
 apply plugin: 'com.palantir.gradle-conjure-java'
 ```
@@ -474,6 +474,14 @@ Then, add a `src/main/conjure` folder and author your Conjure files (typically w
 To generate code, run the `compileConjureJavaServer` task. Generated code -- today, the Gradle plugin
 only generates Java -- will be placed in `src/generated/java`. Note that generated code currently biases
 towards server-styled defaults.
+
+By default, the plugin renders Conjure `optional<>` fields as Guava `Optional` types. This behavior can be toggled
+via the `optionalType` configuration point:
+```gradle
+conjureJavaServer {
+    optionalType = 'JAVA8'  // default: 'GUAVA'
+}
+```
 
 ### Conjure Publish Gradle Plugin
 

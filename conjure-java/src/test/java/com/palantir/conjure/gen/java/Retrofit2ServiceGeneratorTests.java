@@ -26,7 +26,7 @@ public final class Retrofit2ServiceGeneratorTests {
 
         ServiceGenerator gen = new Retrofit2ServiceGenerator(Settings.builder()
                 .ignoreUnknownProperties(false)
-                .optionalTypeStrategy(OptionalTypeStrategy.Java8)
+                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build());
 
         Set<JavaFile> files = gen.generate(def);

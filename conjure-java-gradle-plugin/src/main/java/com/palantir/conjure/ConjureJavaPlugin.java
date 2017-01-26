@@ -33,6 +33,8 @@ public class ConjureJavaPlugin implements Plugin<Project> {
 
     @Override
     public final void apply(Project project) {
+        ConjureExtension extension = project.getExtensions().create("conjureJavaServer", ConjureExtension.class);
+
         project.getPluginManager().apply(JavaPlugin.class);
 
         // java generated source set
@@ -60,6 +62,9 @@ public class ConjureJavaPlugin implements Plugin<Project> {
                 .create("compileConjureJavaServer", CompileConjureJavaServerTask.class);
         compileConjureJavaServerTask.setSource(conjureSourceSet);
         compileConjureJavaServerTask.setOutputDirectory(project.file("src/generated/java"));
+        project.afterEvaluate(p -> {
+            compileConjureJavaServerTask.configure(extension.getOptionalType());
+        });
 
         Task compileGeneratedJavaTask = project.getTasks()
                 .getByName(generatedSourceSet.getCompileJavaTaskName());

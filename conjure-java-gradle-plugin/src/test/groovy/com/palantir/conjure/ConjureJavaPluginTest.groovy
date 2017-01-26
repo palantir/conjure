@@ -8,7 +8,7 @@ import com.google.common.io.Resources
 import java.nio.charset.Charset
 import org.gradle.testkit.runner.TaskOutcome
 
-public class ConjureJavaPluginTest extends GradleTestSpec {
+class ConjureJavaPluginTest extends GradleTestSpec {
 
     private static final String FAIL_ECLIPSE_CONTAINS_RESOURCES_GENERATED_FOLDER =
             "FAIL: Eclipse classpath contains build/resources/generated folder";
@@ -71,7 +71,7 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.UP_TO_DATE
     }
 
-    def 'compileJava causes full task hierarchy to execute' () {
+    def 'compileJava causes full task hierarchy to execute'() {
         when:
         def result = run("compileJava")
 
@@ -183,6 +183,33 @@ public class ConjureJavaPluginTest extends GradleTestSpec {
 
         then:
         result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+    }
+
+    def 'generates Guava optionals by default'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-optional.yml"))
+        def result = run("compileConjureJavaServer")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+        compiledFile("test/a/api/SimpleObject.java").text.contains("import com.google.common.base.Optional;")
+        !compiledFile("test/a/api/SimpleObject.java").text.contains("import java.util.Optional;")
+    }
+
+    def 'can configure generation of Java8 optionals instead of Guava optionals'() {
+        when:
+        createSourceFile("a.yml", readResource("test-service-optional.yml"))
+        buildFile << """
+            conjureJavaServer {
+                optionalType = 'JAVA8'
+            }
+        """.stripIndent()
+        def result = run("compileConjureJavaServer")
+
+        then:
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+        !compiledFile("test/a/api/SimpleObject.java").text.contains("import com.google.common.base.Optional;")
+        compiledFile("test/a/api/SimpleObject.java").text.contains("import java.util.Optional;")
     }
 
     def createSourceFile(String fileName, String text) {

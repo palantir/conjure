@@ -26,8 +26,8 @@ import java.util.OptionalInt;
 public final class TypeMapper {
 
     public enum OptionalTypeStrategy {
-        Java8(java.util.Optional.class, "empty"),
-        Guava(com.google.common.base.Optional.class, "absent");
+        JAVA8(java.util.Optional.class, "empty"),
+        GUAVA(com.google.common.base.Optional.class, "absent");
 
         private ClassName clazz;
         private String absentMethodName;
@@ -98,7 +98,7 @@ public final class TypeMapper {
     }
 
     private TypeName getClassNameForOptionalType(OptionalType type) {
-        if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.Java8) {
+        if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.JAVA8) {
             // special handling for primitive optionals with Java 8
             switch ((PrimitiveType) type.itemType()) {
                 case DOUBLE:

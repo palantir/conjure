@@ -35,7 +35,7 @@ public final class JerseyServiceGeneratorTests {
 
         ServiceGenerator gen = new JerseyServiceGenerator(Settings.builder()
                 .ignoreUnknownProperties(false)
-                .optionalTypeStrategy(OptionalTypeStrategy.Java8)
+                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build());
 
         Set<JavaFile> files = gen.generate(def);

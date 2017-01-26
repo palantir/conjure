@@ -12,7 +12,7 @@ public interface Settings {
 
     @Value.Default
     default OptionalTypeStrategy optionalTypeStrategy() {
-        return OptionalTypeStrategy.Java8;
+        return OptionalTypeStrategy.JAVA8;
     }
 
     @Value.Default

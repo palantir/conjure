@@ -16,6 +16,7 @@ import com.palantir.conjure.gen.java.types.TypeMapper;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
@@ -27,6 +28,9 @@ public class CompileConjureJavaServerTask extends SourceTask {
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
+
+    @Input
+    private TypeMapper.OptionalTypeStrategy optionalType;
 
     @OutputDirectory
     public final File getOutputDirectory() {
@@ -46,7 +50,7 @@ public class CompileConjureJavaServerTask extends SourceTask {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
 
         Settings settings = Settings.builder()
-                .optionalTypeStrategy(TypeMapper.OptionalTypeStrategy.Guava)
+                .optionalTypeStrategy(optionalType)
                 .ignoreUnknownProperties(true)
                 .build();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
@@ -56,5 +60,9 @@ public class CompileConjureJavaServerTask extends SourceTask {
         File outputDir = getOutputDirectory();
         checkState(outputDir.exists() || outputDir.mkdirs(), "Unable to make directory tree %s", outputDir);
         generator.emit(conjure, outputDir);
+    }
+
+    public final void configure(TypeMapper.OptionalTypeStrategy optionalTypeStrategy) {
+        this.optionalType = optionalTypeStrategy;
     }
 }
