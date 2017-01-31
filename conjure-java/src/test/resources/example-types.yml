@@ -38,10 +38,14 @@ types:
       AnyMapExample:
         fields:
           items: map<string, any>
-      AliasExample:
+      StringAliasExample:
         alias: string
       DoubleAliasExample:
         alias: double
+      IntegerAliasExample:
+        alias: integer
+      BooleanAliasExample:
+        alias: boolean
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>
@@ -56,4 +60,4 @@ types:
           items: list<string>
           set: set<string>
           map: map<string, string>
-          alias: AliasExample
+          alias: StringAliasExample

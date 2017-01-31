@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class DoubleAliasExample {
-    private final double value;
+public final class IntegerAliasExample {
+    private final int value;
 
-    private DoubleAliasExample(double value) {
+    private IntegerAliasExample(int value) {
         this.value = value;
     }
 
     @JsonValue
-    public double get() {
+    public int get() {
         return value;
     }
 
@@ -24,20 +24,20 @@ public final class DoubleAliasExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof DoubleAliasExample && this.value == ((DoubleAliasExample) other).value);
+        return this == other || (other instanceof IntegerAliasExample && this.value == ((IntegerAliasExample) other).value);
     }
 
     @Override
     public int hashCode() {
-        return Double.hashCode(value);
+        return Integer.hashCode(value);
     }
 
-    public static DoubleAliasExample valueOf(String value) {
-        return new DoubleAliasExample(Double.parseDouble(value));
+    public static IntegerAliasExample valueOf(String value) {
+        return new IntegerAliasExample(Integer.parseInt(value));
     }
 
     @JsonCreator
-    public static DoubleAliasExample of(double value) {
-        return new DoubleAliasExample(value);
+    public static IntegerAliasExample of(int value) {
+        return new IntegerAliasExample(value);
     }
 }

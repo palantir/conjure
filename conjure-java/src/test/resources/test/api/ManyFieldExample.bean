@@ -33,9 +33,9 @@ public final class ManyFieldExample {
 
     private final Map<String, String> map;
 
-    private final AliasExample alias;
+    private final StringAliasExample alias;
 
-    private ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") int integer, @JsonProperty("doubleValue") double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("set") Set<String> set, @JsonProperty("map") Map<String, String> map, @JsonProperty("alias") AliasExample alias) {
+    private ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") int integer, @JsonProperty("doubleValue") double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("set") Set<String> set, @JsonProperty("map") Map<String, String> map, @JsonProperty("alias") StringAliasExample alias) {
         validateFields(string, optionalItem, items, set, map, alias);
         this.string = string;
         this.integer = integer;
@@ -83,7 +83,7 @@ public final class ManyFieldExample {
     }
 
     @JsonProperty("alias")
-    public AliasExample getAlias() {
+    public StringAliasExample getAlias() {
         return this.alias;
     }
 
@@ -116,7 +116,7 @@ public final class ManyFieldExample {
             .toString();
     }
 
-    private static void validateFields(String string, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, AliasExample alias) {
+    private static void validateFields(String string, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, StringAliasExample alias) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");
         missingFields = addFieldIfMissing(missingFields, optionalItem, "optionalItem");
@@ -159,7 +159,7 @@ public final class ManyFieldExample {
 
         private Map<String, String> map = new LinkedHashMap<>();
 
-        private AliasExample alias;
+        private StringAliasExample alias;
 
         private Builder() {
         }
@@ -249,7 +249,7 @@ public final class ManyFieldExample {
             return this;
         }
 
-        public Builder alias(AliasExample alias) {
+        public Builder alias(StringAliasExample alias) {
             this.alias = Objects.requireNonNull(alias, "alias cannot be null");
             return this;
         }

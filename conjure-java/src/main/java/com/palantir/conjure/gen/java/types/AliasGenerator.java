@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
@@ -68,9 +69,9 @@ public final class AliasGenerator {
                         .build())
                 .addMethod(MethodSpec.methodBuilder("valueOf")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .addParameter(aliasType, "value")
+                        .addParameter(String.class, "value")
                         .returns(thisClass)
-                        .addStatement("return new $T(value)", thisClass)
+                        .addCode(getPrimitiveValueOfConstructor(typeDef.alias(), thisClass, aliasType))
                         .build())
                 .addMethod(MethodSpec.methodBuilder("of")
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -88,6 +89,25 @@ public final class AliasGenerator {
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
+    }
+
+    private static CodeBlock getPrimitiveValueOfConstructor(
+            PrimitiveType primitiveType, ClassName thisClass, TypeName aliasType) {
+        switch (primitiveType) {
+            case STRING:
+                return CodeBlock.builder().addStatement("return new $T(value)", thisClass).build();
+            case DOUBLE:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.parseDouble(value))", thisClass, aliasType.box()).build();
+            case INTEGER:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.parseInt(value))", thisClass, aliasType.box()).build();
+            case BOOLEAN:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.parseBoolean(value))", thisClass, aliasType.box()).build();
+            default:
+                throw new IllegalStateException("Unknown primitive type: " + primitiveType);
+        }
     }
 
     private static MethodSpec createConstructor(TypeName aliasType) {

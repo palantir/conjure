@@ -6,10 +6,10 @@ import java.util.Objects;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class AliasExample {
+public final class StringAliasExample {
     private final String value;
 
-    private AliasExample(String value) {
+    private StringAliasExample(String value) {
         Objects.requireNonNull(value, "value cannot be null");
         this.value = value;
     }
@@ -26,7 +26,7 @@ public final class AliasExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof AliasExample && this.value.equals(((AliasExample) other).value));
+        return this == other || (other instanceof StringAliasExample && this.value.equals(((StringAliasExample) other).value));
     }
 
     @Override
@@ -34,12 +34,12 @@ public final class AliasExample {
         return value.hashCode();
     }
 
-    public static AliasExample valueOf(String value) {
-        return new AliasExample(value);
+    public static StringAliasExample valueOf(String value) {
+        return new StringAliasExample(value);
     }
 
     @JsonCreator
-    public static AliasExample of(String value) {
-        return new AliasExample(value);
+    public static StringAliasExample of(String value) {
+        return new StringAliasExample(value);
     }
 }
