@@ -32,8 +32,12 @@ public final class DoubleAliasExample {
         return Double.hashCode(value);
     }
 
-    @JsonCreator
     public static DoubleAliasExample valueOf(double value) {
+        return new DoubleAliasExample(value);
+    }
+
+    @JsonCreator
+    public static DoubleAliasExample of(double value) {
         return new DoubleAliasExample(value);
     }
 }
