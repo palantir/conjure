@@ -64,7 +64,7 @@ public final class TypeMapper {
         } else if (type instanceof MapType) {
             return getClassNameForMapType((MapType) type);
         } else if (type instanceof PrimitiveType) {
-            return primtiveTypeToClassName((PrimitiveType) type);
+            return primitiveTypeToClassName((PrimitiveType) type);
         } else if (type instanceof ReferenceType) {
             return referenceTypeToClassName((ReferenceType) type);
         } else if (type instanceof AnyType) {
@@ -132,7 +132,7 @@ public final class TypeMapper {
         }
     }
 
-    private static TypeName primtiveTypeToClassName(PrimitiveType type) {
+    private static TypeName primitiveTypeToClassName(PrimitiveType type) {
         switch (type) {
             case STRING:
                 return ClassName.get(String.class);
