@@ -63,6 +63,7 @@ Base types in the system are:
  * `double` (64-bit floating point numbers)
  * `boolean` `(true|false)`
  * `any` (unknown placeholder type)
+ * `binary` (byte[])
 
 ### Built-Ins
 Conjure offers several built-ins to assist with mapping to existing language
@@ -287,6 +288,7 @@ this service.
  * `auth`: an optional auth requirement to override `default-auth`,
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
+ * `returns`: a valid Conjure type (`binary` not allowed)
  * `args`: a map of argument names (typically in camel case) to argument
    definitions, where an argument may use the short-hand form:
 
@@ -307,7 +309,7 @@ this service.
    ```
 
    and for:
-    * `type`: a valid Conjure type
+    * `type`: a valid Conjure type (`binary` not allowed)
     * (optional) `docs`: a standard string and generally treated throughout
       rendering as Markdown.
     * (optional) `deprecated`: a string that indicates that this endpoint

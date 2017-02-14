@@ -11,6 +11,9 @@ types:
       DoubleExample:
         fields:
           doubleValue: double
+      BinaryExample:
+        fields:
+          binary: binary
       OptionalExample:
         fields:
           item: optional<string>

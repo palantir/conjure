@@ -7,9 +7,9 @@ package com.palantir.conjure.gen.java.types;
 import com.google.common.base.Joiner;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -25,8 +25,12 @@ public final class Expressions {
         return CodeBlock.of("$1N(" + indexParams(2, args.size() + 2) + ")", append(method, args));
     }
 
+    public static <T> CodeBlock staticMethodCall(Class<?> clazz, String method, T... args) {
+        return staticMethodCall(clazz, method, Arrays.asList(args));
+    }
+
     public static CodeBlock staticMethodCall(Class<?> clazz, String method, Collection<?> args) {
-        return CodeBlock.of("$1T.$2N(" + indexParams(3, args.size() + 3) + ")", append(Objects.class, method, args));
+        return CodeBlock.of("$1T.$2N(" + indexParams(3, args.size() + 3) + ")", append(clazz, method, args));
     }
 
     private static Object[] append(Object one, Collection<?> rest) {

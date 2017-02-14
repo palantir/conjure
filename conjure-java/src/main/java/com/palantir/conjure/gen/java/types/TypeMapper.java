@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -17,6 +18,7 @@ import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SetType;
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -69,6 +71,8 @@ public final class TypeMapper {
             return referenceTypeToClassName((ReferenceType) type);
         } else if (type instanceof AnyType) {
             return ClassName.get(Object.class);
+        } else if (type instanceof BinaryType) {
+            return ArrayTypeName.of(byte.class);
         }
         throw new IllegalStateException("Unexpected type " + type.getClass());
     }

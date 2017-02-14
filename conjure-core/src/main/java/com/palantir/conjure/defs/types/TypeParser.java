@@ -29,6 +29,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 SetTypeParser.INSTANCE,
                 OptionalTypeParser.INSTANCE,
                 AnyTypeParser.INSTANCE,
+                BinaryTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
         return parser.parse(input);
     }
@@ -65,6 +66,19 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
             return AnyType.of();
+        }
+    }
+
+    private enum BinaryTypeParser implements Parser<BinaryType> {
+        INSTANCE;
+
+        @Override
+        public BinaryType parse(ParserState input) throws ParseException {
+            ExpectationResult result = Parsers.expect("binary").parse(input);
+            if (Parsers.nullOrUnexpected(result)) {
+                return null;
+            }
+            return BinaryType.of();
         }
     }
 

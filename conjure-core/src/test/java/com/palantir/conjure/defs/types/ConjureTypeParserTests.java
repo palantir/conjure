@@ -50,6 +50,12 @@ public final class ConjureTypeParserTests {
     }
 
     @Test
+    public void testParser_binaryType() throws Exception {
+        assertThat(TypeParser.INSTANCE.parse("binary"))
+                .isEqualTo(BinaryType.of());
+    }
+
+    @Test
     public void testParser_listType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("list<string>"))
              .isEqualTo(ListType.of(PrimitiveType.STRING));

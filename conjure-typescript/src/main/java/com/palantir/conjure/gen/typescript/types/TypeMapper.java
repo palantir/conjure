@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
@@ -88,6 +89,7 @@ public final class TypeMapper {
         return null;
     }
 
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     private String getTypeNameFromConjureType(ConjureType conjureType) {
         if (conjureType instanceof ExternalTypeDefinition) {
             return getTypeNameFromConjureType(((ExternalTypeDefinition) conjureType).baseType());
@@ -110,6 +112,9 @@ public final class TypeMapper {
             return getTypeNameFromConjureType(((SetType) conjureType).itemType()) + "[]";
         } else if (conjureType instanceof AnyType) {
             return "any";
+        } else if (conjureType instanceof BinaryType) {
+            // TODO(jellis): support this
+            throw new RuntimeException("BinaryType not supported by conjure-typescript");
         }
         throw new IllegalArgumentException("Unknown conjure type: " + conjureType);
     }

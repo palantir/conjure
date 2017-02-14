@@ -6,11 +6,11 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -30,6 +30,8 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -94,9 +96,9 @@ public final class BeanGenerator implements TypeGenerator {
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
                 .addMethods(createGetters(fields))
                 .addMethod(createEquals(objectClass))
-                .addMethod(createEqualTo(objectClass, poetFields))
+                .addMethod(createEqualTo(objectClass, fields))
                 .addMethod(createHashCode(poetFields))
-                .addMethod(createToString(typeName, poetFields));
+                .addMethod(createToString(typeName, fields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
@@ -213,25 +215,30 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    private static MethodSpec createEqualTo(TypeName thisClass, Collection<FieldSpec> fields) {
-        List<String> comparisons = new ArrayList<>(fields.size());
-        int fieldNumber = 1;
-        for (FieldSpec spec : fields) {
-            if (spec.type.isPrimitive()) {
-                comparisons.add(String.format("this.$%1$dN == other.$%1$dN", fieldNumber));
-            } else {
-                comparisons.add(String.format("this.$%1$dN.equals(other.$%1$dN)", fieldNumber));
-            }
-            fieldNumber = fieldNumber + 1;
-        }
-        String equalsExpression = Joiner.on(" && ").join(comparisons);
+    private static MethodSpec createEqualTo(TypeName thisClass, Collection<EnrichedField> fields) {
+        CodeBlock equalsTo = CodeBlocks.of(fields.stream()
+                .map(BeanGenerator::createEqualsStatement)
+                .collect(joining(CodeBlock.of(" && "))));
 
         return MethodSpec.methodBuilder("equalTo")
                 .addModifiers(Modifier.PRIVATE)
                 .addParameter(thisClass, "other")
                 .returns(TypeName.BOOLEAN)
-                .addStatement("return " + equalsExpression, fields.toArray())
+                .addStatement("return $L", equalsTo)
                 .build();
+    }
+
+    private static CodeBlock createEqualsStatement(EnrichedField field) {
+        String thisField = "this." + field.poetSpec().name;
+        String otherField = "other." + field.poetSpec().name;
+
+        if (field.poetSpec().type.isPrimitive()) {
+            return CodeBlock.of("$L == $L", thisField, otherField);
+        } else if (field.conjureDef().type() instanceof BinaryType) {
+            return Expressions.staticMethodCall(Arrays.class, "equals", thisField, otherField);
+        } else {
+            return CodeBlock.of("$L.equals($L)", thisField, otherField);
+        }
     }
 
     private static MethodSpec createHashCode(Collection<FieldSpec> fields) {
@@ -243,13 +250,13 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    private static MethodSpec createToString(String thisClassName, Collection<FieldSpec> poetFields) {
+    private static MethodSpec createToString(String thisClassName, Collection<EnrichedField> fields) {
         CodeBlock returnStatement = CodeBlock.builder()
                 .add("return new $T($S).append(\"{\")\n", StringBuilder.class, thisClassName)
                 .indent()
                     .indent()
-                        .add(CodeBlocks.of(poetFields.stream()
-                            .map(f -> CodeBlock.of(".append($1S).append(\": \").append($1N)\n", f.name))
+                        .add(CodeBlocks.of(fields.stream()
+                            .map(BeanGenerator::createAppendStatement)
                             .collect(joining(CodeBlock.of(".append(\", \")")))))
                     .unindent()
                     .add(".append(\"}\")\n")
@@ -263,6 +270,24 @@ public final class BeanGenerator implements TypeGenerator {
                 .returns(ClassName.get(String.class))
                 .addCode(returnStatement)
                 .build();
+    }
+
+    private static CodeBlock createAppendStatement(EnrichedField field) {
+        String fieldName = field.poetSpec().name;
+        CodeBlock.Builder builder = CodeBlock.builder()
+                .add(".append($S)", fieldName)
+                .add(".append(\": \")");
+
+        if (field.conjureDef().type() instanceof BinaryType) {
+            // base64 encode binary fields
+            CodeBlock encoded = Expressions.staticMethodCall(Base64.class, "getEncoder().encode", field.poetSpec());
+            builder.add(".append($L)", encoded);
+        } else {
+            // default to the field's toString method
+            builder.add(".append($N)", fieldName);
+        }
+
+        return builder.add("\n").build();
     }
 
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
