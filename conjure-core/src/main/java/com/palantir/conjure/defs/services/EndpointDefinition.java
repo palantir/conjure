@@ -4,9 +4,10 @@
 
 package com.palantir.conjure.defs.services;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BinaryType;
@@ -46,13 +47,12 @@ public interface EndpointDefinition {
     @Value.Check
     default void check() {
         returns().ifPresent(type ->
-                Preconditions.checkArgument(!isIllegal(type), "Endpoint cannot have return type '%s'", type));
+                checkArgument(!isIllegal(type), "Endpoint cannot have return type '%s'", type));
         toStream(args())
                 .map(Map::values)
                 .flatMap(Collection::stream)
                 .map(ArgumentDefinition::type)
-                .forEach(type -> Preconditions.checkArgument(!isIllegal(type),
-                        "Endpoint cannot have argument with type '%s'", type));
+                .forEach(type -> checkArgument(!isIllegal(type), "Endpoint cannot have argument with type '%s'", type));
     }
 
     static boolean isIllegal(ConjureType type) {
