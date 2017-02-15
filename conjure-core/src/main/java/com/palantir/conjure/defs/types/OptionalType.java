@@ -15,6 +15,11 @@ public interface OptionalType extends ConjureType {
     @JsonProperty("item-type")
     ConjureType itemType();
 
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     static OptionalType of(ConjureType itemType) {
         return ImmutableOptionalType.builder().itemType(itemType).build();
     }

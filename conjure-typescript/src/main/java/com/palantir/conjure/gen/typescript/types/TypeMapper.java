@@ -7,13 +7,14 @@ package com.palantir.conjure.gen.typescript.types;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -45,36 +46,72 @@ public final class TypeMapper {
     public Set<ReferenceType> getReferencedConjureNames(ConjureType conjureType) {
         ImmutableSet.Builder<ReferenceType> result = ImmutableSet.builder();
         Stack<ConjureType> stack = new Stack<>();
-        Set<ConjureType> seen = Sets.newHashSet();
+        ReferencedNameVisitor visitor = new ReferencedNameVisitor(stack, result);
         stack.add(conjureType);
         while (!stack.isEmpty()) {
             ConjureType poppedConjureType = stack.pop();
-            if (!seen.contains(poppedConjureType)) {
-                if (poppedConjureType instanceof ExternalTypeDefinition) {
-                    throw new RuntimeException("Should never happen");
-                } else if (poppedConjureType instanceof ListType) {
-                    stack.add(((ListType) poppedConjureType).itemType());
-                } else if (poppedConjureType instanceof MapType) {
-                    stack.add(((MapType) poppedConjureType).keyType());
-                    stack.add(((MapType) poppedConjureType).valueType());
-                } else if (poppedConjureType instanceof ObjectTypeDefinition) {
-                    // TODO support this
-                    throw new RuntimeException("Not supported");
-                } else if (poppedConjureType instanceof OptionalType) {
-                    stack.add(((OptionalType) poppedConjureType).itemType());
-                } else if (poppedConjureType instanceof ReferenceType) {
-                    result.add((ReferenceType) poppedConjureType);
-                } else if (poppedConjureType instanceof SetType) {
-                    stack.add(((SetType) poppedConjureType).itemType());
-                } else if (poppedConjureType instanceof AnyType) {
-                    // no-op
-                } else {
-                    throw new IllegalArgumentException("Unknown conjure type: " + poppedConjureType);
-                }
-                // PrimitiveType omitted - no op
-            }
+            poppedConjureType.visit(visitor);
         }
         return result.build();
+    }
+
+    private static class ReferencedNameVisitor implements ConjureTypeVisitor<Void> {
+
+        private final Stack<ConjureType> stack;
+        private final Builder<ReferenceType> result;
+
+        ReferencedNameVisitor(
+                Stack<ConjureType> stack, ImmutableSet.Builder<ReferenceType> result) {
+            this.stack = stack;
+            this.result = result;
+        }
+
+        @Override
+        public Void visit(AnyType anyType) {
+            return null;
+        }
+
+        @Override
+        public Void visit(ListType listType) {
+            stack.add(listType.itemType());
+            return null;
+        }
+
+        @Override
+        public Void visit(MapType mapType) {
+            stack.add(mapType.keyType());
+            stack.add(mapType.valueType());
+            return null;
+        }
+
+        @Override
+        public Void visit(OptionalType optionalType) {
+            stack.add(optionalType.itemType());
+            return null;
+        }
+
+        @Override
+        public Void visit(PrimitiveType primitiveType) {
+            return null;
+        }
+
+        @Override
+        public Void visit(ReferenceType referenceType) {
+            result.add(referenceType);
+            return null;
+        }
+
+        @Override
+        public Void visit(SetType setType) {
+            stack.add(setType.itemType());
+            return null;
+        }
+
+        @Override
+        public Void visit(BinaryType binaryType) {
+            return null;
+        }
+
     }
 
     public String getContainingPackage(ReferenceType name) {
@@ -91,64 +128,78 @@ public final class TypeMapper {
 
     @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     private String getTypeNameFromConjureType(ConjureType conjureType) {
-        if (conjureType instanceof ExternalTypeDefinition) {
-            return getTypeNameFromConjureType(((ExternalTypeDefinition) conjureType).baseType());
-        } else if (conjureType instanceof ListType) {
-            return getTypeNameFromConjureType(((ListType) conjureType).itemType()) + "[]";
-        } else if (conjureType instanceof MapType) {
-            String keyType = getTypeNameFromConjureType(((MapType) conjureType).keyType());
-            String valueType = getTypeNameFromConjureType(((MapType) conjureType).valueType());
-            return "{ [key: " + keyType + "]: " + valueType + " }";
-        } else if (conjureType instanceof ObjectTypeDefinition) {
-            // TODO support this
-            throw new RuntimeException("Not supported");
-        } else if (conjureType instanceof OptionalType) {
-            return getTypeNameFromConjureType(((OptionalType) conjureType).itemType());
-        } else if (conjureType instanceof PrimitiveType) {
-            return getPrimitiveTypeName((PrimitiveType) conjureType);
-        } else if (conjureType instanceof ReferenceType) {
-            return referenceTypeToName((ReferenceType) conjureType);
-        } else if (conjureType instanceof SetType) {
-            return getTypeNameFromConjureType(((SetType) conjureType).itemType()) + "[]";
-        } else if (conjureType instanceof AnyType) {
+        return conjureType.visit(new TypeNameVisitor());
+    }
+
+    private class TypeNameVisitor implements ConjureTypeVisitor<String> {
+
+        @Override
+        public String visit(AnyType anyType) {
             return "any";
-        } else if (conjureType instanceof BinaryType) {
+        }
+
+        @Override
+        public String visit(ListType listType) {
+            return getTypeNameFromConjureType(listType.itemType()) + "[]";
+        }
+
+        @Override
+        public String visit(MapType mapType) {
+            String keyType = getTypeNameFromConjureType(mapType.keyType());
+            String valueType = getTypeNameFromConjureType(mapType.valueType());
+            return "{ [key: " + keyType + "]: " + valueType + " }";
+        }
+
+        @Override
+        public String visit(OptionalType optionalType) {
+            return getTypeNameFromConjureType(optionalType.itemType());
+        }
+
+        @Override
+        public String visit(PrimitiveType primitiveType) {
+            switch (primitiveType) {
+                case DOUBLE:
+                case INTEGER:
+                    return "number";
+                case STRING:
+                    return "string";
+                case BOOLEAN:
+                    return "boolean";
+                default:
+                    throw new IllegalArgumentException("Unknown primitive type" + primitiveType);
+            }
+        }
+
+        @Override
+        public String visit(ReferenceType refType) {
+            BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
+            if (defType != null) {
+                if (defType instanceof AliasTypeDefinition) {
+                    // in typescript we collapse alias types to concrete types
+                    return visit(((AliasTypeDefinition) defType).alias());
+                } else if (defType instanceof EnumTypeDefinition) {
+                    return refType.type();
+                } else {
+                    // Interfaces are prepended with "I"
+                    return "I" + refType.type();
+                }
+            } else {
+                ExternalTypeDefinition depType = types.imports().get(refType.type());
+                checkNotNull(depType, "Unable to resolve type %s", refType.type());
+                return getTypeNameFromConjureType(depType.baseType());
+            }
+        }
+
+        @Override
+        public String visit(SetType setType) {
+            return getTypeNameFromConjureType(setType.itemType()) + "[]";
+        }
+
+        @Override
+        public String visit(BinaryType binaryType) {
             // TODO(jellis): support this
             throw new RuntimeException("BinaryType not supported by conjure-typescript");
         }
-        throw new IllegalArgumentException("Unknown conjure type: " + conjureType);
-    }
 
-    private String getPrimitiveTypeName(PrimitiveType conjureType) {
-        switch (conjureType) {
-            case DOUBLE:
-            case INTEGER:
-                return "number";
-            case STRING:
-                return "string";
-            case BOOLEAN:
-                return "boolean";
-            default:
-                throw new IllegalArgumentException("Unknown primitive type" + conjureType);
-        }
-    }
-
-    private String referenceTypeToName(ReferenceType refType) {
-        BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
-        if (defType != null) {
-            if (defType instanceof AliasTypeDefinition) {
-                // in typescript we collapse alias types to concrete types
-                return getPrimitiveTypeName(((AliasTypeDefinition) defType).alias());
-            } else if (defType instanceof EnumTypeDefinition) {
-                return refType.type();
-            } else {
-                // Interfaces are prepended with "I"
-                return "I" + refType.type();
-            }
-        } else {
-            ExternalTypeDefinition depType = types.imports().get(refType.type());
-            checkNotNull(depType, "Unable to resolve type %s", refType.type());
-            return this.getTypeNameFromConjureType(depType.baseType());
-        }
     }
 }

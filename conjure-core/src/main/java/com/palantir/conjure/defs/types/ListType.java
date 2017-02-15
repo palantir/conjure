@@ -15,6 +15,11 @@ public interface ListType extends ConjureType {
     @JsonProperty("item-type")
     ConjureType itemType();
 
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     static ListType of(ConjureType itemType) {
         return ImmutableListType.builder().itemType(itemType).build();
     }

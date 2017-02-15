@@ -18,6 +18,11 @@ public interface MapType extends ConjureType {
     @JsonProperty("value-type")
     ConjureType valueType();
 
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     static MapType of(ConjureType keyType, ConjureType valueType) {
         return ImmutableMapType.builder().keyType(keyType).valueType(valueType).build();
     }

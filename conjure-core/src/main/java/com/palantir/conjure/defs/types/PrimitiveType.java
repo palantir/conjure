@@ -36,6 +36,11 @@ public enum PrimitiveType implements ReferenceType {
         return type;
     }
 
+    @Override
+    public <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     @JsonCreator
     public static PrimitiveType fromString(String type) {
         return fromTypeString(type).orElseThrow(() -> new IllegalArgumentException("Unknown primitive type: " + type));

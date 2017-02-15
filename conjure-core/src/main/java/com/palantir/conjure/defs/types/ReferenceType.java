@@ -16,6 +16,11 @@ public interface ReferenceType extends ConjureType {
     @JsonProperty("type")
     String type();
 
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     static ReferenceType of(String type) {
         Optional<PrimitiveType> primitiveType = PrimitiveType.fromTypeString(type);
         if (primitiveType.isPresent()) {

@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -57,24 +58,7 @@ public final class TypeMapper {
     }
 
     public TypeName getClassName(ConjureType type) {
-        if (type instanceof OptionalType) {
-            return getClassNameForOptionalType((OptionalType) type);
-        } else if (type instanceof SetType) {
-            return getClassNameForSetType((SetType) type);
-        } else if (type instanceof ListType) {
-            return getClassNameForListType((ListType) type);
-        } else if (type instanceof MapType) {
-            return getClassNameForMapType((MapType) type);
-        } else if (type instanceof PrimitiveType) {
-            return primitiveTypeToClassName((PrimitiveType) type);
-        } else if (type instanceof ReferenceType) {
-            return referenceTypeToClassName((ReferenceType) type);
-        } else if (type instanceof AnyType) {
-            return ClassName.get(Object.class);
-        } else if (type instanceof BinaryType) {
-            return ArrayTypeName.of(byte.class);
-        }
-        throw new IllegalStateException("Unexpected type " + type.getClass());
+        return type.visit(new ClassNameVisitor());
     }
 
     public ClassName getOptionalType() {
@@ -85,70 +69,90 @@ public final class TypeMapper {
         return optionalTypeStrategy.getAbsentMethodName();
     }
 
-    private TypeName getClassNameForMapType(MapType type) {
-        return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
-                boxIfPrimitive(getClassName(type.keyType())),
-                boxIfPrimitive(getClassName(type.valueType())));
-    }
+    private class ClassNameVisitor implements ConjureTypeVisitor<TypeName> {
 
-    private TypeName getClassNameForListType(ListType type) {
-        TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
-        return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
-    }
+        @Override
+        public TypeName visit(AnyType type) {
+            return ClassName.get(Object.class);
+        }
 
-    private TypeName getClassNameForSetType(SetType type) {
-        TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
-        return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
-    }
+        @Override
+        public TypeName visit(ListType type) {
+            TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
+            return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
+        }
 
-    private TypeName getClassNameForOptionalType(OptionalType type) {
-        if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.JAVA8) {
-            // special handling for primitive optionals with Java 8
-            switch ((PrimitiveType) type.itemType()) {
-                case DOUBLE:
-                    return ClassName.get(OptionalDouble.class);
-                case INTEGER:
-                    return ClassName.get(OptionalInt.class);
-                case BOOLEAN:
-                    // no OptionalBoolean type
+        @Override
+        public TypeName visit(MapType type) {
+            return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
+                    boxIfPrimitive(getClassName(type.keyType())),
+                    boxIfPrimitive(getClassName(type.valueType())));
+        }
+
+        @Override
+        public TypeName visit(OptionalType type) {
+            if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.JAVA8) {
+                // special handling for primitive optionals with Java 8
+                switch ((PrimitiveType) type.itemType()) {
+                    case DOUBLE:
+                        return ClassName.get(OptionalDouble.class);
+                    case INTEGER:
+                        return ClassName.get(OptionalInt.class);
+                    case BOOLEAN:
+                        // no OptionalBoolean type
+                    case STRING:
+                    default:
+                        // treat normally
+                }
+            }
+            TypeName itemType = getClassName(type.itemType());
+            if (itemType.isPrimitive()) {
+                // safe for primitives (Guava case or Booleans with Java 8)
+                itemType = itemType.box();
+            }
+            return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), itemType);
+        }
+
+        @Override
+        public TypeName visit(PrimitiveType type) {
+            switch (type) {
                 case STRING:
+                    return ClassName.get(String.class);
+                case DOUBLE:
+                    return TypeName.DOUBLE;
+                case INTEGER:
+                    return TypeName.INT;
+                case BOOLEAN:
+                    return TypeName.BOOLEAN;
                 default:
-                    // treat normally
+                    throw new IllegalStateException("Unknown primitive type: " + type);
             }
         }
-        TypeName itemType = getClassName(type.itemType());
-        if (itemType.isPrimitive()) {
-            // safe for primitives (Guava case or Booleans with Java 8)
-            itemType = itemType.box();
-        }
-        return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), itemType);
-    }
 
-    private TypeName referenceTypeToClassName(ReferenceType refType) {
-        BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
-        if (defType != null) {
-            String packageName = defType.packageName().orElse(types.definitions().defaultPackage());
-            return ClassName.get(packageName, refType.type());
-        } else {
-            ExternalTypeDefinition depType = types.imports().get(refType.type());
-            checkNotNull(depType, "Unable to resolve type %s", refType.type());
-            return ClassName.bestGuess(depType.external().get("java"));
+        @Override
+        public TypeName visit(ReferenceType refType) {
+            BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
+            if (defType != null) {
+                String packageName = defType.packageName().orElse(types.definitions().defaultPackage());
+                return ClassName.get(packageName, refType.type());
+            } else {
+                ExternalTypeDefinition depType = types.imports().get(refType.type());
+                checkNotNull(depType, "Unable to resolve type %s", refType.type());
+                return ClassName.bestGuess(depType.external().get("java"));
+            }
         }
-    }
 
-    private static TypeName primitiveTypeToClassName(PrimitiveType type) {
-        switch (type) {
-            case STRING:
-                return ClassName.get(String.class);
-            case DOUBLE:
-                return TypeName.DOUBLE;
-            case INTEGER:
-                return TypeName.INT;
-            case BOOLEAN:
-                return TypeName.BOOLEAN;
-            default:
-                throw new IllegalStateException("Unknown primitive type: " + type);
+        @Override
+        public TypeName visit(SetType type) {
+            TypeName itemType = boxIfPrimitive(getClassName(type.itemType()));
+            return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
         }
+
+        @Override
+        public TypeName visit(BinaryType binaryType) {
+            return ArrayTypeName.of(byte.class);
+        }
+
     }
 
     private static TypeName boxIfPrimitive(TypeName type) {

@@ -13,6 +13,11 @@ public interface BinaryType extends ConjureType {
 
     // marker interface
 
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
+
     static BinaryType of() {
         return ImmutableBinaryType.builder().build();
     }

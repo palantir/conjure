@@ -11,6 +11,8 @@ import com.palantir.parsec.ParseException;
  */
 public interface ConjureType {
 
+    <T> T visit(ConjureTypeVisitor<T> visitor);
+
     static ConjureType fromString(String value) throws ParseException {
         return TypeParser.INSTANCE.parse(value);
     }
