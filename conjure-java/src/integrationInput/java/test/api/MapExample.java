@@ -2,38 +2,41 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = MapExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class SetExample {
-    private final Set<String> items;
+public final class MapExample {
+    private final Map<String, String> items;
 
-    private SetExample(@JsonProperty("items") Set<String> items) {
+    private MapExample(@JsonProperty("items") Map<String, String> items) {
         validateFields(items);
-        this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
+        this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
     }
 
     @JsonProperty("items")
-    public Set<String> getItems() {
+    public Map<String, String> getItems() {
         return this.items;
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof SetExample && equalTo((SetExample) other));
+        return this == other || (other instanceof MapExample && equalTo((MapExample) other));
     }
 
-    private boolean equalTo(SetExample other) {
+    private boolean equalTo(MapExample other) {
         return this.items.equals(other.items);
     }
 
@@ -44,19 +47,19 @@ public final class SetExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("SetExample").append("{")
+        return new StringBuilder("MapExample").append("{")
                 .append("items").append(": ").append(items)
             .append("}")
             .toString();
     }
 
-    public static SetExample of(Set<String> items) {
+    public static MapExample of(Map<String, String> items) {
         return builder()
             .items(items)
             .build();
     }
 
-    private static void validateFields(Set<String> items) {
+    private static void validateFields(Map<String, String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
@@ -80,34 +83,34 @@ public final class SetExample {
     }
 
     public static final class Builder {
-        private Set<String> items = new LinkedHashSet<>();
+        private Map<String, String> items = new LinkedHashMap<>();
 
         private Builder() {
         }
 
-        public Builder from(SetExample other) {
+        public Builder from(MapExample other) {
             items(other.getItems());
             return this;
         }
 
-        public Builder items(Collection<String> items) {
+        public Builder items(Map<String, String> items) {
             this.items.clear();
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder addAllItems(Collection<String> items) {
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+        public Builder putAllItems(Map<String, String> items) {
+            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder items(String items) {
-            this.items.add(items);
+        public Builder items(String key, String value) {
+            this.items.put(key, value);
             return this;
         }
 
-        public SetExample build() {
-            return new SetExample(items);
+        public MapExample build() {
+            return new MapExample(items);
         }
     }
 }

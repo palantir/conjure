@@ -2,36 +2,42 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = SetExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class ListExample {
-    private final List<String> items;
+public final class SetExample {
+    private final Set<String> items;
 
-    private ListExample(@JsonProperty("items") List<String> items) {
+    private SetExample(@JsonProperty("items") Set<String> items) {
         validateFields(items);
-        this.items = Collections.unmodifiableList(new ArrayList<>(items));
+        this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
     }
 
     @JsonProperty("items")
-    public List<String> getItems() {
+    public Set<String> getItems() {
         return this.items;
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof ListExample && equalTo((ListExample) other));
+        return this == other || (other instanceof SetExample && equalTo((SetExample) other));
     }
 
-    private boolean equalTo(ListExample other) {
+    private boolean equalTo(SetExample other) {
         return this.items.equals(other.items);
     }
 
@@ -42,19 +48,19 @@ public final class ListExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("ListExample").append("{")
+        return new StringBuilder("SetExample").append("{")
                 .append("items").append(": ").append(items)
             .append("}")
             .toString();
     }
 
-    public static ListExample of(List<String> items) {
+    public static SetExample of(Set<String> items) {
         return builder()
             .items(items)
             .build();
     }
 
-    private static void validateFields(List<String> items) {
+    private static void validateFields(Set<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
@@ -78,12 +84,12 @@ public final class ListExample {
     }
 
     public static final class Builder {
-        private List<String> items = new ArrayList<>();
+        private Set<String> items = new LinkedHashSet<>();
 
         private Builder() {
         }
 
-        public Builder from(ListExample other) {
+        public Builder from(SetExample other) {
             items(other.getItems());
             return this;
         }
@@ -104,8 +110,8 @@ public final class ListExample {
             return this;
         }
 
-        public ListExample build() {
-            return new ListExample(items);
+        public SetExample build() {
+            return new SetExample(items);
         }
     }
 }

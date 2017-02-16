@@ -2,61 +2,63 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = AnyExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class BinaryExample {
-    private final byte[] binary;
+public final class AnyExample {
+    private final Object any;
 
-    private BinaryExample(@JsonProperty("binary") byte[] binary) {
-        validateFields(binary);
-        this.binary = binary;
+    private AnyExample(@JsonProperty("any") Object any) {
+        validateFields(any);
+        this.any = any;
     }
 
-    @JsonProperty("binary")
-    public byte[] getBinary() {
-        return this.binary;
+    @JsonProperty("any")
+    public Object getAny() {
+        return this.any;
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof BinaryExample && equalTo((BinaryExample) other));
+        return this == other || (other instanceof AnyExample && equalTo((AnyExample) other));
     }
 
-    private boolean equalTo(BinaryExample other) {
-        return Arrays.equals(this.binary, other.binary);
+    private boolean equalTo(AnyExample other) {
+        return this.any.equals(other.any);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(binary);
+        return Objects.hash(any);
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("BinaryExample").append("{")
-                .append("binary").append(": ").append(Base64.getEncoder().encode(binary))
+        return new StringBuilder("AnyExample").append("{")
+                .append("any").append(": ").append(any)
             .append("}")
             .toString();
     }
 
-    public static BinaryExample of(byte[] binary) {
+    public static AnyExample of(Object any) {
         return builder()
-            .binary(binary)
+            .any(any)
             .build();
     }
 
-    private static void validateFields(byte[] binary) {
+    private static void validateFields(Object any) {
         List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, binary, "binary");
+        missingFields = addFieldIfMissing(missingFields, any, "any");
         if (missingFields != null) {
             throw new IllegalStateException("Some required fields have not been set: " + missingFields);
         }
@@ -78,23 +80,23 @@ public final class BinaryExample {
     }
 
     public static final class Builder {
-        private byte[] binary;
+        private Object any;
 
         private Builder() {
         }
 
-        public Builder from(BinaryExample other) {
-            binary(other.getBinary());
+        public Builder from(AnyExample other) {
+            any(other.getAny());
             return this;
         }
 
-        public Builder binary(byte[] binary) {
-            this.binary = Objects.requireNonNull(binary, "binary cannot be null");
+        public Builder any(Object any) {
+            this.any = Objects.requireNonNull(any, "any cannot be null");
             return this;
         }
 
-        public BinaryExample build() {
-            return new BinaryExample(binary);
+        public AnyExample build() {
+            return new AnyExample(any);
         }
     }
 }

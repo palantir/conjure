@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
@@ -92,6 +93,8 @@ public final class BeanGenerator implements TypeGenerator {
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
+                        .addMember("builder", "$T.class", builderClass).build())
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
                 .addMethods(createGetters(fields))

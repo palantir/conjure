@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +15,9 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = ManyFieldExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )

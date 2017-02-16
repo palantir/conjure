@@ -2,12 +2,16 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = OptionalExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )

@@ -50,7 +50,7 @@ public final class BeanJavaTypeGeneratorTests {
 
     private void assertThatFilesAreTheSame(Set<JavaFile> files) throws IOException {
         for (JavaFile file : files) {
-            File expectedFile = new File("src/test/resources/test/api/" + file.typeSpec.name + ".bean");
+            File expectedFile = new File("src/integrationInput/java/test/api/" + file.typeSpec.name + ".java");
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
                 // help make shrink-wrapping output sane
                 if (!expectedFile.exists()) {

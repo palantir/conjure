@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -10,29 +11,32 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = AnyMapExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class MapExample {
-    private final Map<String, String> items;
+public final class AnyMapExample {
+    private final Map<String, Object> items;
 
-    private MapExample(@JsonProperty("items") Map<String, String> items) {
+    private AnyMapExample(@JsonProperty("items") Map<String, Object> items) {
         validateFields(items);
         this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
     }
 
     @JsonProperty("items")
-    public Map<String, String> getItems() {
+    public Map<String, Object> getItems() {
         return this.items;
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof MapExample && equalTo((MapExample) other));
+        return this == other || (other instanceof AnyMapExample && equalTo((AnyMapExample) other));
     }
 
-    private boolean equalTo(MapExample other) {
+    private boolean equalTo(AnyMapExample other) {
         return this.items.equals(other.items);
     }
 
@@ -43,19 +47,19 @@ public final class MapExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("MapExample").append("{")
+        return new StringBuilder("AnyMapExample").append("{")
                 .append("items").append(": ").append(items)
             .append("}")
             .toString();
     }
 
-    public static MapExample of(Map<String, String> items) {
+    public static AnyMapExample of(Map<String, Object> items) {
         return builder()
             .items(items)
             .build();
     }
 
-    private static void validateFields(Map<String, String> items) {
+    private static void validateFields(Map<String, Object> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
@@ -79,34 +83,34 @@ public final class MapExample {
     }
 
     public static final class Builder {
-        private Map<String, String> items = new LinkedHashMap<>();
+        private Map<String, Object> items = new LinkedHashMap<>();
 
         private Builder() {
         }
 
-        public Builder from(MapExample other) {
+        public Builder from(AnyMapExample other) {
             items(other.getItems());
             return this;
         }
 
-        public Builder items(Map<String, String> items) {
+        public Builder items(Map<String, Object> items) {
             this.items.clear();
             this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder putAllItems(Map<String, String> items) {
+        public Builder putAllItems(Map<String, Object> items) {
             this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder items(String key, String value) {
+        public Builder items(String key, Object value) {
             this.items.put(key, value);
             return this;
         }
 
-        public MapExample build() {
-            return new MapExample(items);
+        public AnyMapExample build() {
+            return new AnyMapExample(items);
         }
     }
 }

@@ -1,5 +1,16 @@
 apply from: "${rootDir}/gradle/publish-libs.gradle"
 
+sourceSets {
+    integrationInput
+    test {
+        compileClasspath += integrationInput.output
+        runtimeClasspath += integrationInput.output
+    }
+}
+
+tasks.checkstyleIntegrationInput.enabled = false
+tasks.findbugsIntegrationInput.enabled = false
+
 dependencies {
     compile project(':conjure-core')
 
@@ -11,9 +22,13 @@ dependencies {
     compile 'org.apache.commons:commons-lang3'
     compile 'org.slf4j:slf4j-api'
 
+    testCompile 'com.palantir.remoting2:jackson-support'
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
+
+    integrationInputCompile 'com.fasterxml.jackson.core:jackson-databind'
+    integrationInputCompile 'com.google.guava:guava'
 
     processor 'org.immutables:value'
 }

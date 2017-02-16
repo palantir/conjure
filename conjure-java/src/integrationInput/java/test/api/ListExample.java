@@ -2,37 +2,40 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Generated;
 
+@JsonDeserialize(
+        builder = ListExample.Builder.class
+)
 @JsonIgnoreProperties(
         ignoreUnknown = true
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class AnyMapExample {
-    private final Map<String, Object> items;
+public final class ListExample {
+    private final List<String> items;
 
-    private AnyMapExample(@JsonProperty("items") Map<String, Object> items) {
+    private ListExample(@JsonProperty("items") List<String> items) {
         validateFields(items);
-        this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
+        this.items = Collections.unmodifiableList(new ArrayList<>(items));
     }
 
     @JsonProperty("items")
-    public Map<String, Object> getItems() {
+    public List<String> getItems() {
         return this.items;
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof AnyMapExample && equalTo((AnyMapExample) other));
+        return this == other || (other instanceof ListExample && equalTo((ListExample) other));
     }
 
-    private boolean equalTo(AnyMapExample other) {
+    private boolean equalTo(ListExample other) {
         return this.items.equals(other.items);
     }
 
@@ -43,19 +46,19 @@ public final class AnyMapExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("AnyMapExample").append("{")
+        return new StringBuilder("ListExample").append("{")
                 .append("items").append(": ").append(items)
             .append("}")
             .toString();
     }
 
-    public static AnyMapExample of(Map<String, Object> items) {
+    public static ListExample of(List<String> items) {
         return builder()
             .items(items)
             .build();
     }
 
-    private static void validateFields(Map<String, Object> items) {
+    private static void validateFields(List<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
@@ -79,34 +82,34 @@ public final class AnyMapExample {
     }
 
     public static final class Builder {
-        private Map<String, Object> items = new LinkedHashMap<>();
+        private List<String> items = new ArrayList<>();
 
         private Builder() {
         }
 
-        public Builder from(AnyMapExample other) {
+        public Builder from(ListExample other) {
             items(other.getItems());
             return this;
         }
 
-        public Builder items(Map<String, Object> items) {
+        public Builder items(Collection<String> items) {
             this.items.clear();
-            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder putAllItems(Map<String, Object> items) {
-            this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));
+        public Builder addAllItems(Collection<String> items) {
+            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder items(String key, Object value) {
-            this.items.put(key, value);
+        public Builder items(String items) {
+            this.items.add(items);
             return this;
         }
 
-        public AnyMapExample build() {
-            return new AnyMapExample(items);
+        public ListExample build() {
+            return new ListExample(items);
         }
     }
 }

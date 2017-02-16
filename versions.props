@@ -1,6 +1,8 @@
 com.google.guava:guava = 19.0
 com.fasterxml.jackson.*:jackson-* = 2.7.4
+com.fasterxml.jackson.datatype:jackson-datatype-jdk7 = 2.6.7
 com.github.jknack:handlebars = 4.0.6
+com.palantir.remoting2:jackson-support = 2.0.0
 com.squareup:javapoet = 1.7.0
 commons-io:commons-io = 2.5
 junit:junit = 4.12
