@@ -8,6 +8,12 @@ sourceSets {
     }
 }
 
+idea {
+    module {
+        testSourceDirs += sourceSets.integrationInput.java.srcDirs
+    }
+}
+
 tasks.checkstyleIntegrationInput.enabled = false
 tasks.findbugsIntegrationInput.enabled = false
 
