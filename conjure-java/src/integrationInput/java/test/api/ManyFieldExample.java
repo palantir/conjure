@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -180,21 +181,25 @@ public final class ManyFieldExample {
             return this;
         }
 
+        @JsonSetter("string")
         public Builder string(String string) {
             this.string = Objects.requireNonNull(string, "string cannot be null");
             return this;
         }
 
+        @JsonSetter("integer")
         public Builder integer(int integer) {
             this.integer = integer;
             return this;
         }
 
+        @JsonSetter("doubleValue")
         public Builder doubleValue(double doubleValue) {
             this.doubleValue = doubleValue;
             return this;
         }
 
+        @JsonSetter("optionalItem")
         public Builder optionalItem(Optional<String> optionalItem) {
             this.optionalItem = Objects.requireNonNull(optionalItem, "optionalItem cannot be null");
             return this;
@@ -205,6 +210,7 @@ public final class ManyFieldExample {
             return this;
         }
 
+        @JsonSetter("items")
         public Builder items(Collection<String> items) {
             this.items.clear();
             this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
@@ -221,6 +227,7 @@ public final class ManyFieldExample {
             return this;
         }
 
+        @JsonSetter("set")
         public Builder set(Collection<String> set) {
             this.set.clear();
             this.set.addAll(Objects.requireNonNull(set, "set cannot be null"));
@@ -237,6 +244,7 @@ public final class ManyFieldExample {
             return this;
         }
 
+        @JsonSetter("map")
         public Builder map(Map<String, String> map) {
             this.map.clear();
             this.map.putAll(Objects.requireNonNull(map, "map cannot be null"));
@@ -253,6 +261,7 @@ public final class ManyFieldExample {
             return this;
         }
 
+        @JsonSetter("alias")
         public Builder alias(StringAliasExample alias) {
             this.alias = Objects.requireNonNull(alias, "alias cannot be null");
             return this;

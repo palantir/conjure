@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Objects;
 import javax.annotation.Generated;
@@ -68,6 +69,7 @@ public final class IntegerExample {
             return this;
         }
 
+        @JsonSetter("integer")
         public Builder integer(int integer) {
             this.integer = integer;
             return this;

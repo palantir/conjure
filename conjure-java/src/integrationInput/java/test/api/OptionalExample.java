@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,7 @@ public final class OptionalExample {
             return this;
         }
 
+        @JsonSetter("item")
         public Builder item(Optional<String> item) {
             this.item = Objects.requireNonNull(item, "item cannot be null");
             return this;

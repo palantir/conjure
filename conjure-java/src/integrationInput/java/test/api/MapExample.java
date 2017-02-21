@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,6 +94,7 @@ public final class MapExample {
             return this;
         }
 
+        @JsonSetter("items")
         public Builder items(Map<String, String> items) {
             this.items.clear();
             this.items.putAll(Objects.requireNonNull(items, "items cannot be null"));

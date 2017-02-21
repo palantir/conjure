@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,6 +93,7 @@ public final class BinaryExample {
             return this;
         }
 
+        @JsonSetter("binary")
         public Builder binary(byte[] binary) {
             this.binary = Objects.requireNonNull(binary, "binary cannot be null");
             return this;

@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -16,6 +17,7 @@ import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.java.types.BeanGenerator.EnrichedField;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -111,8 +113,8 @@ public final class BeanBuilderGenerator {
             Collection<EnrichedField> fields) {
         Collection<MethodSpec> setters = Lists.newArrayListWithExpectedSize(fields.size());
         for (EnrichedField field : fields) {
-            setters.add(createSetter(builderClass, Optional.empty(), field.poetSpec(), field.conjureDef().type(),
-                    typeMapper, /* shouldClearFirst */ true));
+            setters.add(createSetter(builderClass, Optional.empty(), field, field.conjureDef().type(),
+                    typeMapper));
             setters.addAll(createAuxiliarySetters(builderClass, typeMapper, field.poetSpec(),
                     field.conjureDef().type()));
         }
@@ -120,6 +122,33 @@ public final class BeanBuilderGenerator {
     }
 
     private static MethodSpec createSetter(
+            ClassName builderClass,
+            Optional<String> methodNamePrefix,
+            EnrichedField field,
+            ConjureType type,
+            TypeMapper typeMapper) {
+        MethodSpec.Builder builder = createSetterSpec(
+                builderClass, methodNamePrefix, field.poetSpec(), type, typeMapper,
+                /* shouldClearFirst */ true);
+
+        return builder.addAnnotation(AnnotationSpec.builder(JsonSetter.class)
+                        .addMember("value", "$S", field.jsonKey())
+                        .build())
+                    .build();
+    }
+
+    private static MethodSpec createAuxiliarySetter(
+            ClassName builderClass,
+            Optional<String> methodNamePrefix,
+            FieldSpec field,
+            ConjureType type,
+            TypeMapper typeMapper,
+            boolean shouldClearFirst) {
+        return createSetterSpec(
+                builderClass, methodNamePrefix, field, type, typeMapper, shouldClearFirst).build();
+    }
+
+    private static MethodSpec.Builder createSetterSpec(
             ClassName builderClass,
             Optional<String> methodNamePrefix,
             FieldSpec field,
@@ -134,7 +163,7 @@ public final class BeanBuilderGenerator {
                 .addParameter(widenToCollectionIfPossible(field.type, type, typeMapper), field.name)
                 .returns(builderClass)
                 .addCode(typeAwareSet(field, type, shouldClearFirst))
-                .addStatement("return this").build();
+                .addStatement("return this");
     }
 
     private static TypeName widenToCollectionIfPossible(TypeName current, ConjureType type, TypeMapper typeMapper) {
@@ -174,15 +203,15 @@ public final class BeanBuilderGenerator {
             FieldSpec field,
             ConjureType type) {
         if (type instanceof ListType) {
-            return ImmutableList.of(createSetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
+            return ImmutableList.of(createAuxiliarySetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
                     /* shouldClearFirst */ false),
                     createItemSetter(builderClass, typeMapper, field, ((ListType) type).itemType()));
         } else if (type instanceof SetType) {
-            return ImmutableList.of(createSetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
+            return ImmutableList.of(createAuxiliarySetter(builderClass, Optional.of("addAll"), field, type, typeMapper,
                     /* shouldClearFirst */ false),
                     createItemSetter(builderClass, typeMapper, field, ((SetType) type).itemType()));
         } else if (type instanceof MapType) {
-            return ImmutableList.of(createSetter(builderClass, Optional.of("putAll"), field, type, typeMapper,
+            return ImmutableList.of(createAuxiliarySetter(builderClass, Optional.of("putAll"), field, type, typeMapper,
                     /* shouldClearFirst */ false),
                     createMapSetter(builderClass, typeMapper, field, (MapType) type));
         } else if (type instanceof OptionalType) {
