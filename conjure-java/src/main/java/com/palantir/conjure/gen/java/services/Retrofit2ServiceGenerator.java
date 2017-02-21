@@ -11,8 +11,10 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
+import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -47,12 +49,15 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy());
+        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy(),
+                Retrofit2ReturnTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
-                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper))
+                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());
     }
 
-    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition, TypeMapper typeMapper) {
+    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition,
+            TypeMapper typeMapper, TypeMapper returnTypeMapper) {
         TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
@@ -67,7 +72,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                         endpoint.getValue(),
                         serviceDefinition.basePath(),
                         serviceDefinition.defaultAuth(),
-                        typeMapper))
+                        typeMapper,
+                        returnTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.packageName(), serviceBuilder.build())
@@ -80,13 +86,19 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             EndpointDefinition endpointDef,
             String basePath,
             AuthDefinition defaultAuth,
-            TypeMapper typeMapper) {
+            TypeMapper typeMapper,
+            TypeMapper returnTypeMapper) {
         Set<String> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
                         .addMember("value", "$S", constructPath(basePath, endpointDef.http().path(), encodedPathArgs))
                         .build());
+
+        if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
+            methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Streaming")).build());
+        }
+
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
                 ClassName.get("java.lang", "Deprecated")));
 
@@ -95,7 +107,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         if (endpointDef.returns().isPresent()) {
             methodBuilder.returns(
-                    ParameterizedTypeName.get(CALL_TYPE, typeMapper.getClassName(endpointDef.returns().get())));
+                    ParameterizedTypeName.get(CALL_TYPE, returnTypeMapper.getClassName(endpointDef.returns().get())));
         } else {
             methodBuilder.returns(ParameterizedTypeName.get(CALL_TYPE, ClassName.get(Void.class)));
         }

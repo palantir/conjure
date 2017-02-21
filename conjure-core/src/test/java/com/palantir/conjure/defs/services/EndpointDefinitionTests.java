@@ -29,14 +29,4 @@ public final class EndpointDefinitionTests {
                 .build();
     }
 
-    @Test
-    public void testCheck_returnBinary() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Endpoint cannot have return type 'BinaryType{}'");
-        EndpointDefinition.builder()
-                .from(BASE_DEF)
-                .returns(BinaryType.of())
-                .build();
-    }
-
 }

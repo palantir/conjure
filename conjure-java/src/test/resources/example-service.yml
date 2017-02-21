@@ -69,6 +69,24 @@ services:
             markers:
              - Safe
         returns: optional<Dataset>
+
+      getRawData:
+        http: GET /datasets/{datasetRid}/raw
+        args:
+          datasetRid:
+            type: ResourceIdentifier
+            markers:
+             - Safe
+        returns: binary
+
+      maybeGetRawData:
+        http: GET /datasets/{datasetRid}/raw-maybe
+        args:
+          datasetRid:
+            type: ResourceIdentifier
+            markers:
+             - Safe
+        returns: optional<binary>
         
       getBranches:
         http: GET /datasets/{datasetRid}/branches

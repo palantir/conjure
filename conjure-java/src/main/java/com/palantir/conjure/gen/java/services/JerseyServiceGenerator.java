@@ -12,10 +12,12 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
+import com.palantir.conjure.gen.java.types.JerseyReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -42,12 +44,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy());
+        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy(),
+                JerseyReturnTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
-                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper))
+                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());
     }
 
-    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition, TypeMapper typeMapper) {
+    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition,
+            TypeMapper typeMapper, TypeMapper returnTypeMapper) {
         TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
@@ -68,7 +73,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .map(endpoint -> generateServiceMethod(
                         endpoint.getKey(),
                         endpoint.getValue(),
-                        serviceDefinition.defaultAuth(), typeMapper))
+                        serviceDefinition.defaultAuth(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.packageName(), serviceBuilder.build())
@@ -80,7 +85,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             String endpointName,
             EndpointDefinition endpointDef,
             AuthDefinition defaultAuth,
-            TypeMapper typeMapper) {
+            TypeMapper typeMapper,
+            TypeMapper returnTypeMapper) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
@@ -89,13 +95,19 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         .build())
                 .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, typeMapper));
 
+        if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
+            methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
+                    .addMember("value", "$T.APPLICATION_OCTET_STREAM", ClassName.get("javax.ws.rs.core", "MediaType"))
+                    .build());
+        }
+
         endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
                 ClassName.get("java.lang", "Deprecated")));
 
         ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
                 content -> methodBuilder.addJavadoc("$L", content.toString()));
 
-        endpointDef.returns().ifPresent(type -> methodBuilder.returns(typeMapper.getClassName(type)));
+        endpointDef.returns().ifPresent(type -> methodBuilder.returns(returnTypeMapper.getClassName(type)));
 
         return methodBuilder.build();
     }

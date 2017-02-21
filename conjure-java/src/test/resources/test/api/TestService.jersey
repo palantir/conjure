@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 
 /**
  * A Markdown description of the service.
@@ -43,6 +44,15 @@ public interface TestService {
     @GET
     @Path("/datasets/{datasetRid}")
     Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/datasets/{datasetRid}/raw")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    StreamingOutput getRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/datasets/{datasetRid}/raw-maybe")
+    Optional<byte[]> maybeGetRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches")

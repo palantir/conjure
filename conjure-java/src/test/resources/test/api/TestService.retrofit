@@ -11,12 +11,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Generated;
+import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Streaming;
 
 /**
  * A Markdown description of the service.
@@ -34,6 +36,13 @@ public interface TestService {
 
     @GET("/catalog/datasets/{datasetRid}")
     Call<Optional<Dataset>> getDataset(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET("/catalog/datasets/{datasetRid}/raw")
+    @Streaming
+    Call<ResponseBody> getRawData(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET("/catalog/datasets/{datasetRid}/raw-maybe")
+    Call<Optional<byte[]>> maybeGetRawData(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/datasets/{datasetRid}/branches")
     Call<Set<String>> getBranches(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);

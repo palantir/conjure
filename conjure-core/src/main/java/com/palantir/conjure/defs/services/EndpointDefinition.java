@@ -46,8 +46,6 @@ public interface EndpointDefinition {
 
     @Value.Check
     default void check() {
-        returns().ifPresent(type ->
-                checkArgument(!isIllegal(type), "Endpoint cannot have return type '%s'", type));
         toStream(args())
                 .map(Map::values)
                 .flatMap(Collection::stream)
