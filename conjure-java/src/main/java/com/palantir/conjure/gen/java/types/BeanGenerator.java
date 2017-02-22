@@ -115,7 +115,7 @@ public final class BeanGenerator implements TypeGenerator {
 
         typeBuilder
                 .addMethod(createBuilder(builderClass))
-                .addType(BeanBuilderGenerator.generate(typeMapper, defaultPackage, objectClass, builderClass, typeDef));
+                .addType(BeanBuilderGenerator.generate(typeMapper, objectClass, builderClass, typeDef));
 
         if (settings.ignoreUnknownProperties()) {
             typeBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnoreProperties.class)

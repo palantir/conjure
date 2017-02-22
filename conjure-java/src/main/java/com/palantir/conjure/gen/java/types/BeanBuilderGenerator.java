@@ -43,7 +43,6 @@ public final class BeanBuilderGenerator {
 
     public static TypeSpec generate(
             TypeMapper typeMapper,
-            String defaultPackage,
             ClassName objectClass,
             ClassName builderClass,
             ObjectTypeDefinition typeDef) {
