@@ -50,6 +50,6 @@ public final class Conjure {
     public static ConjureImports parseTypesFromConjureImports(ConjureDefinition conjureImports) {
         return new ConjureImports(
                 Maps.transformValues(conjureImports.types().conjureImports(),
-                        name -> Conjure.parse(new File(name + ".yml")).types().definitions()));
+                        path -> Conjure.parse(new File(path)).types().definitions()));
     }
 }

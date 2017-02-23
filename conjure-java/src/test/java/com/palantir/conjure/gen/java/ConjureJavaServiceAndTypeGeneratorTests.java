@@ -60,17 +60,44 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
                 new BeanGenerator(settings));
         generator.emit(conjure, src);
 
-        assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
+        assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
                 .contains("public final class CreateDatasetRequest");
-        assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/datasets/BackingFileSystem.java"))
+        assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/datasets/BackingFileSystem.java"))
                 .contains("public final class BackingFileSystem");
-        assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/datasets/Dataset.java"))
+        assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/datasets/Dataset.java"))
                 .contains("public final class Dataset");
-        assertThat(compiledFile(src, "test/api/TestService.java"))
+        assertThat(compiledFileContent(src, "test/api/TestService.java"))
                 .contains("public interface TestService");
     }
 
-    private static String compiledFile(File srcDir, String clazz) throws IOException {
-        return Files.asCharSource(new File(srcDir, clazz), StandardCharsets.UTF_8).read();
+    @Test
+    public void testConjureImports() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        File src = folder.newFolder("src");
+        Settings settings = Settings.standard();
+        ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
+                new JerseyServiceGenerator(settings),
+                new BeanGenerator(settings));
+        generator.emit(conjure, src);
+
+        // Generated files contain imports
+        assertThat(compiledFileContent(src, "test/api/with/imports/ComplexObjectWithImports.java"))
+                .contains("import test.api.StringExample;");
+        assertThat(compiledFileContent(src, "test/api/with/imports/TestService.java"))
+                .contains("import test.api.StringExample;")
+                .contains("import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;");
+
+        // Imported files are not generated.
+        assertThat(compiledFile(src, "com/palantir/foundry/catalog/api/datasets/BackingFileSystem.java"))
+                .doesNotExist();
+        assertThat(compiledFile(src, "test/api/StringExample.java")).doesNotExist();
+    }
+
+    private static String compiledFileContent(File srcDir, String clazz) throws IOException {
+        return Files.asCharSource(compiledFile(srcDir, clazz), StandardCharsets.UTF_8).read();
+    }
+
+    private static File compiledFile(File srcDir, String clazz) throws IOException {
+        return new File(srcDir, clazz);
     }
 }

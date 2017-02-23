@@ -15,12 +15,12 @@ public final class ConjureImportsTest {
     @Test
     public void testValidNameSpaceNames() throws Exception {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        new ConjureImports(ImmutableMap.of("ab", imports, "abcdefghij", imports));
+        new ConjureImports(ImmutableMap.of("ab", imports, "camelCase", imports));
 
-        for (String ns : new String[] {"", "a", "ABC", "%s"}) {
+        for (String ns : new String[] {"", "ns1", "%$"}) {
             assertThatThrownBy(() -> new ConjureImports(ImmutableMap.of(ns, imports)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("The following namespaces do not satisfy the namespace pattern [a-z]{2,10}: [%s]", ns);
+                    .hasMessage("The following namespaces do not satisfy the namespace pattern [a-zA-Z]+: [%s]", ns);
         }
     }
 }

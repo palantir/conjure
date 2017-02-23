@@ -1,0 +1,23 @@
+types:
+  conjure-imports:
+    importedTypes: src/test/resources/example-types.yml
+    importedServices: src/test/resources/example-service.yml
+  definitions:
+    default-package: test.api.with.imports
+    objects:
+      ComplexObjectWithImports:
+        fields:
+          string: string
+          imported: importedTypes.StringExample
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api.with.imports
+    base-path: /catalog
+    endpoints:
+      testEndpoint:
+        http: GET /testEndpoint
+        args:
+          importedString: importedTypes.StringExample
+        returns: importedServices.BackingFileSystem

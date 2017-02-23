@@ -22,9 +22,9 @@ public interface TypesDefinition {
 
     /**
      * A list of Conjure definitions from which Conjure types are made available ("imported") for this Conjure
-     * definition. For each import entry {@code <namespace>:<import-name>}, the Conjure compiler expects the existence
-     * of a corresponding Conjure file {@code <import-name>.yml} and makes each {@code <type>} imported from this
-     * Conjure definition available as {@code <namespace>.<type>}.
+     * definition. For each import entry {@code <namespace>:<import-path>}, the Conjure compiler expects the existence
+     * of a Conjure file {@code <import-path>} and makes each {@code <type>} imported from this Conjure definition
+     * available as {@code <namespace>.<type>}.
      */
     @JsonProperty("conjure-imports")
     Map<String, String> conjureImports();

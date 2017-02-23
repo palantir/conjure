@@ -30,7 +30,9 @@ public enum TypeParser implements Parser<ConjureType> {
                 OptionalTypeParser.INSTANCE,
                 AnyTypeParser.INSTANCE,
                 BinaryTypeParser.INSTANCE,
+                ImportedTypeReferenceParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
+
         return parser.parse(input);
     }
 
@@ -53,6 +55,34 @@ public enum TypeParser implements Parser<ConjureType> {
         @Override
         public ReferenceType parse(ParserState input) throws ParseException {
             return ReferenceType.of(REF_PARSER.parse(input));
+        }
+    }
+
+    private enum ImportedTypeReferenceParser implements Parser<ReferenceType> {
+        INSTANCE;
+
+        public static final Parser<String> NAMESPACE_PARSER = new RawStringParser(
+                new RawStringParser.AllowableCharacters() {
+                    @Override
+                    public boolean isAllowed(char character) {
+                        return ('a' <= character && character <= 'z')
+                                || ('A' <= character && character <= 'Z');
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Character is one of [a-zA-Z]";
+                    }
+                });
+
+        @Override
+        public ReferenceType parse(ParserState input) throws ParseException {
+            String namespace = NAMESPACE_PARSER.parse(input);
+            if (Parsers.nullOrUnexpected(Parsers.expect(".").parse(input))) {
+                return null;
+            }
+            String ref = TypeReferenceParser.REF_PARSER.parse(input);
+            return ReferenceType.of(namespace, ref);
         }
     }
 

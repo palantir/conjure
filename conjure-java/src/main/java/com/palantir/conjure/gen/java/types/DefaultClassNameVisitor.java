@@ -104,18 +104,20 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(ReferenceType refType) {
-        // First try to locate type in this conjure definition.
-        BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
-        if (type != null) {
-            String packageName = type.packageName().orElse(types.definitions().defaultPackage());
-            return ClassName.get(packageName, refType.type());
+        if (!refType.namespace().isPresent()) {
+            // Types without namespace are either defined locally in this conjure definition, or raw imports.
+            BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
+            if (type != null) {
+                String packageName = type.packageName().orElse(types.definitions().defaultPackage());
+                return ClassName.get(packageName, refType.type());
+            } else {
+                ExternalTypeDefinition depType = types.imports().get(refType.type());
+                checkNotNull(depType, "Unable to resolve type %s", refType.type());
+                return ClassName.bestGuess(depType.external().get("java"));
+            }
         } else {
-            // TODO(rfink) Second, try to find the type in the Conjure imports
-
-            // Finally, try to find the type in language-specific raw imports.
-            ExternalTypeDefinition depType = types.imports().get(refType.type());
-            checkNotNull(depType, "Unable to resolve type %s", refType.type());
-            return ClassName.bestGuess(depType.external().get("java"));
+            // Types with namespace are imported Conjure types.
+            return ClassName.get(importedTypes.getPackage(refType), refType.type());
         }
     }
 

@@ -32,6 +32,11 @@ public enum PrimitiveType implements ReferenceType {
     }
 
     @Override
+    public Optional<String> namespace() {
+        return Optional.empty();
+    }
+
+    @Override
     public String type() {
         return type;
     }

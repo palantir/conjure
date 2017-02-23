@@ -13,6 +13,9 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ReferenceType extends ConjureType {
 
+    @JsonProperty("namespace")
+    Optional<String> namespace();
+
     @JsonProperty("type")
     String type();
 
@@ -27,6 +30,10 @@ public interface ReferenceType extends ConjureType {
             return primitiveType.get();
         }
         return ImmutableReferenceType.builder().type(type).build();
+    }
+
+    static ReferenceType of(String namespace, String type) {
+        return ImmutableReferenceType.builder().namespace(namespace).type(type).build();
     }
 
 }
