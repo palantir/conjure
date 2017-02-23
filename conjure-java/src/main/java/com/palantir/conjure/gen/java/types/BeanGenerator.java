@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -50,7 +51,7 @@ public final class BeanGenerator implements TypeGenerator {
 
     private final Settings settings;
 
-    // the static factory creation method gets unwieldy with more than 3 parameters.
+    /** The maximum number of parameters for which a static factory method is generated in addition to the builder. */
     private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
 
     public BeanGenerator(Settings settings) {
@@ -60,28 +61,25 @@ public final class BeanGenerator implements TypeGenerator {
     @Override
     public JavaFile generateType(
             TypesDefinition types,
+            ConjureImports importedTypes,
             String defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef) {
+        TypeMapper typeMapper = new TypeMapper(types, importedTypes, settings.optionalTypeStrategy());
         if (typeDef instanceof ObjectTypeDefinition) {
-            return generateBeanType(types, defaultPackage, typeName, (ObjectTypeDefinition) typeDef, settings);
+            return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return EnumGenerator.generateEnumType(
-                    types, defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings);
+                    defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues());
         } else if (typeDef instanceof AliasTypeDefinition) {
             return AliasGenerator.generateAliasType(
-                    types, defaultPackage, typeName, (AliasTypeDefinition) typeDef, settings);
+                    typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
     }
 
-    private static JavaFile generateBeanType(
-            TypesDefinition types,
-            String defaultPackage,
-            String typeName,
-            ObjectTypeDefinition typeDef,
-            Settings settings) {
-        TypeMapper typeMapper = new TypeMapper(types, settings.optionalTypeStrategy());
+    private JavaFile generateBeanType(
+            TypeMapper typeMapper, String defaultPackage, String typeName, ObjectTypeDefinition typeDef) {
 
         String typePackage = typeDef.packageName().orElse(defaultPackage);
         ClassName objectClass = ClassName.get(typePackage, typeName);
@@ -138,9 +136,9 @@ public final class BeanGenerator implements TypeGenerator {
     private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
         return fields.entrySet().stream()
                 .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
-                            typeMapper.getClassName(e.getValue().type()),
-                            Fields.toSafeFieldName(e.getKey()),
-                            Modifier.PRIVATE, Modifier.FINAL)
+                        typeMapper.getClassName(e.getValue().type()),
+                        Fields.toSafeFieldName(e.getKey()),
+                        Modifier.PRIVATE, Modifier.FINAL)
                         .build()))
                 .collect(Collectors.toList());
     }
@@ -161,8 +159,8 @@ public final class BeanGenerator implements TypeGenerator {
 
             builder.addParameter(ParameterSpec.builder(spec.type, spec.name)
                     .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                        .addMember("value", "$S", field.jsonKey())
-                        .build())
+                            .addMember("value", "$S", field.jsonKey())
+                            .build())
                     .build());
 
             if (field.conjureDef().type() instanceof ListType) {
@@ -257,13 +255,13 @@ public final class BeanGenerator implements TypeGenerator {
         CodeBlock returnStatement = CodeBlock.builder()
                 .add("return new $T($S).append(\"{\")\n", StringBuilder.class, thisClassName)
                 .indent()
-                    .indent()
-                        .add(CodeBlocks.of(fields.stream()
-                            .map(BeanGenerator::createAppendStatement)
-                            .collect(joining(CodeBlock.of(".append(\", \")")))))
-                    .unindent()
-                    .add(".append(\"}\")\n")
-                    .addStatement(".toString()")
+                .indent()
+                .add(CodeBlocks.of(fields.stream()
+                        .map(BeanGenerator::createAppendStatement)
+                        .collect(joining(CodeBlock.of(".append(\", \")")))))
+                .unindent()
+                .add(".append(\"}\")\n")
+                .addStatement(".toString()")
                 .unindent()
                 .build();
 
@@ -304,10 +302,10 @@ public final class BeanGenerator implements TypeGenerator {
         }
 
         builder
-            .beginControlFlow("if (missingFields != null)")
-            .addStatement("throw new $T(\"Some required fields have not been set: \" + missingFields)",
-                    IllegalStateException.class)
-            .endControlFlow();
+                .beginControlFlow("if (missingFields != null)")
+                .addStatement("throw new $T(\"Some required fields have not been set: \" + missingFields)",
+                        IllegalStateException.class)
+                .endControlFlow();
         return builder.build();
     }
 
@@ -343,10 +341,10 @@ public final class BeanGenerator implements TypeGenerator {
                 .addParameter(fieldNameParam)
                 .addStatement("$T missingFields = $N", listOfStringType, listParam)
                 .beginControlFlow("if ($N == null)", fieldValueParam)
-                    .beginControlFlow("if (missingFields == null)")
-                        .addStatement("missingFields = new $T<>($L)", ArrayList.class, fieldCount)
-                    .endControlFlow()
-                    .addStatement("missingFields.add($N)", fieldNameParam)
+                .beginControlFlow("if (missingFields == null)")
+                .addStatement("missingFields = new $T<>($L)", ArrayList.class, fieldCount)
+                .endControlFlow()
+                .addStatement("missingFields.add($N)", fieldNameParam)
                 .endControlFlow()
                 .addStatement("return missingFields")
                 .build();

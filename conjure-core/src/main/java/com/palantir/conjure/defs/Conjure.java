@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,4 +45,11 @@ public final class Conjure {
         }
     }
 
+    // TODO(rfink) Consider inlining the imported types when deserializing a ConjureDefinition.
+    // Returns imported definitions, keyed by namespace.
+    public static ConjureImports parseTypesFromConjureImports(ConjureDefinition conjureImports) {
+        return new ConjureImports(
+                Maps.transformValues(conjureImports.types().conjureImports(),
+                        name -> Conjure.parse(new File(name + ".yml")).types().definitions()));
+    }
 }

@@ -29,7 +29,7 @@ public final class ConjureJavaServiceAndTypeGenerator {
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         return Sets.union(
                 serviceGenerator.generate(conjureDefinition),
-                typeGenerator.generate(conjureDefinition.types()));
+                typeGenerator.generate(conjureDefinition));
     }
 
     /**
@@ -38,6 +38,6 @@ public final class ConjureJavaServiceAndTypeGenerator {
      */
     public void emit(ConjureDefinition conjureDefinition, File outputDir) {
         serviceGenerator.emit(conjureDefinition, outputDir);
-        typeGenerator.emit(conjureDefinition.types(), outputDir);
+        typeGenerator.emit(conjureDefinition, outputDir);
     }
 }

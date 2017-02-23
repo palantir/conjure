@@ -6,7 +6,9 @@ package com.palantir.conjure.gen.java.services;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
@@ -48,9 +50,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy());
-        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), settings.optionalTypeStrategy(),
-                Retrofit2ReturnTypeClassNameVisitor::new);
+        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition);
+        TypeMapper typeMapper =
+                new TypeMapper(conjureDefinition.types(), conjureImports, settings.optionalTypeStrategy());
+        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
+                settings.optionalTypeStrategy(), Retrofit2ReturnTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

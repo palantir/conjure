@@ -7,11 +7,9 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Iterables;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
-import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -30,17 +28,16 @@ public final class EnumGenerator {
     private EnumGenerator() {}
 
     public static JavaFile generateEnumType(
-            TypesDefinition types,
             String defaultPackage,
             String typeName,
             EnumTypeDefinition typeDef,
-            Settings settings) {
+            boolean supportUnknownEnumValues) {
         String typePackage = typeDef.packageName().orElse(defaultPackage);
         ClassName thisClass = ClassName.get(typePackage, typeName);
         ClassName enumClass = ClassName.get(typePackage, typeName, "Value");
 
         TypeSpec spec;
-        if (settings.supportUnknownEnumValues()) {
+        if (supportUnknownEnumValues) {
             spec = createSafeEnum(typeName, typeDef, thisClass, enumClass);
         } else {
             spec = createEnum(thisClass, typeDef.values(), false);

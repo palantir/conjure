@@ -6,11 +6,9 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
-import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -26,12 +24,10 @@ public final class AliasGenerator {
     private AliasGenerator() {}
 
     public static JavaFile generateAliasType(
-            TypesDefinition types,
+            TypeMapper typeMapper,
             String defaultPackage,
             String typeName,
-            AliasTypeDefinition typeDef,
-            Settings settings) {
-        TypeMapper typeMapper = new TypeMapper(types, settings.optionalTypeStrategy());
+            AliasTypeDefinition typeDef) {
         TypeName aliasType = typeMapper.getClassName(typeDef.alias());
 
         String typePackage = typeDef.packageName().orElse(defaultPackage);

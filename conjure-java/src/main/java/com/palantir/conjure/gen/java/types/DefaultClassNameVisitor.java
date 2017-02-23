@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -32,11 +33,14 @@ import java.util.OptionalInt;
  */
 public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
-    private final OptionalTypeStrategy optionalTypeStrategy;
     private final TypesDefinition types;
+    private final ConjureImports importedTypes;
+    private final OptionalTypeStrategy optionalTypeStrategy;
 
-    DefaultClassNameVisitor(TypesDefinition types, OptionalTypeStrategy optionalTypeStrategy) {
+    DefaultClassNameVisitor(TypesDefinition types, ConjureImports importedTypes,
+            OptionalTypeStrategy optionalTypeStrategy) {
         this.types = types;
+        this.importedTypes = importedTypes;
         this.optionalTypeStrategy = optionalTypeStrategy;
     }
 
@@ -100,11 +104,15 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(ReferenceType refType) {
-        BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
-        if (defType != null) {
-            String packageName = defType.packageName().orElse(types.definitions().defaultPackage());
+        // First try to locate type in this conjure definition.
+        BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
+        if (type != null) {
+            String packageName = type.packageName().orElse(types.definitions().defaultPackage());
             return ClassName.get(packageName, refType.type());
         } else {
+            // TODO(rfink) Second, try to find the type in the Conjure imports
+
+            // Finally, try to find the type in language-specific raw imports.
             ExternalTypeDefinition depType = types.imports().get(refType.type());
             checkNotNull(depType, "Unable to resolve type %s", refType.type());
             return ClassName.bestGuess(depType.external().get("java"));

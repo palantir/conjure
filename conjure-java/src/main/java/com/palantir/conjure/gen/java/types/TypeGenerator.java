@@ -5,6 +5,9 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.google.common.base.Throwables;
+import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.squareup.javapoet.JavaFile;
@@ -16,8 +19,8 @@ import java.util.stream.Collectors;
 
 public interface TypeGenerator {
 
-    default void emit(TypesDefinition types, File outputDir) {
-        generate(types).forEach(file -> {
+    default void emit(ConjureDefinition conjureDefinition, File outputDir) {
+        generate(conjureDefinition).forEach(file -> {
             try {
                 file.writeTo(outputDir);
             } catch (IOException e) {
@@ -26,18 +29,22 @@ public interface TypeGenerator {
         });
     }
 
-    default Set<JavaFile> generate(TypesDefinition types) {
+    default Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
+        TypesDefinition types = conjureDefinition.types();
+        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition);
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateType(
                         types,
+                        conjureImports,
                         types.definitions().defaultPackage(),
                         type.getKey(),
                         type.getValue()))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     JavaFile generateType(
-            TypesDefinition types,
+            TypesDefinition allTypes,
+            ConjureImports importedTypes,
             String defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef);

@@ -42,12 +42,12 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
 
         generator.generate(conjureDefinition);
         verify(serviceGenerator).generate(conjureDefinition);
-        verify(typeGenerator).generate(types);
+        verify(typeGenerator).generate(conjureDefinition);
 
         File outputDir = folder.newFolder();
         generator.emit(conjureDefinition, outputDir);
         verify(serviceGenerator).emit(conjureDefinition, outputDir);
-        verify(typeGenerator).emit(types, outputDir);
+        verify(typeGenerator).emit(conjureDefinition, outputDir);
     }
 
     @Test

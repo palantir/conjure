@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BinaryType;
@@ -23,8 +24,9 @@ public final class Retrofit2ReturnTypeClassNameVisitor implements ClassNameVisit
 
     private final DefaultClassNameVisitor delegate;
 
-    public Retrofit2ReturnTypeClassNameVisitor(TypesDefinition types, OptionalTypeStrategy optionalTypeStrategy) {
-        this.delegate = new DefaultClassNameVisitor(types, optionalTypeStrategy);
+    public Retrofit2ReturnTypeClassNameVisitor(TypesDefinition types, ConjureImports importedTypes,
+            OptionalTypeStrategy optionalTypeStrategy) {
+        this.delegate = new DefaultClassNameVisitor(types, importedTypes, optionalTypeStrategy);
     }
 
     @Override

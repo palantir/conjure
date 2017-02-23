@@ -184,6 +184,7 @@ public final class TypeMapper {
                     return "I" + refType.type();
                 }
             } else {
+                // TODO(rfink) Implement Conjure imports
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
                 return getTypeNameFromConjureType(depType.baseType());
