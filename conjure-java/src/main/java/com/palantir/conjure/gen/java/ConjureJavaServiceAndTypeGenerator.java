@@ -10,16 +10,20 @@ import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Set;
 
 public final class ConjureJavaServiceAndTypeGenerator {
 
     private final ServiceGenerator serviceGenerator;
     private final TypeGenerator typeGenerator;
+    private final Path baseDir;
 
-    public ConjureJavaServiceAndTypeGenerator(ServiceGenerator serviceGenerator, TypeGenerator typeGenerator) {
+    public ConjureJavaServiceAndTypeGenerator(ServiceGenerator serviceGenerator, TypeGenerator typeGenerator,
+            Path baseDir) {
         this.serviceGenerator = serviceGenerator;
         this.typeGenerator = typeGenerator;
+        this.baseDir = baseDir;
     }
 
     /**
@@ -28,8 +32,8 @@ public final class ConjureJavaServiceAndTypeGenerator {
      */
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         return Sets.union(
-                serviceGenerator.generate(conjureDefinition),
-                typeGenerator.generate(conjureDefinition));
+                serviceGenerator.generate(conjureDefinition, baseDir),
+                typeGenerator.generate(conjureDefinition, baseDir));
     }
 
     /**
@@ -37,7 +41,7 @@ public final class ConjureJavaServiceAndTypeGenerator {
      * the instance's service and type generators.
      */
     public void emit(ConjureDefinition conjureDefinition, File outputDir) {
-        serviceGenerator.emit(conjureDefinition, outputDir);
-        typeGenerator.emit(conjureDefinition, outputDir);
+        serviceGenerator.emit(conjureDefinition, baseDir, outputDir);
+        typeGenerator.emit(conjureDefinition, baseDir, outputDir);
     }
 }

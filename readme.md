@@ -105,6 +105,75 @@ imports:
       java: com.palantir.ri.ResourceIdentifier
 ```
 
+### Imported Conjure Types [Experimental Feature]
+conjure-java has experimental support for importing Conjure types (not services) from other Conjure files. Note that the
+syntax and semantics may be subject to change in future releases.
+
+At the compiler level, an import is defined via a namespace and a relative or absolute path to the imported file, for
+example:
+
+```yaml
+# Importing definition: my-service.yml
+types:
+  conjure-imports:
+    importedTypes: path/to/imported-conjure-definition.yml
+    # ... other imports
+  definitions:
+    default-package: test.a.api
+    objects:
+
+services:
+  TestServiceA:
+    name: Test Service A
+    package: test.a
+    endpoints:
+      get:
+        http: GET /get
+        args:
+          object: importedTypes.SimpleObject
+```
+
+```yaml
+# Imported definition: path/to/imported-conjure-definition.yml
+types:
+  definitions:
+    default-package: test.b.api
+    objects:
+      SimpleObject:
+        fields:
+          stringField: string
+```
+
+Note that the imported object is referenced as `<namespace>.<type-name>`.
+
+The Conjure Java Gradle plugin facilitates the procurement of imported files as follows:
+
+```yaml
+conjureJavaServer {
+    # The conjureImports field accepts arbitrary Gradle `FileCollection`s, for example,
+    # `project.files(...)`, `project(':other-project').files(...)`, etc
+    conjureImports = files("external-import.yml")
+}
+```
+
+For the compilation step, the files specified in `conjureImports` are made available in the `external-imports/`
+directory relative to each Conjure definition in `src/main/conjure`. In this example, the file `external-import.yml` can
+be imported by any file in `src/main/conjure` as:
+
+```yaml
+types:
+  conjure-imports:
+    foo: external-imports/external-import.yml
+```
+
+Furthermore, every file in the `src/main/conjure` source set is made available in the same directory and can be imported
+as:
+```yaml
+types:
+  conjure-imports:
+    bar: other-def.yml   # made available from `src/main/conjure`
+```
+
 ### Packages
 Conjure supports packages, which are namespaces for objects. Package names 
 should follow the Java style naming convention: `com.example.name`

@@ -191,6 +191,28 @@ class ConjureJavaPluginTest extends GradleTestSpec {
         compiledFile("test/a/api/SimpleObject.java").text.contains("import java.util.Optional;")
     }
 
+    def 'copies conjure imports into build directory and provides imports to conjure compiler'() {
+        when:
+        buildFile << """
+            conjureJavaServer {
+                conjureImports = files("external-import.yml")
+            }
+        """.stripIndent()
+        file("external-import.yml").text = readResource("test-service-a.yml")
+        createSourceFile("a.yml", readResource("test-service-with-import.yml"))
+        createSourceFile("internal-import.yml", readResource("test-service-b.yml"))
+        def result = build("compileConjureJavaServer", "compileGeneratedJava", "--stacktrace").buildAndFail()
+
+        then:
+        file("build/conjure/imports/external-import.yml").exists()
+        file("build/conjure/internal-import.yml").exists()
+        file("build/conjure/a.yml").exists()
+        result.task(":compileConjureJavaServer").outcome == TaskOutcome.SUCCESS
+        result.task(":compileGeneratedJava").outcome == TaskOutcome.FAILED // because the imported types are unavailable
+        !compiledFile("test/a/api/with/imports/TestServiceA.java").text.contains("import test.a.api.SimpleObject;")
+        compiledFile("test/a/api/with/imports/TestServiceA.java").text.contains("import test.b.api.SimpleObject;")
+    }
+
     def createSourceFile(String fileName, String text) {
         createFile("src/main/conjure/" + fileName).text = text
     }

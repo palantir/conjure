@@ -13,14 +13,16 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface TypeGenerator {
 
-    default void emit(ConjureDefinition conjureDefinition, File outputDir) {
-        generate(conjureDefinition).forEach(file -> {
+    // TODO(rfink) The API is a bit silly and needs refactoring: Why on earth do I need to pass in a baseDir here?
+    default void emit(ConjureDefinition conjureDefinition, Path baseDir, File outputDir) {
+        generate(conjureDefinition, baseDir).forEach(file -> {
             try {
                 file.writeTo(outputDir);
             } catch (IOException e) {
@@ -29,9 +31,9 @@ public interface TypeGenerator {
         });
     }
 
-    default Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
+    default Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
         TypesDefinition types = conjureDefinition.types();
-        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition);
+        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateType(
                         types,

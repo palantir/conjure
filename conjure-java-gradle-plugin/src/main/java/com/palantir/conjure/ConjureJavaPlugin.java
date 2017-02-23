@@ -63,7 +63,7 @@ public class ConjureJavaPlugin implements Plugin<Project> {
         compileConjureJavaServerTask.setSource(conjureSourceSet);
         compileConjureJavaServerTask.setOutputDirectory(project.file("src/generated/java"));
         project.afterEvaluate(p -> {
-            compileConjureJavaServerTask.configure(extension.getOptionalType());
+            compileConjureJavaServerTask.configure(extension.getOptionalType(), extension.getConjureImports());
         });
 
         Task compileGeneratedJavaTask = project.getTasks()

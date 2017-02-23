@@ -19,6 +19,7 @@ import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -33,7 +34,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         ServiceGenerator serviceGenerator = mock(ServiceGenerator.class);
         TypeGenerator typeGenerator = mock(TypeGenerator.class);
         ConjureJavaServiceAndTypeGenerator generator =
-                new ConjureJavaServiceAndTypeGenerator(serviceGenerator, typeGenerator);
+                new ConjureJavaServiceAndTypeGenerator(serviceGenerator, typeGenerator, null);
 
         TypesDefinition types = mock(TypesDefinition.class);
         ConjureDefinition conjureDefinition = ConjureDefinition.builder()
@@ -41,13 +42,13 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
                 .build();
 
         generator.generate(conjureDefinition);
-        verify(serviceGenerator).generate(conjureDefinition);
-        verify(typeGenerator).generate(conjureDefinition);
+        verify(serviceGenerator).generate(conjureDefinition, null);
+        verify(typeGenerator).generate(conjureDefinition, null);
 
         File outputDir = folder.newFolder();
         generator.emit(conjureDefinition, outputDir);
-        verify(serviceGenerator).emit(conjureDefinition, outputDir);
-        verify(typeGenerator).emit(conjureDefinition, outputDir);
+        verify(serviceGenerator).emit(conjureDefinition, null, outputDir);
+        verify(typeGenerator).emit(conjureDefinition, null, outputDir);
     }
 
     @Test
@@ -57,7 +58,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
-                new BeanGenerator(settings));
+                new BeanGenerator(settings), null);
         generator.emit(conjure, src);
 
         assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
@@ -77,7 +78,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
-                new BeanGenerator(settings));
+                new BeanGenerator(settings), Paths.get("src/test"));
         generator.emit(conjure, src);
 
         // Generated files contain imports

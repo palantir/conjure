@@ -16,6 +16,8 @@ import com.palantir.conjure.gen.java.types.TypeMapper;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
+import org.gradle.api.Project;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -32,6 +34,9 @@ public class CompileConjureJavaServerTask extends SourceTask {
     @Input
     private TypeMapper.OptionalTypeStrategy optionalType;
 
+    @Input
+    private FileCollection conjureImports;
+
     @OutputDirectory
     public final File getOutputDirectory() {
         return outputDirectory;
@@ -39,14 +44,23 @@ public class CompileConjureJavaServerTask extends SourceTask {
 
     @TaskAction
     public final void compileFiles() {
-        compileFiles(getSource().getFiles());
+        Project project = getProject();
+        File baseDir = project.file("build/conjure/");
+        project.copy(copySpec ->
+                copySpec.into(project.file(new File(baseDir, "external-imports")))
+                        .from(conjureImports));
+        project.copy(copySpec ->
+                copySpec.into(project.file(baseDir))
+                        .from(getSource()));
+
+        compileFiles(getSource().getFiles(), baseDir.toPath());
     }
 
-    private void compileFiles(Collection<File> files) {
-        files.forEach(f -> compileFile(f.toPath()));
+    private void compileFiles(Collection<File> files, Path baseDir) {
+        files.forEach(f -> compileFile(f.toPath(), baseDir));
     }
 
-    private void compileFile(Path path) {
+    private void compileFile(Path path, Path baseDir) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
 
         Settings settings = Settings.builder()
@@ -55,14 +69,15 @@ public class CompileConjureJavaServerTask extends SourceTask {
                 .build();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(settings),
-                new BeanGenerator(settings));
+                new BeanGenerator(settings), baseDir);
 
         File outputDir = getOutputDirectory();
         checkState(outputDir.exists() || outputDir.mkdirs(), "Unable to make directory tree %s", outputDir);
         generator.emit(conjure, outputDir);
     }
 
-    public final void configure(TypeMapper.OptionalTypeStrategy optionalTypeStrategy) {
+    public final void configure(TypeMapper.OptionalTypeStrategy optionalTypeStrategy, FileCollection imports) {
         this.optionalType = optionalTypeStrategy;
+        this.conjureImports = imports;
     }
 }

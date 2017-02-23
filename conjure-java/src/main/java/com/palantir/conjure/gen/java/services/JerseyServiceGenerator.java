@@ -27,6 +27,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +45,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     }
 
     @Override
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition);
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
+        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
         TypeMapper typeMapper =
                 new TypeMapper(conjureDefinition.types(), conjureImports, settings.optionalTypeStrategy());
         TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,

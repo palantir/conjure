@@ -10,6 +10,10 @@
         <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
     </Match>
 
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+    </Match>
+
     <!-- Ignore the following bug patterns in test code -->
     <!-- (i.e., classes ending in 'Test' or 'Tests', and inner classes of same) -->
     <Match>

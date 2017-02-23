@@ -25,6 +25,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,8 +50,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     }
 
     @Override
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition);
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
+        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
         TypeMapper typeMapper =
                 new TypeMapper(conjureDefinition.types(), conjureImports, settings.optionalTypeStrategy());
         TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,

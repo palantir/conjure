@@ -38,7 +38,7 @@ public final class JerseyServiceGeneratorTests {
                 .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build());
 
-        Set<JavaFile> files = gen.generate(def);
+        Set<JavaFile> files = gen.generate(def, null);
 
         for (JavaFile file : files) {
             assertThat(file.toString()).isEqualTo(CharStreams.toString(
