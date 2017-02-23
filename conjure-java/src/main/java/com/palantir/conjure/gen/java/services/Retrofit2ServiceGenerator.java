@@ -167,10 +167,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         switch (def.paramType()) {
             case AUTO:
             case PATH:
-                if (pathArgs.contains(paramKey)) {
+                String pathParamKey = def.paramId().orElse(paramKey);
+                if (pathArgs.contains(pathParamKey)) {
                     AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                            .addMember("value", "$S", def.paramId().orElse(paramKey));
-                    if (encodedPathArgs.contains(paramKey)) {
+                            .addMember("value", "$S", pathParamKey);
+                    if (encodedPathArgs.contains(pathParamKey)) {
                         builder.addMember("encoded", "$L", true);
                     }
                     param.addAnnotation(builder.build());

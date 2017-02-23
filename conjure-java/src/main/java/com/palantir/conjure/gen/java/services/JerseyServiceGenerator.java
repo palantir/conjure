@@ -181,7 +181,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         switch (def.paramType()) {
             case AUTO:
             case PATH:
-                if (!pathArgs.contains(argName)) {
+                if (!pathArgs.contains(def.paramId().orElse(argName))) {
                     return Optional.empty();
                 }
                 annotationType = "PathParam";

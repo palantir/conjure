@@ -121,3 +121,12 @@ services:
              - Safe
           branch: string
         returns: optional<string>
+
+      testParam:
+        http: GET /datasets/{dataset-rid}/testParam
+        args:
+          datasetRid:
+            type: ResourceIdentifier
+            param-id: dataset-rid
+            param-type: path
+        returns: optional<string>
