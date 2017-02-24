@@ -14,9 +14,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = BinaryExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class BinaryExample {
     private final byte[] binary;
@@ -82,6 +79,9 @@ public final class BinaryExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private byte[] binary;
 

@@ -15,9 +15,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = PrimitiveOptionalsExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class PrimitiveOptionalsExample {
     private final OptionalDouble num;
@@ -105,6 +102,9 @@ public final class PrimitiveOptionalsExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private OptionalDouble num = OptionalDouble.empty();
 

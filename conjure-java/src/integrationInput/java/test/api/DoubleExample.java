@@ -10,9 +10,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = DoubleExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class DoubleExample {
     private final double doubleValue;
@@ -58,6 +55,9 @@ public final class DoubleExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private double doubleValue;
 

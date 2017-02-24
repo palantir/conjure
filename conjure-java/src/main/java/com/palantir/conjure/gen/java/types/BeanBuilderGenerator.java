@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -45,18 +46,26 @@ public final class BeanBuilderGenerator {
             TypeMapper typeMapper,
             ClassName objectClass,
             ClassName builderClass,
-            ObjectTypeDefinition typeDef) {
+            ObjectTypeDefinition typeDef,
+            boolean ignoreUnknownProperties) {
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
 
-        return TypeSpec.classBuilder("Builder")
+        TypeSpec.Builder builder = TypeSpec.classBuilder("Builder")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                 .addFields(poetFields)
                 .addMethod(createConstructor())
                 .addMethod(createFromObject(builderClass, objectClass, fields))
                 .addMethods(createSetters(builderClass, typeMapper, fields))
-                .addMethod(createBuild(objectClass, poetFields))
-                .build();
+                .addMethod(createBuild(objectClass, poetFields));
+
+        if (ignoreUnknownProperties) {
+            builder.addAnnotation(AnnotationSpec.builder(JsonIgnoreProperties.class)
+                    .addMember("ignoreUnknown", "$L", true)
+                    .build());
+        }
+
+        return builder.build();
     }
 
     private static MethodSpec createConstructor() {
@@ -131,9 +140,9 @@ public final class BeanBuilderGenerator {
                 /* shouldClearFirst */ true);
 
         return builder.addAnnotation(AnnotationSpec.builder(JsonSetter.class)
-                        .addMember("value", "$S", field.jsonKey())
-                        .build())
-                    .build();
+                .addMember("value", "$S", field.jsonKey())
+                .build())
+                .build();
     }
 
     private static MethodSpec createAuxiliarySetter(

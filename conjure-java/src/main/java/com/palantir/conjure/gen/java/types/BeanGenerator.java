@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
@@ -113,13 +112,8 @@ public final class BeanGenerator implements TypeGenerator {
 
         typeBuilder
                 .addMethod(createBuilder(builderClass))
-                .addType(BeanBuilderGenerator.generate(typeMapper, objectClass, builderClass, typeDef));
-
-        if (settings.ignoreUnknownProperties()) {
-            typeBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnoreProperties.class)
-                    .addMember("ignoreUnknown", "$L", true)
-                    .build());
-        }
+                .addType(BeanBuilderGenerator.generate(
+                        typeMapper, objectClass, builderClass, typeDef, settings.ignoreUnknownProperties()));
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 

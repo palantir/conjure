@@ -19,9 +19,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = ManyFieldExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class ManyFieldExample {
     private final String string;
@@ -149,6 +146,9 @@ public final class ManyFieldExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private String string;
 

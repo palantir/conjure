@@ -10,9 +10,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = BooleanExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class BooleanExample {
     private final boolean coin;
@@ -58,6 +55,9 @@ public final class BooleanExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private boolean coin;
 

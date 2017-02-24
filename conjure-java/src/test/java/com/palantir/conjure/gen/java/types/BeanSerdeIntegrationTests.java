@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.remoting2.ext.jackson.ObjectMappers;
 import org.junit.Test;
+import test.api.BooleanExample;
 import test.api.ListExample;
 import test.api.MapExample;
 import test.api.SetExample;
@@ -30,6 +31,13 @@ public final class BeanSerdeIntegrationTests {
     @Test
     public void testMapExampleSerde() throws Exception {
         testSerde("{\"items\": {\"one\": \"eins\", \"two\": \"二\"}}", MapExample.class);
+    }
+
+    @Test
+    public void testIgnoreProperties() throws Exception {
+        // Important for ensuring additive changes don't affect clients adversely
+        BooleanExample boolExample = mapper.readValue("{\"coin\": true, \"ignored\": \"field\"}", BooleanExample.class);
+        assertThat(boolExample.getCoin()).isEqualTo(true);
     }
 
     private static <T> void testSerde(String json, Class<T> clazz) throws Exception {

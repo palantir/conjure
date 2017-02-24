@@ -16,9 +16,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = SetExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class SetExample {
     private final Set<String> items;
@@ -84,6 +81,9 @@ public final class SetExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private Set<String> items = new LinkedHashSet<>();
 

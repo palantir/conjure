@@ -54,6 +54,7 @@ public final class BeanJavaTypeGeneratorTests {
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
                 // help make shrink-wrapping output sane
                 if (!expectedFile.exists()) {
+                    Files.createDirectories(expectedFile.toPath().getParent());
                     Files.write(expectedFile.toPath(), file.toString().getBytes(StandardCharsets.UTF_8));
                 }
             }

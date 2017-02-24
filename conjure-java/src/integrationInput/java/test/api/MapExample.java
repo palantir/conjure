@@ -15,9 +15,6 @@ import javax.annotation.Generated;
 @JsonDeserialize(
         builder = MapExample.Builder.class
 )
-@JsonIgnoreProperties(
-        ignoreUnknown = true
-)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class MapExample {
     private final Map<String, String> items;
@@ -83,6 +80,9 @@ public final class MapExample {
         return new Builder();
     }
 
+    @JsonIgnoreProperties(
+            ignoreUnknown = true
+    )
     public static final class Builder {
         private Map<String, String> items = new LinkedHashMap<>();
 
