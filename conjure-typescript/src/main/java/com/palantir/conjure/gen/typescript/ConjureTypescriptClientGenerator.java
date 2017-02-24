@@ -4,13 +4,21 @@
 
 package com.palantir.conjure.gen.typescript;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
+import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class ConjureTypescriptClientGenerator {
 
@@ -30,6 +38,27 @@ public final class ConjureTypescriptClientGenerator {
     public void emit(ConjureDefinition conjureDefinition, File outputDir) {
         serviceGenerator.emit(conjureDefinition, outputDir);
         typeGenerator.emit(conjureDefinition.types(), outputDir);
+
+        // write index file
+        Set<ExportStatement> serviceExports = serviceGenerator.generateExports(conjureDefinition);
+        Set<ExportStatement> typeExports = typeGenerator.generateExports(conjureDefinition.types());
+
+        DuplicateExportHandler duplicateHandler = new DropDuplicateExportHandler();
+
+        List<ExportStatement> sortedExports = duplicateHandler.handleDuplicates(Sets.union(serviceExports, typeExports))
+                .stream().sorted().collect(Collectors.toList());
+
+        TypescriptFile indexFile = TypescriptFile.builder()
+                .emittables(sortedExports)
+                .name("index")
+                .parentFolderPath("")
+                .build();
+
+        try {
+            indexFile.writeTo(outputDir);
+        } catch (IOException e) {
+            Throwables.propagate(e);
+        }
     }
 
     public static void main(String[] args) {

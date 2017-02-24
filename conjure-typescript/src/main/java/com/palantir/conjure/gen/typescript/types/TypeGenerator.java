@@ -6,14 +6,23 @@ package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public interface TypeGenerator {
+
+    Set<TypescriptFile> generate(TypesDefinition types);
+
+    /**
+     * Returns a set of {@link ExportStatement}s for the given type definitions.
+     * <p>
+     * An exported name may be defined in more than one {@link ExportStatement}. Callers of this method are expected to
+     * resolve or deconflict as appropriate.
+     */
+    Set<ExportStatement> generateExports(TypesDefinition types);
 
     default void emit(TypesDefinition types, File outputDir) {
         generate(types).forEach(file -> {
@@ -24,19 +33,5 @@ public interface TypeGenerator {
             }
         });
     }
-
-    default Set<TypescriptFile> generate(TypesDefinition types) {
-        return types.definitions().objects().entrySet().stream().map(
-                type -> generateType(
-                        types,
-                        types.definitions().defaultPackage(),
-                        type.getKey(),
-                        type.getValue()))
-                .filter(x -> x != null) // TODO(melliot) consider optional
-                .collect(Collectors.toSet());
-    }
-
-    TypescriptFile generateType(TypesDefinition types, String defaultPackage,
-            String typeName, BaseObjectTypeDefinition typeDef);
 
 }

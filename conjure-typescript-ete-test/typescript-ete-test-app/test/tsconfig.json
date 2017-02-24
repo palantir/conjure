@@ -18,6 +18,7 @@
         "../typings/index.d.ts",
         "typings/index.d.ts",
         "../src/app.tsx",
+        "../src/conjure/index.ts",
         "../src/conjure/typescriptetetest/api/calculatorService.ts",
         "../src/conjure/typescriptetetest/api/calculatorServiceImpl.ts",
         "../src/conjure/typescriptetetest/api/identitiesResponse.ts",

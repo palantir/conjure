@@ -13,6 +13,8 @@ import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -72,6 +74,32 @@ public final class ConjureTypescriptClientGeneratorTest {
                 .contains("import { IZ } from \"../package2/folder/z\"");
         assertThat(compiledFile(src, xfile))
                 .contains("import { EnumObject } from \"./enumObject\"");
+    }
+
+    @Test
+    public void indexFileTest() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services/test-service.conjure"));
+        File src = folder.newFolder("src");
+        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
+                new DefaultServiceGenerator(),
+                new DefaultTypeGenerator());
+        generator.emit(conjure, src);
+
+        assertThat(compiledFile(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
+                new File("src/test/resources/services/test-service-index.ts").toPath()), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void indexFileTest_duplicate() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services-types-duplicates.yml"));
+        File src = folder.newFolder("src");
+        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
+                new DefaultServiceGenerator(),
+                new DefaultTypeGenerator());
+        generator.emit(conjure, src);
+
+        assertThat(compiledFile(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
+                new File("src/test/resources/services-types-duplicates-index.ts").toPath()), StandardCharsets.UTF_8));
     }
 
     private static String compiledFile(File srcDir, String clazz) throws IOException {

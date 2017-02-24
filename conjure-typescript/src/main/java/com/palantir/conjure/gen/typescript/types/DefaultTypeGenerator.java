@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -14,6 +15,7 @@ import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
 import com.palantir.conjure.gen.typescript.poet.RawExpression;
@@ -32,29 +34,72 @@ import java.util.stream.Collectors;
 public final class DefaultTypeGenerator implements TypeGenerator {
 
     @Override
-    public TypescriptFile generateType(TypesDefinition types, String defaultPackage, String typeName,
+    public Set<TypescriptFile> generate(TypesDefinition types) {
+        return types.definitions().objects().entrySet().stream().map(
+                type -> generateType(
+                        types,
+                        types.definitions().defaultPackage(),
+                        type.getKey(),
+                        type.getValue()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<ExportStatement> generateExports(TypesDefinition types) {
+        return types.definitions().objects().entrySet().stream().map(
+                type -> generateExport(
+                        types,
+                        types.definitions().defaultPackage(),
+                        type.getKey(),
+                        type.getValue()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+    private Optional<TypescriptFile> generateType(TypesDefinition types, String defaultPackage, String typeName,
             BaseObjectTypeDefinition baseTypeDef) {
         String packageLocation = baseTypeDef.packageName().orElse(defaultPackage);
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
         TypeMapper mapper = new TypeMapper(types, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
-            return generateEnumFile(typeName, (EnumTypeDefinition) baseTypeDef, packageLocation, parentFolderPath,
-                    mapper);
+            return Optional.of(generateEnumFile(
+                    typeName, (EnumTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
         } else if (baseTypeDef instanceof ObjectTypeDefinition) {
-            return generateObjectFile(typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath,
-                    mapper);
+            return Optional.of(generateObjectFile(
+                    typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
         } else if (baseTypeDef instanceof AliasTypeDefinition) {
             // in typescript we do nothing with this
-            return null;
+            return Optional.absent();
         }
         throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
+    }
+
+    private Optional<ExportStatement> generateExport(TypesDefinition types, String defaultPackage, String typeName,
+            BaseObjectTypeDefinition baseTypeDef) {
+        String packageLocation = baseTypeDef.packageName().orElse(defaultPackage);
+        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        if (baseTypeDef instanceof EnumTypeDefinition) {
+            return Optional.of(
+                    GenerationUtils.createExportStatementRelativeToRoot(typeName, parentFolderPath, typeName));
+        } else if (baseTypeDef instanceof ObjectTypeDefinition) {
+            return Optional.of(
+                    GenerationUtils.createExportStatementRelativeToRoot("I" + typeName, parentFolderPath, typeName));
+        } else if (baseTypeDef instanceof AliasTypeDefinition) {
+            // in typescript we do nothing with this
+            return Optional.absent();
+        }
+        throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
+
     }
 
     private static TypescriptFile generateObjectFile(String typeName, ObjectTypeDefinition typeDef,
             String packageLocation, String parentFolderPath, TypeMapper mapper) {
         Set<TypescriptTypeSignature> propertySignatures = typeDef.fields().entrySet()
                 .stream()
-                .map(e -> (TypescriptTypeSignature) TypescriptTypeSignature.builder()
+                .map(e -> TypescriptTypeSignature.builder()
                         .isOptional(e.getValue().type() instanceof OptionalType)
                         .name(e.getKey())
                         .typescriptType(mapper.getTypescriptType(e.getValue().type()))

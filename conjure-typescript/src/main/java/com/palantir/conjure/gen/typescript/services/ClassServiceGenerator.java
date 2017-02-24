@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.services.RequestLineDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.FunctionCallExpression;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
@@ -40,6 +41,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class ClassServiceGenerator implements ServiceGenerator {
+
     @Override
     public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
         TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(),
@@ -71,7 +73,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                             e.getValue(), typeMapper);
                     TypescriptFunctionBody functionBody = generateFunctionBody(serviceDef.basePath(), e.getKey(),
                             e.getValue(), serviceDef.defaultAuth(), typeMapper);
-                    return (TypescriptFunction) TypescriptFunction.builder().functionSignature(functionSignature)
+                    return TypescriptFunction.builder().functionSignature(functionSignature)
                             .functionBody(functionBody).build();
                 })
                 .collect(Collectors.toSet());
@@ -90,7 +92,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         .addNamesToImport("IHttpApiBridge")
                         .filepathToImport("@elements/conjure-fe-lib")
                         .build())
-                .name(clazz + "Impl")
+                .name(getFilename(clazz))
                 .parentFolderPath(parentFolderPath)
                 .build();
     }
@@ -147,5 +149,24 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         } else {
             return paramType;
         }
+    }
+
+    @Override
+    public Set<ExportStatement> generateExports(ConjureDefinition conjureDefinition) {
+        return conjureDefinition.services()
+                .entrySet()
+                .stream()
+                .map(e -> generateExport(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
+    }
+
+    private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
+        String packageLocation = serviceDef.packageName();
+        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        return GenerationUtils.createExportStatementRelativeToRoot(clazz, parentFolderPath, getFilename(clazz));
+    }
+
+    private String getFilename(String clazz) {
+        return clazz + "Impl";
     }
 }

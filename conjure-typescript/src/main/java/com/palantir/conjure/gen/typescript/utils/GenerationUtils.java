@@ -5,10 +5,13 @@
 package com.palantir.conjure.gen.typescript.utils;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
@@ -93,6 +96,18 @@ public final class GenerationUtils {
                 })
                 .filter(conjureType -> conjureType != null)
                 .collect(Collectors.toList());
+    }
+
+    public static ExportStatement createExportStatementRelativeToRoot(
+            String exportName, String parentFolderPath, String sourceName) {
+        String tsFilePath = getTypescriptFilePath(parentFolderPath, sourceName);
+        List<String> segments = ImmutableList.copyOf(tsFilePath.split("/"));
+        String filepathToExport = "./" + Joiner.on("/").join(segments);
+
+        return ExportStatement.builder()
+                .addNamesToExport(exportName)
+                .filepathToExport(filepathToExport)
+                .build();
     }
 
     public static String getCharSource(File file) throws IOException {

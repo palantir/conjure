@@ -1,0 +1,17 @@
+types:
+  definitions:
+    default-package: com.palantir.test.api.objects
+    objects:
+      DuplicateExample:
+        fields:
+          string: string
+      OtherObject: 
+        fields:
+          string: string
+services:
+  DuplicateExample:
+    package: com.palantir.test.api.services
+    name: Duplicate Example
+  OtherService:
+    package: com.palantir.test.api.services
+    name: Other Service

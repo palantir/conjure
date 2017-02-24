@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.services;
 
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
@@ -36,7 +37,7 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                 .map(e -> ServiceUtils.generateFunctionSignature(e.getKey(), e.getValue(), typeMapper))
                 .collect(Collectors.toSet());
         TypescriptInterface serviceInterface = TypescriptInterface.builder()
-                .name("I" + clazz)
+                .name(getInterfaceName(clazz))
                 .methodSignatures(new TreeSet<>(methodSignatures))
                 .build();
         return TypescriptFile.builder()
@@ -45,5 +46,24 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                 .name(clazz)
                 .parentFolderPath(parentFolderPath)
                 .build();
+    }
+
+    @Override
+    public Set<ExportStatement> generateExports(ConjureDefinition conjureDefinition) {
+        return conjureDefinition.services()
+                .entrySet()
+                .stream()
+                .map(e -> generateExport(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
+    }
+
+    private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
+        String packageLocation = serviceDef.packageName();
+        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        return GenerationUtils.createExportStatementRelativeToRoot(getInterfaceName(clazz), parentFolderPath, clazz);
+    }
+
+    private String getInterfaceName(String clazz) {
+        return "I" + clazz;
     }
 }

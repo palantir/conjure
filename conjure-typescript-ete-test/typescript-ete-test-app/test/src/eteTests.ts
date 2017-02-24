@@ -6,8 +6,8 @@ import { assert } from "chai";
 
 import { DefaultHttpApiBridge } from "@elements/conjure-fe-lib";
 
-import { ICalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorService";
-import { CalculatorService } from "../../src/conjure/typescriptetetest/api/calculatorServiceImpl";
+import { ICalculatorService } from "../../src/conjure";
+import { CalculatorService } from "../../src/conjure";
 
 describe.only("End to end calculator service tests", () => {
     let service: ICalculatorService;
