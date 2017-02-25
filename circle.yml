@@ -9,27 +9,10 @@ machine:
 dependencies:
   override:
     - ./gradlew --parallel resolveConfigurations
-    - cd conjure-typescript-ete-test && ./gradlew --parallel resolveConfigurations && cd ..
-  cache_directories:
-    - ./conjure-typescript-ete-test/.gradle
-    - ./conjure-typescript-ete-test/typescript-ete-test-app/node_modules
+
 test:
   override:
-    - ? |
-          set -eu
-          set -o pipefail
-
-          case $CIRCLE_NODE_INDEX in
-          0)
-            ./gradlew --parallel build
-            ;;
-          1)
-            cd conjure-typescript-ete-test && bash ./scripts/verify.sh && cd ..
-            ;;
-          esac
-      :
-        parallel: true
-        timeout: 1200
+    - ./gradlew --parallel build
 
 deployment:
   snapshots:
