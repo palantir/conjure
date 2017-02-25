@@ -16,6 +16,22 @@ than renderable interfaces for consumer services to use, its goal is to remain
 agnostic to client implementations while providing general language bindings for
 use in client creation.
 
+Contents:
+
+ - [Rationale](#why)
+ - [Types](#types)
+   - [Primitives](#primitives)
+   - [Built-ins](#built-ins)
+   - [Imported Types](#imported-types)
+   - [(Experimental) Imported Conjure Types](#experimental-imported-conjure-types)
+   - [Packages](#packages)
+   - [Defined Types](#defined-types)
+ - [Services](#services)
+   - [Endpoints](#endpoints)
+ - [Gradle Plugin](#gradle-plugin)
+   - [Compilation](#conjure-compilation)
+   - [TypeScript Publishing](#typescript-publishing)
+
 Why?
 ----
 The rationale for maintaining Conjure rather than picking an existing IDL (e.g., Swagger) for Elements (and other)
@@ -35,12 +51,12 @@ API breaks are currently a deal-breaker, we are effectively presented with two c
 in a Java-centric way via JAX-RS, or retrofit an IDL to our particular interpretation of the JAX-RS wire format. Conjure
 is an experiment towards the latter choice and has the following advantages:
 
-- Conjure simplifies non-Java implementations of API servers and clients. The TypeScript bindings are a great example.
+- Conjure simplifies non-Java implementations of API servers and clients. The Typescript bindings are a great example.
 - Conjure allows us to specify the wire format independently of existing client/server libraries (e.g., Jersey).
 - Conjure reduces the binary coupling to particular Java features. For example, a Conjure API can be compiled into
   Java7-compatible client code with Guava Optional types, or into Java8 code with Java8 Optionals.
 - Value types are very simple to specify.
-- Conjure can act as a bridge format to some other IDL we may eventually want to use. For example, Conjure can likely 
+- Conjure can act as a bridge format to some other IDL we may eventually want to use. For example, Conjure can likely
   be compiled into Protobuf if we ever wanted to move our service implementations to gRPC.
 
 Of course there are downsides. To mention just two, you cannot Google for Conjure problems, and someone has to maintain
@@ -62,13 +78,12 @@ Base types in the system are:
  * `integer` (32-bit whole numbers)
  * `double` (64-bit floating point numbers)
  * `boolean` `(true|false)`
- * `any` (unknown placeholder type)
- * `binary` (byte[])
 
 ### Built-Ins
 Conjure offers several built-ins to assist with mapping to existing language
 constructs and to simplify API building. These types are genericized by other
 defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
+ * `any` (placeholder for unknown type)
  * `map<K, V>`: a map of `K` to `V`; since Conjure generates JSON serializable
    objects, `K` is generally restricted to `string` (though this is not strictly
    enforced to allow for external types to be present as a key type).
@@ -77,6 +92,7 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
  * `optional<T>`: an optional type to help prevent nullity. Optional types will
    serialize as null when absent and as a concrete non-null value when present.
    The empty string and the empty map/object are valid non-null values.
+ * `binary` (byte[])
 
 ### Imported Types
 External types, or imports, consist of references to types defined outside
@@ -105,7 +121,7 @@ imports:
       java: com.palantir.ri.ResourceIdentifier
 ```
 
-### Imported Conjure Types [Experimental Feature]
+### (Experimental) Imported Conjure Types
 conjure-java has experimental support for importing Conjure types (not services) from other Conjure files. Note that the
 syntax and semantics may be subject to change in future releases.
 
@@ -146,13 +162,13 @@ types:
 
 Note that the imported object is referenced as `<namespace>.<type-name>`.
 
-The Conjure Java Gradle plugin facilitates the procurement of imported files as follows:
+The Conjure Gradle plugin facilitates procurement of imported files as follows:
 
 ```yaml
-conjureJavaServer {
+conjure {
     # The conjureImports field accepts arbitrary Gradle `FileCollection`s, for example,
     # `project.files(...)`, `project(':other-project').files(...)`, etc
-    conjureImports = files("external-import.yml")
+    conjureImports files('external-import.yml')
 }
 ```
 
@@ -175,14 +191,14 @@ types:
 ```
 
 ### Packages
-Conjure supports packages, which are namespaces for objects. Package names 
+Conjure supports packages, which are namespaces for objects. Package names
 should follow the Java style naming convention: `com.example.name`
 
 This manifests in the generated languages as follows:
 
 * Java - the Conjure package name is the Java package name
 * TypeScript - the folder containing the object is the Conjure pakcage
-name with the first two segments removed (this is done for brevity). 
+name with the first two segments removed (this is done for brevity).
 For example: `com.example.folder1.folder2 -> folder1/folder2`
 
 ### Defined Types
@@ -434,134 +450,100 @@ services:
         returns: optional<Dataset>
 ```
 
-Full Example
-------------
-A complete definition might look something like this excerpt from the Foundry
-Catalog API.
+Gradle Plugin
+-------------
+As a code generator, Conjure emits language-specific source code as output. The easiest
+and most supported way to run Conjure is through the gradle plugins shipped with the
+project.
 
-```yaml
-types:
-  imports:
-    ResourceIdentifier:
-      base-type: string
-      external:
-        java: com.palantir.ri.ResourceIdentifier
+### Conjure Compilation
+The Conjure compilation plugin generates code for configurable, pre-defined output types
+and enables importing of remote Conjure types for inclusion in definitions.
 
-    AuthHeader:
-      base-type: string
-      external:
-        java: com.palantir.tokens.auth.AuthHeader
-
-  definitions:
-    default-package: com.palantir.foundry.catalog.api
-    objects:      
-      BackingFileSystem:
-        package: com.palantir.foundry.catalog.api.datasets
-        fields:
-          fileSystemId:
-            type: string
-            docs: The name by which this file system is identified.
-          baseUri: string
-          configuration: map<string, string>
-
-      Dataset:
-        package: com.palantir.foundry.catalog.api.datasets
-        fields:
-          fileSystemId: string
-          rid:
-            type: ResourceIdentifier
-            docs: Uniquely identifies this dataset.
-
-      CreateDatasetRequest:
-        fields:
-          fileSystemId: string
-          path: string
-
-services:
-  TestService:
-    name: Test Service
-    package: com.palantir.foundry.catalog.api
-    base-path: /catalog
-    default-auth: header
-    docs: |
-      A Markdown description of the service.
-    endpoints:
-      getFileSystems:
-        http: GET /fileSystems
-        returns: map<string, BackingFileSystem>
-        docs: |
-          Returns a mapping from file system id to backing file system configuration.
-      createDataset:
-        http: POST /datasets
-        args:
-          request: CreateDatasetRequest
-        returns: Dataset
-      getDataset:
-        http: GET /datasets/{datasetRid}
-        args:
-          datasetRid: ResourceIdentifier
-        returns: optional<Dataset>
-      getBranches:
-        http: GET /datasets/{datasetRid}/branches
-        args:
-          datasetRid:
-            type: ResourceIdentifier
-            docs: |
-              A valid dataset resource identifier.
-        returns: set<string>
+While the plugin does not prescribe a particular layout or project configuration, it's
+loosely designed to work with the following recommended layout:
+```
+project-api
+ ├── definition
+ ├── jersey
+ ├── retrofit
+ └── typescript
+project-server-interface
+project-server
 ```
 
-Gradle Plugins Usage
--------------------
-Conjure supports two gradle plugins. To use either, ensure you have the following added to your root project `build.gradle`:
+Apply the following buildscript configuration to your root project to make the plugin
+available to subprojects:
 ```gradle
 buildscript {
     repositories {
         maven { url 'https://artifactory.palantir.build/artifactory/all-jar' }
     }
-}
-```
-
-### Conjure Java Gradle Plugin
-
-Currently, the best way to use Conjure for java projects is to apply the Conjure Gradle plugin. 
-
-To add the plugin, depend on it in your root project `build.gradle`:
-```gradle
-buildscript {
     dependencies {
-        classpath "com.palantir.conjure:conjure-java-gradle-plugin:${conjureVersion}"
+        classpath "com.palantir.conjure:conjure-gradle-plugin:${conjureVersion}"
     }
 }
 ```
 
-... and apply the plugin on any projects that will have Conjure files:
+Apply the Conjure compilation plugin _only_ on the _definition_ (or equivalent) project,
+where Conjure source will be written:
 ```gradle
-apply plugin: 'com.palantir.gradle-conjure-java'
+apply plugin: 'com.palantir.conjure'
 ```
 
-Then, add a `src/main/conjure` folder and author your Conjure files (typically with a `.yml` extension).
+Choose one or more output target:
+ * `jerseyServer` (Java)
+   * errors on objects with unknown properties during deserialization
+   * errors on enumerations with unknown values during deserialization
+   * annotates services with JAX-RS annotations
+ * `jerseyClient` (Java)
+   * ignores unknown properties on objects during deserialization
+   * safely encapsulates unknown enumeration values during deserialization
+   * annotates services with JAX-RS annotations
+ * `retrofitClient` (Java)
+   * ignores unknown properties on objects during deserialization
+   * safely encapsulates unknown enumeration values during deserialization
+   * annotates services with Retrofit2 annotations
+ * `typescriptClient` (TypeScript)
 
-To generate code, run the `compileConjureJavaServer` task. Generated code -- today, the Gradle plugin
-only generates Java -- will be placed in `src/generated/java`. Note that generated code currently biases
-towards server-styled defaults.
+In addition to generated code, compilation tasks will emit a non-optional `.gitignore`
+file to assist in preventing source controlling generated code (prefer generating code
+as a compilation task).
 
-By default, the plugin renders Conjure `optional<>` fields as Guava `Optional` types. This behavior can be toggled
-via the `optionalType` configuration point:
+If using the recommended layout, emit to `src/main/java`, since the projects exist
+primarily to provide packaging and dependency isolation, not to contain additional code.
+
+(Experimental) Optionally specify additional external imports using `conjureImports`, which
+accepts a Gradle `FileCollection`.
+
+As an example:
 ```gradle
-conjureJavaServer {
-    optionalType = 'JAVA8'  // default: 'GUAVA'
+conjure {
+    jerseyServer {
+        # emit to the project-server-interface project + src/main/java directory
+        output project(':project-server-interface').file('src/main/java')
+    }
+    jerseyClient { output project(':api:jersey').file('src/main/java') }
+    retrofitClient { output project(':api:retrofit').file('src/main/java') }
+    typescriptClient { output project(':api:typescript').file('src') }
+
+    /**
+     * Experimental:
+     * Reference this file in Conjure source as external-imports/external-import.yml
+     */
+    conjureImports files('external-import.yml')
 }
 ```
 
-### Conjure Publish Gradle Plugin
+To generate source, run `compileConjure`.
 
-This plugin allows publishing artifacts from projects using conjure. The plugin publishes artifacts intended for languages supported by conjure. Currently the only language for which artifacts are published is Typescript.
+### TypeScript Publication
+The TypeScript Publication plugin enables publishing typescript artifacts from projects using Conjure.
 
-* Tyepscript publishing
-    * An npm package is published at the location `@elements/${projectName}-conjure`
+When run, an npm package is published to ``@elements/${projectName}-conjure`
 
-To add the plugin, depend on it in your root project `build.gradle`:
+To add the plugin, depend on it in your root project build.gradle:
+
 ```gradle
 buildscript {
     dependencies {
@@ -570,7 +552,8 @@ buildscript {
 }
 ```
 
-...and apply the plugin on any projects that have Conjure files:
+Apply the plugin on projects containing generated TypeScript:
+
 ```gradle
 apply plugin: 'com.palantir.gradle-conjure-publish'
 ```

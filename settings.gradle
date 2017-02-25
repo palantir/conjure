@@ -1,6 +1,6 @@
 include 'conjure-core'
 include 'conjure-java'
-include 'conjure-java-gradle-plugin'
+include 'conjure-gradle-plugin'
 include 'conjure-publish-gradle-plugin'
 include 'conjure-typescript'
 include 'parsec'
