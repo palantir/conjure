@@ -122,7 +122,7 @@ public final class TypeMapper {
             }
             // primitive types for aliases
         }
-        // TODO for now assume to generate primitive types for external definitions
+        // TODO(rmcnamara): for now assume to generate primitive types for external definitions
         return null;
     }
 
@@ -184,7 +184,7 @@ public final class TypeMapper {
                     return "I" + refType.type();
                 }
             } else {
-                // TODO(rfink) Implement Conjure imports
+                // TODO(rfink): Implement Conjure imports
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
                 return getTypeNameFromConjureType(depType.baseType());

@@ -63,8 +63,6 @@ public interface EndpointDefinition {
         return val.map(Stream::of).orElse(Stream.empty());
     }
 
-    // TODO(melliot) verify args and request line match
-
     static Builder builder() {
         return new Builder();
     }

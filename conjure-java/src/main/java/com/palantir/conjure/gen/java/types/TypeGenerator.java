@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public interface TypeGenerator {
 
-    // TODO(rfink) The API is a bit silly and needs refactoring: Why on earth do I need to pass in a baseDir here?
+    // TODO(rfink): The API is a bit silly and needs refactoring: Why on earth do I need to pass in a baseDir here?
     default void emit(ConjureDefinition conjureDefinition, Path baseDir, File outputDir) {
         generate(conjureDefinition, baseDir).forEach(file -> {
             try {

@@ -208,7 +208,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                                         .build())
                                 .build());
             case COOKIE:
-                // TODO generate required retrofit logic to support this
+                // TODO(melliot): generate required retrofit logic to support this
                 log.error("Retrofit does not support Cookie arguments");
                 break;
             case NONE:

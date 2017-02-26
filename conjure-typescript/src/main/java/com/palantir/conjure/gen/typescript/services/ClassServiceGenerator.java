@@ -105,8 +105,10 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .put("endpointPath", StringExpression.of(serviceBasePath + value.http().path()))
                 .put("endpointName", StringExpression.of(name))
                 .put("method", StringExpression.of(value.http().method()))
-                .put("requestMediaType", StringExpression.of("application/json")) // TODO, support other request types
-                .put("responseMediaType", StringExpression.of("application/json")) // TODO, support other request types
+                // TODO(rmcnamara): support other request types
+                .put("requestMediaType", StringExpression.of("application/json"))
+                // TODO(rmcnamara): support other request types
+                .put("responseMediaType", StringExpression.of("application/json"))
                 .put("requiredHeaders", ArrayExpression.of(
                         authDefinition.type() == AuthDefinition.AuthType.HEADER
                                 ? Lists.newArrayList(StringExpression.of("Authorization"))

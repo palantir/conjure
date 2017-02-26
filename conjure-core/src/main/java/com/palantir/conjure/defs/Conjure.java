@@ -46,7 +46,7 @@ public final class Conjure {
         }
     }
 
-    // TODO(rfink) Consider inlining the imported types when deserializing a ConjureDefinition.
+    // TODO(rfink): Consider inlining the imported types when deserializing a ConjureDefinition.
     // Returns imported definitions, keyed by namespace.
     public static ConjureImports parseTypesFromConjureImports(ConjureDefinition conjureImports, Path baseDir) {
         try {

@@ -15,7 +15,6 @@ idea {
 }
 
 tasks.checkstyleIntegrationInput.enabled = false
-tasks.findbugsIntegrationInput.enabled = false
 
 dependencies {
     compile project(':conjure-core')

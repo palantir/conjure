@@ -97,7 +97,7 @@ public final class BeanGenerator implements TypeGenerator {
                 .addMethods(createGetters(fields))
                 .addMethod(createEquals(objectClass))
                 .addMethod(createEqualTo(objectClass, fields))
-                .addMethod(createHashCode(poetFields))
+                .addMethod(createHashCode(fields, poetFields))
                 .addMethod(createToString(typeName, fields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
@@ -158,7 +158,7 @@ public final class BeanGenerator implements TypeGenerator {
                     .build());
 
             if (field.conjureDef().type() instanceof ListType) {
-                // TODO contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
+                // TODO(melliot): contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
                 body.addStatement("this.$1N = $2T.unmodifiableList(new $3T<>($1N))",
                         spec, Collections.class, ArrayList.class);
             } else if (field.conjureDef().type() instanceof SetType) {
@@ -236,13 +236,22 @@ public final class BeanGenerator implements TypeGenerator {
         }
     }
 
-    private static MethodSpec createHashCode(Collection<FieldSpec> fields) {
-        return MethodSpec.methodBuilder("hashCode")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(TypeName.INT)
-                .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", fields))
-                .build();
+    private static MethodSpec createHashCode(Collection<EnrichedField> fields, Collection<FieldSpec> poetFields) {
+        if (fields.stream().anyMatch(f -> f.conjureDef().type() instanceof BinaryType)) {
+            return MethodSpec.methodBuilder("hashCode")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(TypeName.INT)
+                    .addStatement("return $1T.deepHashCode($2L)", Arrays.class, Expressions.objectArray(poetFields))
+                    .build();
+        } else {
+            return MethodSpec.methodBuilder("hashCode")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(TypeName.INT)
+                    .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", poetFields))
+                    .build();
+        }
     }
 
     private static MethodSpec createToString(String thisClassName, Collection<EnrichedField> fields) {
@@ -275,7 +284,8 @@ public final class BeanGenerator implements TypeGenerator {
 
         if (field.conjureDef().type() instanceof BinaryType) {
             // base64 encode binary fields
-            CodeBlock encoded = Expressions.staticMethodCall(Base64.class, "getEncoder().encode", field.poetSpec());
+            CodeBlock encoded = Expressions.staticMethodCall(
+                    Base64.class, "getEncoder().encodeToString", field.poetSpec());
             builder.add(".append($L)", encoded);
         } else {
             // default to the field's toString method

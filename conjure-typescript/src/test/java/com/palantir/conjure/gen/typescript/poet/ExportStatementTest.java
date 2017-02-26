@@ -20,7 +20,7 @@ public final class ExportStatementTest {
     private TypescriptPoetWriter writer;
 
     @Before
-    public void setUp() {
+    public void before() {
         MockitoAnnotations.initMocks(this);
         writer = new TypescriptPoetWriter(printStream);
     }

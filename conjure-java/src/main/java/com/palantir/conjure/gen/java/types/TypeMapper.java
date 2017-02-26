@@ -17,8 +17,8 @@ public final class TypeMapper {
         JAVA8(java.util.Optional.class, "empty"),
         GUAVA(com.google.common.base.Optional.class, "absent");
 
-        private ClassName clazz;
-        private String absentMethodName;
+        private final ClassName clazz;
+        private final String absentMethodName;
 
         OptionalTypeStrategy(Class<?> clazz, String absentMethodName) {
             this.clazz = ClassName.get(clazz);

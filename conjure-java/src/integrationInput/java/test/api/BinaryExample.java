@@ -39,13 +39,13 @@ public final class BinaryExample {
 
     @Override
     public int hashCode() {
-        return Objects.hash(binary);
+        return Arrays.deepHashCode(new Object[]{binary});
     }
 
     @Override
     public String toString() {
         return new StringBuilder("BinaryExample").append("{")
-                .append("binary").append(": ").append(Base64.getEncoder().encode(binary))
+                .append("binary").append(": ").append(Base64.getEncoder().encodeToString(binary))
             .append("}")
             .toString();
     }

@@ -6,10 +6,12 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.google.guava:guava:21.0'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
-        classpath 'com.palantir:gradle-baseline-java:0.6.1'
-        classpath 'gradle.plugin.com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.1.0'
+        classpath 'com.palantir:gradle-baseline-java:0.11.0'
+        classpath 'gradle.plugin.com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.2.0'
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.9'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
     }
 }
@@ -52,8 +54,8 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'com.palantir.baseline-checkstyle'
     apply plugin: 'com.palantir.baseline-eclipse'
-    apply plugin: 'com.palantir.baseline-findbugs'
     apply plugin: 'com.palantir.baseline-idea'
+    apply plugin: 'net.ltgt.errorprone'
     apply plugin: 'org.inferred.processors'
     apply plugin: 'maven-publish'
 

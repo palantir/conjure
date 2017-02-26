@@ -25,7 +25,7 @@ public class ConjurePublishPluginTest extends GradleTestSpec {
         def result = run("compileConjureTypescriptClient")
 
         then:
-        result.task(":compileConjureTypescriptClient").outcome == TaskOutcome.UP_TO_DATE
+        result.task(":compileConjureTypescriptClient").outcome == TaskOutcome.NO_SOURCE
     }
 
     def 'compileConjureTypescriptClient compiles all source files'() {

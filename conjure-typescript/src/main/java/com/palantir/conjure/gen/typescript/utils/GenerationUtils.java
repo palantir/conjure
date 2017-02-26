@@ -82,7 +82,7 @@ public final class GenerationUtils {
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
-                .filter(conjureType -> !conjureType.equals(sourceName))
+                .filter(conjureType -> !conjureType.type().equals(sourceName))
                 .map(conjureType -> {
                     String destName = mapper.getContainingPackage(conjureType);
                     if (destName != null) {

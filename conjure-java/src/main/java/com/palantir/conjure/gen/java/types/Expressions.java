@@ -33,6 +33,10 @@ public final class Expressions {
         return CodeBlock.of("$1T.$2N(" + indexParams(3, args.size() + 3) + ")", append(clazz, method, args));
     }
 
+    public static CodeBlock objectArray(Collection<?> args) {
+        return CodeBlock.of("new Object[]{" + indexParams(1, args.size() + 1) + "}", args.toArray());
+    }
+
     private static Object[] append(Object one, Collection<?> rest) {
         return Stream.concat(Stream.of(one), rest.stream()).toArray();
     }

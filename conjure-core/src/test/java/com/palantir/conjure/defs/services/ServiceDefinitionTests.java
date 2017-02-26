@@ -157,7 +157,7 @@ public final class ServiceDefinitionTests {
             mapper.readValue("alias: bummer", BaseObjectTypeDefinition.class);
             fail();
         } catch (JsonMappingException e) {
-            // TODO(melliot) improve error reporting
+            // TODO(melliot): improve error reporting
             assertThat(e.getMessage()).startsWith(
                     "Can not construct instance of com.palantir.conjure.defs.types.PrimitiveType, "
                             + "problem: Unknown primitive type: bummer");

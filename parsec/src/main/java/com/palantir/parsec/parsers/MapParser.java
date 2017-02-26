@@ -38,7 +38,8 @@ public final class MapParser<A, B> implements Parser<Map<A, B>> {
             } else {
                 break;
             }
-        } while (Parsers.gingerly(separator).parse(input) != null);
+        }
+        while (Parsers.gingerly(separator).parse(input) != null);
         return results;
     }
 }

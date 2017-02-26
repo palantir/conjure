@@ -14,9 +14,6 @@
     <property name="charset" value="UTF-8"/>
     <property name="severity" value="error"/>
 
-    <module name="FileLength"> <!-- Java Style Guide: File length: 2000 lines -->
-        <property name="fileExtensions" value="java"/>
-    </module>
     <module name="FileTabCharacter"/> <!-- Java Style Guide: Whitespace characters -->
     <module name="NewlineAtEndOfFile"> <!-- Java Style Guide: Line ending: LF -->
         <property name="lineSeparator" value="lf"/>
@@ -47,6 +44,11 @@
     </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
     <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
+    <module name="SuppressionCommentFilter">
+        <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+        <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+        <property name="checkFormat" value="$1"/>
+    </module>
     <module name="TreeWalker">
         <module name="AbbreviationAsWordInName"> <!-- Java Style Guide: Camel case : defined -->
             <property name="ignoreFinal" value="false"/>
@@ -94,7 +96,6 @@
         <module name="EqualsHashCode"/>
         <module name="FallThrough"/> <!-- Java Style Guide: Fall-through: commented -->
         <module name="FileContentsHolder"/> <!-- Required for SuppressionCommentFilter -->
-        <module name="FinalClass"/> <!-- Java Coding Guidelines: Private constructors -->
         <module name="GenericWhitespace"> <!-- Java Style Guide: Horizontal whitespace -->
             <message key="ws.followed" value="GenericWhitespace ''{0}'' is followed by whitespace."/>
             <message key="ws.preceded" value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
@@ -112,7 +113,7 @@
             <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
         </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
-            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava"/>
+            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava, com.clearspring.analytics.util, org.spark_project.guava"/>
             <message key="import.illegal" value="Must not import repackaged classes."/>
         </module>
         <module name="IllegalImport">
@@ -304,6 +305,14 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="static enum"/>
             <property name="message" value="Redundant ''static'' modifier."/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(\/\/TODO)|(\/\/ TODO:)|(\/\/ TODO\(\))|(\/\/ TODO\(.*\):[^ ])|(\/\/ TODO\(.*\)[^:])"/>
+            <property name="message" value="TODO format: // TODO(flastname): explanation"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
+            <property name="message" value="Test setup/teardown methods are called before(), beforeClass(), after(), afterClass(), but not setUp, teardown, etc."/>
         </module>
         <module name="RightCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
