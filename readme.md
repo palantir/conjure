@@ -525,7 +525,7 @@ conjure {
     }
     jerseyClient { output project(':api:jersey').file('src/main/java') }
     retrofitClient { output project(':api:retrofit').file('src/main/java') }
-    typescriptClient { output project(':api:typescript').file('src') }
+    typeScriptClient { output project(':api:typescript').file('src') }
 
     /**
      * Experimental:
