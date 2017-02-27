@@ -75,7 +75,7 @@ defined types (e.g. imports and object definitions) use pascal case.
 ### Primitives
 Base types in the system are:
  * `string`
- * `integer` (32-bit whole numbers)
+ * `integer` (32-bit signed whole numbers)
  * `double` (64-bit floating point numbers)
  * `boolean` `(true|false)`
 
