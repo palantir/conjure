@@ -19,10 +19,10 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
-import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import java.nio.ByteBuffer;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
@@ -129,7 +129,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(BinaryType binaryType) {
-        return ArrayTypeName.of(byte.class);
+        return ClassName.get(ByteBuffer.class);
     }
 
     private static TypeName boxIfPrimitive(TypeName type) {

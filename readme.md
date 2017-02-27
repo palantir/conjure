@@ -92,7 +92,8 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
  * `optional<T>`: an optional type to help prevent nullity. Optional types will
    serialize as null when absent and as a concrete non-null value when present.
    The empty string and the empty map/object are valid non-null values.
- * `binary` (byte[])
+ * `binary`: a sequence of bytes. When present as a return value for a service
+   method, encodes an output stream.
 
 ### Imported Types
 External types, or imports, consist of references to types defined outside

@@ -8,6 +8,7 @@ import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
 import java.lang.Deprecated;
 import java.lang.String;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -52,7 +53,7 @@ public interface TestService {
 
     @GET
     @Path("/datasets/{datasetRid}/raw-maybe")
-    Optional<byte[]> maybeGetRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    Optional<ByteBuffer> maybeGetRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches")

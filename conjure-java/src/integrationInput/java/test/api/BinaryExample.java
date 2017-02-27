@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
@@ -16,15 +15,15 @@ import javax.annotation.Generated;
 )
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class BinaryExample {
-    private final byte[] binary;
+    private final ByteBuffer binary;
 
-    private BinaryExample(byte[] binary) {
+    private BinaryExample(ByteBuffer binary) {
         validateFields(binary);
         this.binary = binary;
     }
 
     @JsonProperty("binary")
-    public byte[] getBinary() {
+    public ByteBuffer getBinary() {
         return this.binary;
     }
 
@@ -34,29 +33,29 @@ public final class BinaryExample {
     }
 
     private boolean equalTo(BinaryExample other) {
-        return Arrays.equals(this.binary, other.binary);
+        return this.binary.equals(other.binary);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(new Object[]{binary});
+        return Objects.hash(binary);
     }
 
     @Override
     public String toString() {
         return new StringBuilder("BinaryExample").append("{")
-                .append("binary").append(": ").append(Base64.getEncoder().encodeToString(binary))
+                .append("binary").append(": ").append(binary)
             .append("}")
             .toString();
     }
 
-    public static BinaryExample of(byte[] binary) {
+    public static BinaryExample of(ByteBuffer binary) {
         return builder()
             .binary(binary)
             .build();
     }
 
-    private static void validateFields(byte[] binary) {
+    private static void validateFields(ByteBuffer binary) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, binary, "binary");
         if (missingFields != null) {
@@ -83,7 +82,7 @@ public final class BinaryExample {
             ignoreUnknown = true
     )
     public static final class Builder {
-        private byte[] binary;
+        private ByteBuffer binary;
 
         private Builder() {
         }
@@ -94,7 +93,7 @@ public final class BinaryExample {
         }
 
         @JsonSetter("binary")
-        public Builder binary(byte[] binary) {
+        public Builder binary(ByteBuffer binary) {
             this.binary = Objects.requireNonNull(binary, "binary cannot be null");
             return this;
         }

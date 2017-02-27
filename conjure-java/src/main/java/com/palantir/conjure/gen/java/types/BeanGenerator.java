@@ -11,7 +11,6 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -31,8 +30,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -225,29 +222,18 @@ public final class BeanGenerator implements TypeGenerator {
 
         if (field.poetSpec().type.isPrimitive()) {
             return CodeBlock.of("$L == $L", thisField, otherField);
-        } else if (field.conjureDef().type() instanceof BinaryType) {
-            return Expressions.staticMethodCall(Arrays.class, "equals", thisField, otherField);
         } else {
             return CodeBlock.of("$L.equals($L)", thisField, otherField);
         }
     }
 
     private static MethodSpec createHashCode(Collection<EnrichedField> fields, Collection<FieldSpec> poetFields) {
-        if (fields.stream().anyMatch(f -> f.conjureDef().type() instanceof BinaryType)) {
-            return MethodSpec.methodBuilder("hashCode")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(TypeName.INT)
-                    .addStatement("return $1T.deepHashCode($2L)", Arrays.class, Expressions.objectArray(poetFields))
-                    .build();
-        } else {
-            return MethodSpec.methodBuilder("hashCode")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(TypeName.INT)
-                    .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", poetFields))
-                    .build();
-        }
+        return MethodSpec.methodBuilder("hashCode")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.INT)
+                .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", poetFields))
+                .build();
     }
 
     private static MethodSpec createToString(String thisClassName, Collection<EnrichedField> fields) {
@@ -256,6 +242,8 @@ public final class BeanGenerator implements TypeGenerator {
                 .indent()
                 .indent()
                 .add(CodeBlocks.of(fields.stream()
+                        .map(EnrichedField::poetSpec)
+                        .map(f -> f.name)
                         .map(BeanGenerator::createAppendStatement)
                         .collect(joining(CodeBlock.of(".append(\", \")")))))
                 .unindent()
@@ -272,23 +260,13 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    private static CodeBlock createAppendStatement(EnrichedField field) {
-        String fieldName = field.poetSpec().name;
-        CodeBlock.Builder builder = CodeBlock.builder()
+    private static CodeBlock createAppendStatement(String fieldName) {
+        return CodeBlock.builder()
                 .add(".append($S)", fieldName)
-                .add(".append(\": \")");
-
-        if (field.conjureDef().type() instanceof BinaryType) {
-            // base64 encode binary fields
-            CodeBlock encoded = Expressions.staticMethodCall(
-                    Base64.class, "getEncoder().encodeToString", field.poetSpec());
-            builder.add(".append($L)", encoded);
-        } else {
-            // default to the field's toString method
-            builder.add(".append($N)", fieldName);
-        }
-
-        return builder.add("\n").build();
+                .add(".append(\": \")")
+                .add(".append($N)", fieldName)
+                .add("\n")
+                .build();
     }
 
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {

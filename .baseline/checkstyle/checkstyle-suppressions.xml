@@ -22,4 +22,5 @@
     <!-- Generated code should not be subjected to checkstyle. -->
     <suppress files="[/\\].*[/\\]generated_src[/\\]" checks="." />
     <suppress files="[/\\].*[/\\]generated_testSrc[/\\]" checks="." />
+    <suppress files="[/\\].*[/\\]integrationInput[/\\]" checks="." />
 </suppressions>
