@@ -14,7 +14,7 @@ import javax.annotation.Generated;
 public final class BooleanExample {
     private final boolean coin;
 
-    private BooleanExample(@JsonProperty("coin") boolean coin) {
+    private BooleanExample(boolean coin) {
         this.coin = coin;
     }
 

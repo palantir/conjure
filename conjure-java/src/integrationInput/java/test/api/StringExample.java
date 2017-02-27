@@ -16,7 +16,7 @@ import javax.annotation.Generated;
 public final class StringExample {
     private final String string;
 
-    private StringExample(@JsonProperty("string") String string) {
+    private StringExample(String string) {
         validateFields(string);
         this.string = string;
     }

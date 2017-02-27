@@ -18,7 +18,7 @@ import javax.annotation.Generated;
 public final class ListExample {
     private final List<String> items;
 
-    private ListExample(@JsonProperty("items") List<String> items) {
+    private ListExample(List<String> items) {
         validateFields(items);
         this.items = Collections.unmodifiableList(new ArrayList<>(items));
     }

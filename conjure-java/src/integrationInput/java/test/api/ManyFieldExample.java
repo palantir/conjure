@@ -37,7 +37,7 @@ public final class ManyFieldExample {
 
     private final StringAliasExample alias;
 
-    private ManyFieldExample(@JsonProperty("string") String string, @JsonProperty("integer") int integer, @JsonProperty("doubleValue") double doubleValue, @JsonProperty("optionalItem") Optional<String> optionalItem, @JsonProperty("items") List<String> items, @JsonProperty("set") Set<String> set, @JsonProperty("map") Map<String, String> map, @JsonProperty("alias") StringAliasExample alias) {
+    private ManyFieldExample(String string, int integer, double doubleValue, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, StringAliasExample alias) {
         validateFields(string, optionalItem, items, set, map, alias);
         this.string = string;
         this.integer = integer;

@@ -19,7 +19,7 @@ import javax.annotation.Generated;
 public final class AnyMapExample {
     private final Map<String, Object> items;
 
-    private AnyMapExample(@JsonProperty("items") Map<String, Object> items) {
+    private AnyMapExample(Map<String, Object> items) {
         validateFields(items);
         this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
     }

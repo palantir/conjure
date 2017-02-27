@@ -151,11 +151,7 @@ public final class BeanGenerator implements TypeGenerator {
         for (EnrichedField field : fields) {
             FieldSpec spec = field.poetSpec();
 
-            builder.addParameter(ParameterSpec.builder(spec.type, spec.name)
-                    .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                            .addMember("value", "$S", field.jsonKey())
-                            .build())
-                    .build());
+            builder.addParameter(spec.type, spec.name);
 
             if (field.conjureDef().type() instanceof ListType) {
                 // TODO(melliot): contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec

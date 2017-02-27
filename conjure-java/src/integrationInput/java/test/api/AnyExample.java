@@ -16,7 +16,7 @@ import javax.annotation.Generated;
 public final class AnyExample {
     private final Object any;
 
-    private AnyExample(@JsonProperty("any") Object any) {
+    private AnyExample(Object any) {
         validateFields(any);
         this.any = any;
     }

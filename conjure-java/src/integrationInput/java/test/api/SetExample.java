@@ -20,7 +20,7 @@ import javax.annotation.Generated;
 public final class SetExample {
     private final Set<String> items;
 
-    private SetExample(@JsonProperty("items") Set<String> items) {
+    private SetExample(Set<String> items) {
         validateFields(items);
         this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
     }

@@ -14,7 +14,7 @@ import javax.annotation.Generated;
 public final class DoubleExample {
     private final double doubleValue;
 
-    private DoubleExample(@JsonProperty("doubleValue") double doubleValue) {
+    private DoubleExample(double doubleValue) {
         this.doubleValue = doubleValue;
     }
 

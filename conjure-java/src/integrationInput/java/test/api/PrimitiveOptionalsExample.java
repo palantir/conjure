@@ -23,7 +23,7 @@ public final class PrimitiveOptionalsExample {
 
     private final OptionalInt integer;
 
-    private PrimitiveOptionalsExample(@JsonProperty("num") OptionalDouble num, @JsonProperty("bool") Optional<Boolean> bool, @JsonProperty("integer") OptionalInt integer) {
+    private PrimitiveOptionalsExample(OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
         validateFields(num, bool, integer);
         this.num = num;
         this.bool = bool;

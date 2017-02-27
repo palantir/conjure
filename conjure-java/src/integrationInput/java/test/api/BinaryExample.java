@@ -18,7 +18,7 @@ import javax.annotation.Generated;
 public final class BinaryExample {
     private final byte[] binary;
 
-    private BinaryExample(@JsonProperty("binary") byte[] binary) {
+    private BinaryExample(byte[] binary) {
         validateFields(binary);
         this.binary = binary;
     }

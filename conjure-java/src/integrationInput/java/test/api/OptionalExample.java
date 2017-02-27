@@ -17,7 +17,7 @@ import javax.annotation.Generated;
 public final class OptionalExample {
     private final Optional<String> item;
 
-    private OptionalExample(@JsonProperty("item") Optional<String> item) {
+    private OptionalExample(Optional<String> item) {
         validateFields(item);
         this.item = item;
     }

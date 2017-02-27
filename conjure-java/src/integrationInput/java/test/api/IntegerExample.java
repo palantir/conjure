@@ -14,7 +14,7 @@ import javax.annotation.Generated;
 public final class IntegerExample {
     private final int integer;
 
-    private IntegerExample(@JsonProperty("integer") int integer) {
+    private IntegerExample(int integer) {
         this.integer = integer;
     }
 
