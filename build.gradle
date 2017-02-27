@@ -6,7 +6,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.google.guava:guava:21.0'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
         classpath 'com.palantir:gradle-baseline-java:0.11.0'
