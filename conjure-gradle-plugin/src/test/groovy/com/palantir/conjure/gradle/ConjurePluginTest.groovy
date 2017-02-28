@@ -166,6 +166,41 @@ class ConjurePluginTest extends GradleTestSpec {
         file('typescript-client/src/.gitignore').text.contains('*.ts')
     }
 
+    def 'compile just typescript client with multiple conjure definitions'() {
+        given:
+        file('conjure-def/build.gradle') << """
+        plugins {
+            id 'com.palantir.conjure'
+        }
+
+        conjure {
+            typeScriptClient {
+                output project(':typescript-client').file('src')
+            }
+        }
+        """
+        file('conjure-def/src/main/conjure/api2.yml') << """
+        types:
+          definitions:
+            default-package: test.test.api
+            objects:
+              IntegerExample:
+                fields:
+                  integer: integer
+        """
+
+        when:
+        def result = run(':conjure-def:compileConjure')
+
+        then:
+        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':conjure-def:compileConjureTypeScriptClient').outcome == TaskOutcome.SUCCESS
+
+        file('typescript-client/src/index.ts').exists()
+        file('typescript-client/src/index.ts').text.contains('api/stringExample')
+        file('typescript-client/src/index.ts').text.contains('api/integerExample')
+    }
 
     def 'compile just jersey server and client'() {
         given:

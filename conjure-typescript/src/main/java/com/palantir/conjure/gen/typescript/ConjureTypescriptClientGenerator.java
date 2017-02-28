@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -35,13 +36,19 @@ public final class ConjureTypescriptClientGenerator {
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
      */
-    public void emit(ConjureDefinition conjureDefinition, File outputDir) {
-        serviceGenerator.emit(conjureDefinition, outputDir);
-        typeGenerator.emit(conjureDefinition.types(), outputDir);
+    public void emit(Set<ConjureDefinition> conjureDefinitions, File outputDir) {
+        conjureDefinitions.forEach(conjureDefinition -> {
+            serviceGenerator.emit(conjureDefinition, outputDir);
+            typeGenerator.emit(conjureDefinition.types(), outputDir);
+        });
 
         // write index file
-        Set<ExportStatement> serviceExports = serviceGenerator.generateExports(conjureDefinition);
-        Set<ExportStatement> typeExports = typeGenerator.generateExports(conjureDefinition.types());
+        Set<ExportStatement> serviceExports = conjureDefinitions.stream()
+                .flatMap(conjureDef -> serviceGenerator.generateExports(conjureDef).stream())
+                .collect(Collectors.toSet());
+        Set<ExportStatement> typeExports = conjureDefinitions.stream()
+                .flatMap(conjureDef -> typeGenerator.generateExports(conjureDef.types()).stream())
+                .collect(Collectors.toSet());
 
         DuplicateExportHandler duplicateHandler = new DropDuplicateExportHandler();
 
@@ -70,6 +77,6 @@ public final class ConjureTypescriptClientGenerator {
         ConjureDefinition definition = Conjure.parse(conjureFile);
         ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(new DefaultServiceGenerator(),
                 new DefaultTypeGenerator());
-        generator.emit(definition, outputDir);
+        generator.emit(ImmutableSet.of(definition), outputDir);
     }
 }
