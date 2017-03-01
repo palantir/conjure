@@ -87,7 +87,7 @@ public class ConjurePlugin implements Plugin<Project> {
         task.onlyIf(t -> extension.getJerseyServer().isPresent());
         task.setOutputDirectory(() -> extension.getJerseyServer()
                 .map(conf -> conf.getOutput())
-                .orElseThrow(() -> new IllegalStateException("jerseyServer output not configured")));
+                .orElse(null));
 
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(false)
@@ -110,7 +110,7 @@ public class ConjurePlugin implements Plugin<Project> {
         task.onlyIf(t -> extension.getJerseyClient().isPresent());
         task.setOutputDirectory(() -> extension.getJerseyClient()
                 .map(conf -> conf.getOutput())
-                .orElseThrow(() -> new IllegalStateException("jerseyClient output not configured")));
+                .orElse(null));
 
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(true)
@@ -133,7 +133,7 @@ public class ConjurePlugin implements Plugin<Project> {
         task.onlyIf(t -> extension.getRetrofitClient().isPresent());
         task.setOutputDirectory(() -> extension.getRetrofitClient()
                 .map(conf -> conf.getOutput())
-                .orElseThrow(() -> new IllegalStateException("retrofitClient output not configured")));
+                .orElse(null));
 
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(true)
@@ -157,7 +157,7 @@ public class ConjurePlugin implements Plugin<Project> {
         task.onlyIf(t -> extension.getTypeScriptClient().isPresent());
         task.setOutputDirectory(() -> extension.getTypeScriptClient()
                 .map(conf -> conf.getOutput())
-                .orElseThrow(() -> new IllegalStateException("typescriptClient output not configured")));
+                .orElse(null));
 
         task.setServiceGenerator(new DefaultServiceGenerator());
         task.setTypeGenerator(new DefaultTypeGenerator());

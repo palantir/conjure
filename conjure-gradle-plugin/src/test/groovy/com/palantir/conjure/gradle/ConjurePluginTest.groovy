@@ -234,6 +234,40 @@ class ConjurePluginTest extends GradleTestSpec {
         file('jersey-client/src/main/java/.gitignore').exists()
     }
 
+    def 'run in parallel with multiple targets'() {
+        given:
+        file('jersey-server/build.gradle') << """
+        apply plugin: 'java'
+
+        evaluationDependsOn(':conjure-def')
+
+        tasks.check.dependsOn project(':conjure-def').tasks.compileConjure
+        """
+        file('conjure-def/build.gradle') << """
+        plugins {
+            id 'com.palantir.conjure'
+        }
+
+        conjure {
+            jerseyServer {
+                output project(':jersey-server').file('src/main/java')
+            }
+        }
+        """
+
+        when:
+        def result = run('--parallel', 'check', 'tasks')
+
+        then:
+        result.task(':jersey-server:check').outcome == TaskOutcome.SUCCESS
+        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
+
+        file('jersey-server/src/main/java/test/api/StringExample.java').exists()
+        file('jersey-server/src/main/java/.gitignore').exists()
+    }
+
     def 'copies conjure imports into build directory and provides imports to conjure compiler'() {
         given:
         file('conjure-def/build.gradle') << """
