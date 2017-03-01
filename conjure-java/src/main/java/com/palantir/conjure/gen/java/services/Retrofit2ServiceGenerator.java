@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
-    private static final ClassName CALL_TYPE = ClassName.get("retrofit2.http", "Call");
+    private static final ClassName CALL_TYPE = ClassName.get("retrofit2", "Call");
 
     private static final Logger log = LoggerFactory.getLogger(Retrofit2ServiceGenerator.class);
 
