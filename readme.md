@@ -94,6 +94,9 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
    The empty string and the empty map/object are valid non-null values.
  * `binary`: a sequence of bytes. When present as a return value for a service
    method, encodes an output stream.
+ * `safelong`: a wrapper around a long type which enforces the value is safely
+   representable as an integer in javascript (in javascript, between
+   `Number.MIN_SAFE_INTEGER and Number.MAX_SAFE_INTEGER`).
 
 ### Imported Types
 External types, or imports, consist of references to types defined outside

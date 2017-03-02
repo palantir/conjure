@@ -30,6 +30,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 OptionalTypeParser.INSTANCE,
                 AnyTypeParser.INSTANCE,
                 BinaryTypeParser.INSTANCE,
+                SafeLongTypeParser.INSTANCE,
                 ImportedTypeReferenceParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
 
@@ -177,6 +178,20 @@ public enum TypeParser implements Parser<ConjureType> {
 
             KeyValue<ConjureType, ConjureType> types = kv.parse(input);
             return MapType.of(types.getKey(), types.getValue());
+        }
+    }
+
+    private enum SafeLongTypeParser implements Parser<SafeLongType> {
+        INSTANCE;
+
+        @Override
+        public SafeLongType parse(ParserState input) throws ParseException {
+            ExpectationResult result = Parsers.expect("safelong").parse(input);
+            if (Parsers.nullOrUnexpected(result)) {
+                return null;
+            }
+
+            return SafeLongType.of();
         }
     }
 }

@@ -23,6 +23,7 @@ import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
+import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import java.util.Set;
@@ -109,6 +110,11 @@ public final class TypeMapper {
 
         @Override
         public Void visit(BinaryType binaryType) {
+            return null;
+        }
+
+        @Override
+        public Void visit(SafeLongType safeLongType) {
             return null;
         }
 
@@ -200,6 +206,11 @@ public final class TypeMapper {
         public String visit(BinaryType binaryType) {
             // TODO(jellis): support this
             throw new RuntimeException("BinaryType not supported by conjure-typescript");
+        }
+
+        @Override
+        public String visit(SafeLongType safeLongType) {
+            return "number";
         }
 
     }

@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
+import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.squareup.javapoet.ClassName;
@@ -62,6 +63,11 @@ public final class Retrofit2ReturnTypeClassNameVisitor implements ClassNameVisit
     @Override
     public TypeName visit(SetType setType) {
         return delegate.visit(setType);
+    }
+
+    @Override
+    public TypeName visit(SafeLongType safeLongType) {
+        return delegate.visit(safeLongType);
     }
 
     @Override

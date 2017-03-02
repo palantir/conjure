@@ -17,8 +17,10 @@ import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
+import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
+import com.palantir.conjure.lib.SafeLong;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -130,6 +132,11 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     @Override
     public TypeName visit(BinaryType binaryType) {
         return ClassName.get(ByteBuffer.class);
+    }
+
+    @Override
+    public TypeName visit(SafeLongType safeLongType) {
+        return ClassName.get(SafeLong.class);
     }
 
     private static TypeName boxIfPrimitive(TypeName type) {

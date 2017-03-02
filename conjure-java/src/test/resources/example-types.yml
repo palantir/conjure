@@ -8,6 +8,9 @@ types:
       IntegerExample:
         fields:
           integer: integer
+      SafeLongExample:
+        fields:
+          safeLongValue: safelong
       DoubleExample:
         fields:
           doubleValue: double

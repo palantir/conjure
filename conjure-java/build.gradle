@@ -18,6 +18,7 @@ tasks.checkstyleIntegrationInput.enabled = false
 
 dependencies {
     compile project(':conjure-core')
+    compile project(':conjure-java-lib')
 
     compile 'com.google.guava:guava'
     compile 'com.fasterxml.jackson.core:jackson-databind'
@@ -32,6 +33,7 @@ dependencies {
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
 
+    integrationInputCompile project(':conjure-java-lib')
     integrationInputCompile 'com.fasterxml.jackson.core:jackson-databind'
     integrationInputCompile 'com.google.guava:guava'
 

@@ -22,4 +22,6 @@ public interface ConjureTypeVisitor<T> {
 
     T visit(BinaryType binaryType);
 
+    T visit(SafeLongType safeLongType);
+
 }

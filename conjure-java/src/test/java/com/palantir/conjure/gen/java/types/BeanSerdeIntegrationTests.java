@@ -6,15 +6,22 @@ package com.palantir.conjure.gen.java.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.remoting2.ext.jackson.ObjectMappers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import test.api.BooleanExample;
 import test.api.ListExample;
 import test.api.MapExample;
+import test.api.SafeLongExample;
 import test.api.SetExample;
 
 public final class BeanSerdeIntegrationTests {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final ObjectMapper mapper = ObjectMappers.guavaJdk7Jdk8();
 
@@ -31,6 +38,18 @@ public final class BeanSerdeIntegrationTests {
     @Test
     public void testMapExampleSerde() throws Exception {
         testSerde("{\"items\": {\"one\": \"eins\", \"two\": \"二\"}}", MapExample.class);
+    }
+
+    @Test
+    public void testSafeLongExampleSerde() throws Exception {
+        testSerde("{\"safeLongValue\": 9007199254740991}", SafeLongExample.class);
+    }
+
+    @Test
+    public void testSafeLongExampleSerde_tooLarge() throws Exception {
+        expectedException.expect(JsonMappingException.class);
+        expectedException.expectMessage("number must be safely representable in javascript");
+        testSerde("{\"safeLongValue\": 9007199254740992}", SafeLongExample.class);
     }
 
     @Test
