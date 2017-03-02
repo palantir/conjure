@@ -75,4 +75,16 @@ public interface TestService {
     @GET
     @Path("/datasets/{dataset-rid}/testParam")
     Optional<String> testParam(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("dataset-rid") ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/boolean")
+    boolean testBoolean(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @GET
+    @Path("/double")
+    double testDouble(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @GET
+    @Path("/integer")
+    int testInteger(@HeaderParam("Authorization") AuthHeader authHeader);
 }

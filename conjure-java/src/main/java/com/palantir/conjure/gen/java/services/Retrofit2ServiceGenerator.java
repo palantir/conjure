@@ -112,7 +112,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         if (endpointDef.returns().isPresent()) {
             methodBuilder.returns(
-                    ParameterizedTypeName.get(CALL_TYPE, returnTypeMapper.getClassName(endpointDef.returns().get())));
+                    ParameterizedTypeName.get(CALL_TYPE,
+                            returnTypeMapper.getClassName(endpointDef.returns().get()).box()));
         } else {
             methodBuilder.returns(ParameterizedTypeName.get(CALL_TYPE, ClassName.get(Void.class)));
         }
@@ -234,6 +235,5 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 throw new IllegalArgumentException("Unrecognized HTTP method: " + method);
         }
     }
-
 
 }

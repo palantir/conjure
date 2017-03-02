@@ -5,7 +5,10 @@ import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
 import com.palantir.foundry.catalog.api.datasets.Dataset;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
+import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Double;
+import java.lang.Integer;
 import java.lang.String;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -61,4 +64,13 @@ public interface TestService {
 
     @GET("/catalog/datasets/{dataset-rid}/testParam")
     Call<Optional<String>> testParam(@Header("Authorization") AuthHeader authHeader, @Path("dataset-rid") ResourceIdentifier datasetRid);
+
+    @GET("/catalog/boolean")
+    Call<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);
+
+    @GET("/catalog/double")
+    Call<Double> testDouble(@Header("Authorization") AuthHeader authHeader);
+
+    @GET("/catalog/integer")
+    Call<Integer> testInteger(@Header("Authorization") AuthHeader authHeader);
 }

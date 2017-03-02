@@ -130,3 +130,16 @@ services:
             param-id: dataset-rid
             param-type: path
         returns: optional<string>
+        
+      testBoolean:
+        http: GET /boolean
+        returns: boolean
+
+      testDouble:
+        http: GET /double
+        returns: double
+      
+      testInteger:
+        http: GET /integer
+        returns: integer
+       
