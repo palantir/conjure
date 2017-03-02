@@ -241,7 +241,16 @@ class ConjurePluginTest extends GradleTestSpec {
 
         evaluationDependsOn(':conjure-def')
 
-        tasks.check.dependsOn project(':conjure-def').tasks.compileConjure
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            compile 'com.fasterxml.jackson.core:jackson-databind:2.6.7'
+            compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+        }
+
+        tasks.compileJava.dependsOn project(':conjure-def').tasks.compileConjure
         """
         file('conjure-def/build.gradle') << """
         plugins {
@@ -259,7 +268,7 @@ class ConjurePluginTest extends GradleTestSpec {
         def result = run('--parallel', 'check', 'tasks')
 
         then:
-        result.task(':jersey-server:check').outcome == TaskOutcome.SUCCESS
+        result.task(':jersey-server:compileJava').outcome == TaskOutcome.SUCCESS
         result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
         result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
         result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
