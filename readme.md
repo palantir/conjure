@@ -201,7 +201,7 @@ should follow the Java style naming convention: `com.example.name`
 This manifests in the generated languages as follows:
 
 * Java - the Conjure package name is the Java package name
-* TypeScript - the folder containing the object is the Conjure pakcage
+* TypeScript - the folder containing the object is the Conjure package
 name with the first two segments removed (this is done for brevity).
 For example: `com.example.folder1.folder2 -> folder1/folder2`
 
