@@ -129,7 +129,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 value -> value.value(),
                 value -> CastExpression.builder()
                         .expression(StringExpression.of(value.value()))
-                        .type(typeName)
+                        .type(StringExpression.of(value.value()).emitToString())
                         .build()));
         JsonExpression constantRhs = JsonExpression.builder().putAllKeyValues(jsonMap).build();
         AssignStatement constant = AssignStatement.builder().lhs("export const " + typeName).rhs(constantRhs).build();
