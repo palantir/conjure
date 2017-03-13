@@ -541,6 +541,10 @@ conjure {
 
 To generate source, run `compileConjure`.
 
+Note that you will need to define the dependencies of the generated Java files in the
+subprojects that they are written to. For example, [consider this test]
+(https://github.palantir.build/foundry/conjure/blob/develop/conjure-gradle-plugin/src/test/groovy/com/palantir/conjure/gradle/ConjurePluginTest.groovy#L237).
+
 ### TypeScript Publication
 The TypeScript Publication plugin enables publishing typescript artifacts from projects using Conjure.
 
