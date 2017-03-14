@@ -208,9 +208,9 @@ For example: `com.example.folder1.folder2 -> folder1/folder2`
 ### Defined Types
 Defined types consist of objects completely specified within the context of a
 Conjure file (possibly referencing other type aliases, primitive types,
-and built-ins). These types are either *Object Definitions* or *Enum Definitions*.
-Both types of objects consist of, minimally, a type alias, an optional
-package name and optional documentation.
+and built-ins). These types are *Object Definitions*, *Enum Definitions* or
+*Alias Definitions*. These types of objects consist of, minimally, a type
+alias, an optional package name and optional documentation.
 
 Conjure renderers will use the type alias as the object name, and will emit
 the object definition in the defined package or fall-back to the
@@ -295,7 +295,7 @@ definitions:
 
   # objects is a map from type alias (used in service definitions and
   # other types) to an object type definition.
-  objects:      
+  objects:
     BackingFileSystem:
       # Override the default package specified at the definitions level.
       package: com.palantir.foundry.catalog.api.datasets
