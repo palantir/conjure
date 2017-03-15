@@ -199,8 +199,9 @@ types:
 ```
 
 ### Packages
-Conjure supports packages, which are namespaces for objects. Package names
-should follow the Java style naming convention: `com.example.name`
+Package names are used by generator implementations to determine the output
+location and language-specific namespacing. Package names should follow the 
+Java style naming convention: `com.example.name`.
 
 This manifests in the generated languages as follows:
 
@@ -208,6 +209,10 @@ This manifests in the generated languages as follows:
 * TypeScript - the folder containing the object is the Conjure package
 name with the first two segments removed (this is done for brevity).
 For example: `com.example.folder1.folder2 -> folder1/folder2`
+
+Packages are not used for namespacing purposes within a Conjure file -- all 
+type names must be unique within a Conjure file, even across different types
+(e.g. an object definition and an enum definition).
 
 ### Defined Types
 Defined types consist of objects completely specified within the context of a
