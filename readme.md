@@ -64,13 +64,25 @@ Conjure and keep up with feature requests and bug fixes.
 
 Types
 -----
-Conjure's type system deals with two modes of types, imported types, defined
-outside of Conjure definition files but declared as explicit imports and given
-'local' names for use in a Conjure file and defined types, which are fully
-specified by other types within a Conjure file, primitives and built-ins.
+Conjure's type system deals with two modes of types: *imported types*, which are
+defined outside of Conjure definition files but declared as explicit imports
+and given 'local' names for use in a Conjure file, and *defined types*, which are
+fully specified by primitives, built-ins and types defined in a Conjure file.
 
-By convention, all primitive and built-in types use camel case, while all user
-defined types (e.g. imports and object definitions) use pascal case.
+By convention, all primitive and built-in types use camel case, while all
+user-defined types (e.g. imports and object definitions) use pascal case.
+
+### Rules
+* Type names must be unique with case-insensitive comparison. For example,
+  it is not legal for an imported type and an enum type to have the same type
+  name, even though the Conjure JSON format itself would not prevent this.
+* Types cannot have the same name as any of the Conjure primitives or built-ins.
+* The casing of a type may be changed in generated files to conform with the
+  language specification of the generated code. The requirement that all type
+  names be unique in a case-insensitive comparison guarantees that changing the
+  case will not introduce collisions.
+* Type names must contain only alphanumeric characters and underscores and must
+  start with a letter ([A-Za-z]).
 
 ### Primitives
 Base types in the system are:
@@ -79,7 +91,7 @@ Base types in the system are:
  * `double` (64-bit floating point numbers)
  * `boolean` `(true|false)`
 
-### Built-Ins
+### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language
 constructs and to simplify API building. These types are genericized by other
 defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
@@ -103,7 +115,7 @@ External types, or imports, consist of references to types defined outside
 the context of a Conjure file (possibly in other Conjure files, possibly
 in external systems). A `base-type` is provided as a hint to generators for
 how to handle this type when no external type reference is provided. Note
-that the `base-type` fallback mechanism will only work if the referenced type 
+that the `base-type` fallback mechanism will only work if the referenced type
 is serialized as a primitive -- if the imported type is a non-primitive JSON
 object, then even if a generator falls back on the `base-type` the resulting
 APIs will not handle serialization correctly.
@@ -200,7 +212,7 @@ types:
 
 ### Packages
 Package names are used by generator implementations to determine the output
-location and language-specific namespacing. Package names should follow the 
+location and language-specific namespacing. Package names should follow the
 Java style naming convention: `com.example.name`.
 
 This manifests in the generated languages as follows:
@@ -210,7 +222,7 @@ This manifests in the generated languages as follows:
 name with the first two segments removed (this is done for brevity).
 For example: `com.example.folder1.folder2 -> folder1/folder2`
 
-Packages are not used for namespacing purposes within a Conjure file -- all 
+Packages are not used for namespacing purposes within a Conjure file -- all
 type names must be unique within a Conjure file, even across different types
 (e.g. an object definition and an enum definition).
 
@@ -250,8 +262,13 @@ Docs may be included on this type by using the long form:
 Where docs is a standard string and generally treated throughout rendering as
 Markdown. Use YAML multiline-strings to help with formatting.
 
-Non-primitive types may include other defined type aliases (aliases may be used
-before definition) or leverage primitives and built-ins.
+The fields in a object definition can be primitives, built-ins, imports, type
+aliases or other objects. User-defined types can be used in fields before they
+are defined. If the type for a field is an object type, then the field is assumed
+to be non-`null`/`nil` -- if it is possible for a field to be absent, this should
+be encoded explicitly by specifying it within an `optional<>` built-in. This means
+that an object type definition can only be recursive if the type reference to
+itself is part of an `optional`, `list`, `set` or `map`.
 
 Field names must appear in either camel case or kebab case. Type renderers
 will respect casing for wire format, but may convert case formats to conform
@@ -259,11 +276,18 @@ with language restrictions. As a result, field names must be unique independent
 of case format (e.g. an object may not define both `caseFormat` and
 `case-format` as fields).
 
+Technically, any valid JSON string can be used as a JSON key, so the restriction
+that all field names must be camel case or kebab case means that there are
+specifications for valid JSON objects that cannot be generated by Conjure. This
+has not yet been an issue, but please file an issue if this is something that you
+encounter that causes pain. In the mean time, this can be worked around by
+defining an imported type that imports a compatible type that is defined externally.
+
 #### Enum Definitions
 Each enum definition consists of a type alias, an optional package, and a list
 of valid enumeration values. Values _must not_ include the special value `UNKNOWN`,
 which is reserved to represent an enumeration value that was found but unexpected
-in generated object code.
+in generated object code. Enumeration values are serialized as strings in JSON.
 
 Enum values must be uppercase words separated by underscores.
 
@@ -275,6 +299,8 @@ values:
  - [value]
  - [another value]
 ```
+
+The values specified in the values list must be unique.
 
 #### Alias Definitions
 As a convenience, Conjure offers the ability to alias primitive types so that
