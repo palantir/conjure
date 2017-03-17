@@ -413,6 +413,8 @@ this service.
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
  * `returns`: a valid Conjure type (`binary` not allowed)
+ * `docs`: a standard string and generally treated throughout rendering as
+   Markdown.
  * `args`: a map of argument names (typically in camel case) to argument
    definitions, where an argument may use the short-hand form:
 
