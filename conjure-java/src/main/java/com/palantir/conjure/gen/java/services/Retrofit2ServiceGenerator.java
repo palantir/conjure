@@ -53,9 +53,10 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
         ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
         TypeMapper typeMapper =
-                new TypeMapper(conjureDefinition.types(), conjureImports, settings.optionalTypeStrategy());
+                new TypeMapper(conjureDefinition.types(), conjureImports);
         TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
-                settings.optionalTypeStrategy(), Retrofit2ReturnTypeClassNameVisitor::new);
+                (types, importedTypes) -> new Retrofit2ReturnTypeClassNameVisitor(types, importedTypes
+                ));
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

@@ -61,7 +61,7 @@ public final class BeanGenerator implements TypeGenerator {
             String defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef) {
-        TypeMapper typeMapper = new TypeMapper(types, importedTypes, settings.optionalTypeStrategy());
+        TypeMapper typeMapper = new TypeMapper(types, importedTypes);
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {

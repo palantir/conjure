@@ -15,7 +15,6 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
-import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
@@ -23,9 +22,8 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
 
     private final DefaultClassNameVisitor delegate;
 
-    public JerseyReturnTypeClassNameVisitor(TypesDefinition types, ConjureImports importedTypes,
-            OptionalTypeStrategy optionalTypeStrategy) {
-        this.delegate = new DefaultClassNameVisitor(types, importedTypes, optionalTypeStrategy);
+    public JerseyReturnTypeClassNameVisitor(TypesDefinition types, ConjureImports importedTypes) {
+        this.delegate = new DefaultClassNameVisitor(types, importedTypes);
     }
 
     @Override

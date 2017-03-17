@@ -11,7 +11,6 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
-import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.squareup.javapoet.JavaFile;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,7 +34,6 @@ public final class JerseyServiceGeneratorTests {
 
         ServiceGenerator gen = new JerseyServiceGenerator(Settings.builder()
                 .ignoreUnknownProperties(false)
-                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build());
 
         Set<JavaFile> files = gen.generate(def, null);

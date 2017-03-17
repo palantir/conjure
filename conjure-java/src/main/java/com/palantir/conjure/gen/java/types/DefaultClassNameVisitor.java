@@ -19,12 +19,12 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
-import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.palantir.conjure.lib.SafeLong;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
@@ -37,13 +37,10 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     private final TypesDefinition types;
     private final ConjureImports importedTypes;
-    private final OptionalTypeStrategy optionalTypeStrategy;
 
-    DefaultClassNameVisitor(TypesDefinition types, ConjureImports importedTypes,
-            OptionalTypeStrategy optionalTypeStrategy) {
+    DefaultClassNameVisitor(TypesDefinition types, ConjureImports importedTypes) {
         this.types = types;
         this.importedTypes = importedTypes;
-        this.optionalTypeStrategy = optionalTypeStrategy;
     }
 
     @Override
@@ -66,7 +63,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(OptionalType type) {
-        if (type.itemType() instanceof PrimitiveType && optionalTypeStrategy == OptionalTypeStrategy.JAVA8) {
+        if (type.itemType() instanceof PrimitiveType) {
             // special handling for primitive optionals with Java 8
             switch ((PrimitiveType) type.itemType()) {
                 case DOUBLE:
@@ -80,12 +77,13 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                     // treat normally
             }
         }
+
         TypeName itemType = type.itemType().visit(this);
         if (itemType.isPrimitive()) {
-            // safe for primitives (Guava case or Booleans with Java 8)
+            // Safe for primitives (e.g. Booleans with Java 8)
             itemType = itemType.box();
         }
-        return ParameterizedTypeName.get(optionalTypeStrategy.getClassName(), itemType);
+        return ParameterizedTypeName.get(ClassName.get(Optional.class), itemType);
     }
 
     @Override
@@ -145,5 +143,4 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
         }
         return type;
     }
-
 }

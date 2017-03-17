@@ -8,7 +8,6 @@ import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
-import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.util.Collections;
@@ -92,7 +91,6 @@ public class ConjurePlugin implements Plugin<Project> {
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(false)
                 .supportUnknownEnumValues(false)
-                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build();
         task.setServiceGenerator(new JerseyServiceGenerator(settings));
         task.setTypeGenerator(new BeanGenerator(settings));
@@ -115,7 +113,6 @@ public class ConjurePlugin implements Plugin<Project> {
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(true)
                 .supportUnknownEnumValues(true)
-                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build();
         task.setServiceGenerator(new JerseyServiceGenerator(settings));
         task.setTypeGenerator(new BeanGenerator(settings));
@@ -138,7 +135,6 @@ public class ConjurePlugin implements Plugin<Project> {
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(true)
                 .supportUnknownEnumValues(true)
-                .optionalTypeStrategy(OptionalTypeStrategy.JAVA8)
                 .build();
         task.setServiceGenerator(new Retrofit2ServiceGenerator(settings));
         task.setTypeGenerator(new BeanGenerator(settings));

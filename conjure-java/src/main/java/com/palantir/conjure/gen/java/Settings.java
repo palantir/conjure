@@ -4,16 +4,10 @@
 
 package com.palantir.conjure.gen.java;
 
-import com.palantir.conjure.gen.java.types.TypeMapper.OptionalTypeStrategy;
 import org.immutables.value.Value;
 
 @Value.Immutable
 public interface Settings {
-
-    @Value.Default
-    default OptionalTypeStrategy optionalTypeStrategy() {
-        return OptionalTypeStrategy.JAVA8;
-    }
 
     @Value.Default
     default boolean ignoreUnknownProperties() {
@@ -34,5 +28,4 @@ public interface Settings {
     }
 
     class Builder extends ImmutableSettings.Builder {}
-
 }

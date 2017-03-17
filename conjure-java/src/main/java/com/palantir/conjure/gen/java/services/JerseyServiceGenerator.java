@@ -48,9 +48,10 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
         ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
         TypeMapper typeMapper =
-                new TypeMapper(conjureDefinition.types(), conjureImports, settings.optionalTypeStrategy());
+                new TypeMapper(conjureDefinition.types(), conjureImports);
         TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
-                settings.optionalTypeStrategy(), JerseyReturnTypeClassNameVisitor::new);
+                (types, importedTypes) -> new JerseyReturnTypeClassNameVisitor(types, importedTypes
+                ));
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

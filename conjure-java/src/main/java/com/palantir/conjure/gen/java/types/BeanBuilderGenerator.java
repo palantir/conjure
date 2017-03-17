@@ -106,9 +106,7 @@ public final class BeanBuilderGenerator {
         } else if (field.type() instanceof MapType) {
             spec.initializer("new $T<>()", LinkedHashMap.class);
         } else if (field.type() instanceof OptionalType) {
-            spec.initializer("$T.$L()",
-                    asRawType(typeMapper.getClassName(field.type())),
-                    typeMapper.getAbsentMethodName());
+            spec.initializer("$T.empty()", asRawType(typeMapper.getClassName(field.type())));
         }
         // else no initializer
 
@@ -256,7 +254,7 @@ public final class BeanBuilderGenerator {
             }
         }
         return CodeBlocks.statement("this.$1N = $2T.of($3T.requireNonNull($1N, \"$1N cannot be null\"))",
-                field.name, typeMapper.getOptionalType(), Objects.class);
+                field.name, Optional.class, Objects.class);
     }
 
     private static MethodSpec createItemSetter(
