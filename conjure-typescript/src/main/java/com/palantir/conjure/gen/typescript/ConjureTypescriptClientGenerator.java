@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.typescript;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.Conjure;
@@ -64,7 +63,7 @@ public final class ConjureTypescriptClientGenerator {
         try {
             indexFile.writeTo(outputDir);
         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -23,9 +23,7 @@ public final class Retrofit2ServiceGeneratorTests {
     public void testComposition() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-service.yml"));
 
-        ServiceGenerator gen = new Retrofit2ServiceGenerator(Settings.builder()
-                .ignoreUnknownProperties(false)
-                .build());
+        ServiceGenerator gen = new Retrofit2ServiceGenerator();
 
         Set<JavaFile> files = gen.generate(def, null);
 

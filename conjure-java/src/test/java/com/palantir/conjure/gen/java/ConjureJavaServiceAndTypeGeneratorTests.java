@@ -57,7 +57,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
-                new JerseyServiceGenerator(settings),
+                new JerseyServiceGenerator(),
                 new BeanGenerator(settings), null);
         generator.emit(conjure, src);
 
@@ -77,7 +77,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
-                new JerseyServiceGenerator(settings),
+                new JerseyServiceGenerator(),
                 new BeanGenerator(settings), Paths.get("src/test"));
         generator.emit(conjure, src);
 

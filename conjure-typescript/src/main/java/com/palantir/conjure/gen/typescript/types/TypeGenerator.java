@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.typescript.types;
 
-import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
@@ -29,7 +28,7 @@ public interface TypeGenerator {
             try {
                 file.writeTo(outputDir);
             } catch (IOException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         });
     }

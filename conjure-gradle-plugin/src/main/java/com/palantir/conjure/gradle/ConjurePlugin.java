@@ -92,7 +92,7 @@ public class ConjurePlugin implements Plugin<Project> {
                 .ignoreUnknownProperties(false)
                 .supportUnknownEnumValues(false)
                 .build();
-        task.setServiceGenerator(new JerseyServiceGenerator(settings));
+        task.setServiceGenerator(new JerseyServiceGenerator());
         task.setTypeGenerator(new BeanGenerator(settings));
 
         return task;
@@ -114,7 +114,7 @@ public class ConjurePlugin implements Plugin<Project> {
                 .ignoreUnknownProperties(true)
                 .supportUnknownEnumValues(true)
                 .build();
-        task.setServiceGenerator(new JerseyServiceGenerator(settings));
+        task.setServiceGenerator(new JerseyServiceGenerator());
         task.setTypeGenerator(new BeanGenerator(settings));
 
         return task;
@@ -136,7 +136,7 @@ public class ConjurePlugin implements Plugin<Project> {
                 .ignoreUnknownProperties(true)
                 .supportUnknownEnumValues(true)
                 .build();
-        task.setServiceGenerator(new Retrofit2ServiceGenerator(settings));
+        task.setServiceGenerator(new Retrofit2ServiceGenerator());
         task.setTypeGenerator(new BeanGenerator(settings));
 
         return task;

@@ -32,10 +32,7 @@ public final class JerseyServiceGeneratorTests {
     private void testServiceGeneration(String resource) throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream(resource));
 
-        ServiceGenerator gen = new JerseyServiceGenerator(Settings.builder()
-                .ignoreUnknownProperties(false)
-                .build());
-
+        ServiceGenerator gen = new JerseyServiceGenerator();
         Set<JavaFile> files = gen.generate(def, null);
 
         for (JavaFile file : files) {

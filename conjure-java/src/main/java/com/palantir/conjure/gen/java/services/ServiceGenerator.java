@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.java.services;
 
-import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.squareup.javapoet.JavaFile;
@@ -29,7 +28,7 @@ public interface ServiceGenerator {
             try {
                 f.writeTo(outputDir);
             } catch (IOException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         });
     }

@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
@@ -26,7 +25,7 @@ public interface TypeGenerator {
             try {
                 file.writeTo(outputDir);
             } catch (IOException e) {
-                Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         });
     }
