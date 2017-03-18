@@ -33,14 +33,14 @@ public final class BeanJavaTypeGeneratorTests {
     public void testEnumJavaGenerator_withNoUnknown() throws IOException {
         ConjureDefinition def = Conjure.parse(
                 "types:\n"
-                + "  definitions:\n"
-                + "    default-package: test.api\n"
-                + "    objects:\n"
-                + "      BareEnumExample:\n"
-                + "        docs: An enum that's just an enum.\n"
-                + "        values:\n"
-                + "          - ONE\n"
-                + "          - TWO\n");
+                        + "  definitions:\n"
+                        + "    default-package: test.api\n"
+                        + "    objects:\n"
+                        + "      BareEnumExample:\n"
+                        + "        docs: An enum that's just an enum.\n"
+                        + "        values:\n"
+                        + "          - ONE\n"
+                        + "          - TWO\n");
 
         Set<JavaFile> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
                 .generate(def, null);

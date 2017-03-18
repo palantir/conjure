@@ -5,11 +5,9 @@
 package com.palantir.conjure.gen.java.services;
 
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.squareup.javapoet.JavaFile;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -17,21 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public interface ServiceGenerator {
 
     /** Returns the set of Java files generated from the service definitions in the given conjure specification. */
-    Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir);
-
-    /**
-     * Writes the Java files generated from the service definitions in the given conjure specification to the given
-     * directory.
-     */
-    default void emit(ConjureDefinition conjureDefinition, Path baseDir, File outputDir) {
-        generate(conjureDefinition, baseDir).forEach(f -> {
-            try {
-                f.writeTo(outputDir);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
+    Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports);
 
     static Optional<String> getJavaDoc(EndpointDefinition endpointDef) {
         Optional<String> depr = endpointDef.deprecated()

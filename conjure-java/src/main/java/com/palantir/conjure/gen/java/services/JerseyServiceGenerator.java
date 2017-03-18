@@ -7,7 +7,6 @@ package com.palantir.conjure.gen.java.services;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
@@ -26,7 +25,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,12 +36,11 @@ import org.apache.commons.lang3.StringUtils;
 public final class JerseyServiceGenerator implements ServiceGenerator {
 
     @Override
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, Path baseDir) {
-        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjureDefinition, baseDir);
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
         TypeMapper typeMapper =
-                new TypeMapper(conjureDefinition.types(), conjureImports);
+                new TypeMapper(conjureDefinition.types(), imports);
         TypeMapper returnTypeMapper =
-                new TypeMapper(conjureDefinition.types(), conjureImports, JerseyReturnTypeClassNameVisitor::new);
+                new TypeMapper(conjureDefinition.types(), imports, JerseyReturnTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

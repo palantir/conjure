@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.gen.java.ConjureJavaServiceAndTypeGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
@@ -69,13 +70,14 @@ public class CompileConjureJavaTask extends SourceTask {
 
     private void compileFile(Path path, Path baseDir) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
+        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, baseDir);
 
-        ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
-                serviceGenerator, typeGenerator, baseDir);
+        ConjureJavaServiceAndTypeGenerator generator =
+                new ConjureJavaServiceAndTypeGenerator(serviceGenerator, typeGenerator);
 
         File outputDir = getOutputDirectory();
         checkState(outputDir.exists() || outputDir.mkdirs(), "Unable to make directory tree %s", outputDir);
-        generator.emit(conjure, outputDir);
+        generator.emit(conjure, imports, outputDir);
     }
 
 }

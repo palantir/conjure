@@ -6,11 +6,14 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
@@ -34,32 +37,35 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
         ServiceGenerator serviceGenerator = mock(ServiceGenerator.class);
         TypeGenerator typeGenerator = mock(TypeGenerator.class);
         ConjureJavaServiceAndTypeGenerator generator =
-                new ConjureJavaServiceAndTypeGenerator(serviceGenerator, typeGenerator, null);
+                new ConjureJavaServiceAndTypeGenerator(serviceGenerator, typeGenerator);
 
         TypesDefinition types = mock(TypesDefinition.class);
         ConjureDefinition conjureDefinition = ConjureDefinition.builder()
                 .types(types)
                 .build();
 
-        generator.generate(conjureDefinition);
-        verify(serviceGenerator).generate(conjureDefinition, null);
-        verify(typeGenerator).generate(conjureDefinition, null);
+        ConjureImports imports = new ConjureImports(ImmutableMap.of());
+
+        generator.generate(conjureDefinition, imports);
+        verify(serviceGenerator).generate(conjureDefinition, imports);
+        verify(typeGenerator).generate(conjureDefinition, imports);
 
         File outputDir = folder.newFolder();
-        generator.emit(conjureDefinition, outputDir);
-        verify(serviceGenerator).emit(conjureDefinition, null, outputDir);
-        verify(typeGenerator).emit(conjureDefinition, null, outputDir);
+        generator.emit(conjureDefinition, imports, outputDir);
+        verify(serviceGenerator, times(2)).generate(conjureDefinition, imports);
+        verify(typeGenerator, times(2)).generate(conjureDefinition, imports);
     }
 
     @Test
     public void smokeTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-service.yml"));
+        ConjureImports imports = new ConjureImports(ImmutableMap.of());
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(),
-                new BeanGenerator(settings), null);
-        generator.emit(conjure, src);
+                new BeanGenerator(settings));
+        generator.emit(conjure, imports, src);
 
         assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
                 .contains("public final class CreateDatasetRequest");
@@ -74,12 +80,13 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
     @Test
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, Paths.get("src/test"));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(),
-                new BeanGenerator(settings), Paths.get("src/test"));
-        generator.emit(conjure, src);
+                new BeanGenerator(settings));
+        generator.emit(conjure, imports, src);
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "test/api/with/imports/ComplexObjectWithImports.java"))
