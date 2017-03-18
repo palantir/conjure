@@ -44,7 +44,6 @@ class GradleTestSpec extends Specification {
         def splitted = path.split('/')
         def directory = splitted.size() > 1 ? directory(splitted[0..-2].join('/'), baseDir) : baseDir
         def file = new File(directory, splitted[-1])
-        file.createNewFile()
         file
     }
 

@@ -11,15 +11,60 @@ import org.gradle.testkit.runner.TaskOutcome
 class ConjurePluginTest extends GradleTestSpec {
 
     def setup() {
-        file('settings.gradle') << """
-        include 'conjure-def'
-        include 'jersey-server'
-        include 'jersey-client'
-        include 'retrofit-client'
-        include 'typescript-client'
+        createFile('settings.gradle') << """
+        include 'api'
+        include 'api:api-objects'
+        include 'api:jersey-server'
+        include 'api:jersey-client'
+        include 'api:retrofit-client'
+        include 'api:typescript-client'
+        include 'server'
         """
 
-        file('conjure-def/src/main/conjure/api.yml') << """
+        createFile('build.gradle') << """
+        buildscript {
+            repositories {
+                maven {
+                    url 'https://artifactory.palantir.build/artifactory/all-jar/'
+                }
+            }
+
+            dependencies {
+                classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
+            }
+        }
+        allprojects {
+            version '0.1.0'
+            group 'com.palantir.conjure.test'
+
+            repositories {
+                maven {
+                    url 'https://artifactory.palantir.build/artifactory/all-jar/'
+                }
+            }
+            apply plugin: 'nebula.dependency-recommender'
+
+            dependencyRecommendations {
+                propertiesFile file: project.rootProject.file('versions.props')
+            }
+
+            configurations.all {
+                resolutionStrategy {
+                    failOnVersionConflict()
+                }
+            }
+        }
+        """
+
+        createFile('versions.props') << """
+        com.fasterxml.jackson.*:* = 2.6.7
+        com.google.guava:guava = 18.0
+        com.palantir.conjure:conjure-java-lib = 0.25.0
+        com.squareup.retrofit2:retrofit = 2.1.0
+        javax.ws.rs:javax.ws.rs-api = 2.0.1
+        """
+
+        createFile('api/src/main/conjure/api.yml') << """
         types:
           definitions:
             default-package: test.test.api
@@ -39,228 +84,61 @@ class ConjurePluginTest extends GradleTestSpec {
                   object: StringExample
                 returns: StringExample
         """
-
-        directory('jersey-server')
-        directory('jersey-client')
-        directory('retrofit-client')
-        directory('typescript-client')
     }
 
-    def 'compile just jersey server'() {
+    def 'compileConjure generates code in subprojects'() {
         given:
-        file('conjure-def/build.gradle') << """
+        createFile('api/build.gradle') << """
         plugins {
             id 'com.palantir.conjure'
-        }
-
-        conjure {
-            jerseyServer {
-                output project(':jersey-server').file('src/main/java')
-            }
         }
         """
 
         when:
-        def result = run(':conjure-def:compileConjure')
+        def result = run(':api:compileConjure')
 
         then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyClient').outcome == TaskOutcome.SKIPPED
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyClient').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureRetrofitClient').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureTypeScriptClient').outcome == TaskOutcome.SUCCESS
 
-        file('jersey-server/src/main/java/test/test/api/StringExample.java').exists()
-        !file('jersey-server/src/main/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
+        file('api/jersey-server/src/generated/java/test/test/api/StringExample.java').exists()
+        !file('api/jersey-server/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
 
-        file('jersey-server/src/main/java/.gitignore').exists()
-        file('jersey-server/src/main/java/.gitignore').text.contains('*.java')
+        file('api/jersey-server/src/generated/java/.gitignore').exists()
+        file('api/jersey-server/src/generated/java/.gitignore').text.contains('*.java')
     }
 
-    def 'compile just jersey client'() {
+    def 'check code compiles'() {
         given:
-        file('conjure-def/build.gradle') << """
+        createFile('api/build.gradle') << """
         plugins {
             id 'com.palantir.conjure'
-        }
-
-        conjure {
-            jerseyClient {
-                output project(':jersey-client').file('src/main/java')
-            }
         }
         """
 
         when:
-        def result = run(':conjure-def:compileConjure')
+        def result = run('check')
 
         then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SKIPPED
-        result.task(':conjure-def:compileConjureJerseyClient').outcome == TaskOutcome.SUCCESS
+        result.task(':api:jersey-server:compileJava').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
 
-        file('jersey-client/src/main/java/test/test/api/StringExample.java').exists()
-        file('jersey-client/src/main/java/test/test/api/StringExample.java').text.contains('ignoreUnknown = true')
-
-        file('jersey-client/src/main/java/.gitignore').exists()
-        file('jersey-client/src/main/java/.gitignore').text.contains('*.java')
+        file('api/jersey-server/src/generated/java/test/test/api/StringExample.java').exists()
+        file('api/jersey-server/src/generated/java/.gitignore').exists()
     }
 
-    def 'compile just retrofit client'() {
+
+    def 'check code compiles when run in parallel with multiple build targets'() {
         given:
-        file('conjure-def/build.gradle') << """
+        createFile('api/build.gradle') << """
         plugins {
             id 'com.palantir.conjure'
-        }
-
-        conjure {
-            retrofitClient {
-                output project(':retrofit-client').file('src/main/java')
-            }
-        }
-        """
-
-        when:
-        def result = run(':conjure-def:compileConjure')
-
-        then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SKIPPED
-        result.task(':conjure-def:compileConjureJerseyClient').outcome == TaskOutcome.SKIPPED
-        result.task(':conjure-def:compileConjureRetrofitClient').outcome == TaskOutcome.SUCCESS
-
-        file('retrofit-client/src/main/java/test/test/api/TestServiceA.java').exists()
-        file('retrofit-client/src/main/java/test/test/api/TestServiceA.java').text.contains('import retrofit2.')
-
-        file('retrofit-client/src/main/java/.gitignore').exists()
-        file('retrofit-client/src/main/java/.gitignore').text.contains('*.java')
-    }
-
-    def 'compile just typescript client'() {
-        given:
-        file('conjure-def/build.gradle') << """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-
-        conjure {
-            typeScriptClient {
-                output project(':typescript-client').file('src')
-            }
-        }
-        """
-
-        when:
-        def result = run(':conjure-def:compileConjure')
-
-        then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureTypeScriptClient').outcome == TaskOutcome.SUCCESS
-
-        file('typescript-client/src/index.ts').exists()
-        file('typescript-client/src/index.ts').text.contains('api/stringExample')
-
-        file('typescript-client/src/.gitignore').exists()
-        file('typescript-client/src/.gitignore').text.contains('*.ts')
-    }
-
-    def 'compile just typescript client with multiple conjure definitions'() {
-        given:
-        file('conjure-def/build.gradle') << """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-
-        conjure {
-            typeScriptClient {
-                output project(':typescript-client').file('src')
-            }
-        }
-        """
-        file('conjure-def/src/main/conjure/api2.yml') << """
-        types:
-          definitions:
-            default-package: test.test.api
-            objects:
-              IntegerExample:
-                fields:
-                  integer: integer
-        """
-
-        when:
-        def result = run(':conjure-def:compileConjure')
-
-        then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureTypeScriptClient').outcome == TaskOutcome.SUCCESS
-
-        file('typescript-client/src/index.ts').exists()
-        file('typescript-client/src/index.ts').text.contains('api/stringExample')
-        file('typescript-client/src/index.ts').text.contains('api/integerExample')
-    }
-
-    def 'compile just jersey server and client'() {
-        given:
-        file('conjure-def/build.gradle') << """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-
-        conjure {
-            jerseyServer {
-                output project(':jersey-server').file('src/main/java')
-            }
-            jerseyClient {
-                output project(':jersey-client').file('src/main/java')
-            }
-        }
-        """
-
-        when:
-        def result = run(':conjure-def:compileConjure')
-
-        then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyClient').outcome == TaskOutcome.SUCCESS
-
-        file('jersey-server/src/main/java/test/api/StringExample.java').exists()
-        file('jersey-client/src/main/java/test/api/StringExample.java').exists()
-        file('jersey-server/src/main/java/.gitignore').exists()
-        file('jersey-client/src/main/java/.gitignore').exists()
-    }
-
-    def 'run in parallel with multiple targets'() {
-        given:
-        file('jersey-server/build.gradle') << """
-        apply plugin: 'java'
-
-        evaluationDependsOn(':conjure-def')
-
-        repositories {
-            jcenter()
-        }
-
-        dependencies {
-            compile 'com.fasterxml.jackson.core:jackson-databind:2.6.7'
-            compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
-        }
-
-        tasks.compileJava.dependsOn project(':conjure-def').tasks.compileConjure
-        """
-        file('conjure-def/build.gradle') << """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-
-        conjure {
-            jerseyServer {
-                output project(':jersey-server').file('src/main/java')
-            }
         }
         """
 
@@ -268,34 +146,75 @@ class ConjurePluginTest extends GradleTestSpec {
         def result = run('--parallel', 'check', 'tasks')
 
         then:
-        result.task(':jersey-server:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
+        result.task(':api:jersey-server:compileJava').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
 
-        file('jersey-server/src/main/java/test/api/StringExample.java').exists()
-        file('jersey-server/src/main/java/.gitignore').exists()
+        file('api/jersey-server/src/generated/java/test/test/api/StringExample.java').exists()
+        file('api/jersey-server/src/generated/java/.gitignore').exists()
+    }
+
+    def 'check publication'() {
+        given:
+        createFile('api/build.gradle') << """
+        plugins {
+            id 'com.palantir.conjure'
+        }
+        """
+
+        file('server/build.gradle') << """
+        buildscript {
+            repositories {
+                maven {
+                    url 'https://artifactory.palantir.build/artifactory/all-jar/'
+                }
+            }
+            dependencies {
+                classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
+            }
+        }
+        apply plugin: 'java'
+        apply plugin: 'nebula.maven-base-publish'
+        apply plugin: 'nebula.maven-resolved-dependencies'
+        apply plugin: 'nebula.javadoc-jar'
+        apply plugin: 'nebula.source-jar'
+
+        dependencies {
+            compile project(':api:jersey-server')
+        }
+        """
+
+        when:
+        def result = run('--parallel', 'publishToMavenLocal')
+
+        then:
+        result.task(':api:jersey-server:compileJava').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
+
+        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/').exists()
+        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/api-jersey-server/0.1.0/api-jersey-server-0.1.0.pom').exists()
+        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').exists()
+        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').text.contains('>api-jersey-server<')
     }
 
     def 'copies conjure imports into build directory and provides imports to conjure compiler'() {
         given:
-        file('conjure-def/build.gradle') << """
+        createFile('api/build.gradle') << """
         plugins {
             id 'com.palantir.conjure'
         }
 
         conjure {
             conjureImports files('external-import.yml')
-
-            jerseyServer {
-                output project(':jersey-server').file('src/main/java')
-            }
-            jerseyClient {
-                output project(':jersey-client').file('src/main/java')
-            }
         }
+
+        // TODO(melliot): TypeScript does not support imports
+        tasks.getByName('compileConjureTypeScriptClient').enabled = false
         """
-        file('conjure-def/src/main/conjure/conjure.yml') << """
+        createFile('api/src/main/conjure/conjure.yml') << """
         types:
           conjure-imports:
             externalImport: external-imports/external-import.yml
@@ -307,7 +226,7 @@ class ConjurePluginTest extends GradleTestSpec {
         services:
           TestServiceA:
             name: Test Service A
-            package: test.api
+            package: test.x.api
 
             endpoints:
               get:
@@ -316,7 +235,7 @@ class ConjurePluginTest extends GradleTestSpec {
                   object: externalImport.ExternalImport
                 returns: internalImport.InternalImport
         """
-        file('conjure-def/src/main/conjure/internal-import.yml') << """
+        createFile('api/src/main/conjure/internal-import.yml') << """
         types:
           definitions:
             default-package: test.a.api
@@ -325,7 +244,7 @@ class ConjurePluginTest extends GradleTestSpec {
                 fields:
                   stringField: string
         """
-        file('conjure-def/external-import.yml') << """
+        createFile('api/external-import.yml') << """
         types:
           definitions:
             default-package: test.b.api
@@ -336,20 +255,20 @@ class ConjurePluginTest extends GradleTestSpec {
         """
 
         when:
-        def result = run(':conjure-def:compileConjure')
+        def result = run(':api:compileConjure')
 
         then:
-        result.task(':conjure-def:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
-        result.task(':conjure-def:compileConjureJerseyClient').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyServer').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJerseyClient').outcome == TaskOutcome.SUCCESS
 
-        file('conjure-def/build/conjure/imports/external-import.yml').exists()
-        file('conjure-def/build/conjure/internal-import.yml').exists()
-        file('conjure-def/build/conjure/conjure.yml').exists()
+        file('api/build/conjure/external-imports/external-import.yml').exists()
+        file('api/build/conjure/internal-import.yml').exists()
+        file('api/build/conjure/conjure.yml').exists()
 
-        file('jersey-server/src/main/java/test/api/TestServiceA.java').text.contains("import test.a.api.InternalImport;")
-        file('jersey-server/src/main/java/test/api/TestServiceA.java').text.contains("import test.b.api.ExternalImport;")
+        file('api/jersey-server/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.a.api.InternalImport;")
+        file('api/jersey-server/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.b.api.ExternalImport;")
     }
 
     def readResource(String name) {
