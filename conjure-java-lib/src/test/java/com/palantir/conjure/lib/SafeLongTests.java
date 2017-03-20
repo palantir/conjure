@@ -66,4 +66,10 @@ public final class SafeLongTests {
         expectedException.expect(JsonMappingException.class);
         mapper.readValue(json, typeReference);
     }
+
+    @Test
+    public void testToString() {
+        assertThat(SafeLong.of(maxValue).toString()).isEqualTo("9007199254740991");
+        assertThat(SafeLong.of(minValue).toString()).isEqualTo("-9007199254740991");
+    }
 }

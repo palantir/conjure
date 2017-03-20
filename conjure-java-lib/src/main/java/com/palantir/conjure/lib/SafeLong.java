@@ -36,4 +36,9 @@ public abstract class SafeLong {
         return ImmutableSafeLong.of(value);
     }
 
+    @Override
+    public final String toString() {
+        return Long.toString(longValue());
+    }
+
 }
