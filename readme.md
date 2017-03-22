@@ -501,9 +501,9 @@ project.
 The Conjure compilation plugin generates code for pre-defined output types
 and enables importing of remote Conjure types for inclusion in definitions.
 
-To assist with generating multiple outputs, the plugin generates multiple subprojects
-beneath the project to which it is applied. These subprojects _must_ be defined
-in `settings.gradle` per instructions below.
+To help manage its multiple output targets, the Conjure plugin generates subprojects
+beneath the project on which the plugin is applied. These subprojects _must_ be
+included in `settings.gradle`.
 
 Apply the following buildscript configuration to your root project to make the plugin
 available to subprojects:
@@ -525,35 +525,31 @@ apply plugin: 'com.palantir.conjure'
 
 In the root directory `settings.gradle` file, ensure you define:
 ```gradle
-include '<project with plugin applied>'
-include '<project with plugin applied>:jersey-server'
-include '<project with plugin applied>:jersey-client'
-include '<project with plugin applied>:retrofit-client'
-include '<project with plugin applied>:typescript-client'
+include '<proj>' // project where com.palantir.conjure plugin is applied
+include '<proj>:<proj>-jersey-server'
+include '<proj>:<proj>-jersey-client'
+include '<proj>:<proj>-retrofit-client'
+include '<proj>:<proj>-typescript-client'
 ```
 
 The plugin then emits tailored outputs to each of these subprojects:
- * `jersey-server` (Java)
+ * `<proj>-jersey-server` (Java)
    * errors on objects with unknown properties during deserialization
    * errors on enumerations with unknown values during deserialization
    * annotates services with JAX-RS annotations
- * `jersey-client` (Java)
+ * `<proj>-jersey-client` (Java)
    * ignores unknown properties on objects during deserialization
    * safely encapsulates unknown enumeration values during deserialization
    * annotates services with JAX-RS annotations
- * `retrofit-client` (Java)
+ * `<proj>-retrofit-client` (Java)
    * ignores unknown properties on objects during deserialization
    * safely encapsulates unknown enumeration values during deserialization
    * annotates services with Retrofit2 annotations
- * `typescript-client` (TypeScript)
+ * `<proj>-typescript-client` (TypeScript)
 
 In addition to generated code, compilation tasks will emit a non-optional `.gitignore`
 file to assist in preventing source controlling generated code (prefer generating code
 as a compilation task).
-
-Publications from these projects are configured to emit to `<definition project>-<config>`.
-Note that publications will not publish unless a publication destination or artifactory
-configuration is enabled. The configured publication's name is `nebula`.
 
 (Experimental) Optionally specify additional external imports using `conjureImports`, which
 accepts a Gradle `FileCollection`.
@@ -586,11 +582,35 @@ task to be disabled:
 
 Depend on a generated project using standard gradle syntax:
 ```gradle
-# e.g. in project-server/build.gradle
+// e.g. for conjure project `project-api`, in `project-server/build.gradle`:
 dependencies {
-    compile project(':project-api:jersey-server')
+    compile project(':project-api:project-api-jersey-server')
 }
 ```
+
+Consumers of this plugin are expected to provide concrete versions for the following
+dependencies, which are included automatically in appropriate projects:
+
+ * `com.palantir.conjure:conjure-java-lib`
+ * `com.squareup.retrofit2:retrofit`
+ * `javax.ws.rs:javax.ws.rs-api`
+
+Common strategies for specifying versions include:
+
+ * Use the [nebula dependency recommender plugin](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin)
+ * Specify an explicit resolution strategy in the Conjure project's gradle:
+
+   ```gradle
+   subprojects {
+       configurations.compile {
+           resolutionStrategy {
+               force 'com.palantir.conjure:conjure-java-lib:0.26.0'
+               force 'com.squareup.retrofit2:retrofit:2.1.0'
+               force 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+           }
+       }
+   }
+   ```
 
 ### TypeScript Publication
 The TypeScript Publication plugin enables publishing typescript artifacts from projects using Conjure.
