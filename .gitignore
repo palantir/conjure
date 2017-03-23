@@ -49,3 +49,12 @@ generated/
 
 # Blueprint theme
 __init__.pyc
+
+# Python
+*.pyc
+**/*.egg-info/
+.cache/
+.ipynb_checkpoints/
+.vscode/
+
+

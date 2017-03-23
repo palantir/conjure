@@ -3,6 +3,8 @@ include 'conjure-java'
 include 'conjure-java-lib'
 include 'conjure-gradle-plugin'
 include 'conjure-publish-gradle-plugin'
+include 'conjure-python'
+include 'conjure-python-lib'
 include 'conjure-typescript'
 include 'parsec'
 

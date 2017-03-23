@@ -1,0 +1,70 @@
+types:
+  definitions:
+    default-package: example.api
+    objects:
+      StringExample:
+        fields:
+          string: string
+      IntegerExample:
+        fields:
+          integer: integer
+      SafeLongExample:
+        fields:
+          safeLongValue: safelong
+      DoubleExample:
+        fields:
+          doubleValue: double
+      BinaryExample:
+        fields:
+          binary: binary
+      OptionalExample:
+        fields:
+          item: optional<string>
+      ListExample:
+        fields:
+          items: list<string>
+      SetExample:
+        fields:
+          items: set<string>
+      MapExample:
+        fields:
+          items: map<string, string>
+      EnumExample:
+        docs: |
+          This enumerates the numbers 1:2.
+        values:
+          - ONE
+          - TWO
+      BooleanExample:
+        fields:
+          coin: boolean
+      AnyExample:
+        fields:
+          any: any
+      AnyMapExample:
+        fields:
+          items: map<string, any>
+      # StringAliasExample:
+      #   alias: string
+      # DoubleAliasExample:
+      #   alias: double
+      # IntegerAliasExample:
+      #   alias: integer
+      # BooleanAliasExample:
+      #   alias: boolean
+      PrimitiveOptionalsExample:
+        fields:
+          num: optional<double>
+          bool: optional<boolean>
+          integer: optional<integer>
+      ManyFieldExample:
+        fields:
+          string: string
+          integer: integer
+          integerExample: IntegerExample
+          doubleValue: double
+          optionalItem: optional<string>
+          items: list<string>
+          set: set<string>
+          map: map<string, string>
+          # alias: StringAliasExample

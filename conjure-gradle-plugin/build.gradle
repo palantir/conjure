@@ -5,6 +5,7 @@ apply from: "${rootDir}/gradle/publish-libs.gradle"
 
 dependencies {
     compile project(':conjure-java')
+    compile project(':conjure-python')
     compile project(':conjure-typescript')
 
     compile 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'

@@ -1,0 +1,19 @@
+package:
+  name: conjure-python-lib
+  version: {{ GIT_VERSION_STRING.replace("-", "_") }}
+
+source:
+  path: ../python
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - pytest
+    - requests
+    - typing
+
+  run:
+    - python
+    - requests
+    - typing

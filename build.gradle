@@ -10,6 +10,7 @@ buildscript {
         classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
         classpath 'com.palantir:gradle-baseline-java:0.11.0'
         classpath 'gradle.plugin.com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.2.0'
+        classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.6.0'
         classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.9'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
     }

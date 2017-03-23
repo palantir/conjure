@@ -17,6 +17,7 @@ class ConjurePluginTest extends GradleTestSpec {
         include 'api:api-jersey'
         include 'api:api-retrofit'
         include 'api:api-typescript'
+        include 'api:api-python'
         include 'server'
         """
 
@@ -108,6 +109,36 @@ class ConjurePluginTest extends GradleTestSpec {
 
         file('api/api-objects/src/generated/java/.gitignore').exists()
         file('api/api-objects/src/generated/java/.gitignore').text.contains('*.java')
+    }
+
+    def 'pythonTask is disabled by default'() {
+        when:
+        def result = run(':api:compileConjure')
+
+        then:
+        result.task(':api:compileConjurePython').outcome == TaskOutcome.SKIPPED
+    }
+
+    def 'pythonTask generates code when enabled'() {
+        given:
+        file('api/build.gradle').text = """
+        plugins {
+            id 'com.palantir.conjure'
+        }
+
+        conjure {
+            conjureImports files('external-import.yml')
+        }
+
+        tasks.getByName('compileConjurePython').enabled = true
+        """
+
+        when:
+        def result = run(':api:compileConjure')
+
+        then:
+        result.task(':api:compileConjurePython').outcome == TaskOutcome.SUCCESS
+        file('api/api-python/python/api/__init__.py').exists()
     }
 
     def 'check code compiles'() {

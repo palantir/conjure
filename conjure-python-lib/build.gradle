@@ -1,0 +1,25 @@
+apply from: "${rootDir}/gradle/python-conda.gradle"
+
+def runTypeCheck = { ->
+    def environmentFilePath = "./mypy.yml"
+    def location = "${project.buildDir}/envs/mypy-env"
+    exec {
+        environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
+        commandLine "${miniconda.buildEnvironmentDirectory}/bin/conda", "env", "create",
+            "--prefix", location, "-f", environmentFilePath, "--force"
+    }
+    exec {
+        commandLine location + "/bin/mypy",
+            "--config-file", "python/mypy.ini",
+            "python/conjure"
+    }
+}
+
+task runMyPyTypeCheck {
+    dependsOn 'setupPython'
+    doLast {
+        runTypeCheck()
+    }
+}
+
+tasks.check.dependsOn(runMyPyTypeCheck)

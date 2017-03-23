@@ -8,6 +8,8 @@ import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
+import com.palantir.conjure.gen.python.client.ClientGenerator;
+import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.util.Collections;
@@ -130,6 +132,25 @@ public class ConjurePlugin implements Plugin<Project> {
                         task.setOutputDirectory(subproj.file("src"));
                         task.setServiceGenerator(new DefaultServiceGenerator());
                         task.setTypeGenerator(new DefaultTypeGenerator());
+                        conjureTask.dependsOn(task);
+                    });
+        });
+
+        project.project(project.getName() + "-python", (subproj) -> {
+            applyDependencyForIdeTasks(subproj, conjureTask);
+
+            project.getTasks().create("compileConjurePython",
+                    CompileConjurePythonTask.class,
+                    (task) -> {
+                        task.setSource(conjureSourceSet);
+                        task.dependsOn(processConjureImports);
+                        task.setOutputDirectory(subproj.file("python"));
+                        task.setClientGenerator(new ClientGenerator());
+                        task.setBeanGenerator(new DefaultBeanGenerator());
+
+                        // disable by default
+                        task.setEnabled(false);
+
                         conjureTask.dependsOn(task);
                     });
         });
