@@ -8,11 +8,27 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.squareup.javapoet.JavaFile;
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 public interface ServiceGenerator {
+
+    /**
+     * Generates and emits to the given output directory all services and types of the given conjure definition, using
+     * the instance's service and type generators.
+     */
+    default void emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+        generate(conjureDefinition, imports).forEach(f -> {
+            try {
+                f.writeTo(outputDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
     /** Returns the set of Java files generated from the service definitions in the given conjure specification. */
     Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports);

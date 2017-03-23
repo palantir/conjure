@@ -9,6 +9,8 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.squareup.javapoet.JavaFile;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +27,20 @@ public interface TypeGenerator {
                         type.getKey(),
                         type.getValue()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /**
+     * Generates and emits to the given output directory all services and types of the given conjure definition, using
+     * the instance's service and type generators.
+     */
+    default void emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+        generate(conjureDefinition, imports).forEach(f -> {
+            try {
+                f.writeTo(outputDir);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     JavaFile generateType(
