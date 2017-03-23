@@ -114,6 +114,9 @@ public class ConjurePlugin implements Plugin<Project> {
             if (task != null) {
                 task.dependsOn(conjureTask);
             }
+
+            plugin.getModel().getModule().getSourceDirs().add(project.file("src/generated/java"));
+            plugin.getModel().getModule().getGeneratedSourceDirs().add(project.file("src/generated/java"));
         });
         project.getPlugins().withType(EclipsePlugin.class, plugin -> {
             Task task = project.getTasks().findByName("eclipse");
