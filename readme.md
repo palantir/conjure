@@ -16,6 +16,10 @@ than renderable interfaces for consumer services to use, its goal is to remain
 agnostic to client implementations while providing general language bindings for
 use in client creation.
 
+[Spellbook](http://spellbook.il.palantir.global) hosts Conjure files in a
+readable, searchable format. Register your own Conjure files on Spellbook
+by following the [submission instructions](https://github.palantir.build/foundry/spellbook).
+
 Contents:
 
  - [Rationale](#why)
