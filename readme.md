@@ -416,9 +416,9 @@ this service.
  * `auth`: an optional auth requirement to override `default-auth`,
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
- * `returns`: a valid Conjure type (`binary` not allowed). `returns` is an
-   optional property -- if it is not specified, it indicates that the endpoint
-   does not return a value (equivalent to a `void` function in Java).
+ * `returns`: a valid Conjure type. `returns` is an optional property -- if 
+   it is not specified, it indicates that the endpoint does not return a value 
+   (equivalent to a `void` function in Java).
  * `docs`: a standard string and generally treated throughout rendering as
    Markdown.
  * `args`: a map of argument names (typically in camel case) to argument
