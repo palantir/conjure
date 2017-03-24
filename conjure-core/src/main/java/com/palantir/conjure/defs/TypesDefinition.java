@@ -30,7 +30,10 @@ public interface TypesDefinition {
     Map<String, String> conjureImports();
 
     @JsonProperty("definitions")
-    ObjectsDefinition definitions();
+    @Value.Default
+    default ObjectsDefinition definitions() {
+        return ObjectsDefinition.builder().defaultPackage("").build();
+    }
 
     static Builder builder() {
         return new Builder();

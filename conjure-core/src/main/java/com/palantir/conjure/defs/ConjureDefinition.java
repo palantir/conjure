@@ -16,7 +16,10 @@ import org.immutables.value.Value;
 public interface ConjureDefinition {
 
     @JsonProperty("types")
-    TypesDefinition types();
+    @Value.Default
+    default TypesDefinition types() {
+        return TypesDefinition.builder().build();
+    }
 
     @JsonProperty("services")
     Map<String, ServiceDefinition> services();
