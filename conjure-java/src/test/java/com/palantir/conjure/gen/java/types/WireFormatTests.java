@@ -8,8 +8,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.palantir.remoting2.ext.jackson.ObjectMappers;
 import java.nio.ByteBuffer;
+import java.util.Set;
 import org.junit.Test;
 import test.api.BinaryExample;
 import test.api.DoubleAliasExample;
@@ -21,6 +24,7 @@ import test.api.OptionalExample;
 import test.api.SetExample;
 import test.api.StringAliasExample;
 import test.api.StringExample;
+import test.api.UnionTypeExample;
 
 public final class WireFormatTests {
 
@@ -133,6 +137,70 @@ public final class WireFormatTests {
         assertThat(StringAliasExample.of("a").hashCode()).isEqualTo(StringAliasExample.of("a").hashCode());
         assertThat(IntegerAliasExample.of(103).hashCode()).isEqualTo(IntegerAliasExample.of(103).hashCode());
         assertThat(DoubleAliasExample.of(10.3).hashCode()).isEqualTo(DoubleAliasExample.of(10.3).hashCode());
+    }
+
+    @Test
+    public void testUnionType() throws Exception {
+        StringExample stringExample = StringExample.of("foo");
+        UnionTypeExample unionTypeStringExample = UnionTypeExample.of(stringExample);
+        UnionTypeExample unionTypeSet = UnionTypeExample.of(ImmutableSet.of("item"));
+        UnionTypeExample unionTypeInt = UnionTypeExample.of(5);
+        String serializedUnionTypeStringExample = "{\"type\":\"StringExample\",\"StringExample\":{\"string\":\"foo\"}}";
+        String serializedUnionTypeSet = "{\"type\":\"set<string>\",\"set<string>\":[\"item\"]}";
+        String serializedUnionTypeInt = "{\"type\":\"integer\",\"integer\":5}";
+
+        // serialization
+        assertThat(mapper.writeValueAsString(unionTypeStringExample)).isEqualTo(serializedUnionTypeStringExample);
+        assertThat(mapper.writeValueAsString(unionTypeSet)).isEqualTo(serializedUnionTypeSet);
+        assertThat(mapper.writeValueAsString(unionTypeInt)).isEqualTo(serializedUnionTypeInt);
+        // serialization of member type is unchanged
+        assertThat(mapper.writeValueAsString(stringExample)).isEqualTo("{\"string\":\"foo\"}");
+
+        // deserialization and equals()
+        assertThat(mapper.readValue(serializedUnionTypeStringExample, UnionTypeExample.class))
+                .isEqualTo(unionTypeStringExample);
+        assertThat(mapper.readValue(serializedUnionTypeSet, UnionTypeExample.class)).isEqualTo(unionTypeSet);
+        assertThat(mapper.readValue(serializedUnionTypeInt, UnionTypeExample.class)).isEqualTo(unionTypeInt);
+
+        assertThat(unionTypeStringExample).isEqualTo(stringExample);
+        assertThat(unionTypeSet).isEqualTo(ImmutableSet.of("item"));
+        assertThat(unionTypeInt).isEqualTo(5);
+
+        // visitor
+        UnionTypeExample.Visitor<Integer> visitor = new TestVisitor();
+        assertThat(unionTypeStringExample.accept(visitor)).isEqualTo("foo".length());
+        assertThat(unionTypeInt.accept(visitor)).isEqualTo(5);
+        assertThat(unionTypeSet.accept(visitor)).isEqualTo(1);
+
+        // unknown subtype
+        String serializedUnionTypeUnknown = "{\"type\":\"unknown\",\"value\":5}";
+        UnionTypeExample unionTypeUnknown = mapper.readValue(serializedUnionTypeUnknown, UnionTypeExample.class);
+        assertThat(unionTypeUnknown).isEqualTo(ImmutableMap.of("value", 5));
+        assertThat(unionTypeUnknown.accept(visitor)).isEqualTo(0);
+    }
+
+    private static class TestVisitor implements UnionTypeExample.Visitor<Integer> {
+
+        @Override
+        public Integer visit(StringExample stringExampleValue) {
+            return stringExampleValue.getString().length();
+        }
+
+        @Override
+        public Integer visit(Set<String> setStringValue) {
+            return setStringValue.size();
+        }
+
+        @Override
+        public Integer visit(int integerValue) {
+            return integerValue;
+        }
+
+        @Override
+        public Integer visitUnknown() {
+            return 0;
+        }
+
     }
 
 }

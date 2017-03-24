@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.UnionTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
@@ -64,6 +65,9 @@ public final class BeanGenerator implements TypeGenerator {
         TypeMapper typeMapper = new TypeMapper(types, importedTypes);
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
+        } else if (typeDef instanceof UnionTypeDefinition) {
+            return UnionGenerator.generateUnionType(new DefaultClassNameVisitor(types, importedTypes),
+                    typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return EnumGenerator.generateEnumType(
                     defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues());

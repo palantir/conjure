@@ -37,6 +37,9 @@ public interface BaseObjectTypeDefinition {
             } else if (tree.get("alias") != null) {
                 return ImmutableAliasTypeDefinition.fromJson(
                         parser.getCodec().treeToValue(tree, ImmutableAliasTypeDefinition.Json.class));
+            } else if (tree.get("union") != null) {
+                return ImmutableUnionTypeDefinition.fromJson(
+                        parser.getCodec().treeToValue(tree, ImmutableUnionTypeDefinition.Json.class));
             } else {
                 throw new IllegalArgumentException(
                         "Unrecognized definition, objects must have either fields, values or an alias defined.");
