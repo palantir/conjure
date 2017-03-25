@@ -23,9 +23,9 @@ public final class ConjureTypescriptServiceTest {
 
     @Test
     public void testTypescriptServiceGenerator_generate_testService() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.conjure"));
+        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.yml"));
 
-        Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def);
+        Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def, null);
 
         for (TypescriptFile file : files) {
             assertThat(file.writeToString()).isEqualTo(CharStreams.toString(new InputStreamReader(
@@ -36,7 +36,7 @@ public final class ConjureTypescriptServiceTest {
 
     @Test
     public void testTypescriptServiceGenerator_generateExports_testService() {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.conjure"));
+        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.yml"));
         Set<ExportStatement> exports = new DefaultServiceGenerator().generateExports(def);
 
         assertThat(exports.size()).isEqualTo(2);

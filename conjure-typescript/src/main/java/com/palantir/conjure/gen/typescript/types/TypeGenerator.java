@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.typescript.types;
 
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 public interface TypeGenerator {
 
-    Set<TypescriptFile> generate(TypesDefinition types);
+    Set<TypescriptFile> generate(TypesDefinition types, ConjureImports conjureImports);
 
     /**
      * Returns a set of {@link ExportStatement}s for the given type definitions.
@@ -23,8 +24,8 @@ public interface TypeGenerator {
      */
     Set<ExportStatement> generateExports(TypesDefinition types);
 
-    default void emit(TypesDefinition types, File outputDir) {
-        generate(types).forEach(file -> {
+    default void emit(TypesDefinition types, ConjureImports conjureImports, File outputDir) {
+        generate(types, conjureImports).forEach(file -> {
             try {
                 file.writeTo(outputDir);
             } catch (IOException e) {

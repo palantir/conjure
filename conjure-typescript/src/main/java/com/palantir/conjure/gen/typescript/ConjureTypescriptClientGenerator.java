@@ -4,15 +4,14 @@
 
 package com.palantir.conjure.gen.typescript;
 
-import com.google.common.collect.ImmutableSet;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.Sets;
-import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
-import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
-import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -34,12 +33,19 @@ public final class ConjureTypescriptClientGenerator {
     /**
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
+     * <p>
+     * Takes in a list of {@link ConjureDefinition}s in order to produce a single index file.
      */
-    public void emit(Set<ConjureDefinition> conjureDefinitions, File outputDir) {
-        conjureDefinitions.forEach(conjureDefinition -> {
-            serviceGenerator.emit(conjureDefinition, outputDir);
-            typeGenerator.emit(conjureDefinition.types(), outputDir);
-        });
+    public void emit(List<ConjureDefinition> conjureDefinitions, List<ConjureImports> conjureImports, File outputDir) {
+        checkArgument(conjureDefinitions.size() == conjureImports.size(),
+                "conjureDefinitions and conjureImports must be of the same size");
+        for (int i = 0; i < conjureDefinitions.size(); i++) {
+            ConjureDefinition definition = conjureDefinitions.get(i);
+            ConjureImports imports = conjureImports.get(i);
+
+            serviceGenerator.emit(definition, imports, outputDir);
+            typeGenerator.emit(definition.types(), imports, outputDir);
+        }
 
         // write index file
         Set<ExportStatement> serviceExports = conjureDefinitions.stream()
@@ -67,15 +73,4 @@ public final class ConjureTypescriptClientGenerator {
         }
     }
 
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            throw new RuntimeException("Expected 2 args, got " + args.length);
-        }
-        File conjureFile = new File(args[0]);
-        File outputDir = new File(args[1]);
-        ConjureDefinition definition = Conjure.parse(conjureFile);
-        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(new DefaultServiceGenerator(),
-                new DefaultTypeGenerator());
-        generator.emit(ImmutableSet.of(definition), outputDir);
-    }
 }

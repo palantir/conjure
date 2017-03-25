@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -34,10 +35,11 @@ import java.util.stream.Collectors;
 public final class DefaultTypeGenerator implements TypeGenerator {
 
     @Override
-    public Set<TypescriptFile> generate(TypesDefinition types) {
+    public Set<TypescriptFile> generate(TypesDefinition types, ConjureImports imports) {
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateType(
                         types,
+                        imports,
                         types.definitions().defaultPackage(),
                         type.getKey(),
                         type.getValue()))
@@ -59,11 +61,11 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private Optional<TypescriptFile> generateType(TypesDefinition types, String defaultPackage, String typeName,
-            BaseObjectTypeDefinition baseTypeDef) {
+    private Optional<TypescriptFile> generateType(TypesDefinition types, ConjureImports imports, String defaultPackage,
+            String typeName, BaseObjectTypeDefinition baseTypeDef) {
         String packageLocation = baseTypeDef.packageName().orElse(defaultPackage);
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
-        TypeMapper mapper = new TypeMapper(types, defaultPackage);
+        TypeMapper mapper = new TypeMapper(types, imports, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(generateEnumFile(
                     typeName, (EnumTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));

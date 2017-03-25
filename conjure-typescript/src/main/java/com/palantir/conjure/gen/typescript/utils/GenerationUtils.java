@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -82,19 +83,18 @@ public final class GenerationUtils {
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
-                .filter(conjureType -> !conjureType.type().equals(sourceName))
-                .map(conjureType -> {
-                    String destName = mapper.getContainingPackage(conjureType);
-                    if (destName != null) {
+                .filter(referenceType -> !referenceType.type().equals(sourceName))
+                .map(referenceType -> {
+                    Optional<String> maybeDestName = mapper.getContainingPackage(referenceType);
+                    return maybeDestName.map(destName -> {
                         String destFolder = GenerationUtils.packageNameToFolderPath(destName);
-                        return GenerationUtils.createImportStatement(mapper.getTypescriptType(conjureType),
+                        return GenerationUtils.createImportStatement(mapper.getTypescriptType(referenceType),
                                 getTypescriptFilePath(folderLocation, sourceName),
-                                getTypescriptFilePath(destFolder, conjureType.type()));
-                    } else {
-                        return null;
-                    }
+                                getTypescriptFilePath(destFolder, referenceType.type()));
+                    });
                 })
-                .filter(conjureType -> conjureType != null)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 

@@ -48,10 +48,10 @@ public final class Conjure {
 
     // TODO(rfink): Consider inlining the imported types when deserializing a ConjureDefinition.
     // Returns imported definitions, keyed by namespace.
-    public static ConjureImports parseTypesFromConjureImports(ConjureDefinition conjureImports, Path baseDir) {
+    public static ConjureImports parseImportsFromConjureDefinition(ConjureDefinition conjureDefinition, Path baseDir) {
         try {
             return new ConjureImports(
-                    Maps.transformValues(conjureImports.types().conjureImports(),
+                    Maps.transformValues(conjureDefinition.types().conjureImports(),
                             path -> Conjure.parse(baseDir.resolve(path).toFile()).types().definitions()));
         } catch (RuntimeException e) {
             throw new RuntimeException("Failed to open imported Conjure definition", e);

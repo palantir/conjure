@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript.services;
 
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
@@ -19,8 +20,8 @@ import java.util.stream.Collectors;
 public final class InterfaceServiceGenerator implements ServiceGenerator {
 
     @Override
-    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(),
+    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition, ConjureImports conjureImports) {
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
                 conjureDefinition.types().definitions().defaultPackage());
         return conjureDefinition.services()
                 .entrySet()

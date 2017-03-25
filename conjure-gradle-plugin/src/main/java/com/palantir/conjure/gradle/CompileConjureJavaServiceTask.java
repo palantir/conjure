@@ -59,7 +59,7 @@ public class CompileConjureJavaServiceTask extends SourceTask {
 
     private void compileFile(Path path, Path baseDir) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, baseDir);
+        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, baseDir);
         serviceGenerator.emit(conjure, imports, outputDirectory);
     }
 
