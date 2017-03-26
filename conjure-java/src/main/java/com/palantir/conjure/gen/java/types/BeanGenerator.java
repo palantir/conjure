@@ -37,8 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -96,10 +94,10 @@ public final class BeanGenerator implements TypeGenerator {
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
                 .addMethods(createGetters(fields))
-                .addMethod(createEquals(objectClass))
-                .addMethod(createEqualTo(objectClass, fields))
-                .addMethod(createHashCode(fields, poetFields))
-                .addMethod(createToString(typeName, fields));
+                .addMethod(MethodSpecs.createEquals(objectClass))
+                .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
+                .addMethod(MethodSpecs.createHashCode(poetFields))
+                .addMethod(MethodSpecs.createToString(typeName, poetFields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
@@ -195,84 +193,6 @@ public final class BeanGenerator implements TypeGenerator {
         return getterBuilder.build();
     }
 
-    private static MethodSpec createEquals(TypeName thisClass) {
-        ParameterSpec other = ParameterSpec.builder(TypeName.OBJECT, "other").build();
-        return MethodSpec.methodBuilder("equals")
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .addParameter(other)
-                .returns(TypeName.BOOLEAN)
-                .addStatement("return this == $1N || ($1N instanceof $2T && equalTo(($2T) $1N))",
-                        other, thisClass)
-                .build();
-    }
-
-    private static MethodSpec createEqualTo(TypeName thisClass, Collection<EnrichedField> fields) {
-        CodeBlock equalsTo = CodeBlocks.of(fields.stream()
-                .map(BeanGenerator::createEqualsStatement)
-                .collect(joining(CodeBlock.of(" && "))));
-
-        return MethodSpec.methodBuilder("equalTo")
-                .addModifiers(Modifier.PRIVATE)
-                .addParameter(thisClass, "other")
-                .returns(TypeName.BOOLEAN)
-                .addStatement("return $L", equalsTo)
-                .build();
-    }
-
-    private static CodeBlock createEqualsStatement(EnrichedField field) {
-        String thisField = "this." + field.poetSpec().name;
-        String otherField = "other." + field.poetSpec().name;
-
-        if (field.poetSpec().type.isPrimitive()) {
-            return CodeBlock.of("$L == $L", thisField, otherField);
-        } else {
-            return CodeBlock.of("$L.equals($L)", thisField, otherField);
-        }
-    }
-
-    private static MethodSpec createHashCode(Collection<EnrichedField> fields, Collection<FieldSpec> poetFields) {
-        return MethodSpec.methodBuilder("hashCode")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(TypeName.INT)
-                .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", poetFields))
-                .build();
-    }
-
-    private static MethodSpec createToString(String thisClassName, Collection<EnrichedField> fields) {
-        CodeBlock returnStatement = CodeBlock.builder()
-                .add("return new $T($S).append(\"{\")\n", StringBuilder.class, thisClassName)
-                .indent()
-                .indent()
-                .add(CodeBlocks.of(fields.stream()
-                        .map(EnrichedField::poetSpec)
-                        .map(f -> f.name)
-                        .map(BeanGenerator::createAppendStatement)
-                        .collect(joining(CodeBlock.of(".append(\", \")")))))
-                .unindent()
-                .add(".append(\"}\")\n")
-                .addStatement(".toString()")
-                .unindent()
-                .build();
-
-        return MethodSpec.methodBuilder("toString")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(ClassName.get(String.class))
-                .addCode(returnStatement)
-                .build();
-    }
-
-    private static CodeBlock createAppendStatement(String fieldName) {
-        return CodeBlock.builder()
-                .add(".append($S)", fieldName)
-                .add(".append(\": \")")
-                .add(".append($N)", fieldName)
-                .add("\n")
-                .build();
-    }
-
     private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("validateFields")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
@@ -342,23 +262,6 @@ public final class BeanGenerator implements TypeGenerator {
 
     public static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
-    }
-
-    private static <T> Collector<T, ArrayList<T>, ArrayList<T>> joining(T delim) {
-        return Collector.of(ArrayList::new,
-                (list, element) -> {
-                    if (!list.isEmpty()) {
-                        list.add(delim);
-                    }
-                    list.add(element);
-                },
-                (list1, list2) -> {
-                    if (!list1.isEmpty()) {
-                        list1.add(delim);
-                    }
-                    list1.addAll(list2);
-                    return list1;
-                });
     }
 
     private static TypeName getTypeNameWithoutOptional(FieldSpec spec) {
