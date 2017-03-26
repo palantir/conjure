@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
 import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -37,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +59,7 @@ public final class BeanGenerator implements TypeGenerator {
     public JavaFile generateType(
             TypesDefinition types,
             ConjureImports importedTypes,
-            String defaultPackage,
+            Optional<String> defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef) {
         TypeMapper typeMapper = new TypeMapper(types, importedTypes);
@@ -77,9 +79,9 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     private JavaFile generateBeanType(
-            TypeMapper typeMapper, String defaultPackage, String typeName, ObjectTypeDefinition typeDef) {
+            TypeMapper typeMapper, Optional<String> defaultPackage, String typeName, ObjectTypeDefinition typeDef) {
 
-        String typePackage = typeDef.packageName().orElse(defaultPackage);
+        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
         ClassName objectClass = ClassName.get(typePackage, typeName);
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 

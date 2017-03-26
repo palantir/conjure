@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.UnionTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -49,8 +51,8 @@ public final class UnionGenerator {
     private static final TypeVariableName TYPE_VARIABLE = TypeVariableName.get("T");
 
     public static JavaFile generateUnionType(ClassNameVisitor classNameVisitor,
-            TypeMapper typeMapper, String defaultPackage, String typeName, UnionTypeDefinition typeDef) {
-        String typePackage = typeDef.packageName().orElse(defaultPackage);
+            TypeMapper typeMapper, Optional<String> defaultPackage, String typeName, UnionTypeDefinition typeDef) {
+        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
         ClassName unionClass = ClassName.get(typePackage, typeName);
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");

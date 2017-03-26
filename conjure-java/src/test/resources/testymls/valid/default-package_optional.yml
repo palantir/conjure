@@ -1,0 +1,8 @@
+types:
+  definitions:
+    # valid: "default-package" property is optional if package is specified for individual objects
+    objects:
+      SimpleObject:
+        package: com.palantir.simple
+        fields:
+          name: string

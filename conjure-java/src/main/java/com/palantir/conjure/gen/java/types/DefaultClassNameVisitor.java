@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.java.types;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -108,7 +109,8 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             // Types without namespace are either defined locally in this conjure definition, or raw imports.
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
-                String packageName = type.packageName().orElse(types.definitions().defaultPackage());
+                String packageName = ObjectDefinitions.getPackageName(type.packageName(),
+                        types.definitions().defaultPackage());
                 return ClassName.get(packageName, refType.type());
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());

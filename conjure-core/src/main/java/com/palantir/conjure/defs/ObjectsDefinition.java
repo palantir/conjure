@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import java.util.Map;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = ImmutableObjectsDefinition.class)
@@ -18,7 +19,7 @@ import org.immutables.value.Value;
 public interface ObjectsDefinition {
 
     @JsonProperty("default-package")
-    String defaultPackage();
+    Optional<String> defaultPackage();
 
     @JsonProperty("objects")
     Map<String, BaseObjectTypeDefinition> objects();

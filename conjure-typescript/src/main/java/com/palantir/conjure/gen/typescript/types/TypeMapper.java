@@ -8,6 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
@@ -26,15 +27,16 @@ import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
 public final class TypeMapper {
 
-    private final String defaultPackage;
+    private final Optional<String> defaultPackage;
     private final TypesDefinition types;
 
-    public TypeMapper(TypesDefinition types, String defaultPackage) {
+    public TypeMapper(TypesDefinition types, Optional<String> defaultPackage) {
         this.types = types;
         this.defaultPackage = defaultPackage;
     }
@@ -124,7 +126,7 @@ public final class TypeMapper {
         BaseObjectTypeDefinition defType = types.definitions().objects().get(name.type());
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
-                return defType.packageName().orElse(defaultPackage);
+                return ObjectDefinitions.getPackageName(defType.packageName(), defaultPackage);
             }
             // primitive types for aliases
         }

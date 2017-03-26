@@ -2,7 +2,3 @@ types:
   # valid: "definitions" property is optional
   conjure-imports:
     importedTypes: path/to/definition.yml
-services:
-  TestService:
-    name: Test Service
-    package: test.a
