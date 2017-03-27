@@ -29,7 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ConjurePythonGeneratorTest {
+public final class ConjurePythonGeneratorTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();

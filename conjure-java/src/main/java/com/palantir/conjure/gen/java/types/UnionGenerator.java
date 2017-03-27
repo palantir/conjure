@@ -15,10 +15,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.UnionValueDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.parsec.ParseException;
 import com.squareup.javapoet.AnnotationSpec;
@@ -32,6 +32,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
-import org.immutables.value.Value;
 
 public final class UnionGenerator {
 
@@ -56,13 +56,11 @@ public final class UnionGenerator {
         ClassName unionClass = ClassName.get(typePackage, typeName);
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
-        List<StringAndTypeName> memberStringsAndTypes = typeDef.union().stream()
-                .map(memberStr -> ImmutableStringAndTypeName.builder()
-                        .string(memberStr)
-                        .typeName(typeMapper.getClassName(toConjureType(memberStr)))
-                        .build())
+        List<UnionValueDefinition> unionValues = typeDef.union().stream()
+                .sorted(Comparator.comparing(UnionValueDefinition::value))
                 .collect(Collectors.toList());
-        List<TypeName> memberTypes = Lists.transform(memberStringsAndTypes, tuple -> tuple.typeName());
+        List<TypeName> memberTypes = Lists.transform(unionValues,
+                unionValue -> typeMapper.getClassName(toConjureType(unionValue.value())));
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
@@ -72,35 +70,23 @@ public final class UnionGenerator {
                 .addFields(fields)
                 .addMethod(generateConstructor(baseClass))
                 .addMethod(generateGetValue(baseClass))
-                .addMethods(generateStaticFactories(unionClass, memberTypes))
+                .addMethods(generateStaticFactories(typeMapper, unionClass, unionValues))
                 .addMethod(generateAcceptVisitMethod(visitorClass, memberTypes))
                 .addType(generateVisitor(unionClass, visitorClass, memberTypes))
                 .addType(generateBase(baseClass, memberTypes))
-                .addTypes(generateWrapperClasses(baseClass, memberStringsAndTypes))
+                .addTypes(generateWrapperClasses(typeMapper, baseClass, unionValues))
                 .addType(generateUnknownWrapper(baseClass))
                 .addMethod(generateEquals(unionClass, memberTypes))
                 .addMethod(MethodSpecs.createEqualTo(unionClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
                 .addMethod(MethodSpecs.createToString(unionClass.simpleName(), fields));
 
-        if (typeDef.docs().isPresent()) {
-            typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
-        }
+        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
         return JavaFile.builder(typePackage, typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
-    }
-
-    @Value.Immutable
-    @ConjureImmutablesStyle
-    interface StringAndTypeName {
-
-        String string();
-
-        TypeName typeName();
-
     }
 
     private static ConjureType toConjureType(String string) {
@@ -130,16 +116,19 @@ public final class UnionGenerator {
                 .build();
     }
 
-    private static List<MethodSpec> generateStaticFactories(ClassName unionClass, List<TypeName> memberTypes) {
-        return Lists.transform(memberTypes, memberType -> {
+    private static List<MethodSpec> generateStaticFactories(
+            TypeMapper typeMapper, ClassName unionClass, List<UnionValueDefinition> unionValues) {
+        return Lists.transform(unionValues, unionValue -> {
+            TypeName memberType = typeMapper.getClassName(toConjureType(unionValue.value()));
             String variableName = variableName(memberType);
-            return MethodSpec.methodBuilder("of")
+            MethodSpec.Builder builder = MethodSpec.methodBuilder("of")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(memberType, variableName)
                     .addStatement("return new $T(new $T($L))",
                             unionClass, wrapperClass(unionClass, memberType), variableName)
-                    .returns(unionClass)
-                    .build();
+                    .returns(unionClass);
+            unionValue.docs().ifPresent(docs -> builder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
+            return builder.build();
         });
     }
 
@@ -241,14 +230,14 @@ public final class UnionGenerator {
     }
 
     private static List<TypeSpec> generateWrapperClasses(
-            ClassName baseClass, List<StringAndTypeName> memberStringsAndTypes) {
-        return Lists.transform(memberStringsAndTypes, memberStringAndType -> {
-            String memberString = memberStringAndType.string();
-            TypeName memberType = memberStringAndType.typeName();
+            TypeMapper typeMapper, ClassName baseClass, List<UnionValueDefinition> unionValues) {
+        return Lists.transform(unionValues, unionValue -> {
+            String memberString = unionValue.value();
+            TypeName memberType = typeMapper.getClassName(toConjureType(memberString));
+            ClassName wrapperClass = peerWrapperClass(baseClass, memberType);
 
             AnnotationSpec jsonPropertyAnnotation = AnnotationSpec.builder(JsonProperty.class)
                     .addMember("value", "$S", StringUtils.uncapitalize(memberString)).build();
-            ClassName wrapperClass = peerWrapperClass(baseClass, memberType);
             List<FieldSpec> fields = ImmutableList.of(
                     FieldSpec.builder(memberType, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
