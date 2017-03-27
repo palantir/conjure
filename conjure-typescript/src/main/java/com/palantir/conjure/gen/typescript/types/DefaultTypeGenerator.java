@@ -62,7 +62,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     private Optional<TypescriptFile> generateType(TypesDefinition types, Optional<String> defaultPackage,
             String typeName, BaseObjectTypeDefinition baseTypeDef) {
-        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage);
+        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
         TypeMapper mapper = new TypeMapper(types, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
@@ -80,7 +80,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     private Optional<ExportStatement> generateExport(TypesDefinition types, Optional<String> defaultPackage,
             String typeName, BaseObjectTypeDefinition baseTypeDef) {
-        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage);
+        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(

@@ -110,7 +110,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
                 String packageName = ObjectDefinitions.getPackageName(type.packageName(),
-                        types.definitions().defaultPackage());
+                        types.definitions().defaultPackage(), refType.type());
                 return ClassName.get(packageName, refType.type());
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());

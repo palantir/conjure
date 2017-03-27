@@ -32,7 +32,7 @@ public final class AliasGenerator {
             AliasTypeDefinition typeDef) {
         TypeName aliasType = typeMapper.getClassName(typeDef.alias());
 
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
+        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
         ClassName thisClass = ClassName.get(typePackage, typeName);
 
         TypeSpec.Builder spec = TypeSpec.classBuilder(typeName)

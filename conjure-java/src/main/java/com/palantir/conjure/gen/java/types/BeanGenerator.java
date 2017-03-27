@@ -81,7 +81,7 @@ public final class BeanGenerator implements TypeGenerator {
     private JavaFile generateBeanType(
             TypeMapper typeMapper, Optional<String> defaultPackage, String typeName, ObjectTypeDefinition typeDef) {
 
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
+        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
         ClassName objectClass = ClassName.get(typePackage, typeName);
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 

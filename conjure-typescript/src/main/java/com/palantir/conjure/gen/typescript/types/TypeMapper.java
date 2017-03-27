@@ -126,7 +126,7 @@ public final class TypeMapper {
         BaseObjectTypeDefinition defType = types.definitions().objects().get(name.type());
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
-                return ObjectDefinitions.getPackageName(defType.packageName(), defaultPackage);
+                return ObjectDefinitions.getPackageName(defType.packageName(), defaultPackage, name.type());
             }
             // primitive types for aliases
         }

@@ -34,7 +34,7 @@ public final class EnumGenerator {
             String typeName,
             EnumTypeDefinition typeDef,
             boolean supportUnknownEnumValues) {
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
+        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
         ClassName thisClass = ClassName.get(typePackage, typeName);
         ClassName enumClass = ClassName.get(typePackage, typeName, "Value");
 
