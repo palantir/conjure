@@ -245,10 +245,13 @@ public final class UnionGenerator {
         return Lists.transform(memberStringsAndTypes, memberStringAndType -> {
             String memberString = memberStringAndType.string();
             TypeName memberType = memberStringAndType.typeName();
-            ClassName wrapperClass = peerWrapperClass(baseClass, memberType);
 
+            AnnotationSpec jsonPropertyAnnotation = AnnotationSpec.builder(JsonProperty.class)
+                    .addMember("value", "$S", StringUtils.uncapitalize(memberString)).build();
+            ClassName wrapperClass = peerWrapperClass(baseClass, memberType);
             List<FieldSpec> fields = ImmutableList.of(
                     FieldSpec.builder(memberType, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
+
             return TypeSpec.classBuilder(wrapperClass)
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
                     .addSuperinterface(baseClass)
@@ -260,8 +263,7 @@ public final class UnionGenerator {
                             .addModifiers(Modifier.PRIVATE)
                             .addAnnotation(AnnotationSpec.builder(JsonCreator.class).build())
                             .addParameter(ParameterSpec.builder(memberType, VALUE_FIELD_NAME)
-                                    .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                                            .addMember("value", "$S", memberString).build())
+                                    .addAnnotation(jsonPropertyAnnotation)
                                     .build())
                             .addStatement("$L",
                                     Expressions.staticMethodCall(Objects.class, "requireNonNull", VALUE_FIELD_NAME))
@@ -269,8 +271,7 @@ public final class UnionGenerator {
                             .build())
                     .addMethod(MethodSpec.methodBuilder("getValue")
                             .addModifiers(Modifier.PRIVATE)
-                            .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                                    .addMember("value", "$S", memberString).build())
+                            .addAnnotation(jsonPropertyAnnotation)
                             .addStatement("return $L", VALUE_FIELD_NAME)
                             .returns(memberType)
                             .build())

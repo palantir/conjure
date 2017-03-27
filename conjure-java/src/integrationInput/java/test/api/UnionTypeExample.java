@@ -112,12 +112,12 @@ public final class UnionTypeExample {
         private final StringExample value;
 
         @JsonCreator
-        private StringExampleWrapper(@JsonProperty("StringExample") StringExample value) {
+        private StringExampleWrapper(@JsonProperty("stringExample") StringExample value) {
             Objects.requireNonNull(value);
             this.value = value;
         }
 
-        @JsonProperty("StringExample")
+        @JsonProperty("stringExample")
         private StringExample getValue() {
             return value;
         }
