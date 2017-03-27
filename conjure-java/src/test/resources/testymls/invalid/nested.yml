@@ -1,0 +1,13 @@
+services:
+  TestService:
+    name: Test Service
+    package: test.a
+    endpoints:
+      testEndpoint:
+        http:
+          method: GET
+          # invalid: braces cannot be nested
+          path: /path/{{arg}}/trailer
+        args:
+          arg: string
+        returns: string

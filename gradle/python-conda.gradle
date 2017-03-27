@@ -1,5 +1,15 @@
 apply plugin: 'com.palantir.python.miniconda'
 
+// override miniconda gradle plugin default repos
+repositories {
+    ivy {
+        url 'https://artifactory.palantir.build/artifactory/external-dist-miniconda-cache/'
+        layout 'pattern', {
+            artifact '[module]-[revision]-[classifier].[ext]'
+        }
+    }
+}
+
 miniconda {
     minicondaVersion = '4.3.11'
     packages = ['python']
@@ -8,7 +18,7 @@ miniconda {
         'conda-forge'
         // TODO(gatesn): Use these repos when https://github.com/palantir/gradle-miniconda-plugin/issues/41 is resolved
         //'https://artifactory.palantir.build/artifactory/external-conda-anaconda',
-        //'https://artifactory.palantir.build/artifactory/external-conda-forge',
+        //'https://artifactory.palantir.build/artifactory/external-conda-forge'
     ]
     buildOutputDirectory = "${project.buildDir}/conda-dist"
 }

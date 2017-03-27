@@ -33,7 +33,8 @@ public final class ConjureImports {
         ObjectsDefinition imports = getImportsForRefNameSpace(type);
         BaseObjectTypeDefinition typeDef = Verify.verifyNotNull(imports.objects().get(type.type()),
                 "Imported type not found: %s", type);
-        return typeDef.packageName().orElse(getImportsForRefNameSpace(type).defaultPackage());
+        return ObjectDefinitions.getPackageName(typeDef.packageName(),
+                getImportsForRefNameSpace(type).defaultPackage(), type.type());
     }
 
     private ObjectsDefinition getImportsForRefNameSpace(ReferenceType type) {

@@ -7,13 +7,15 @@ package com.palantir.conjure.gen.java.types;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.remoting2.ext.jackson.ObjectMappers;
 import java.nio.ByteBuffer;
 import java.util.Set;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import test.api.BinaryExample;
 import test.api.DoubleAliasExample;
 import test.api.EnumExample;
@@ -29,6 +31,9 @@ import test.api.UnionTypeExample;
 public final class WireFormatTests {
 
     private final ObjectMapper mapper = ObjectMappers.guavaJdk7Jdk8();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testMissingCollectionFieldsDeserializeAsEmpty() throws Exception {
@@ -171,12 +176,21 @@ public final class WireFormatTests {
         assertThat(unionTypeStringExample.accept(visitor)).isEqualTo("foo".length());
         assertThat(unionTypeInt.accept(visitor)).isEqualTo(5);
         assertThat(unionTypeSet.accept(visitor)).isEqualTo(1);
+    }
 
-        // unknown subtype
+    @Test
+    public void testUnionType_unknownType() throws Exception {
         String serializedUnionTypeUnknown = "{\"type\":\"unknown\",\"value\":5}";
         UnionTypeExample unionTypeUnknown = mapper.readValue(serializedUnionTypeUnknown, UnionTypeExample.class);
-        assertThat(unionTypeUnknown).isEqualTo(ImmutableMap.of("value", 5));
-        assertThat(unionTypeUnknown.accept(visitor)).isEqualTo(0);
+        assertThat(mapper.writeValueAsString(unionTypeUnknown)).isEqualTo(serializedUnionTypeUnknown);
+        assertThat(unionTypeUnknown.accept(new TestVisitor())).isEqualTo(0);
+    }
+
+    @Test
+    public void testUnionType_noType() throws Exception {
+        String noType = "{\"typ\":\"unknown\",\"value\":5}";
+        expectedException.expect(JsonMappingException.class);
+        mapper.readValue(noType, UnionTypeExample.class);
     }
 
     private static class TestVisitor implements UnionTypeExample.Visitor<Integer> {
@@ -197,7 +211,7 @@ public final class WireFormatTests {
         }
 
         @Override
-        public Integer visitUnknown() {
+        public Integer visitUnknown(String unknownType) {
             return 0;
         }
 

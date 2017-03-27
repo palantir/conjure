@@ -12,6 +12,7 @@ import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public interface TypeGenerator {
     JavaFile generateType(
             TypesDefinition allTypes,
             ConjureImports importedTypes,
-            String defaultPackage,
+            Optional<String> defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef);
 

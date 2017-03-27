@@ -1,0 +1,7 @@
+types:
+  definitions:
+    objects:
+      SimpleObject:
+        # invalid: "default-package" property is not specified for "definitions" and "package" property is not specified for object
+        fields:
+          name: string

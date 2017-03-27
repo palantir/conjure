@@ -1,0 +1,4 @@
+services:
+  TestService:
+    name: Test Service
+    # invalid: "package" is a required property

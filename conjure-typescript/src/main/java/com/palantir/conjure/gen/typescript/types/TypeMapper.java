@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
@@ -33,11 +34,11 @@ import java.util.Stack;
 
 public final class TypeMapper {
 
-    private final String defaultPackage;
+    private final Optional<String> defaultPackage;
     private final ConjureImports importedTypes;
     private final TypesDefinition types;
 
-    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, String defaultPackage) {
+    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, Optional<String> defaultPackage) {
         this.types = types;
         this.importedTypes = importedTypes;
         this.defaultPackage = defaultPackage;
@@ -131,7 +132,8 @@ public final class TypeMapper {
         BaseObjectTypeDefinition defType = types.definitions().objects().get(referenceType.type());
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
-                return Optional.of(defType.packageName().orElse(defaultPackage));
+                return Optional.of(ObjectDefinitions.getPackageName(
+                        defType.packageName(), defaultPackage, referenceType.type()));
             }
             // primitive types for aliases
         }
