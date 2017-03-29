@@ -25,17 +25,5 @@ tasks.setupPython.doFirst {
     environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
 }
 
-tasks.setupCondaBuild.doFirst {
-    environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
-}
-
-tasks.condaBuildCheck.doFirst {
-    environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
-}
-
-tasks.condaBuild.doFirst {
-    environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
-}
-
 condaBuildCheck.environment.put('GIT_VERSION_STRING', project.version.replace('-', '_'))
 condaBuild.environment.put('GIT_VERSION_STRING', project.version.replace('-', '_'))
