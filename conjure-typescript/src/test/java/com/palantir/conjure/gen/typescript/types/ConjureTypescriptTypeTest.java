@@ -25,7 +25,7 @@ public final class ConjureTypescriptTypeTest {
     public void testTypescriptTypeGenerator_generate_allExamples() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
 
-        Set<TypescriptFile> files = new DefaultTypeGenerator().generate(def.types());
+        Set<TypescriptFile> files = new DefaultTypeGenerator().generate(def.types(), null);
 
         for (TypescriptFile file : files) {
             assertThat(file.writeToString()).isEqualTo(CharStreams.toString(new InputStreamReader(

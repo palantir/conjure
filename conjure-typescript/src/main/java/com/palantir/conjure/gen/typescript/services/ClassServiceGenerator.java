@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
@@ -43,8 +44,8 @@ import java.util.stream.Collectors;
 public final class ClassServiceGenerator implements ServiceGenerator {
 
     @Override
-    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(),
+    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition, ConjureImports conjureImports) {
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
                 conjureDefinition.types().definitions().defaultPackage());
         return conjureDefinition.services()
                 .entrySet()

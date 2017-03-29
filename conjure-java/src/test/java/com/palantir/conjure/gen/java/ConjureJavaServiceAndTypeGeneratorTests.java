@@ -80,7 +80,7 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
     @Test
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
-        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, Paths.get("src/test"));
+        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(

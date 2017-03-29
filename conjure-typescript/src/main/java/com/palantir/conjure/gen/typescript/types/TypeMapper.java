@@ -8,6 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
@@ -34,10 +35,12 @@ import java.util.Stack;
 public final class TypeMapper {
 
     private final Optional<String> defaultPackage;
+    private final ConjureImports importedTypes;
     private final TypesDefinition types;
 
-    public TypeMapper(TypesDefinition types, Optional<String> defaultPackage) {
+    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, Optional<String> defaultPackage) {
         this.types = types;
+        this.importedTypes = importedTypes;
         this.defaultPackage = defaultPackage;
     }
 
@@ -45,7 +48,6 @@ public final class TypeMapper {
         return TypescriptType.builder().name(getTypeNameFromConjureType(conjureType)).build();
     }
 
-    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public Set<ReferenceType> getReferencedConjureNames(ConjureType conjureType) {
         ImmutableSet.Builder<ReferenceType> result = ImmutableSet.builder();
         Stack<ConjureType> stack = new Stack<>();
@@ -122,19 +124,23 @@ public final class TypeMapper {
 
     }
 
-    public String getContainingPackage(ReferenceType name) {
-        BaseObjectTypeDefinition defType = types.definitions().objects().get(name.type());
+    public Optional<String> getContainingPackage(ReferenceType referenceType) {
+        if (referenceType.namespace().isPresent()) {
+            return Optional.of(importedTypes.getPackage(referenceType));
+        }
+
+        BaseObjectTypeDefinition defType = types.definitions().objects().get(referenceType.type());
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
-                return ObjectDefinitions.getPackageName(defType.packageName(), defaultPackage, name.type());
+                return Optional.of(ObjectDefinitions.getPackageName(
+                        defType.packageName(), defaultPackage, referenceType.type()));
             }
             // primitive types for aliases
         }
         // TODO(rmcnamara): for now assume to generate primitive types for external definitions
-        return null;
+        return Optional.empty();
     }
 
-    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     private String getTypeNameFromConjureType(ConjureType conjureType) {
         return conjureType.visit(new TypeNameVisitor());
     }
@@ -180,22 +186,25 @@ public final class TypeMapper {
 
         @Override
         public String visit(ReferenceType refType) {
-            BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
-            if (defType != null) {
-                if (defType instanceof AliasTypeDefinition) {
-                    // in typescript we collapse alias types to concrete types
-                    return visit(((AliasTypeDefinition) defType).alias());
-                } else if (defType instanceof EnumTypeDefinition) {
-                    return refType.type();
-                } else {
-                    // Interfaces are prepended with "I"
-                    return "I" + refType.type();
-                }
+            if (refType.namespace().isPresent()) {
+                return refType.type();
             } else {
-                // TODO(rfink): Implement Conjure imports
-                ExternalTypeDefinition depType = types.imports().get(refType.type());
-                checkNotNull(depType, "Unable to resolve type %s", refType.type());
-                return getTypeNameFromConjureType(depType.baseType());
+                BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
+                if (defType != null) {
+                    if (defType instanceof AliasTypeDefinition) {
+                        // in typescript we collapse alias types to concrete types
+                        return visit(((AliasTypeDefinition) defType).alias());
+                    } else if (defType instanceof EnumTypeDefinition) {
+                        return refType.type();
+                    } else {
+                        // Interfaces are prepended with "I"
+                        return "I" + refType.type();
+                    }
+                } else {
+                    ExternalTypeDefinition depType = types.imports().get(refType.type());
+                    checkNotNull(depType, "Unable to resolve type %s", refType.type());
+                    return getTypeNameFromConjureType(depType.baseType());
+                }
             }
         }
 

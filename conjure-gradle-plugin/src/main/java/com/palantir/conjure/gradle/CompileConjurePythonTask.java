@@ -68,7 +68,7 @@ public class CompileConjurePythonTask extends SourceTask {
 
     private void compileFile(Path path, Path baseDir) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        ConjureImports conjureImports = Conjure.parseTypesFromConjureImports(conjure, baseDir);
+        ConjureImports conjureImports = Conjure.parseImportsFromConjureDefinition(conjure, baseDir);
 
         ConjurePythonGenerator generator = new ConjurePythonGenerator(beanGenerator, clientGenerator);
 

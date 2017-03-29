@@ -41,7 +41,7 @@ public final class ConjurePythonGeneratorTest {
 
         ConjurePythonGenerator generator = new ConjurePythonGenerator(
                 new DefaultBeanGenerator(), new ClientGenerator());
-        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, src.toPath());
+        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, src.toPath());
 
         InMemoryPythonFileWriter pythonFileWriter = new InMemoryPythonFileWriter();
         generator.write(conjure, imports, pythonFileWriter);
@@ -66,7 +66,7 @@ public final class ConjurePythonGeneratorTest {
 
         ConjurePythonGenerator generator = new ConjurePythonGenerator(
                 new DefaultBeanGenerator(), new ClientGenerator());
-        ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, src.toPath());
+        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, src.toPath());
 
         InMemoryPythonFileWriter pythonFileWriter = new InMemoryPythonFileWriter();
         generator.write(conjure, imports, pythonFileWriter);
@@ -125,7 +125,7 @@ public final class ConjurePythonGeneratorTest {
             Files.createParentDirs(referenceCodeLocation.toFile());
             ConjurePythonGenerator generator = new ConjurePythonGenerator(
                     new DefaultBeanGenerator(), new ClientGenerator());
-            ConjureImports imports = Conjure.parseTypesFromConjureImports(conjure, referenceCodeLocation);
+            ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, referenceCodeLocation);
             generator.write(conjure, imports, new DefaultPythonFileWriter(referenceCodeLocation));
         }
 
