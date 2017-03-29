@@ -25,6 +25,7 @@ public final class Expressions {
         return CodeBlock.of("$1N(" + indexParams(2, args.size() + 2) + ")", append(method, args));
     }
 
+    @SafeVarargs
     public static <T> CodeBlock staticMethodCall(Class<?> clazz, String method, T... args) {
         return staticMethodCall(clazz, method, Arrays.asList(args));
     }

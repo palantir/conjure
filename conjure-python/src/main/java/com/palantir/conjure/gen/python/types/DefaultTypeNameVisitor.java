@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -92,6 +93,11 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
     @Override
     public String visit(SafeLongType safeLongType) {
         return "int";
+    }
+
+    @Override
+    public String visit(DateTimeType dateTimeType) {
+        return "str";
     }
 
 }

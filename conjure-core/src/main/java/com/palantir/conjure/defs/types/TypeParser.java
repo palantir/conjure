@@ -28,9 +28,10 @@ public enum TypeParser implements Parser<ConjureType> {
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
                 OptionalTypeParser.INSTANCE,
-                AnyTypeParser.INSTANCE,
-                BinaryTypeParser.INSTANCE,
-                SafeLongTypeParser.INSTANCE,
+                TypeFromString.of("any", AnyType.of()),
+                TypeFromString.of("binary", BinaryType.of()),
+                TypeFromString.of("safelong", SafeLongType.of()),
+                TypeFromString.of("datetime", DateTimeType.of()),
                 ImportedTypeReferenceParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
 
@@ -84,32 +85,6 @@ public enum TypeParser implements Parser<ConjureType> {
             }
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
             return ReferenceType.of(namespace, ref);
-        }
-    }
-
-    private enum AnyTypeParser implements Parser<AnyType> {
-        INSTANCE;
-
-        @Override
-        public AnyType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("any").parse(input);
-            if (Parsers.nullOrUnexpected(result)) {
-                return null;
-            }
-            return AnyType.of();
-        }
-    }
-
-    private enum BinaryTypeParser implements Parser<BinaryType> {
-        INSTANCE;
-
-        @Override
-        public BinaryType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("binary").parse(input);
-            if (Parsers.nullOrUnexpected(result)) {
-                return null;
-            }
-            return BinaryType.of();
         }
     }
 
@@ -181,17 +156,27 @@ public enum TypeParser implements Parser<ConjureType> {
         }
     }
 
-    private enum SafeLongTypeParser implements Parser<SafeLongType> {
-        INSTANCE;
+    private static final class TypeFromString<T> implements Parser<T> {
+        private final String type;
+        private final T instance;
+
+        TypeFromString(String type, T instance) {
+            this.type = type;
+            this.instance = instance;
+        }
 
         @Override
-        public SafeLongType parse(ParserState input) throws ParseException {
-            ExpectationResult result = Parsers.expect("safelong").parse(input);
+        public T parse(ParserState input) throws ParseException {
+            ExpectationResult result = Parsers.expect(type).parse(input);
             if (Parsers.nullOrUnexpected(result)) {
                 return null;
             }
 
-            return SafeLongType.of();
+            return instance;
+        }
+
+        public static <T> TypeFromString<T> of(String type, T instance) {
+            return new TypeFromString<>(type, instance);
         }
     }
 }

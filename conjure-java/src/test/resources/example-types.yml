@@ -11,6 +11,9 @@ types:
       SafeLongExample:
         fields:
           safeLongValue: safelong
+      DateTimeExample:
+        fields:
+          datetime: datetime
       DoubleExample:
         fields:
           doubleValue: double

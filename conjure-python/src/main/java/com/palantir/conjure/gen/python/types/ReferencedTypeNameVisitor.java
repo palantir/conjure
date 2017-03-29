@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -100,6 +101,11 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
 
     @Override
     public Set<PythonClassName> visit(SafeLongType safeLongType) {
+        return ImmutableSet.of();
+    }
+
+    @Override
+    public Set<PythonClassName> visit(DateTimeType dateTimeType) {
         return ImmutableSet.of();
     }
 

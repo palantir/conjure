@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -122,6 +123,11 @@ public final class TypeMapper {
             return null;
         }
 
+        @Override
+        public Void visit(DateTimeType dateTimeType) {
+            return null;
+        }
+
     }
 
     public Optional<String> getContainingPackage(ReferenceType referenceType) {
@@ -222,6 +228,11 @@ public final class TypeMapper {
         @Override
         public String visit(SafeLongType safeLongType) {
             return "number";
+        }
+
+        @Override
+        public String visit(DateTimeType dateTimeType) {
+            return "string";
         }
 
     }

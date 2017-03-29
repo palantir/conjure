@@ -8,6 +8,7 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.OptionalType;
@@ -69,6 +70,11 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
     @Override
     public TypeName visit(BinaryType binaryType) {
         return ClassName.get(javax.ws.rs.core.StreamingOutput.class);
+    }
+
+    @Override
+    public TypeName visit(DateTimeType dateTimeType) {
+        return delegate.visit(dateTimeType);
     }
 
 }

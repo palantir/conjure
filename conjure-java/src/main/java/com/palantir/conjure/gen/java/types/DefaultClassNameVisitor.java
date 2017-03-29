@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
@@ -25,6 +26,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import java.nio.ByteBuffer;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -137,6 +139,11 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     @Override
     public TypeName visit(SafeLongType safeLongType) {
         return ClassName.get(SafeLong.class);
+    }
+
+    @Override
+    public TypeName visit(DateTimeType dateTimeType) {
+        return ClassName.get(ZonedDateTime.class);
     }
 
     private static TypeName boxIfPrimitive(TypeName type) {

@@ -10,6 +10,7 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -44,11 +45,16 @@ public final class MethodSpecs {
     }
 
     public static MethodSpec createHashCode(Collection<FieldSpec> fields) {
+        CodeBlock hashInput = CodeBlocks.of(
+                fields.stream()
+                .map(MethodSpecs::createHashInput)
+                .collect(joining(CodeBlock.of(", "))));
+
         return MethodSpec.methodBuilder("hashCode")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.INT)
-                .addStatement("return $L", Expressions.staticMethodCall(Objects.class, "hash", fields))
+                .addStatement("return $1T.$2N($3L)", Objects.class, "hash", hashInput)
                 .build();
     }
 
@@ -90,9 +96,19 @@ public final class MethodSpecs {
 
         if (field.type.isPrimitive()) {
             return CodeBlock.of("$L == $L", thisField, otherField);
-        } else {
-            return CodeBlock.of("$L.equals($L)", thisField, otherField);
+        } else if (field.type.equals(ClassName.get(ZonedDateTime.class))) {
+            return CodeBlock.of("$L.isEqual($L)", thisField, otherField);
         }
+
+        return CodeBlock.of("$L.equals($L)", thisField, otherField);
+    }
+
+    private static CodeBlock createHashInput(FieldSpec field) {
+        if (field.type.equals(ClassName.get(ZonedDateTime.class))) {
+            return CodeBlock.of("$N.toInstant()", field);
+        }
+
+        return CodeBlock.of("$N", field);
     }
 
     private static <T> Collector<T, ArrayList<T>, ArrayList<T>> joining(T delim) {

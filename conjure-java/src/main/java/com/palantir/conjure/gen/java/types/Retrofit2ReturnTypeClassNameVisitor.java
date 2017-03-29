@@ -8,6 +8,7 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.OptionalType;
@@ -71,6 +72,11 @@ public final class Retrofit2ReturnTypeClassNameVisitor implements ClassNameVisit
     @Override
     public TypeName visit(BinaryType binaryType) {
         return RESPONSE_BODY_TYPE;
+    }
+
+    @Override
+    public TypeName visit(DateTimeType dateTimeType) {
+        return delegate.visit(dateTimeType);
     }
 
 }

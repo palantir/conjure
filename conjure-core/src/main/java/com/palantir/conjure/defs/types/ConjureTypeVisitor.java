@@ -24,4 +24,6 @@ public interface ConjureTypeVisitor<T> {
 
     T visit(SafeLongType safeLongType);
 
+    T visit(DateTimeType dateTimeType);
+
 }

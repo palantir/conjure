@@ -113,6 +113,19 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
  * `safelong`: a wrapper around a long type which enforces the value is safely
    representable as an integer in javascript (in javascript, between
    `Number.MIN_SAFE_INTEGER and Number.MAX_SAFE_INTEGER`).
+ * `datetime`: a date/time capable of precisely representing an instant in
+   human readable time, encoded as a string using ISO-8601 with required offset
+   and optional zone id. Second-precision is required, formats may include up to
+   nanosecond precision. Implementations must support handling the received
+   string or precisely modeling the received human readable time with
+   nanosecond precision. e.g. all of these are equivalent:
+    * `2017-01-02T03:04:05Z`
+    * `2017-01-02T03:04:05.000Z`
+    * `2017-01-02T03:04:05.000000Z`
+    * `2017-01-02T03:04:05.000000000Z`
+    * `2017-01-02T04:04:05.000000000+01:00`
+    * `2017-01-02T05:04:05.000000000+02:00`
+    * `2017-01-02T04:04:05.000000000+01:00[Europe/Berlin]`
 
 ### Imported Types
 External types, or imports, consist of references to types defined outside
@@ -416,8 +429,8 @@ this service.
  * `auth`: an optional auth requirement to override `default-auth`,
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
- * `returns`: a valid Conjure type. `returns` is an optional property -- if 
-   it is not specified, it indicates that the endpoint does not return a value 
+ * `returns`: a valid Conjure type. `returns` is an optional property -- if
+   it is not specified, it indicates that the endpoint does not return a value
    (equivalent to a `void` function in Java).
  * `docs`: a standard string and generally treated throughout rendering as
    Markdown.
@@ -543,7 +556,7 @@ The plugin then emits tailored outputs to each of these subprojects:
  * `<proj>-objects` (Java)
    * all of the defined bean types
    * ignores unknown properties on objects during deserialization
-   * safely encapsulates unknown enumeration values during deserialization 
+   * safely encapsulates unknown enumeration values during deserialization
  * `<proj>-jersey` (Java client/service definitions using Jersey)
  * `<proj>-retrofit` (Java client definitions using Retrofit)
  * `<proj>-typescript` (TypeScript)

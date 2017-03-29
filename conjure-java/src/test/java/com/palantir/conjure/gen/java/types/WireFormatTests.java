@@ -12,11 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.remoting2.ext.jackson.ObjectMappers;
 import java.nio.ByteBuffer;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import test.api.BinaryExample;
+import test.api.DateTimeExample;
 import test.api.DoubleAliasExample;
 import test.api.EnumExample;
 import test.api.IntegerAliasExample;
@@ -191,6 +194,75 @@ public final class WireFormatTests {
         String noType = "{\"typ\":\"unknown\",\"value\":5}";
         expectedException.expect(JsonMappingException.class);
         mapper.readValue(noType, UnionTypeExample.class);
+    }
+
+    @Test
+    public void testDateTime_roundTrip() throws Exception {
+        String serialized = "{\"datetime\":\"2017-01-02T03:04:05.000000006Z\"}";
+        DateTimeExample deserialized = DateTimeExample.of(
+                ZonedDateTime.of(2017, 1, 2, 3, 4, 5, 6, ZoneId.of("UTC")));
+        assertThat(mapper.writeValueAsString(deserialized)).isEqualTo(serialized);
+        assertThat(mapper.readValue(serialized, DateTimeExample.class)).isEqualTo(deserialized);
+    }
+
+    @Test
+    public void testDateTimeType_acceptFormats() throws Exception {
+        DateTimeExample reference = DateTimeExample.of(ZonedDateTime.parse("2017-01-02T03:04:05.000000006Z"));
+
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05.000000006Z\"}", DateTimeExample.class))
+                .isEqualTo(reference);
+
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05.000000006+00:00\"}", DateTimeExample.class))
+                .isEqualTo(reference);
+
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T04:04:05.000000006+01:00\"}", DateTimeExample.class))
+                .isEqualTo(reference);
+
+        assertThat(mapper.readValue(
+                "{\"datetime\":\"2017-01-02T04:04:05.000000006+01:00[Europe/Berlin]\"}", DateTimeExample.class))
+                .isEqualTo(reference);
+
+        DateTimeExample secondsOnly = DateTimeExample.of(ZonedDateTime.parse("2017-01-02T03:04:05.000000000Z"));
+
+        // seconds
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05Z\"}", DateTimeExample.class))
+                .isEqualTo(secondsOnly);
+
+        // milli
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05.000Z\"}", DateTimeExample.class))
+                .isEqualTo(secondsOnly);
+
+        // micro
+        assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05.000000Z\"}", DateTimeExample.class))
+                .isEqualTo(secondsOnly);
+    }
+
+    @Test
+    public void testDateTimeType_equality() throws Exception {
+        ZonedDateTime aa = ZonedDateTime.parse("2017-01-02T03:04:05.000000006Z");
+        ZonedDateTime bb = ZonedDateTime.parse("2017-01-02T03:04:05.000000006+00:00");
+        ZonedDateTime cc = ZonedDateTime.parse("2017-01-02T04:04:05.000000006+01:00");
+        ZonedDateTime dd = ZonedDateTime.parse("2017-01-02T04:04:05.000000006+01:00[Europe/Berlin]");
+
+        assertThat(aa.isEqual(bb)).isTrue();
+        assertThat(aa.isEqual(cc)).isTrue();
+        assertThat(aa.isEqual(dd)).isTrue();
+        assertThat(bb.isEqual(cc)).isTrue();
+        assertThat(bb.isEqual(dd)).isTrue();
+        assertThat(cc.isEqual(dd)).isTrue();
+
+        DateTimeExample one = DateTimeExample.of(ZonedDateTime.parse("2017-01-02T03:04:05.000000006Z"));
+        DateTimeExample two = DateTimeExample.of(ZonedDateTime.parse("2017-01-02T04:04:05.000000006+01:00"));
+        DateTimeExample three = DateTimeExample.of(
+                ZonedDateTime.parse("2017-01-02T04:04:05.000000006+01:00[Europe/Berlin]"));
+
+        assertThat(one).isEqualTo(two);
+        assertThat(one).isEqualTo(three);
+        assertThat(two).isEqualTo(three);
+
+        assertThat(one.hashCode()).isEqualTo(two.hashCode());
+        assertThat(one.hashCode()).isEqualTo(three.hashCode());
+        assertThat(two.hashCode()).isEqualTo(three.hashCode());
     }
 
     private static class TestVisitor implements UnionTypeExample.Visitor<Integer> {
