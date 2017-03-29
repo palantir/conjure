@@ -31,8 +31,7 @@ public final class ListParser<T> implements Parser<List<T>> {
             } else {
                 break;
             }
-        }
-        while (Parsers.gingerly(separator).parse(input) != null);
+        } while (Parsers.gingerly(separator).parse(input) != null);
         return results;
     }
 

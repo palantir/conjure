@@ -118,9 +118,7 @@ public final class BeanGenerator implements TypeGenerator {
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 
-        if (typeDef.docs().isPresent()) {
-            typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
-        }
+        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
         return JavaFile.builder(typePackage, typeBuilder.build())
                 .skipJavaLangImports(true)

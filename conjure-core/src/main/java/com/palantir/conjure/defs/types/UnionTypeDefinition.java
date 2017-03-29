@@ -9,13 +9,12 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.Set;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = UnionTypeDefinition.class)
+@JsonDeserialize(as = ImmutableUnionTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
 
-    @Value.NaturalOrder
-    Set<String> union();
+    Set<UnionValueDefinition> union();
 
     static Builder builder() {
         return new Builder();
