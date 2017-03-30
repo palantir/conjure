@@ -15,9 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Generated;
 
-/**
- * A type which can either be a StringExample, a set of strings, or an integer.
- */
+/** A type which can either be a StringExample, a set of strings, or an integer. */
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class UnionTypeExample {
     private final Base value;
@@ -33,9 +31,7 @@ public final class UnionTypeExample {
         return value;
     }
 
-    /**
-     * Docs for when UnionTypeExample is of type StringExample.
-     */
+    /** Docs for when UnionTypeExample is of type StringExample. */
     public static UnionTypeExample of(StringExample stringExampleValue) {
         return new UnionTypeExample(new StringExampleWrapper(stringExampleValue));
     }
@@ -58,15 +54,23 @@ public final class UnionTypeExample {
         } else if (value instanceof UnknownWrapper) {
             return visitor.visitUnknown(((UnknownWrapper) value).getType());
         }
-        throw new IllegalStateException(String.format("Could not identify type %s", value.getClass()));
+        throw new IllegalStateException(
+                String.format("Could not identify type %s", value.getClass()));
     }
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
-                || (other instanceof StringExample && value instanceof StringExampleWrapper && Objects.equals(((StringExampleWrapper) value).value, other))
-                || (other instanceof Integer && value instanceof IntegerWrapper && Objects.equals(((IntegerWrapper) value).value, other))
-                || (other instanceof Set && value instanceof SetStringWrapper && Objects.equals(((SetStringWrapper) value).value, other));
+        return this == other
+                || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
+                || (other instanceof StringExample
+                        && value instanceof StringExampleWrapper
+                        && Objects.equals(((StringExampleWrapper) value).value, other))
+                || (other instanceof Integer
+                        && value instanceof IntegerWrapper
+                        && Objects.equals(((IntegerWrapper) value).value, other))
+                || (other instanceof Set
+                        && value instanceof SetStringWrapper
+                        && Objects.equals(((SetStringWrapper) value).value, other));
     }
 
     private boolean equalTo(UnionTypeExample other) {
@@ -80,10 +84,13 @@ public final class UnionTypeExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("UnionTypeExample").append("{")
-                .append("value").append(": ").append(value)
-            .append("}")
-            .toString();
+        return new StringBuilder("UnionTypeExample")
+                .append("{")
+                .append("value")
+                .append(": ")
+                .append(value)
+                .append("}")
+                .toString();
     }
 
     public interface Visitor<T> {
@@ -97,21 +104,18 @@ public final class UnionTypeExample {
     }
 
     @JsonTypeInfo(
-            use = JsonTypeInfo.Id.NAME,
-            property = "type",
-            visible = true,
-            defaultImpl = UnknownWrapper.class
+        use = JsonTypeInfo.Id.NAME,
+        property = "type",
+        visible = true,
+        defaultImpl = UnknownWrapper.class
     )
     @JsonSubTypes({
-            @JsonSubTypes.Type(StringExampleWrapper.class),
-            @JsonSubTypes.Type(IntegerWrapper.class),
-            @JsonSubTypes.Type(SetStringWrapper.class)
+        @JsonSubTypes.Type(StringExampleWrapper.class),
+        @JsonSubTypes.Type(IntegerWrapper.class),
+        @JsonSubTypes.Type(SetStringWrapper.class)
     })
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
-    private interface Base {
-    }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private interface Base {}
 
     @JsonTypeName("StringExample")
     private static class StringExampleWrapper implements Base {
@@ -130,7 +134,9 @@ public final class UnionTypeExample {
 
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof StringExampleWrapper && equalTo((StringExampleWrapper) other));
+            return this == other
+                    || (other instanceof StringExampleWrapper
+                            && equalTo((StringExampleWrapper) other));
         }
 
         private boolean equalTo(StringExampleWrapper other) {
@@ -144,10 +150,13 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("StringExampleWrapper").append("{")
-                    .append("value").append(": ").append(value)
-                .append("}")
-                .toString();
+            return new StringBuilder("StringExampleWrapper")
+                    .append("{")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
         }
     }
 
@@ -168,7 +177,8 @@ public final class UnionTypeExample {
 
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof IntegerWrapper && equalTo((IntegerWrapper) other));
+            return this == other
+                    || (other instanceof IntegerWrapper && equalTo((IntegerWrapper) other));
         }
 
         private boolean equalTo(IntegerWrapper other) {
@@ -182,10 +192,13 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("IntegerWrapper").append("{")
-                    .append("value").append(": ").append(value)
-                .append("}")
-                .toString();
+            return new StringBuilder("IntegerWrapper")
+                    .append("{")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
         }
     }
 
@@ -206,7 +219,8 @@ public final class UnionTypeExample {
 
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof SetStringWrapper && equalTo((SetStringWrapper) other));
+            return this == other
+                    || (other instanceof SetStringWrapper && equalTo((SetStringWrapper) other));
         }
 
         private boolean equalTo(SetStringWrapper other) {
@@ -220,18 +234,21 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("SetStringWrapper").append("{")
-                    .append("value").append(": ").append(value)
-                .append("}")
-                .toString();
+            return new StringBuilder("SetStringWrapper")
+                    .append("{")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
         }
     }
 
     @JsonTypeInfo(
-            use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.EXISTING_PROPERTY,
-            property = "type",
-            visible = true
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true
     )
     private static class UnknownWrapper implements Base {
         private final String type;
@@ -267,7 +284,8 @@ public final class UnionTypeExample {
 
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof UnknownWrapper && equalTo((UnknownWrapper) other));
+            return this == other
+                    || (other instanceof UnknownWrapper && equalTo((UnknownWrapper) other));
         }
 
         private boolean equalTo(UnknownWrapper other) {
@@ -281,11 +299,17 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("UnknownWrapper").append("{")
-                    .append("type").append(": ").append(type)
-                    .append(", ").append("value").append(": ").append(value)
-                .append("}")
-                .toString();
+            return new StringBuilder("UnknownWrapper")
+                    .append("{")
+                    .append("type")
+                    .append(": ")
+                    .append(type)
+                    .append(", ")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
         }
     }
 }

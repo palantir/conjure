@@ -24,46 +24,60 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
 
-/**
- * A Markdown description of the service.
- */
+/** A Markdown description of the service. */
 @Generated("com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator")
 public interface TestService {
-    /**
-     * Returns a mapping from file system id to backing file system configuration.
-     */
+    /** Returns a mapping from file system id to backing file system configuration. */
     @GET("/catalog/fileSystems")
-    Call<Map<String, BackingFileSystem>> getFileSystems(@Header("Authorization") AuthHeader authHeader);
+    Call<Map<String, BackingFileSystem>> getFileSystems(
+            @Header("Authorization") AuthHeader authHeader);
 
     @POST("/catalog/datasets")
-    Call<Dataset> createDataset(@Header("Authorization") AuthHeader authHeader, @Body CreateDatasetRequest request);
+    Call<Dataset> createDataset(
+            @Header("Authorization") AuthHeader authHeader, @Body CreateDatasetRequest request);
 
     @GET("/catalog/datasets/{datasetRid}")
-    Call<Optional<Dataset>> getDataset(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+    Call<Optional<Dataset>> getDataset(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/datasets/{datasetRid}/raw")
     @Streaming
-    Call<ResponseBody> getRawData(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+    Call<ResponseBody> getRawData(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/datasets/{datasetRid}/raw-maybe")
-    Call<Optional<ByteBuffer>> maybeGetRawData(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+    Call<Optional<ByteBuffer>> maybeGetRawData(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/datasets/{datasetRid}/branches")
-    Call<Set<String>> getBranches(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+    Call<Set<String>> getBranches(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     /**
      * Gets all branches of this dataset.
+     *
      * @deprecated use getBranches instead
      */
     @GET("/catalog/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
-    Call<Set<String>> getBranchesDeprecated(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid);
+    Call<Set<String>> getBranchesDeprecated(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/datasets/{datasetRid}/branches/{branch}/resolve")
-    Call<Optional<String>> resolveBranch(@Header("Authorization") AuthHeader authHeader, @Path("datasetRid") ResourceIdentifier datasetRid, @Path(value = "branch", encoded = true) String branch);
+    Call<Optional<String>> resolveBranch(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("datasetRid") ResourceIdentifier datasetRid,
+            @Path(value = "branch", encoded = true) String branch);
 
     @GET("/catalog/datasets/{dataset-rid}/testParam")
-    Call<Optional<String>> testParam(@Header("Authorization") AuthHeader authHeader, @Path("dataset-rid") ResourceIdentifier datasetRid);
+    Call<Optional<String>> testParam(
+            @Header("Authorization") AuthHeader authHeader,
+            @Path("dataset-rid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/boolean")
     Call<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);

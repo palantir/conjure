@@ -4,34 +4,36 @@
 
 package com.palantir.conjure.gen.java.services;
 
+import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 public interface ServiceGenerator {
 
+    /** Returns the set of Java files generated from the service definitions in the given conjure specification. */
+    Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports);
+
     /**
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
      */
-    default void emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+    default List<Path> emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+        List<Path> emittedPaths = Lists.newArrayList();
         generate(conjureDefinition, imports).forEach(f -> {
-            try {
-                f.writeTo(outputDir);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Path emittedPath = Goethe.formatAndEmit(f, outputDir.toPath());
+            emittedPaths.add(emittedPath);
         });
+        return emittedPaths;
     }
-
-    /** Returns the set of Java files generated from the service definitions in the given conjure specification. */
-    Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports);
 
     static Optional<String> getJavaDoc(EndpointDefinition endpointDef) {
         Optional<String> depr = endpointDef.deprecated()

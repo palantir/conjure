@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = ListExample.Builder.class
-)
+@JsonDeserialize(builder = ListExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class ListExample {
     private final List<String> items;
@@ -44,27 +42,30 @@ public final class ListExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("ListExample").append("{")
-                .append("items").append(": ").append(items)
-            .append("}")
-            .toString();
+        return new StringBuilder("ListExample")
+                .append("{")
+                .append("items")
+                .append(": ")
+                .append(items)
+                .append("}")
+                .toString();
     }
 
     public static ListExample of(List<String> items) {
-        return builder()
-            .items(items)
-            .build();
+        return builder().items(items).build();
     }
 
     private static void validateFields(List<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -79,14 +80,11 @@ public final class ListExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private List<String> items = new ArrayList<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(ListExample other) {
             items(other.getItems());

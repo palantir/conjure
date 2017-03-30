@@ -12,9 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = MapExample.Builder.class
-)
+@JsonDeserialize(builder = MapExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class MapExample {
     private final Map<String, String> items;
@@ -45,27 +43,30 @@ public final class MapExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("MapExample").append("{")
-                .append("items").append(": ").append(items)
-            .append("}")
-            .toString();
+        return new StringBuilder("MapExample")
+                .append("{")
+                .append("items")
+                .append(": ")
+                .append(items)
+                .append("}")
+                .toString();
     }
 
     public static MapExample of(Map<String, String> items) {
-        return builder()
-            .items(items)
-            .build();
+        return builder().items(items).build();
     }
 
     private static void validateFields(Map<String, String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -80,14 +81,11 @@ public final class MapExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Map<String, String> items = new LinkedHashMap<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(MapExample other) {
             items(other.getItems());

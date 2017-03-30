@@ -12,9 +12,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = PrimitiveOptionalsExample.Builder.class
-)
+@JsonDeserialize(builder = PrimitiveOptionalsExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class PrimitiveOptionalsExample {
     private final OptionalDouble num;
@@ -23,7 +21,8 @@ public final class PrimitiveOptionalsExample {
 
     private final OptionalInt integer;
 
-    private PrimitiveOptionalsExample(OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
+    private PrimitiveOptionalsExample(
+            OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
         validateFields(num, bool, integer);
         this.num = num;
         this.bool = bool;
@@ -47,11 +46,15 @@ public final class PrimitiveOptionalsExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof PrimitiveOptionalsExample && equalTo((PrimitiveOptionalsExample) other));
+        return this == other
+                || (other instanceof PrimitiveOptionalsExample
+                        && equalTo((PrimitiveOptionalsExample) other));
     }
 
     private boolean equalTo(PrimitiveOptionalsExample other) {
-        return this.num.equals(other.num) && this.bool.equals(other.bool) && this.integer.equals(other.integer);
+        return this.num.equals(other.num)
+                && this.bool.equals(other.bool)
+                && this.integer.equals(other.integer);
     }
 
     @Override
@@ -61,33 +64,42 @@ public final class PrimitiveOptionalsExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("PrimitiveOptionalsExample").append("{")
-                .append("num").append(": ").append(num)
-                .append(", ").append("bool").append(": ").append(bool)
-                .append(", ").append("integer").append(": ").append(integer)
-            .append("}")
-            .toString();
+        return new StringBuilder("PrimitiveOptionalsExample")
+                .append("{")
+                .append("num")
+                .append(": ")
+                .append(num)
+                .append(", ")
+                .append("bool")
+                .append(": ")
+                .append(bool)
+                .append(", ")
+                .append("integer")
+                .append(": ")
+                .append(integer)
+                .append("}")
+                .toString();
     }
 
-    public static PrimitiveOptionalsExample of(OptionalDouble num, Boolean bool, OptionalInt integer) {
-        return builder()
-            .num(num)
-            .bool(Optional.of(bool))
-            .integer(integer)
-            .build();
+    public static PrimitiveOptionalsExample of(
+            OptionalDouble num, Boolean bool, OptionalInt integer) {
+        return builder().num(num).bool(Optional.of(bool)).integer(integer).build();
     }
 
-    private static void validateFields(OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
+    private static void validateFields(
+            OptionalDouble num, Optional<Boolean> bool, OptionalInt integer) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");
         missingFields = addFieldIfMissing(missingFields, bool, "bool");
         missingFields = addFieldIfMissing(missingFields, integer, "integer");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -102,9 +114,7 @@ public final class PrimitiveOptionalsExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private OptionalDouble num = OptionalDouble.empty();
 
@@ -112,8 +122,7 @@ public final class PrimitiveOptionalsExample {
 
         private OptionalInt integer = OptionalInt.empty();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(PrimitiveOptionalsExample other) {
             num(other.getNum());

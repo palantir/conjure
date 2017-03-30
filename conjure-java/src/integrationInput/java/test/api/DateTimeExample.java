@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = DateTimeExample.Builder.class
-)
+@JsonDeserialize(builder = DateTimeExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class DateTimeExample {
     private final ZonedDateTime datetime;
@@ -29,7 +27,8 @@ public final class DateTimeExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof DateTimeExample && equalTo((DateTimeExample) other));
+        return this == other
+                || (other instanceof DateTimeExample && equalTo((DateTimeExample) other));
     }
 
     private boolean equalTo(DateTimeExample other) {
@@ -43,27 +42,30 @@ public final class DateTimeExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("DateTimeExample").append("{")
-                .append("datetime").append(": ").append(datetime)
-            .append("}")
-            .toString();
+        return new StringBuilder("DateTimeExample")
+                .append("{")
+                .append("datetime")
+                .append(": ")
+                .append(datetime)
+                .append("}")
+                .toString();
     }
 
     public static DateTimeExample of(ZonedDateTime datetime) {
-        return builder()
-            .datetime(datetime)
-            .build();
+        return builder().datetime(datetime).build();
     }
 
     private static void validateFields(ZonedDateTime datetime) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, datetime, "datetime");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -78,14 +80,11 @@ public final class DateTimeExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private ZonedDateTime datetime;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(DateTimeExample other) {
             datetime(other.getDatetime());

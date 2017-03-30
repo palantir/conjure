@@ -13,9 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = SetExample.Builder.class
-)
+@JsonDeserialize(builder = SetExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class SetExample {
     private final Set<String> items;
@@ -46,27 +44,30 @@ public final class SetExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("SetExample").append("{")
-                .append("items").append(": ").append(items)
-            .append("}")
-            .toString();
+        return new StringBuilder("SetExample")
+                .append("{")
+                .append("items")
+                .append(": ")
+                .append(items)
+                .append("}")
+                .toString();
     }
 
     public static SetExample of(Set<String> items) {
-        return builder()
-            .items(items)
-            .build();
+        return builder().items(items).build();
     }
 
     private static void validateFields(Set<String> items) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -81,14 +82,11 @@ public final class SetExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Set<String> items = new LinkedHashSet<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(SetExample other) {
             items(other.getItems());

@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = BooleanExample.Builder.class
-)
+@JsonDeserialize(builder = BooleanExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class BooleanExample {
     private final boolean coin;
@@ -25,7 +23,8 @@ public final class BooleanExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof BooleanExample && equalTo((BooleanExample) other));
+        return this == other
+                || (other instanceof BooleanExample && equalTo((BooleanExample) other));
     }
 
     private boolean equalTo(BooleanExample other) {
@@ -39,30 +38,28 @@ public final class BooleanExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("BooleanExample").append("{")
-                .append("coin").append(": ").append(coin)
-            .append("}")
-            .toString();
+        return new StringBuilder("BooleanExample")
+                .append("{")
+                .append("coin")
+                .append(": ")
+                .append(coin)
+                .append("}")
+                .toString();
     }
 
     public static BooleanExample of(boolean coin) {
-        return builder()
-            .coin(coin)
-            .build();
+        return builder().coin(coin).build();
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private boolean coin;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(BooleanExample other) {
             coin(other.getCoin());

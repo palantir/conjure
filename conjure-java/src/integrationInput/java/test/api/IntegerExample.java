@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = IntegerExample.Builder.class
-)
+@JsonDeserialize(builder = IntegerExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class IntegerExample {
     private final int integer;
@@ -25,7 +23,8 @@ public final class IntegerExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof IntegerExample && equalTo((IntegerExample) other));
+        return this == other
+                || (other instanceof IntegerExample && equalTo((IntegerExample) other));
     }
 
     private boolean equalTo(IntegerExample other) {
@@ -39,30 +38,28 @@ public final class IntegerExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("IntegerExample").append("{")
-                .append("integer").append(": ").append(integer)
-            .append("}")
-            .toString();
+        return new StringBuilder("IntegerExample")
+                .append("{")
+                .append("integer")
+                .append(": ")
+                .append(integer)
+                .append("}")
+                .toString();
     }
 
     public static IntegerExample of(int integer) {
-        return builder()
-            .integer(integer)
-            .build();
+        return builder().integer(integer).build();
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private int integer;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(IntegerExample other) {
             integer(other.getInteger());

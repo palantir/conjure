@@ -23,58 +23,72 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
-/**
- * A Markdown description of the service.
- */
+/** A Markdown description of the service. */
 @Path("/catalog")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
 public interface TestService {
-    /**
-     * Returns a mapping from file system id to backing file system configuration.
-     */
+    /** Returns a mapping from file system id to backing file system configuration. */
     @GET
     @Path("/fileSystems")
-    Map<String, BackingFileSystem> getFileSystems(@HeaderParam("Authorization") AuthHeader authHeader);
+    Map<String, BackingFileSystem> getFileSystems(
+            @HeaderParam("Authorization") AuthHeader authHeader);
 
     @POST
     @Path("/datasets")
-    Dataset createDataset(@HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
+    Dataset createDataset(
+            @HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
 
     @GET
     @Path("/datasets/{datasetRid}")
-    Optional<Dataset> getDataset(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    Optional<Dataset> getDataset(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/raw")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    StreamingOutput getRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    StreamingOutput getRawData(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/raw-maybe")
-    Optional<ByteBuffer> maybeGetRawData(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    Optional<ByteBuffer> maybeGetRawData(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches")
-    Set<String> getBranches(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    Set<String> getBranches(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     /**
      * Gets all branches of this dataset.
+     *
      * @deprecated use getBranches instead
      */
     @GET
     @Path("/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
-    Set<String> getBranchesDeprecated(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+    Set<String> getBranchesDeprecated(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
     @Path("/datasets/{datasetRid}/branches/{branch:.+}/resolve")
-    Optional<String> resolveBranch(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid, @PathParam("branch") String branch);
+    Optional<String> resolveBranch(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid,
+            @PathParam("branch") String branch);
 
     @GET
     @Path("/datasets/{dataset-rid}/testParam")
-    Optional<String> testParam(@HeaderParam("Authorization") AuthHeader authHeader, @PathParam("dataset-rid") ResourceIdentifier datasetRid);
+    Optional<String> testParam(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @PathParam("dataset-rid") ResourceIdentifier datasetRid);
 
     @GET
     @Path("/boolean")

@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = DoubleExample.Builder.class
-)
+@JsonDeserialize(builder = DoubleExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class DoubleExample {
     private final double doubleValue;
@@ -39,30 +37,28 @@ public final class DoubleExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("DoubleExample").append("{")
-                .append("doubleValue").append(": ").append(doubleValue)
-            .append("}")
-            .toString();
+        return new StringBuilder("DoubleExample")
+                .append("{")
+                .append("doubleValue")
+                .append(": ")
+                .append(doubleValue)
+                .append("}")
+                .toString();
     }
 
     public static DoubleExample of(double doubleValue) {
-        return builder()
-            .doubleValue(doubleValue)
-            .build();
+        return builder().doubleValue(doubleValue).build();
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private double doubleValue;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(DoubleExample other) {
             doubleValue(other.getDoubleValue());

@@ -10,9 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = OptionalExample.Builder.class
-)
+@JsonDeserialize(builder = OptionalExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class OptionalExample {
     private final Optional<String> item;
@@ -29,7 +27,8 @@ public final class OptionalExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof OptionalExample && equalTo((OptionalExample) other));
+        return this == other
+                || (other instanceof OptionalExample && equalTo((OptionalExample) other));
     }
 
     private boolean equalTo(OptionalExample other) {
@@ -43,27 +42,30 @@ public final class OptionalExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("OptionalExample").append("{")
-                .append("item").append(": ").append(item)
-            .append("}")
-            .toString();
+        return new StringBuilder("OptionalExample")
+                .append("{")
+                .append("item")
+                .append(": ")
+                .append(item)
+                .append("}")
+                .toString();
     }
 
     public static OptionalExample of(String item) {
-        return builder()
-            .item(Optional.of(item))
-            .build();
+        return builder().item(Optional.of(item)).build();
     }
 
     private static void validateFields(Optional<String> item) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, item, "item");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -78,14 +80,11 @@ public final class OptionalExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Optional<String> item = Optional.empty();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(OptionalExample other) {
             item(other.getItem());

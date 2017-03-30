@@ -20,10 +20,11 @@ dependencies {
     compile project(':conjure-core')
     compile project(':conjure-java-lib')
 
-    compile 'com.google.guava:guava'
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    compile 'com.google.googlejavaformat:google-java-format'
+    compile 'com.google.guava:guava'
     compile 'com.squareup:javapoet'
     compile 'org.apache.commons:commons-lang3'
     compile 'org.slf4j:slf4j-api'

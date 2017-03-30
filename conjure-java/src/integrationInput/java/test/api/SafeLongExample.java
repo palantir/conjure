@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = SafeLongExample.Builder.class
-)
+@JsonDeserialize(builder = SafeLongExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class SafeLongExample {
     private final SafeLong safeLongValue;
@@ -29,7 +27,8 @@ public final class SafeLongExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof SafeLongExample && equalTo((SafeLongExample) other));
+        return this == other
+                || (other instanceof SafeLongExample && equalTo((SafeLongExample) other));
     }
 
     private boolean equalTo(SafeLongExample other) {
@@ -43,27 +42,30 @@ public final class SafeLongExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("SafeLongExample").append("{")
-                .append("safeLongValue").append(": ").append(safeLongValue)
-            .append("}")
-            .toString();
+        return new StringBuilder("SafeLongExample")
+                .append("{")
+                .append("safeLongValue")
+                .append(": ")
+                .append(safeLongValue)
+                .append("}")
+                .toString();
     }
 
     public static SafeLongExample of(SafeLong safeLongValue) {
-        return builder()
-            .safeLongValue(safeLongValue)
-            .build();
+        return builder().safeLongValue(safeLongValue).build();
     }
 
     private static void validateFields(SafeLong safeLongValue) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, safeLongValue, "safeLongValue");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -78,14 +80,11 @@ public final class SafeLongExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private SafeLong safeLongValue;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(SafeLongExample other) {
             safeLongValue(other.getSafeLongValue());
@@ -94,7 +93,8 @@ public final class SafeLongExample {
 
         @JsonSetter("safeLongValue")
         public Builder safeLongValue(SafeLong safeLongValue) {
-            this.safeLongValue = Objects.requireNonNull(safeLongValue, "safeLongValue cannot be null");
+            this.safeLongValue =
+                    Objects.requireNonNull(safeLongValue, "safeLongValue cannot be null");
             return this;
         }
 

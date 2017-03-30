@@ -16,9 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = ManyFieldExample.Builder.class
-)
+@JsonDeserialize(builder = ManyFieldExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class ManyFieldExample {
     private final String string;
@@ -37,7 +35,15 @@ public final class ManyFieldExample {
 
     private final StringAliasExample alias;
 
-    private ManyFieldExample(String string, int integer, double doubleValue, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, StringAliasExample alias) {
+    private ManyFieldExample(
+            String string,
+            int integer,
+            double doubleValue,
+            Optional<String> optionalItem,
+            List<String> items,
+            Set<String> set,
+            Map<String, String> map,
+            StringAliasExample alias) {
         validateFields(string, optionalItem, items, set, map, alias);
         this.string = string;
         this.integer = integer;
@@ -91,11 +97,19 @@ public final class ManyFieldExample {
 
     @Override
     public boolean equals(Object other) {
-        return this == other || (other instanceof ManyFieldExample && equalTo((ManyFieldExample) other));
+        return this == other
+                || (other instanceof ManyFieldExample && equalTo((ManyFieldExample) other));
     }
 
     private boolean equalTo(ManyFieldExample other) {
-        return this.string.equals(other.string) && this.integer == other.integer && this.doubleValue == other.doubleValue && this.optionalItem.equals(other.optionalItem) && this.items.equals(other.items) && this.set.equals(other.set) && this.map.equals(other.map) && this.alias.equals(other.alias);
+        return this.string.equals(other.string)
+                && this.integer == other.integer
+                && this.doubleValue == other.doubleValue
+                && this.optionalItem.equals(other.optionalItem)
+                && this.items.equals(other.items)
+                && this.set.equals(other.set)
+                && this.map.equals(other.map)
+                && this.alias.equals(other.alias);
     }
 
     @Override
@@ -105,20 +119,50 @@ public final class ManyFieldExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("ManyFieldExample").append("{")
-                .append("string").append(": ").append(string)
-                .append(", ").append("integer").append(": ").append(integer)
-                .append(", ").append("doubleValue").append(": ").append(doubleValue)
-                .append(", ").append("optionalItem").append(": ").append(optionalItem)
-                .append(", ").append("items").append(": ").append(items)
-                .append(", ").append("set").append(": ").append(set)
-                .append(", ").append("map").append(": ").append(map)
-                .append(", ").append("alias").append(": ").append(alias)
-            .append("}")
-            .toString();
+        return new StringBuilder("ManyFieldExample")
+                .append("{")
+                .append("string")
+                .append(": ")
+                .append(string)
+                .append(", ")
+                .append("integer")
+                .append(": ")
+                .append(integer)
+                .append(", ")
+                .append("doubleValue")
+                .append(": ")
+                .append(doubleValue)
+                .append(", ")
+                .append("optionalItem")
+                .append(": ")
+                .append(optionalItem)
+                .append(", ")
+                .append("items")
+                .append(": ")
+                .append(items)
+                .append(", ")
+                .append("set")
+                .append(": ")
+                .append(set)
+                .append(", ")
+                .append("map")
+                .append(": ")
+                .append(map)
+                .append(", ")
+                .append("alias")
+                .append(": ")
+                .append(alias)
+                .append("}")
+                .toString();
     }
 
-    private static void validateFields(String string, Optional<String> optionalItem, List<String> items, Set<String> set, Map<String, String> map, StringAliasExample alias) {
+    private static void validateFields(
+            String string,
+            Optional<String> optionalItem,
+            List<String> items,
+            Set<String> set,
+            Map<String, String> map,
+            StringAliasExample alias) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, string, "string");
         missingFields = addFieldIfMissing(missingFields, optionalItem, "optionalItem");
@@ -127,11 +171,13 @@ public final class ManyFieldExample {
         missingFields = addFieldIfMissing(missingFields, map, "map");
         missingFields = addFieldIfMissing(missingFields, alias, "alias");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -146,9 +192,7 @@ public final class ManyFieldExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private String string;
 
@@ -166,8 +210,7 @@ public final class ManyFieldExample {
 
         private StringAliasExample alias;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(ManyFieldExample other) {
             string(other.getString());
@@ -206,7 +249,9 @@ public final class ManyFieldExample {
         }
 
         public Builder optionalItem(String optionalItem) {
-            this.optionalItem = Optional.of(Objects.requireNonNull(optionalItem, "optionalItem cannot be null"));
+            this.optionalItem =
+                    Optional.of(
+                            Objects.requireNonNull(optionalItem, "optionalItem cannot be null"));
             return this;
         }
 
@@ -268,7 +313,8 @@ public final class ManyFieldExample {
         }
 
         public ManyFieldExample build() {
-            return new ManyFieldExample(string, integer, doubleValue, optionalItem, items, set, map, alias);
+            return new ManyFieldExample(
+                    string, integer, doubleValue, optionalItem, items, set, map, alias);
         }
     }
 }

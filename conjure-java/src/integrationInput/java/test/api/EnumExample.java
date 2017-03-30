@@ -7,15 +7,16 @@ import javax.annotation.Generated;
 
 /**
  * This enumerates the numbers 1:2.
- * <p>
- * This class is used instead of a native enum to support unknown values.
- * Rather than throw an exception, the {@link EnumExample#valueOf} method defaults to a new instantiation of
- * {@link EnumExample} where {@link EnumExample#get} will return {@link EnumExample.Value#UNKNOWN}.
- * <p>
- * For example, {@code EnumExample.valueOf("corrupted value").get()} will return {@link EnumExample.Value#UNKNOWN},
- * but {@link EnumExample#toString} will return "corrupted value".
- * <p>
- * There is no method to access all instantiations of this class, since they cannot be known at compile time.
+ *
+ * <p>This class is used instead of a native enum to support unknown values. Rather than throw an
+ * exception, the {@link EnumExample#valueOf} method defaults to a new instantiation of {@link
+ * EnumExample} where {@link EnumExample#get} will return {@link EnumExample.Value#UNKNOWN}.
+ *
+ * <p>For example, {@code EnumExample.valueOf("corrupted value").get()} will return {@link
+ * EnumExample.Value#UNKNOWN}, but {@link EnumExample#toString} will return "corrupted value".
+ *
+ * <p>There is no method to access all instantiations of this class, since they cannot be known at
+ * compile time.
  */
 @Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
 public final class EnumExample {
@@ -49,7 +50,9 @@ public final class EnumExample {
 
     @Override
     public boolean equals(Object other) {
-        return (this == other) || (other instanceof EnumExample && this.string.equals(((EnumExample) other).string));
+        return (this == other)
+                || (other instanceof EnumExample
+                        && this.string.equals(((EnumExample) other).string));
     }
 
     @Override

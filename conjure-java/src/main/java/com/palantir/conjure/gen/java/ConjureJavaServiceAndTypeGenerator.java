@@ -4,14 +4,17 @@
 
 package com.palantir.conjure.gen.java;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
+import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 public final class ConjureJavaServiceAndTypeGenerator {
@@ -38,13 +41,12 @@ public final class ConjureJavaServiceAndTypeGenerator {
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
      */
-    public void emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+    public List<Path> emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+        List<Path> emittedPaths = Lists.newArrayList();
         generate(conjureDefinition, imports).forEach(f -> {
-            try {
-                f.writeTo(outputDir);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Path emittedPath = Goethe.formatAndEmit(f, outputDir.toPath());
+            emittedPaths.add(emittedPath);
         });
+        return emittedPaths;
     }
 }

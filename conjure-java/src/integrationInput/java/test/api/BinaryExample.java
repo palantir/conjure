@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Generated;
 
-@JsonDeserialize(
-        builder = BinaryExample.Builder.class
-)
+@JsonDeserialize(builder = BinaryExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
 public final class BinaryExample {
     private final ByteBuffer binary;
@@ -43,27 +41,30 @@ public final class BinaryExample {
 
     @Override
     public String toString() {
-        return new StringBuilder("BinaryExample").append("{")
-                .append("binary").append(": ").append(binary)
-            .append("}")
-            .toString();
+        return new StringBuilder("BinaryExample")
+                .append("{")
+                .append("binary")
+                .append(": ")
+                .append(binary)
+                .append("}")
+                .toString();
     }
 
     public static BinaryExample of(ByteBuffer binary) {
-        return builder()
-            .binary(binary)
-            .build();
+        return builder().binary(binary).build();
     }
 
     private static void validateFields(ByteBuffer binary) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, binary, "binary");
         if (missingFields != null) {
-            throw new IllegalStateException("Some required fields have not been set: " + missingFields);
+            throw new IllegalStateException(
+                    "Some required fields have not been set: " + missingFields);
         }
     }
 
-    private static List<String> addFieldIfMissing(List<String> prev, Object fieldValue, String fieldName) {
+    private static List<String> addFieldIfMissing(
+            List<String> prev, Object fieldValue, String fieldName) {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
@@ -78,14 +79,11 @@ public final class BinaryExample {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(
-            ignoreUnknown = true
-    )
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private ByteBuffer binary;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         public Builder from(BinaryExample other) {
             binary(other.getBinary());
