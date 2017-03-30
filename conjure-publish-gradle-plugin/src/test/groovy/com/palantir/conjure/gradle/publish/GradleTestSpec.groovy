@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure
+package com.palantir.conjure.gradle.publish
 
 import com.energizedwork.spock.extensions.TempDirectory
 import groovy.transform.CompileStatic
@@ -13,11 +13,9 @@ import spock.lang.Specification
 public class GradleTestSpec extends Specification {
     @TempDirectory
     protected File testDir
-    File buildFile
 
     def setup() {
-        buildFile = file("build.gradle")
-        println("Build directory: \n" + testDir.absolutePath)
+        println("Build directory: " + testDir.absolutePath)
     }
 
     protected def run(String... tasks) {

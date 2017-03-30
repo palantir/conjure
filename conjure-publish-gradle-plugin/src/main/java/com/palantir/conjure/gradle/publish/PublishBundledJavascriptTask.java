@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure;
+package com.palantir.conjure.gradle.publish;
 
 import java.io.File;
 import java.io.IOException;

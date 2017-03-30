@@ -650,7 +650,7 @@ buildscript {
 Apply the plugin on projects containing generated TypeScript:
 
 ```gradle
-apply plugin: 'com.palantir.gradle-conjure-publish'
+apply plugin: 'com.palantir.typescript-publish'
 ```
 
-To publish, run the `publishConjure` task.
+To publish, run the `publishTypeScript` task.

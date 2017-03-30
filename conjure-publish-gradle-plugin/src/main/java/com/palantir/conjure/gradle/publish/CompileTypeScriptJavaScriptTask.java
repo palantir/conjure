@@ -2,7 +2,7 @@
  * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
  */
 
-package com.palantir.conjure;
+package com.palantir.conjure.gradle.publish;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
-public class CompileTypescriptJavascriptTask extends ConventionTask {
+public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
     private File inputDirectory;
     private File outputDirectory;
