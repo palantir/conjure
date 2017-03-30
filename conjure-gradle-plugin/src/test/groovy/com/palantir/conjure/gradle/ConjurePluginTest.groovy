@@ -111,14 +111,6 @@ class ConjurePluginTest extends GradleTestSpec {
         file('api/api-objects/src/generated/java/.gitignore').text.contains('*.java')
     }
 
-    def 'pythonTask is disabled by default'() {
-        when:
-        def result = run(':api:compileConjure')
-
-        then:
-        result.task(':api:compileConjurePython').outcome == TaskOutcome.SKIPPED
-    }
-
     def 'pythonTask generates code when enabled'() {
         given:
         file('api/build.gradle').text = """
@@ -147,7 +139,6 @@ class ConjurePluginTest extends GradleTestSpec {
 
         then:
         result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
         result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
@@ -164,7 +155,6 @@ class ConjurePluginTest extends GradleTestSpec {
         then:
         result.task(':api:api-objects:compileJava').outcome == TaskOutcome.SUCCESS
         result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
         result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
 
@@ -215,7 +205,6 @@ class ConjurePluginTest extends GradleTestSpec {
 
         then:
         result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
         result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
 
@@ -294,6 +283,40 @@ class ConjurePluginTest extends GradleTestSpec {
 
         file('api/api-jersey/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.a.api.InternalImport;")
         file('api/api-jersey/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.b.api.ExternalImport;")
+    }
+
+    def 'omitting a project from settings is sufficient to disable'() {
+        given:
+        file('settings.gradle').text = """
+        include 'api'
+        include 'api:api-objects'
+        """
+
+        when:
+        def result = run(':api:compileConjure')
+
+        then:
+        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
+        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureJersey') == null
+
+        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
+        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
+    }
+
+    def 'including only the jersey project throws because objects project is missing'() {
+        given:
+        file('settings.gradle').text = """
+        include 'api'
+        include 'api:api-jersey'
+        """
+
+        when:
+        def result = fail(':api:compileConjure')
+
+        then:
+        result.task(':api:compileConjureJersey') == null
     }
 
     def readResource(String name) {

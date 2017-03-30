@@ -7,6 +7,7 @@ package com.palantir.conjure.gradle
 import com.energizedwork.spock.extensions.TempDirectory
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
 
@@ -18,8 +19,12 @@ class GradleTestSpec extends Specification {
         println("Build directory: " + testDir.absolutePath)
     }
 
-    protected run(String... tasks) {
+    protected BuildResult run(String... tasks) {
         return build(tasks).build()
+    }
+
+    protected BuildResult fail(String... tasks) {
+        return build(tasks).buildAndFail()
     }
 
     protected build(String... tasks) {

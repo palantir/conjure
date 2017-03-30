@@ -53,107 +53,128 @@ public class ConjurePlugin implements Plugin<Project> {
 
         applyDependencyForIdeTasks(project, conjureTask);
 
-        Project objectsProject = project.project(project.getName() + "-objects", (subproj) -> {
-            subproj.getPluginManager().apply(JavaPlugin.class);
+        final String objectsProjectName = project.getName() + "-objects";
+        final String retrofitProjectName = project.getName() + "-retrofit";
+        final String jerseyProjectName = project.getName() + "-jersey";
+        final String typescriptProjectName = project.getName() + "-typescript";
+        final String pythonProjectName = project.getName() + "-python";
 
-            addGeneratedToMainSourceSet(subproj);
-            applyDependencyForIdeTasks(subproj, conjureTask);
+        final Project objectsProject;
+        if (project.findProject(objectsProjectName) != null) {
+            objectsProject = project.project(objectsProjectName, (subproj) -> {
+                subproj.getPluginManager().apply(JavaPlugin.class);
 
-            project.getTasks().create("compileConjureObjects",
-                    CompileConjureJavaObjectsTask.class,
-                    (task) -> {
-                        task.dependsOn(processConjureImports);
-                        task.setSource(conjureSourceSet);
-                        task.setOutputDirectory(subproj.file("src/generated/java"));
-                        Settings settings = Settings.builder()
-                                .ignoreUnknownProperties(true)
-                                .supportUnknownEnumValues(true)
-                                .build();
-                        task.setTypeGenerator(new BeanGenerator(settings));
-                        conjureTask.dependsOn(task);
-                        subproj.getTasks().getByName("compileJava").dependsOn(task);
-                    });
+                addGeneratedToMainSourceSet(subproj);
 
-            subproj.getDependencies().add("compile", "com.palantir.conjure:conjure-java-lib");
-        });
+                project.getTasks().create("compileConjureObjects",
+                        CompileConjureJavaObjectsTask.class,
+                        (task) -> {
+                            task.dependsOn(processConjureImports);
+                            task.setSource(conjureSourceSet);
+                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            Settings settings = Settings.builder()
+                                    .ignoreUnknownProperties(true)
+                                    .supportUnknownEnumValues(true)
+                                    .build();
+                            task.setTypeGenerator(new BeanGenerator(settings));
+                            conjureTask.dependsOn(task);
+                            subproj.getTasks().getByName("compileJava").dependsOn(task);
+                            applyDependencyForIdeTasks(subproj, task);
+                        });
 
-        project.project(project.getName() + "-retrofit", (subproj) -> {
-            subproj.getPluginManager().apply(JavaPlugin.class);
+                subproj.getDependencies().add("compile", "com.palantir.conjure:conjure-java-lib");
+            });
+        } else {
+            objectsProject = null;
+        }
 
-            addGeneratedToMainSourceSet(subproj);
-            applyDependencyForIdeTasks(subproj, conjureTask);
+        if (project.findProject(retrofitProjectName) != null) {
+            if (objectsProject == null) {
+                throw new IllegalStateException(
+                        String.format("Cannot enable '%s' without '%s'", retrofitProjectName, objectsProjectName));
+            }
+            project.project(retrofitProjectName, (subproj) -> {
+                subproj.getPluginManager().apply(JavaPlugin.class);
 
-            project.getTasks().create("compileConjureRetrofit",
-                    CompileConjureJavaServiceTask.class,
-                    (task) -> {
-                        task.dependsOn(processConjureImports);
-                        task.setSource(conjureSourceSet);
-                        task.setOutputDirectory(subproj.file("src/generated/java"));
-                        task.setServiceGenerator(new Retrofit2ServiceGenerator());
-                        conjureTask.dependsOn(task);
-                        subproj.getTasks().getByName("compileJava").dependsOn(task);
-                    });
+                addGeneratedToMainSourceSet(subproj);
 
-            subproj.getTasks().getByName("compileJava").dependsOn(conjureTask);
-            subproj.getDependencies().add("compile", objectsProject);
-            subproj.getDependencies().add("compile", "com.squareup.retrofit2:retrofit");
-        });
+                project.getTasks().create("compileConjureRetrofit",
+                        CompileConjureJavaServiceTask.class,
+                        (task) -> {
+                            task.dependsOn(processConjureImports);
+                            task.setSource(conjureSourceSet);
+                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            task.setServiceGenerator(new Retrofit2ServiceGenerator());
+                            conjureTask.dependsOn(task);
+                            subproj.getTasks().getByName("compileJava").dependsOn(task);
+                            applyDependencyForIdeTasks(subproj, task);
+                        });
 
-        project.project(project.getName() + "-jersey", (subproj) -> {
-            subproj.getPluginManager().apply(JavaPlugin.class);
+                subproj.getDependencies().add("compile", objectsProject);
+                subproj.getDependencies().add("compile", "com.squareup.retrofit2:retrofit");
+            });
+        }
 
-            addGeneratedToMainSourceSet(subproj);
-            applyDependencyForIdeTasks(subproj, conjureTask);
+        if (project.findProject(jerseyProjectName) != null) {
+            if (objectsProject == null) {
+                throw new IllegalStateException(
+                        String.format("Cannot enable '%s' without '%s'", jerseyProjectName, objectsProjectName));
+            }
+            project.project(project.getName() + "-jersey", (subproj) -> {
+                subproj.getPluginManager().apply(JavaPlugin.class);
 
-            project.getTasks().create("compileConjureJersey",
-                    CompileConjureJavaServiceTask.class,
-                    (task) -> {
-                        task.dependsOn(processConjureImports);
-                        task.setSource(conjureSourceSet);
-                        task.setOutputDirectory(subproj.file("src/generated/java"));
-                        task.setServiceGenerator(new JerseyServiceGenerator());
-                        conjureTask.dependsOn(task);
-                        subproj.getTasks().getByName("compileJava").dependsOn(task);
-                    });
+                addGeneratedToMainSourceSet(subproj);
 
-            subproj.getTasks().getByName("compileJava").dependsOn(conjureTask);
-            subproj.getDependencies().add("compile", objectsProject);
-            subproj.getDependencies().add("compile", "javax.ws.rs:javax.ws.rs-api");
-        });
+                project.getTasks().create("compileConjureJersey",
+                        CompileConjureJavaServiceTask.class,
+                        (task) -> {
+                            task.dependsOn(processConjureImports);
+                            task.setSource(conjureSourceSet);
+                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            task.setServiceGenerator(new JerseyServiceGenerator());
+                            conjureTask.dependsOn(task);
+                            subproj.getTasks().getByName("compileJava").dependsOn(task);
+                            applyDependencyForIdeTasks(subproj, task);
+                        });
 
-        project.project(project.getName() + "-typescript", (subproj) -> {
-            applyDependencyForIdeTasks(subproj, conjureTask);
+                subproj.getDependencies().add("compile", objectsProject);
+                subproj.getDependencies().add("compile", "javax.ws.rs:javax.ws.rs-api");
+            });
+        }
 
-            project.getTasks().create("compileConjureTypeScript",
-                    CompileConjureTypeScriptTask.class,
-                    (task) -> {
-                        task.setSource(conjureSourceSet);
-                        task.dependsOn(processConjureImports);
-                        task.setOutputDirectory(subproj.file("src"));
-                        task.setServiceGenerator(new DefaultServiceGenerator());
-                        task.setTypeGenerator(new DefaultTypeGenerator());
-                        conjureTask.dependsOn(task);
-                    });
-        });
+        if (project.findProject(typescriptProjectName) != null) {
+            project.project(typescriptProjectName, (subproj) -> {
+                applyDependencyForIdeTasks(subproj, conjureTask);
 
-        project.project(project.getName() + "-python", (subproj) -> {
-            applyDependencyForIdeTasks(subproj, conjureTask);
+                project.getTasks().create("compileConjureTypeScript",
+                        CompileConjureTypeScriptTask.class,
+                        (task) -> {
+                            task.setSource(conjureSourceSet);
+                            task.dependsOn(processConjureImports);
+                            task.setOutputDirectory(subproj.file("src"));
+                            task.setServiceGenerator(new DefaultServiceGenerator());
+                            task.setTypeGenerator(new DefaultTypeGenerator());
+                            conjureTask.dependsOn(task);
+                        });
+            });
+        }
 
-            project.getTasks().create("compileConjurePython",
-                    CompileConjurePythonTask.class,
-                    (task) -> {
-                        task.setSource(conjureSourceSet);
-                        task.dependsOn(processConjureImports);
-                        task.setOutputDirectory(subproj.file("python"));
-                        task.setClientGenerator(new ClientGenerator());
-                        task.setBeanGenerator(new DefaultBeanGenerator());
+        if (project.findProject(pythonProjectName) != null) {
+            project.project(pythonProjectName, (subproj) -> {
+                applyDependencyForIdeTasks(subproj, conjureTask);
 
-                        // disable by default
-                        task.setEnabled(false);
-
-                        conjureTask.dependsOn(task);
-                    });
-        });
+                project.getTasks().create("compileConjurePython",
+                        CompileConjurePythonTask.class,
+                        (task) -> {
+                            task.setSource(conjureSourceSet);
+                            task.dependsOn(processConjureImports);
+                            task.setOutputDirectory(subproj.file("python"));
+                            task.setClientGenerator(new ClientGenerator());
+                            task.setBeanGenerator(new DefaultBeanGenerator());
+                            conjureTask.dependsOn(task);
+                        });
+            });
+        }
     }
 
     private void addGeneratedToMainSourceSet(Project subproj) {
