@@ -4,7 +4,6 @@ types:
     objects:
       X:
         fields:
-          fx: X
           fy: Y
           fz: Z
           fe: EnumObject

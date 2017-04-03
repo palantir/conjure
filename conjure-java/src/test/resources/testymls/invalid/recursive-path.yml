@@ -1,0 +1,11 @@
+types:
+  definitions:
+    default-package: test.api
+    objects:
+      # invalid: cannot have object definition that has concrete cycle
+      PointerObject:
+        fields:
+          val: PathRecursiveObject
+      PathRecursiveObject:
+        fields:
+          other: PointerObject
