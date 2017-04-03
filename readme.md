@@ -477,8 +477,8 @@ this service.
 ### Service Example
 See also:
  * [Example Service Definition](conjure-java/src/test/resources/example-service.yml)
- * [Example Generated Jersey Service Code](conjure-java/src/test/resources/test/api/TestService.jersey)
- * [Example Generated Retrofit Client Code](conjure-java/src/test/resources/test/api/TestService.retrofit)
+ * [Example Generated Jersey Service Code](conjure-java/src/test/resources/test/api/TestService.java.jersey)
+ * [Example Generated Retrofit Client Code](conjure-java/src/test/resources/test/api/TestService.java.retrofit)
  * [Example Generated TypeScript Client Code](conjure-typescript/src/test/resources/services)
 
 ```yaml
