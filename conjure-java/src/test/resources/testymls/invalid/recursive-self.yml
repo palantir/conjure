@@ -1,8 +1,0 @@
-types:
-  definitions:
-    default-package: test.api
-    objects:
-      # invalid: cannot have a concrete recursive reference
-      SelfRecursiveObject:
-          fields:
-            self: SelfRecursiveObject
