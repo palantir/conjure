@@ -14,7 +14,6 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.RequestLineDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
@@ -115,23 +114,21 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                                 ? Lists.newArrayList(StringExpression.of("Authorization"))
                                 : Lists.newArrayList()))
                 .put("pathArguments", ArrayExpression.of(
-                        value.args().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> resolveParamType(e.getKey(), e.getValue().paramType(), value.http())
-                                        == ArgumentDefinition.ParamType.PATH)
+                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
                                 .map(e -> e.getKey())
                                 .map(RawExpression::of)
                                 .collect(Collectors.toList())))
                 .put("queryArguments", JsonExpression.builder().keyValues(
-                        value.args().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> resolveParamType(e.getKey(), e.getValue().paramType(), value.http())
-                                        == ArgumentDefinition.ParamType.QUERY)
+                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
                                 .map(e -> e.getKey())
                                 .collect(Collectors.toMap(identifier -> identifier,
                                         identifier -> RawExpression.of(identifier))))
                         .build())
-                .put("data", Iterables.getOnlyElement(value.args().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> resolveParamType(e.getKey(), e.getValue().paramType(), value.http())
-                                        == ArgumentDefinition.ParamType.BODY)
+                .put("data", Iterables.getOnlyElement(
+                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.BODY)
                                 .map(e -> e.getKey())
                                 .map(RawExpression::of)
                                 .collect(Collectors.toList()), RawExpression.of("undefined")))
@@ -142,16 +139,6 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 JsonExpression.builder().keyValues(keyValues).build()).build();
         return TypescriptFunctionBody.builder().addStatements(
                 ReturnStatement.builder().expression(call).build()).build();
-    }
-
-    private static ArgumentDefinition.ParamType resolveParamType(String name, ArgumentDefinition.ParamType paramType,
-            RequestLineDefinition requestLineDefinition) {
-        if (paramType == ArgumentDefinition.ParamType.AUTO) {
-            return requestLineDefinition.pathArgs().contains(name) ? ArgumentDefinition.ParamType.PATH
-                    : ArgumentDefinition.ParamType.BODY;
-        } else {
-            return paramType;
-        }
     }
 
     @Override

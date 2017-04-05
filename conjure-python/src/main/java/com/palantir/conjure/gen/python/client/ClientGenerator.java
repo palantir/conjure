@@ -50,12 +50,12 @@ public final class ClientGenerator {
                     ed.returns()
                             .ifPresent(returnType -> referencedTypesBuilder.addAll(returnType.visit(
                                     referencedTypeNameVisitor)));
-                    ed.args().ifPresent(args -> {
+                    ed.argsWithAutoDefined().ifPresent(args -> {
                         args.values().forEach(arg -> referencedTypesBuilder.addAll(arg.type().visit(
                                 referencedTypeNameVisitor)));
                     });
 
-                    List<PythonEndpointParam> params = ed.args().map(args -> args.entrySet()
+                    List<PythonEndpointParam> params = ed.argsWithAutoDefined().map(args -> args.entrySet()
                             .stream()
                             .map(argEntry -> PythonEndpointParam
                                     .builder()

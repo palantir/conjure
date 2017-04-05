@@ -31,7 +31,8 @@ public final class ServiceUtils {
             String name, String packageLocation, TypeMapper typeMapper) {
         List<ConjureType> usedTypes = serviceDef.endpoints().values().stream()
                 .flatMap(endpoint -> {
-                    Stream<ConjureType> endpointTypes = endpoint.args().orElse(Maps.newHashMap()).values().stream()
+                    Stream<ConjureType> endpointTypes = endpoint.argsWithAutoDefined().orElse(
+                            Maps.newHashMap()).values().stream()
                             .map(ArgumentDefinition::type);
                     if (endpoint.returns().isPresent()) {
                         endpointTypes = Stream.concat(endpointTypes, Stream.of(endpoint.returns().get()));
@@ -48,7 +49,7 @@ public final class ServiceUtils {
                 type -> typeMapper.getTypescriptType(value.returns().get()).name()).orElse("void");
         return TypescriptFunctionSignature.builder()
                 .name(name)
-                .parameters(generateParameters(value.args().orElse(ImmutableMap.of()), typeMapper))
+                .parameters(generateParameters(value.argsWithAutoDefined().orElse(ImmutableMap.of()), typeMapper))
                 .returnType(TypescriptType.builder().name("Promise<" + innerReturnType + ">").build())
                 .build();
     }

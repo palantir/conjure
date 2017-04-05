@@ -1,0 +1,11 @@
+services:
+  TestService:
+    name: Test Service
+    package: test.a
+    endpoints:
+      testEndpoint:
+        http:
+          method: GET
+          path: /{arg}
+        args:
+          # invalid: cannot have a path argument in the path that is not defined as an argument

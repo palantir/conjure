@@ -58,7 +58,6 @@ public interface PythonEndpointDefinition extends Emittable {
                                 .addAll(params())
                                 .build() : params();
             paramsWithHeader = paramsWithHeader.stream()
-                    .map(pep -> convertAutoParam(pep, http().path()))
                     .collect(Collectors.toList());
 
             poetWriter.writeIndentedLine("def %s(self, %s):",
@@ -166,21 +165,6 @@ public interface PythonEndpointDefinition extends Emittable {
 
             poetWriter.decreaseIndent();
         });
-    }
-
-    static PythonEndpointParam convertAutoParam(PythonEndpointParam param, String path) {
-        // need to convert to path param if it appears in the path, body otherwise
-        if (param.paramType() != ArgumentDefinition.ParamType.AUTO) {
-            return param;
-        }
-
-        ArgumentDefinition.ParamType newParamType = path.contains("{" + param.paramId().orElse(param.paramName()) + "}")
-                ? ArgumentDefinition.ParamType.PATH : ArgumentDefinition.ParamType.BODY;
-
-        return PythonEndpointParam.builder()
-                    .from(param)
-                    .paramType(newParamType)
-                    .build();
     }
 
     class Builder extends ImmutablePythonEndpointDefinition.Builder {}

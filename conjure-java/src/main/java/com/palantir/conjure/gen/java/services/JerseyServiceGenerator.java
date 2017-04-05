@@ -116,9 +116,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         AuthDefinition auth = endpointDef.auth().orElse(defaultAuth);
         createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
-        if (endpointDef.args().isPresent()) {
+        if (endpointDef.argsWithAutoDefined().isPresent()) {
             Set<String> pathArgs = endpointDef.http().pathArgs();
-            endpointDef.args().get().forEach((name, def) -> {
+            endpointDef.argsWithAutoDefined().get().forEach((name, def) -> {
                 parameterSpecs.add(createServiceMethodParameterArg(typeMapper, pathArgs, name, def));
             });
         }
@@ -169,11 +169,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             Set<String> pathArgs) {
         final String annotationType;
         switch (def.paramType()) {
-            case AUTO:
             case PATH:
-                if (!pathArgs.contains(def.paramId().orElse(argName))) {
-                    return Optional.empty();
-                }
                 annotationType = "PathParam";
                 break;
             case QUERY:

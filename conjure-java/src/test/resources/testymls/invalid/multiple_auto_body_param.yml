@@ -1,0 +1,16 @@
+services:
+  TestService:
+    name: Test Service
+    package: test.a
+    endpoints:
+      testEndpoint:
+        http:
+          method: GET
+          path: /path
+        # invalid: cannot have multiple arguments with param-type "auto" that resolve to "body"
+        args:
+          arg:
+            type: string
+          arg2:
+            type: string
+        returns: string

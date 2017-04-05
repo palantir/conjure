@@ -111,9 +111,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         getAuthParameter(methodBuilder, endpointDef.auth().orElse(defaultAuth)).ifPresent(methodBuilder::addParameter);
 
-        endpointDef.args().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
+        endpointDef.argsWithAutoDefined().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
                 .map(arg -> createEndpointParameter(
-                        typeMapper, pathArgs, encodedPathArgs, arg.getKey(), arg.getValue()))
+                        typeMapper, encodedPathArgs, arg.getKey(), arg.getValue()))
                 .collect(Collectors.toList())));
 
         return methodBuilder.build();
@@ -148,26 +148,21 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return replaceEncodedPathArgs(path.replaceFirst(pattern, replacement), currentArg + 1, encodedPathArgs);
     }
 
-    private ParameterSpec createEndpointParameter(TypeMapper typeMapper, Set<String> pathArgs,
-            Set<String> encodedPathArgs, String paramKey, ArgumentDefinition def) {
+    private ParameterSpec createEndpointParameter(TypeMapper typeMapper, Set<String> encodedPathArgs, String paramKey,
+            ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
                 typeMapper.getClassName(def.type()),
                 paramKey);
 
         switch (def.paramType()) {
-            case AUTO:
             case PATH:
                 String pathParamKey = def.paramId().orElse(paramKey);
-                if (pathArgs.contains(pathParamKey)) {
-                    AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                            .addMember("value", "$S", pathParamKey);
-                    if (encodedPathArgs.contains(pathParamKey)) {
-                        builder.addMember("encoded", "$L", true);
-                    }
-                    param.addAnnotation(builder.build());
-                } else {
-                    param.addAnnotation(ClassName.get("retrofit2.http", "Body"));
+                AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
+                        .addMember("value", "$S", pathParamKey);
+                if (encodedPathArgs.contains(pathParamKey)) {
+                    builder.addMember("encoded", "$L", true);
                 }
+                param.addAnnotation(builder.build());
                 break;
             case QUERY:
                 param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))

@@ -4,27 +4,23 @@
 
 package com.palantir.conjure.defs.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
-import java.util.Collection;
+import com.palantir.conjure.defs.validators.EndpointDefinitionValidator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = ImmutableEndpointDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EndpointDefinition {
-
-    Set<Class<? extends ConjureType>> ILLEGAL_ARG_TYPES = ImmutableSet.of(BinaryType.class);
 
     @JsonProperty("http")
     RequestLineDefinition http();
@@ -34,6 +30,39 @@ public interface EndpointDefinition {
 
     @JsonProperty("args")
     Optional<Map<String, ArgumentDefinition>> args();
+
+    /**
+     * Returns the arguments for this endpoint where all instances of ParamType.AUTO have been set to
+     * ParamType.PATH or ParamType.BODY.
+     *
+     * @return the arguments for this endpoint
+     */
+    @Value.Derived
+    default Optional<Map<String, ArgumentDefinition>> argsWithAutoDefined() {
+        if (!args().isPresent()) {
+            return Optional.empty();
+        }
+
+        Set<String> pathArgs = http().pathArgs();
+        Map<String, ArgumentDefinition> outputMap = new LinkedHashMap<>();
+        args().orElse(ImmutableMap.of()).entrySet().stream()
+                .map(entry -> {
+                    ArgumentDefinition origArgDef = entry.getValue();
+                    ArgumentDefinition.Builder builder = ArgumentDefinition.builder().from(origArgDef);
+                    if (origArgDef.paramType() == ArgumentDefinition.ParamType.AUTO) {
+                        if (pathArgs.contains(origArgDef.paramId().orElse(entry.getKey()))) {
+                            // argument exists in request line -- it is a path arg
+                            builder.paramType(ArgumentDefinition.ParamType.PATH);
+                        } else {
+                            // argument does not exist in request line -- it is a body arg
+                            builder.paramType(ArgumentDefinition.ParamType.BODY);
+                        }
+                    }
+                    return Maps.immutableEntry(entry.getKey(), builder.build());
+                })
+                .forEachOrdered(entry -> outputMap.put(entry.getKey(), entry.getValue()));
+        return Optional.of(outputMap);
+    }
 
     @JsonProperty("returns")
     Optional<ConjureType> returns();
@@ -46,21 +75,9 @@ public interface EndpointDefinition {
 
     @Value.Check
     default void check() {
-        toStream(args())
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .map(ArgumentDefinition::type)
-                .forEach(type -> checkArgument(!isIllegal(type), "Endpoint cannot have argument with type '%s'", type));
-    }
-
-    static boolean isIllegal(ConjureType type) {
-        return ILLEGAL_ARG_TYPES.stream()
-                .filter(illegalClass -> illegalClass.isAssignableFrom(type.getClass()))
-                .count() > 0;
-    }
-
-    static <T> Stream<T> toStream(Optional<T> val) {
-        return val.map(Stream::of).orElse(Stream.empty());
+        for (EndpointDefinitionValidator validator : EndpointDefinitionValidator.values()) {
+            validator.validate(this);
+        }
     }
 
     static Builder builder() {

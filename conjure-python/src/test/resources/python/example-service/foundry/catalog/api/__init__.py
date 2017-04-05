@@ -312,9 +312,10 @@ class TestService(Service):
 
         _path_params = {
             'datasetRid': datasetRid,
+            'branch': branch,
         } # type: Dict[str, Any]
 
-        _json = ConjureEncoder().default(branch) # type: Any
+        _json = None # type: Any
 
         _path = '/datasets/{datasetRid}/branches/{branch}/resolve'
         _path = _path.format(**_path_params)
