@@ -24,9 +24,7 @@ public final class ConjureTypescriptTypeTest {
     @Test
     public void testTypescriptTypeGenerator_generate_allExamples() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
-
         Set<TypescriptFile> files = new DefaultTypeGenerator().generate(def.types(), null);
-
         for (TypescriptFile file : files) {
             assertThat(file.writeToString()).isEqualTo(CharStreams.toString(new InputStreamReader(
                     getClass().getResourceAsStream("/types/" + StringUtils.uncapitalize(file.name()) + ".ts"),
@@ -39,7 +37,7 @@ public final class ConjureTypescriptTypeTest {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
         Set<ExportStatement> exports = new DefaultTypeGenerator().generateExports(def.types());
 
-        assertThat(exports.size()).isEqualTo(12);   // AliasExample is ignored
+        assertThat(exports.size()).isEqualTo(13);   // AliasExample is ignored
         Set<ExportStatement> expectedExports = Sets.newHashSet(
                 exportStatement("IStringExample", "stringExample"),
                 exportStatement("IIntegerExample", "integerExample"),
@@ -52,7 +50,8 @@ public final class ConjureTypescriptTypeTest {
                 exportStatement("IBooleanExample", "booleanExample"),
                 exportStatement("IAnyExample", "anyExample"),
                 exportStatement("IAnyMapExample", "anyMapExample"),
-                exportStatement("IManyFieldExample", "manyFieldExample"));
+                exportStatement("IManyFieldExample", "manyFieldExample"),
+                exportStatement("IUnionTypeExample", "unionTypeExample"));
         assertThat(exports).containsAll(expectedExports);
     }
 

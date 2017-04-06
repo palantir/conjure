@@ -35,6 +35,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +67,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         TypescriptConstructor constructor = TypescriptConstructor.builder()
                 .addParameters(TypescriptTypeSignature.builder().name("bridge").typescriptType(bridgeType).build())
                 .functionBody(constructorBody).build();
-        Set<TypescriptFunction> methods = serviceDef.endpoints().entrySet()
+        List<TypescriptFunction> methods = serviceDef.endpoints().entrySet()
                 .stream()
                 .map(e -> {
                     TypescriptFunctionSignature functionSignature = ServiceUtils.generateFunctionSignature(e.getKey(),
@@ -76,7 +77,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                     return TypescriptFunction.builder().functionSignature(functionSignature)
                             .functionBody(functionBody).build();
                 })
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(TypescriptFunction::functionSignature))
+                .collect(Collectors.toList());
         List<AssignStatement> fields = Lists.newArrayList(
                 AssignStatement.builder().lhs("private bridge: IHttpApiBridge").build());
         TypescriptClass typescriptClass = TypescriptClass.builder()

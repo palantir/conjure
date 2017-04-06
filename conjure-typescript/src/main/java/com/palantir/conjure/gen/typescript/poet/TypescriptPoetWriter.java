@@ -66,4 +66,10 @@ public final class TypescriptPoetWriter {
         emittable.emit(this);
         return this;
     }
+
+    public TypescriptPoetWriter emitIndented(Emittable emittable) {
+        writeIndented();
+        emittable.emit(this);
+        return this;
+    }
 }

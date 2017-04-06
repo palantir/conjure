@@ -48,3 +48,9 @@ types:
           set: set<string>
           map: map<string, string>
           alias: AliasExample
+      UnionTypeExample:
+        union:
+          - StringExample
+          - set<string>
+          - integer
+          - map<string, string>

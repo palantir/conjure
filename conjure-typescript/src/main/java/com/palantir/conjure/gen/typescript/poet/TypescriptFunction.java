@@ -13,9 +13,18 @@ public interface TypescriptFunction extends Emittable {
     TypescriptFunctionBody functionBody();
     TypescriptFunctionSignature functionSignature();
 
+    @Value.Default
+    default boolean isStatic() {
+        return false;
+    }
+
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        writer.writeIndented("public ");
+        if (isStatic()) {
+            writer.writeIndented("export function ");
+        } else {
+            writer.writeIndented("public ");
+        }
         functionSignature().emit(writer);
         writer.write(" ");
         functionBody().emit(writer);
