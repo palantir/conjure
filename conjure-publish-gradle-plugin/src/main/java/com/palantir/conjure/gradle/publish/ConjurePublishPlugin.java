@@ -37,6 +37,8 @@ public class ConjurePublishPlugin implements Plugin<Project> {
                 .create("publishBundledJavaScript", PublishBundledJavascriptTask.class);
         publishBundledJavascriptTask.setInputDirectory(bundleJavaScriptOutput);
 
+        project.getExtensions().create("publishTypeScript", ConjurePublishPluginExtension.class);
+
         Task publishConjureTask = project.getTasks().create("publishTypeScript");
 
         bundleJavascriptTask.dependsOn(compileTypescriptJavascriptTask);

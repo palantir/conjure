@@ -45,8 +45,15 @@ public class BundleJavascriptTask extends ConventionTask {
         Handlebars handlebars = new Handlebars();
         try {
             Template template = handlebars.compileInline(ConjurePublishPlugin.readResource("package.json.hbs"));
-            String packageJsonText = template.apply(ImmutableMap.of("projectName", getProject().getName(),
-                    "version", getProject().getVersion()));
+            ConjurePublishPluginExtension extension = getProject().getExtensions()
+                    .getByType(ConjurePublishPluginExtension.class);
+            String packageJsonText = template.apply(
+                    ImmutableMap.of(
+                        "scopeName", extension.getScopeName(),
+                        "projectName", getProject().getName(),
+                        "version", getProject().getVersion()
+                    )
+            );
             ConjurePublishPlugin.makeFile(new File(getOutputDirectory(), "package.json"), packageJsonText);
         } catch (IOException e) {
             throw new RuntimeException(e);

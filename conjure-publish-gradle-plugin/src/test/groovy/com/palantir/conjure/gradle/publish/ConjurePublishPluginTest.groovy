@@ -15,6 +15,8 @@ public class ConjurePublishPluginTest extends GradleTestSpec {
         plugins {
             id 'com.palantir.typescript-publish'
         }
+
+        publishTypeScript.scopeName = 'my-scope'
         """
 
         file('src/index.ts').text = readResource('src/index.ts')
@@ -40,7 +42,7 @@ public class ConjurePublishPluginTest extends GradleTestSpec {
         result.task(':compileTypeScriptJavaScript').outcome == TaskOutcome.SUCCESS
         result.task(':bundleJavaScript').outcome == TaskOutcome.SUCCESS
         bundledJavascriptOutputFile('api/testServiceAImpl.js').text.contains('var TestServiceA = ')
-        bundledJavascriptOutputFile('package.json').text.contains(String.format('"name": "@elements/%s-conjure"',
+        bundledJavascriptOutputFile('package.json').text.contains(String.format('"name": "@my-scope/%s-conjure"',
                 testDir.getName()));
     }
 
