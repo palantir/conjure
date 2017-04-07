@@ -18,7 +18,6 @@ import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.UnionTypeDefinition;
-import com.palantir.conjure.defs.types.UnionValueDefinition;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
 import com.palantir.conjure.gen.typescript.poet.EqualityStatement;
@@ -161,7 +160,6 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     private TypescriptFile generateUnionTypeFile(String typeName, UnionTypeDefinition baseTypeDef,
             String packageLocation, String parentFolderPath, TypeMapper mapper) {
-        Set<UnionValueDefinition> unions = baseTypeDef.union();
         List<ConjureType> referencedTypes = Lists.newArrayList();
         SortedSet<TypescriptTypeSignature> propertySignatures = new TreeSet<TypescriptTypeSignature>();
         propertySignatures.add(TypescriptTypeSignature.builder()
@@ -173,32 +171,30 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         ReturnStatement baseReturn = ReturnStatement.builder().expression(RawExpression.of("undefined")).build();
         String interfaceName = "I" + typeName;
         TypescriptType unionType = TypescriptType.builder().name(interfaceName).build();
-        for (UnionValueDefinition union : unions) {
-            String unionValue = union.value();
-            String unionValueUncapitalized = StringUtils.uncapitalize(unionValue);
-            ConjureType conjureTypeOfUnionValue = getConjureType(unionValue);
-            referencedTypes.add(conjureTypeOfUnionValue);
+        baseTypeDef.union().forEach((memberName, memberType) -> {
+            ConjureType conjureTypeOfMemberType = getConjureType(memberType.type());
+            referencedTypes.add(conjureTypeOfMemberType);
             propertySignatures.add(
                     TypescriptTypeSignature.builder()
-                            .name(StringExpression.of(unionValueUncapitalized).emitToString())
-                            .typescriptType(mapper.getTypescriptType(conjureTypeOfUnionValue))
+                            .name(StringExpression.of(memberName).emitToString())
+                            .typescriptType(mapper.getTypescriptType(conjureTypeOfMemberType))
                             .isOptional(true)
                             .build());
             TypescriptFunctionSignature functionHeader =
                     TypescriptFunctionSignature.builder()
                             .addParameters(
                                     TypescriptTypeSignature.builder().name("obj").typescriptType(unionType).build())
-                            .name(simpleName(unionValueUncapitalized))
+                            .name(StringUtils.uncapitalize(memberName))
                             .build();
             TypescriptEqualityClause typescriptEqualityClause = TypescriptEqualityClause.builder()
-                    .clause("obj.type === " + StringExpression.of(unionValue).emitToString())
+                    .clause("obj.type === " + StringExpression.of(memberType.type()).emitToString())
                     .build();
             EqualityStatement equalityStatement = EqualityStatement.builder()
                     .typescriptEqualityStatement(typescriptEqualityClause)
                     .equalityBody(ReturnStatement.builder()
                             .expression(
                                     RawExpression.of(
-                                            "obj[" + StringExpression.of(unionValueUncapitalized).emitToString() + "]"))
+                                            "obj[" + StringExpression.of(memberName).emitToString() + "]"))
                             .build())
                     .build();
             TypescriptFunction helperFunction = TypescriptFunction.builder()
@@ -209,7 +205,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .isStatic(true)
                     .build();
             methods.add(helperFunction);
-        }
+        });
         propertySignatures.add(TypescriptTypeSignature.builder()
                 .name("[key: string]")
                 .typescriptType(mapper.getTypescriptType(AnyType.of()))
@@ -237,24 +233,4 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         }
     }
 
-    // Example set<string> -> setString
-    private static String simpleName(String rawName) {
-        int startingIndex = rawName.indexOf("<");
-        int endingIndex = rawName.indexOf(">");
-        if (startingIndex > -1 && endingIndex > -1) {
-            String dataStructureName = rawName.substring(0, startingIndex);
-            // Parameterized type
-            int multiParamaterIndex = rawName.indexOf(",");
-            if (multiParamaterIndex > -1) {
-                String firstParam = StringUtils.capitalize(rawName.substring(startingIndex + 1, multiParamaterIndex));
-                String secondParam =
-                        StringUtils
-                                .capitalize(StringUtils.strip(rawName.substring(multiParamaterIndex + 1, endingIndex)));
-                return dataStructureName + firstParam + secondParam;
-            } else {
-                return dataStructureName + StringUtils.capitalize(rawName.substring(startingIndex + 1, endingIndex));
-            }
-        }
-        return rawName;
-    }
 }

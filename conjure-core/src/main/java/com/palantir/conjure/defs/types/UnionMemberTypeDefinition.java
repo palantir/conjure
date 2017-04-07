@@ -4,44 +4,47 @@
 
 package com.palantir.conjure.defs.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.UnionValueDefinition.UnionValueDeserializer;
+import com.palantir.conjure.defs.types.UnionMemberTypeDefinition.UnionMemberTypeDeserializer;
 import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(using = UnionValueDeserializer.class)
+@JsonDeserialize(using = UnionMemberTypeDeserializer.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface UnionValueDefinition {
+public interface UnionMemberTypeDefinition {
 
-    String value();
+    @JsonProperty("type")
+    String type();
 
+    @JsonProperty("docs")
     Optional<String> docs();
 
-    static UnionValueDefinition.Builder builder() {
+    static UnionMemberTypeDefinition.Builder builder() {
         return new Builder();
     }
 
-    class Builder extends ImmutableUnionValueDefinition.Builder {}
+    class Builder extends ImmutableUnionMemberTypeDefinition.Builder {}
 
-    class UnionValueDeserializer extends JsonDeserializer<UnionValueDefinition> {
+    class UnionMemberTypeDeserializer extends JsonDeserializer<UnionMemberTypeDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public UnionValueDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
+        public UnionMemberTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
                 throws IOException, JsonProcessingException {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
-                return builder().value(candidate).build();
+                return builder().type(candidate).build();
             }
 
-            return ImmutableUnionValueDefinition.fromJson(
-                    parser.readValueAs(ImmutableUnionValueDefinition.Json.class));
+            return ImmutableUnionMemberTypeDefinition.fromJson(
+                    parser.readValueAs(ImmutableUnionMemberTypeDefinition.Json.class));
         }
     }
 }

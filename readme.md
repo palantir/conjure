@@ -300,6 +300,70 @@ has not yet been an issue, but please file an issue if this is something that yo
 encounter that causes pain. In the mean time, this can be worked around by
 defining an imported type that imports a compatible type that is defined externally.
 
+#### Union Definitions
+Conjure supports unions, where a union contains exactly one of several possible types. Each union definition consists of
+a type alias, an optional package, and a `union` block, which is a map of name (used for serialization of the union
+type) to a member type definition. Member types may include any other Conjure type (built-ins, imports, etc.).
+
+```yaml
+union:
+  [name]: [type]
+  [another name]: [another type]
+```
+
+A concrete example where a union type might be used is in describing a payload object. For example, the payload can be
+_either_ a service log _or_ a request log. Using the above format, this object could be defined in Conjure as follows:
+
+```yaml
+Payload:
+  union:
+    serviceLog: ServiceLog
+    requestLog: RequestLog
+```
+
+Docs may be included by using the long form:
+
+```yaml
+union:
+  [name]:
+    type: [type]
+    docs: [docs]
+```
+
+The serialized format includes two fields: a `type` field with a value corresponding to the member type as specified in
+the Conjure definition, and member name field with a value corresponding to the serialized, wrapped object.
+
+For the above example, an instance of the `Payload` object containing a `ServiceLog` would be serialized as:
+
+```javascript
+{
+  "type": "ServiceLog", 
+  "serviceLog": {
+    // fields of ServiceLog object
+  }
+}
+```
+
+An instance of the `Payload` object containing a `RequestLog` would be serialized as:
+
+```javascript
+{
+  "type": "RequestLog",
+  "requestLog": {
+    // fields of RequestLog object
+  }
+}
+```
+
+As with enums, there is the risk that union definitions are augmented over time with additional member types. Older
+clients that are unaware of the new types should be able to deserialize and handle these objects gracefully.
+
+In Java, a visitor interface is generated for union types, to facilitate consumption and customization of behavior
+depending on the wrapped type. The interface includes a `visit()` method for each wrapped type, as well as a
+`visitUnknown(String unknownType)` method which is executed when the wrapped object does not match any of the known
+member types. Clients should implement the `visitUnknown` method by logging a warning, while servers should treat the
+execution of this method as an exceptional state.
+
 #### Enum Definitions
 Each enum definition consists of a type alias, an optional package, and a list
 of valid enumeration values. Values _must not_ include the special value `UNKNOWN`,
@@ -318,6 +382,14 @@ values:
 ```
 
 The values specified in the values list must be unique.
+
+Docs may be included by using the long form:
+
+```yaml
+values:
+  - value: [value]
+    docs: [docs]
+```
 
 #### Alias Definitions
 As a convenience, Conjure offers the ability to alias primitive types so that

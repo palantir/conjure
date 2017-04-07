@@ -32,25 +32,25 @@ public final class UnionTypeExample {
     }
 
     /** Docs for when UnionTypeExample is of type StringExample. */
-    public static UnionTypeExample of(StringExample stringExampleValue) {
-        return new UnionTypeExample(new StringExampleWrapper(stringExampleValue));
+    public static UnionTypeExample of(StringExample value) {
+        return new UnionTypeExample(new StringExampleWrapper(value));
     }
 
-    public static UnionTypeExample of(int integerValue) {
-        return new UnionTypeExample(new IntegerWrapper(integerValue));
+    public static UnionTypeExample of(Set<String> value) {
+        return new UnionTypeExample(new SetWrapper(value));
     }
 
-    public static UnionTypeExample of(Set<String> setStringValue) {
-        return new UnionTypeExample(new SetStringWrapper(setStringValue));
+    public static UnionTypeExample of(int value) {
+        return new UnionTypeExample(new NumberWrapper(value));
     }
 
     public <T> T accept(Visitor<T> visitor) {
-        if (value instanceof StringExampleWrapper) {
+        if (value instanceof NumberWrapper) {
+            return visitor.visit(((NumberWrapper) value).value);
+        } else if (value instanceof SetWrapper) {
+            return visitor.visit(((SetWrapper) value).value);
+        } else if (value instanceof StringExampleWrapper) {
             return visitor.visit(((StringExampleWrapper) value).value);
-        } else if (value instanceof IntegerWrapper) {
-            return visitor.visit(((IntegerWrapper) value).value);
-        } else if (value instanceof SetStringWrapper) {
-            return visitor.visit(((SetStringWrapper) value).value);
         } else if (value instanceof UnknownWrapper) {
             return visitor.visitUnknown(((UnknownWrapper) value).getType());
         }
@@ -62,15 +62,15 @@ public final class UnionTypeExample {
     public boolean equals(Object other) {
         return this == other
                 || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
+                || (other instanceof Integer
+                        && value instanceof NumberWrapper
+                        && Objects.equals(((NumberWrapper) value).value, other))
+                || (other instanceof Set
+                        && value instanceof SetWrapper
+                        && Objects.equals(((SetWrapper) value).value, other))
                 || (other instanceof StringExample
                         && value instanceof StringExampleWrapper
-                        && Objects.equals(((StringExampleWrapper) value).value, other))
-                || (other instanceof Integer
-                        && value instanceof IntegerWrapper
-                        && Objects.equals(((IntegerWrapper) value).value, other))
-                || (other instanceof Set
-                        && value instanceof SetStringWrapper
-                        && Objects.equals(((SetStringWrapper) value).value, other));
+                        && Objects.equals(((StringExampleWrapper) value).value, other));
     }
 
     private boolean equalTo(UnionTypeExample other) {
@@ -94,11 +94,11 @@ public final class UnionTypeExample {
     }
 
     public interface Visitor<T> {
-        T visit(StringExample stringExampleValue);
+        T visit(int value);
 
-        T visit(int integerValue);
+        T visit(Set<String> value);
 
-        T visit(Set<String> setStringValue);
+        T visit(StringExample value);
 
         T visitUnknown(String unknownType);
     }
@@ -110,14 +110,14 @@ public final class UnionTypeExample {
         defaultImpl = UnknownWrapper.class
     )
     @JsonSubTypes({
-        @JsonSubTypes.Type(StringExampleWrapper.class),
-        @JsonSubTypes.Type(IntegerWrapper.class),
-        @JsonSubTypes.Type(SetStringWrapper.class)
+        @JsonSubTypes.Type(NumberWrapper.class),
+        @JsonSubTypes.Type(SetWrapper.class),
+        @JsonSubTypes.Type(StringExampleWrapper.class)
     })
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Base {}
 
-    @JsonTypeName("StringExample")
+    @JsonTypeName("stringExample")
     private static class StringExampleWrapper implements Base {
         private final StringExample value;
 
@@ -160,70 +160,27 @@ public final class UnionTypeExample {
         }
     }
 
-    @JsonTypeName("integer")
-    private static class IntegerWrapper implements Base {
-        private final int value;
-
-        @JsonCreator
-        private IntegerWrapper(@JsonProperty("integer") int value) {
-            Objects.requireNonNull(value);
-            this.value = value;
-        }
-
-        @JsonProperty("integer")
-        private int getValue() {
-            return value;
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return this == other
-                    || (other instanceof IntegerWrapper && equalTo((IntegerWrapper) other));
-        }
-
-        private boolean equalTo(IntegerWrapper other) {
-            return this.value == other.value;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(value);
-        }
-
-        @Override
-        public String toString() {
-            return new StringBuilder("IntegerWrapper")
-                    .append("{")
-                    .append("value")
-                    .append(": ")
-                    .append(value)
-                    .append("}")
-                    .toString();
-        }
-    }
-
-    @JsonTypeName("set<string>")
-    private static class SetStringWrapper implements Base {
+    @JsonTypeName("set")
+    private static class SetWrapper implements Base {
         private final Set<String> value;
 
         @JsonCreator
-        private SetStringWrapper(@JsonProperty("set<string>") Set<String> value) {
+        private SetWrapper(@JsonProperty("set") Set<String> value) {
             Objects.requireNonNull(value);
             this.value = value;
         }
 
-        @JsonProperty("set<string>")
+        @JsonProperty("set")
         private Set<String> getValue() {
             return value;
         }
 
         @Override
         public boolean equals(Object other) {
-            return this == other
-                    || (other instanceof SetStringWrapper && equalTo((SetStringWrapper) other));
+            return this == other || (other instanceof SetWrapper && equalTo((SetWrapper) other));
         }
 
-        private boolean equalTo(SetStringWrapper other) {
+        private boolean equalTo(SetWrapper other) {
             return this.value.equals(other.value);
         }
 
@@ -234,7 +191,49 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("SetStringWrapper")
+            return new StringBuilder("SetWrapper")
+                    .append("{")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
+        }
+    }
+
+    @JsonTypeName("number")
+    private static class NumberWrapper implements Base {
+        private final int value;
+
+        @JsonCreator
+        private NumberWrapper(@JsonProperty("number") int value) {
+            Objects.requireNonNull(value);
+            this.value = value;
+        }
+
+        @JsonProperty("number")
+        private int getValue() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other
+                    || (other instanceof NumberWrapper && equalTo((NumberWrapper) other));
+        }
+
+        private boolean equalTo(NumberWrapper other) {
+            return this.value == other.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
+        public String toString() {
+            return new StringBuilder("NumberWrapper")
                     .append("{")
                     .append("value")
                     .append(": ")

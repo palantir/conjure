@@ -73,7 +73,8 @@ types:
       UnionTypeExample:
         docs: A type which can either be a StringExample, a set of strings, or an integer.
         union:
-          - value: StringExample
+          stringExample:
+            type: StringExample
             docs: Docs for when UnionTypeExample is of type StringExample.
-          - set<string>
-          - integer
+          set: set<string>
+          number: integer

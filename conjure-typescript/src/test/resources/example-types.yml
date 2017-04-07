@@ -50,7 +50,7 @@ types:
           alias: AliasExample
       UnionTypeExample:
         union:
-          - StringExample
-          - set<string>
-          - integer
-          - map<string, string>
+          stringExample: StringExample
+          set: set<string>
+          number: integer
+          map: map<string, string>

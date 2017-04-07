@@ -153,9 +153,9 @@ public final class WireFormatTests {
         UnionTypeExample unionTypeStringExample = UnionTypeExample.of(stringExample);
         UnionTypeExample unionTypeSet = UnionTypeExample.of(ImmutableSet.of("item"));
         UnionTypeExample unionTypeInt = UnionTypeExample.of(5);
-        String serializedUnionTypeStringExample = "{\"type\":\"StringExample\",\"stringExample\":{\"string\":\"foo\"}}";
-        String serializedUnionTypeSet = "{\"type\":\"set<string>\",\"set<string>\":[\"item\"]}";
-        String serializedUnionTypeInt = "{\"type\":\"integer\",\"integer\":5}";
+        String serializedUnionTypeStringExample = "{\"type\":\"stringExample\",\"stringExample\":{\"string\":\"foo\"}}";
+        String serializedUnionTypeSet = "{\"type\":\"set\",\"set\":[\"item\"]}";
+        String serializedUnionTypeInt = "{\"type\":\"number\",\"number\":5}";
 
         // serialization
         assertThat(mapper.writeValueAsString(unionTypeStringExample)).isEqualTo(serializedUnionTypeStringExample);
