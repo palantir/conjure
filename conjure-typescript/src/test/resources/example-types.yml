@@ -48,6 +48,7 @@ types:
           set: set<string>
           map: map<string, string>
           alias: AliasExample
+          kebab-case: string
       UnionTypeExample:
         union:
           stringExample: StringExample

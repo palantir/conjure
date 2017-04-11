@@ -122,7 +122,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .stream()
                 .map(e -> TypescriptTypeSignature.builder()
                         .isOptional(e.getValue().type() instanceof OptionalType)
-                        .name(e.getKey())
+                        .name(Identifiers.safeMemberName(e.getKey()))
                         .typescriptType(mapper.getTypescriptType(e.getValue().type()))
                         .build())
                 .collect(Collectors.toSet());
