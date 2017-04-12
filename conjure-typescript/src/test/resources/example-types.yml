@@ -55,3 +55,6 @@ types:
           set: set<string>
           number: integer
           map: map<string, string>
+      UnionReferenceExample:
+        fields:
+          unionField: UnionTypeExample

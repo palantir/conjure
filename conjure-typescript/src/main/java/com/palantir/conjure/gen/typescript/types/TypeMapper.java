@@ -28,6 +28,7 @@ import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.defs.types.ReferenceType;
 import com.palantir.conjure.defs.types.SafeLongType;
 import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.UnionTypeDefinition;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import java.util.Optional;
 import java.util.Set;
@@ -137,11 +138,13 @@ public final class TypeMapper {
 
         BaseObjectTypeDefinition defType = types.definitions().objects().get(referenceType.type());
         if (defType != null) {
-            if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition) {
+            if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
+                    || defType instanceof UnionTypeDefinition) {
                 return Optional.of(ObjectDefinitions.getPackageName(
                         defType.packageName(), defaultPackage, referenceType.type()));
+            } else if (!(defType instanceof AliasTypeDefinition)) {
+                throw new IllegalArgumentException("Unknown base object type definition");
             }
-            // primitive types for aliases
         }
         // TODO(rmcnamara): for now assume to generate primitive types for external definitions
         return Optional.empty();

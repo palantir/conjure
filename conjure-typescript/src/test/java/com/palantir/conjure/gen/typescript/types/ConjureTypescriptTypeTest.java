@@ -6,7 +6,6 @@ package com.palantir.conjure.gen.typescript.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -37,9 +36,7 @@ public final class ConjureTypescriptTypeTest {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
         Set<ExportStatement> exports = new DefaultTypeGenerator().generateExports(def.types());
 
-        assertThat(exports.size()).isEqualTo(13);   // AliasExample is ignored
-        Set<ExportStatement> expectedExports = Sets.newHashSet(
-                exportStatement("IStringExample", "stringExample"),
+        assertThat(exports).containsExactlyInAnyOrder(exportStatement("IStringExample", "stringExample"),
                 exportStatement("IIntegerExample", "integerExample"),
                 exportStatement("IDoubleExample", "doubleExample"),
                 exportStatement("IOptionalExample", "optionalExample"),
@@ -51,8 +48,8 @@ public final class ConjureTypescriptTypeTest {
                 exportStatement("IAnyExample", "anyExample"),
                 exportStatement("IAnyMapExample", "anyMapExample"),
                 exportStatement("IManyFieldExample", "manyFieldExample"),
-                exportStatement("IUnionTypeExample", "unionTypeExample"));
-        assertThat(exports).containsAll(expectedExports);
+                exportStatement("IUnionTypeExample", "unionTypeExample"),
+                exportStatement("IUnionReferenceExample", "unionReferenceExample"));
     }
 
     private ExportStatement exportStatement(String typeName, String filename) {
