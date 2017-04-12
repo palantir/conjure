@@ -18,7 +18,6 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface TypesDefinition {
 
-    @JsonProperty("imports")
     Map<String, ExternalTypeDefinition> imports();
 
     /**
@@ -30,7 +29,6 @@ public interface TypesDefinition {
     @JsonProperty("conjure-imports")
     Map<String, String> conjureImports();
 
-    @JsonProperty("definitions")
     @Value.Default
     default ObjectsDefinition definitions() {
         return ObjectsDefinition.builder().defaultConjurePackage(ConjurePackage.NONE).build();

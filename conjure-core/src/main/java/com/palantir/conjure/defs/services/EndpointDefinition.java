@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -22,13 +21,10 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface EndpointDefinition {
 
-    @JsonProperty("http")
     RequestLineDefinition http();
 
-    @JsonProperty("auth")
     Optional<AuthDefinition> auth();
 
-    @JsonProperty("args")
     Optional<Map<String, ArgumentDefinition>> args();
 
     /**
@@ -64,13 +60,10 @@ public interface EndpointDefinition {
         return Optional.of(outputMap);
     }
 
-    @JsonProperty("returns")
     Optional<ConjureType> returns();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
-    @JsonProperty("deprecated")
     Optional<String> deprecated();
 
     @Value.Check

@@ -4,9 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -21,10 +19,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionMemberTypeDefinition {
 
-    @JsonProperty("type")
     String type();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
     static UnionMemberTypeDefinition.Builder builder() {
@@ -37,7 +33,7 @@ public interface UnionMemberTypeDefinition {
         @SuppressWarnings("deprecation")
         @Override
         public UnionMemberTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
+                throws IOException {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 return builder().type(candidate).build();

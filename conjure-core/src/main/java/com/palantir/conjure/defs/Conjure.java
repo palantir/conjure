@@ -4,10 +4,12 @@
 
 package com.palantir.conjure.defs;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +18,7 @@ import java.nio.file.Path;
 
 public final class Conjure {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
-            .registerModule(new Jdk8Module())
-            .setPropertyNamingStrategy(PropertyNamingStrategy.KEBAB_CASE);
+    private static final ObjectMapper MAPPER = createConjureParserObjectMapper();
 
     private Conjure() {}
 
@@ -57,5 +57,15 @@ public final class Conjure {
             throw new RuntimeException("Failed to open imported Conjure definition", e);
 
         }
+    }
+
+    @VisibleForTesting
+    static ObjectMapper createConjureParserObjectMapper() {
+        return new ObjectMapper(new YAMLFactory())
+                .registerModule(new Jdk8Module())
+                .setAnnotationIntrospector(
+                        AnnotationIntrospector.pair(
+                                new KebabCaseEnforcingAnnotationInspector(), // needs to come first.
+                                new JacksonAnnotationIntrospector()));
     }
 }

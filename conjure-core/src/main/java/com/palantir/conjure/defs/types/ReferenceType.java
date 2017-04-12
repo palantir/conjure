@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -13,10 +12,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ReferenceType extends ConjureType {
 
-    @JsonProperty("namespace")
     Optional<String> namespace();
 
-    @JsonProperty("type")
     String type();
 
     @Override

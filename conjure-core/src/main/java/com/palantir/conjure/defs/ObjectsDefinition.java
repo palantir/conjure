@@ -23,7 +23,6 @@ public interface ObjectsDefinition {
     @JsonProperty("default-package")
     Optional<ConjurePackage> defaultConjurePackage();
 
-    @JsonProperty("objects")
     Map<String, BaseObjectTypeDefinition> objects();
 
     static Builder builder() {

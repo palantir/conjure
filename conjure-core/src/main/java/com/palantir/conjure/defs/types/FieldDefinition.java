@@ -4,9 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,10 +20,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface FieldDefinition {
 
-    @JsonProperty("type")
     ConjureType type();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
     static FieldDefinition of(ConjureType type) {
@@ -36,8 +32,7 @@ public interface FieldDefinition {
     class FieldDefinitionDeserializer extends JsonDeserializer<FieldDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public FieldDefinition deserialize(JsonParser parser, DeserializationContext context)
-                throws IOException, JsonProcessingException {
+        public FieldDefinition deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 
             String candidate = parser.getValueAsString();
             if (candidate != null) {

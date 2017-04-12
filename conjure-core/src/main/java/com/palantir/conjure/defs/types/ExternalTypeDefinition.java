@@ -15,7 +15,6 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ExternalTypeDefinition {
 
-    @JsonProperty("external")
     Map<String, String> external();
 
     @JsonProperty("base-type")

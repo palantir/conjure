@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.validators.UnionTypeDefinitionValidator;
@@ -16,7 +15,6 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
 
-    @JsonProperty("union")
     Map<String, UnionMemberTypeDefinition> union();
 
     @Value.Check

@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import java.util.Map;
@@ -15,13 +14,11 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ConjureDefinition {
 
-    @JsonProperty("types")
     @Value.Default
     default TypesDefinition types() {
         return TypesDefinition.builder().build();
     }
 
-    @JsonProperty("services")
     Map<String, ServiceDefinition> services();
 
     static Builder builder() {

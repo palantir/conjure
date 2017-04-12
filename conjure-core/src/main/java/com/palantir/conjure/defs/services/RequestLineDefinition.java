@@ -6,7 +6,6 @@ package com.palantir.conjure.defs.services;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -25,10 +24,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface RequestLineDefinition {
 
-    @JsonProperty("method")
     String method();
 
-    @JsonProperty("path")
     String path();
 
     @Value.Derived

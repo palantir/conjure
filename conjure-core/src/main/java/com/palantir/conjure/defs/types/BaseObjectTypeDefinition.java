@@ -20,7 +20,6 @@ public interface BaseObjectTypeDefinition {
     @JsonProperty("package")
     Optional<ConjurePackage> conjurePackage();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
     class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
@@ -46,5 +45,4 @@ public interface BaseObjectTypeDefinition {
             }
         }
     }
-
 }

@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
@@ -14,7 +13,6 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
 
-    @JsonProperty("alias")
     PrimitiveType alias();
 
     static Builder builder() {

@@ -17,13 +17,11 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ServiceDefinition {
 
-    @JsonProperty("name")
     String name();
 
     @JsonProperty("package")
     ConjurePackage conjurePackage();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
     @JsonProperty("default-auth")
@@ -38,7 +36,6 @@ public interface ServiceDefinition {
         return "/";
     }
 
-    @JsonProperty("endpoints")
     Map<String, EndpointDefinition> endpoints();
 
     static Builder builder() {

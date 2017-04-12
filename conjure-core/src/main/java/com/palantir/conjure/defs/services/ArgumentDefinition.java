@@ -25,10 +25,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ArgumentDefinition {
 
-    @JsonProperty("type")
     ConjureType type();
 
-    @JsonProperty("docs")
     Optional<String> docs();
 
     @JsonProperty("param-id")
@@ -40,7 +38,6 @@ public interface ArgumentDefinition {
         return ParamType.AUTO;
     }
 
-    @JsonProperty("markers")
     Set<ConjureType> markers();
 
     enum ParamType {

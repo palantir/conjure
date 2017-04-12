@@ -6,7 +6,6 @@ package com.palantir.conjure.defs.types;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -23,7 +22,6 @@ public interface EnumTypeDefinition extends BaseObjectTypeDefinition {
 
     Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z]+(_[A-Z]+)*");
 
-    @JsonProperty("values")
     Set<EnumValueDefinition> values();
 
     // we keep this check instead of pushing it down to EnumValueDefinition for better errors
