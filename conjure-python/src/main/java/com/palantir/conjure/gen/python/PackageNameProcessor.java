@@ -4,13 +4,12 @@
 
 package com.palantir.conjure.gen.python;
 
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.Optional;
 
 /**
  * Post process package names.
  */
 public interface PackageNameProcessor {
-
-    String getPackageName(Optional<String> packageName);
-
+    ConjurePackage getPackageName(Optional<ConjurePackage> conjurePackage);
 }

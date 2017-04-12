@@ -8,6 +8,7 @@ import com.google.common.base.CaseFormat;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
@@ -32,22 +33,21 @@ public final class DefaultBeanGenerator implements BeanGenerator {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateObject(types, importedTypes, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
-            return generateObject(types, importedTypes, packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
+            return generateObject(packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
         }
     }
 
-    private PythonEnum generateObject(TypesDefinition types,
-            ConjureImports importedTypes,
+    private PythonEnum generateObject(
             PackageNameProcessor packageNameProcessor,
             String typeName,
             EnumTypeDefinition typeDef) {
 
-        String packageName = packageNameProcessor.getPackageName(typeDef.packageName());
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
 
         return PythonEnum.builder()
-                .packageName(packageName)
+                .packageName(packageName.name())
                 .className(typeName)
                 .docs(typeDef.docs())
                 .values(typeDef.values().stream()
@@ -67,33 +67,33 @@ public final class DefaultBeanGenerator implements BeanGenerator {
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, importedTypes, packageNameProcessor);
 
-        String packageName = packageNameProcessor.getPackageName(typeDef.packageName());
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
 
         Set<PythonImport> imports = typeDef.fields().entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().type().visit(referencedTypeNameVisitor).stream())
-                .filter(entry -> !entry.packageName().equals(packageName)) // don't need to import if in this file
+                .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
 
         return PythonBean.builder()
-            .packageName(packageName)
-            .addAllRequiredImports(PythonBean.DEFAULT_IMPORTS)
-            .addAllRequiredImports(imports)
-            .className(typeName)
-            .docs(typeDef.docs())
-            .fields(typeDef.fields()
-                    .entrySet()
-                    .stream()
-                    .map(entry -> PythonField.builder()
-                            .attributeName(pythonAttributeName(entry.getKey()))
-                            .jsonIdentifier(entry.getKey())
-                            .docs(entry.getValue().docs())
-                            .pythonType(mapper.getTypeName(entry.getValue().type()))
-                            .myPyType(myPyMapper.getTypeName(entry.getValue().type()))
-                            .build())
-                    .collect(Collectors.toList()))
-            .build();
+                .packageName(packageName.name())
+                .addAllRequiredImports(PythonBean.DEFAULT_IMPORTS)
+                .addAllRequiredImports(imports)
+                .className(typeName)
+                .docs(typeDef.docs())
+                .fields(typeDef.fields()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> PythonField.builder()
+                                .attributeName(pythonAttributeName(entry.getKey()))
+                                .jsonIdentifier(entry.getKey())
+                                .docs(entry.getValue().docs())
+                                .pythonType(mapper.getTypeName(entry.getValue().type()))
+                                .myPyType(myPyMapper.getTypeName(entry.getValue().type()))
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     private static String pythonAttributeName(String jsonFieldName) {

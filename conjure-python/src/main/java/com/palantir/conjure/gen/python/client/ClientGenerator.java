@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
@@ -79,21 +80,22 @@ public final class ClientGenerator {
                 })
                 .collect(Collectors.toList());
 
-        String packageName = packageNameProvider.getPackageName(Optional.of(serviceDefinition.packageName()));
+        ConjurePackage packageName = packageNameProvider.getPackageName(
+                Optional.of(serviceDefinition.conjurePackage()));
 
         List<PythonImport> imports = referencedTypesBuilder.build()
                 .stream()
-                .filter(entry -> !entry.packageName().equals(packageName)) // don't need to import if in this file
+                .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(className -> PythonImport.of(className, Optional.empty()))
                 .collect(Collectors.toList());
 
         return PythonService.builder()
-                    .packageName(packageName)
-                    .addAllRequiredImports(PythonService.DEFAULT_IMPORTS)
-                    .addAllRequiredImports(imports)
-                    .className(serviceName)
-                    .addAllEndpointDefinitions(endpoints)
-                    .build();
+                .packageName(packageName.name())
+                .addAllRequiredImports(PythonService.DEFAULT_IMPORTS)
+                .addAllRequiredImports(imports)
+                .className(serviceName)
+                .addAllEndpointDefinitions(endpoints)
+                .build();
 
     }
 }

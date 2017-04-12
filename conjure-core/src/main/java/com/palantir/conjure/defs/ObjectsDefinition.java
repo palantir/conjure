@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.validators.ObjectsDefinitionValidator;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import org.immutables.value.Value;
 public interface ObjectsDefinition {
 
     @JsonProperty("default-package")
-    Optional<String> defaultPackage();
+    Optional<ConjurePackage> defaultConjurePackage();
 
     @JsonProperty("objects")
     Map<String, BaseObjectTypeDefinition> objects();
@@ -37,5 +38,4 @@ public interface ObjectsDefinition {
             validator.validate(this);
         }
     }
-
 }

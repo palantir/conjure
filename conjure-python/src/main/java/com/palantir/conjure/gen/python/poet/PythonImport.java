@@ -24,7 +24,7 @@ public interface PythonImport extends Emittable, Comparable<PythonImport> {
     default void emit(PythonPoetWriter poetWriter) {
         // TODO (bduffield): emit relative to package
         poetWriter.writeIndentedLine(String.format("from %s import %s",
-                className().packageName(), className().className()));
+                className().conjurePackage().name(), className().className()));
     }
 
     @Override

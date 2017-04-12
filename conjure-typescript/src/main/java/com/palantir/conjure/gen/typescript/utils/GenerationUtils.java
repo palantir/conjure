@@ -10,6 +10,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
@@ -32,9 +33,10 @@ public final class GenerationUtils {
 
     private GenerationUtils() {}
 
-    public static String packageNameToFolderPath(String packageName) {
-        Preconditions.checkArgument(PACKAGE.matcher(packageName).matches(), "packages should have at least 3 segments");
-        return PACKAGE_BASE.matcher(packageName).replaceAll("").replace(".", "/");
+    public static String packageToFolderPath(ConjurePackage packageName) {
+        Preconditions.checkArgument(PACKAGE.matcher(packageName.name()).matches(),
+                "packages should have at least 3 segments");
+        return PACKAGE_BASE.matcher(packageName.name()).replaceAll("").replace(".", "/");
     }
 
     @VisibleForTesting
@@ -78,16 +80,16 @@ public final class GenerationUtils {
     }
 
     public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
-            String sourceName, String sourcePackage, TypeMapper mapper) {
-        String folderLocation = GenerationUtils.packageNameToFolderPath(sourcePackage);
+            String sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
+        String folderLocation = GenerationUtils.packageToFolderPath(sourcePackage);
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
                 .filter(referenceType -> !referenceType.type().equals(sourceName))
                 .map(referenceType -> {
-                    Optional<String> maybeDestName = mapper.getContainingPackage(referenceType);
+                    Optional<ConjurePackage> maybeDestName = mapper.getContainingPackage(referenceType);
                     return maybeDestName.map(destName -> {
-                        String destFolder = GenerationUtils.packageNameToFolderPath(destName);
+                        String destFolder = GenerationUtils.packageToFolderPath(destName);
                         return GenerationUtils.createImportStatement(mapper.getTypescriptType(referenceType),
                                 getTypescriptFilePath(folderLocation, sourceName),
                                 getTypescriptFilePath(destFolder, referenceType.type()));

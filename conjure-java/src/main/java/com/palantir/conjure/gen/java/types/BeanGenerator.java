@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -59,14 +60,14 @@ public final class BeanGenerator implements TypeGenerator {
     public JavaFile generateType(
             TypesDefinition types,
             ConjureImports importedTypes,
-            Optional<String> defaultPackage,
+            Optional<ConjurePackage> defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef) {
         TypeMapper typeMapper = new TypeMapper(types, importedTypes);
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
-            return UnionGenerator.generateUnionType(new DefaultClassNameVisitor(types, importedTypes),
+            return UnionGenerator.generateUnionType(
                     typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return EnumGenerator.generateEnumType(
@@ -79,10 +80,13 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     private JavaFile generateBeanType(
-            TypeMapper typeMapper, Optional<String> defaultPackage, String typeName, ObjectTypeDefinition typeDef) {
+            TypeMapper typeMapper,
+            Optional<ConjurePackage> defaultPackage,
+            String typeName,
+            ObjectTypeDefinition typeDef) {
 
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
-        ClassName objectClass = ClassName.get(typePackage, typeName);
+        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ClassName objectClass = ClassName.get(typePackage.name(), typeName);
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
@@ -120,7 +124,7 @@ public final class BeanGenerator implements TypeGenerator {
 
         typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
-        return JavaFile.builder(typePackage, typeBuilder.build())
+        return JavaFile.builder(typePackage.name(), typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.ObjectDefinitions;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.PrimitiveType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.squareup.javapoet.ClassName;
@@ -27,13 +28,13 @@ public final class AliasGenerator {
 
     public static JavaFile generateAliasType(
             TypeMapper typeMapper,
-            Optional<String> defaultPackage,
+            Optional<ConjurePackage> defaultPackage,
             String typeName,
             AliasTypeDefinition typeDef) {
         TypeName aliasType = typeMapper.getClassName(typeDef.alias());
 
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
-        ClassName thisClass = ClassName.get(typePackage, typeName);
+        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ClassName thisClass = ClassName.get(typePackage.name(), typeName);
 
         TypeSpec.Builder spec = TypeSpec.classBuilder(typeName)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(AliasGenerator.class))
@@ -83,7 +84,7 @@ public final class AliasGenerator {
             spec.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
         }
 
-        return JavaFile.builder(typePackage, spec.build())
+        return JavaFile.builder(typePackage.name(), spec.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();

@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.Collections2;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ReferenceType;
 import java.util.Collection;
 import java.util.Map;
@@ -27,14 +28,14 @@ public final class ConjureImports {
                 NAMESPACE_PATTERN, illegalNamespaces);
     }
 
-    public String getPackage(ReferenceType type) {
+    public ConjurePackage getPackage(ReferenceType type) {
         Verify.verifyNotNull(type.namespace().isPresent(),
                 "Must not call ConjureImports methods for ReferenceType without namespace: %s", type);
         ObjectsDefinition imports = getImportsForRefNameSpace(type);
         BaseObjectTypeDefinition typeDef = Verify.verifyNotNull(imports.objects().get(type.type()),
                 "Imported type not found: %s", type);
-        return ObjectDefinitions.getPackageName(typeDef.packageName(),
-                getImportsForRefNameSpace(type).defaultPackage(), type.type());
+        return ObjectDefinitions.getPackage(typeDef.conjurePackage(),
+                getImportsForRefNameSpace(type).defaultConjurePackage(), type.type());
     }
 
     private ObjectsDefinition getImportsForRefNameSpace(ReferenceType type) {

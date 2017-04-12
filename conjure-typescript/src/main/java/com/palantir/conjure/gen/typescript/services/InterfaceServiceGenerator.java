@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.typescript.services;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
@@ -22,7 +23,7 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
     @Override
     public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition, ConjureImports conjureImports) {
         TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
-                conjureDefinition.types().definitions().defaultPackage());
+                conjureDefinition.types().definitions().defaultConjurePackage());
         return conjureDefinition.services()
                 .entrySet()
                 .stream()
@@ -31,8 +32,8 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
     }
 
     private TypescriptFile generate(String clazz, ServiceDefinition serviceDef, TypeMapper typeMapper) {
-        String packageLocation = serviceDef.packageName();
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        ConjurePackage packageLocation = serviceDef.conjurePackage();
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         Set<TypescriptFunctionSignature> methodSignatures = serviceDef.endpoints().entrySet()
                 .stream()
                 .map(e -> ServiceUtils.generateFunctionSignature(e.getKey(), e.getValue(), typeMapper))
@@ -59,8 +60,8 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
     }
 
     private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
-        String packageLocation = serviceDef.packageName();
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        ConjurePackage packageLocation = serviceDef.conjurePackage();
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         return GenerationUtils.createExportStatementRelativeToRoot(getInterfaceName(clazz), parentFolderPath, clazz);
     }
 

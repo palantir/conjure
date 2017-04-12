@@ -15,6 +15,7 @@ import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.DateTimeType;
@@ -36,11 +37,11 @@ import java.util.Stack;
 
 public final class TypeMapper {
 
-    private final Optional<String> defaultPackage;
+    private final Optional<ConjurePackage> defaultPackage;
     private final ConjureImports importedTypes;
     private final TypesDefinition types;
 
-    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, Optional<String> defaultPackage) {
+    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, Optional<ConjurePackage> defaultPackage) {
         this.types = types;
         this.importedTypes = importedTypes;
         this.defaultPackage = defaultPackage;
@@ -131,7 +132,7 @@ public final class TypeMapper {
 
     }
 
-    public Optional<String> getContainingPackage(ReferenceType referenceType) {
+    public Optional<ConjurePackage> getContainingPackage(ReferenceType referenceType) {
         if (referenceType.namespace().isPresent()) {
             return Optional.of(importedTypes.getPackage(referenceType));
         }
@@ -140,8 +141,8 @@ public final class TypeMapper {
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
                     || defType instanceof UnionTypeDefinition) {
-                return Optional.of(ObjectDefinitions.getPackageName(
-                        defType.packageName(), defaultPackage, referenceType.type()));
+                return Optional.of(ObjectDefinitions.getPackage(
+                        defType.conjurePackage(), defaultPackage, referenceType.type()));
             } else if (!(defType instanceof AliasTypeDefinition)) {
                 throw new IllegalArgumentException("Unknown base object type definition");
             }

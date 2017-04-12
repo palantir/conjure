@@ -5,26 +5,27 @@
 package com.palantir.conjure.gen.python.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface PythonClassName extends Comparable<PythonClassName> {
 
-    String packageName();
+    ConjurePackage conjurePackage();
 
     String className();
 
-    static PythonClassName of(String packageName, String className) {
+    static PythonClassName of(ConjurePackage conjurePackage, String className) {
         return ImmutablePythonClassName.builder()
-                .packageName(packageName)
+                .conjurePackage(conjurePackage)
                 .className(className)
                 .build();
     }
 
     @Override
     default int compareTo(PythonClassName other) {
-        int comparePackageName = packageName().compareTo(other.packageName());
+        int comparePackageName = conjurePackage().name().compareTo(other.conjurePackage().name());
         if (comparePackageName != 0) {
             return comparePackageName;
         }

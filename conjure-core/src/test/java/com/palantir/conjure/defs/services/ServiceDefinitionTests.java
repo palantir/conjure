@@ -19,6 +19,7 @@ import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
@@ -186,24 +187,24 @@ public final class ServiceDefinitionTests {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def).isEqualTo(
                 ConjureDefinition.builder()
-                .types(TypesDefinition.builder()
-                        .putImports("ResourceIdentifier",
-                                ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
-                        .definitions(ObjectsDefinition.builder()
-                                .defaultPackage("test.api")
-                                .putObjects("SimpleObject", ObjectTypeDefinition.builder()
-                                        .putFields("stringField", FieldDefinition.of(PrimitiveType.STRING))
+                        .types(TypesDefinition.builder()
+                                .putImports("ResourceIdentifier",
+                                        ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
+                                .definitions(ObjectsDefinition.builder()
+                                        .defaultConjurePackage(ConjurePackage.of("test.api"))
+                                        .putObjects("SimpleObject", ObjectTypeDefinition.builder()
+                                                .putFields("stringField", FieldDefinition.of(PrimitiveType.STRING))
+                                                .build())
                                         .build())
                                 .build())
-                        .build())
-                .putServices("TestService", ServiceDefinition.builder()
-                        .name("Test Service")
-                        .packageName("test.api")
-                        .putEndpoints("get", EndpointDefinition.builder()
-                                .http(RequestLineDefinition.of("GET", "/get"))
+                        .putServices("TestService", ServiceDefinition.builder()
+                                .name("Test Service")
+                                .conjurePackage(ConjurePackage.of("test.api"))
+                                .putEndpoints("get", EndpointDefinition.builder()
+                                        .http(RequestLineDefinition.of("GET", "/get"))
+                                        .build())
                                 .build())
-                        .build())
-                .build());
+                        .build());
     }
 
     private static String multiLineString(String... lines) {

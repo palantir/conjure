@@ -35,7 +35,7 @@ public final class ConjurePythonGenerator {
         TypesDefinition types = conjureDefinition.types();
 
         PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor(
-                new DefaultPackageNameProcessor(conjureDefinition.types().definitions().defaultPackage()));
+                new DefaultPackageNameProcessor(conjureDefinition.types().definitions().defaultConjurePackage()));
 
         List<PythonClass> beanClasses = types.definitions()
                 .objects()

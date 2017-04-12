@@ -9,6 +9,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
@@ -27,7 +28,7 @@ public interface TypeGenerator {
                 type -> generateType(
                         types,
                         imports,
-                        types.definitions().defaultPackage(),
+                        types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -49,7 +50,7 @@ public interface TypeGenerator {
     JavaFile generateType(
             TypesDefinition allTypes,
             ConjureImports importedTypes,
-            Optional<String> defaultPackage,
+            Optional<ConjurePackage> defaultPackage,
             String typeName,
             BaseObjectTypeDefinition typeDef);
 }

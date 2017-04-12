@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -56,7 +57,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 type -> generateType(
                         types,
                         imports,
-                        types.definitions().defaultPackage(),
+                        types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
                 .filter(Optional::isPresent)
@@ -69,7 +70,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateExport(
                         types,
-                        types.definitions().defaultPackage(),
+                        types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
                 .filter(Optional::isPresent)
@@ -78,13 +79,14 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     }
 
     private Optional<TypescriptFile> generateType(TypesDefinition types, ConjureImports imports,
-            Optional<String> defaultPackage, String typeName, BaseObjectTypeDefinition baseTypeDef) {
-        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage, typeName);
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+            Optional<ConjurePackage> defaultPackage, String typeName, BaseObjectTypeDefinition baseTypeDef) {
+        ConjurePackage packageLocation =
+                ObjectDefinitions.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         TypeMapper mapper = new TypeMapper(types, imports, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(generateEnumFile(
-                    typeName, (EnumTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
+                    typeName, (EnumTypeDefinition) baseTypeDef, parentFolderPath));
         } else if (baseTypeDef instanceof ObjectTypeDefinition) {
             return Optional.of(generateObjectFile(
                     typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
@@ -98,10 +100,11 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
     }
 
-    private Optional<ExportStatement> generateExport(TypesDefinition types, Optional<String> defaultPackage,
+    private Optional<ExportStatement> generateExport(TypesDefinition types, Optional<ConjurePackage> defaultPackage,
             String typeName, BaseObjectTypeDefinition baseTypeDef) {
-        String packageLocation = ObjectDefinitions.getPackageName(baseTypeDef.packageName(), defaultPackage, typeName);
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        ConjurePackage packageLocation =
+                ObjectDefinitions.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(
                     GenerationUtils.createExportStatementRelativeToRoot(typeName, parentFolderPath, typeName));
@@ -117,7 +120,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     }
 
     private static TypescriptFile generateObjectFile(String typeName, ObjectTypeDefinition typeDef,
-            String packageLocation, String parentFolderPath, TypeMapper mapper) {
+            ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
         Set<TypescriptTypeSignature> propertySignatures = typeDef.fields().entrySet()
                 .stream()
                 .map(e -> TypescriptTypeSignature.builder()
@@ -140,8 +143,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .addEmittables(thisInterface).parentFolderPath(parentFolderPath).build();
     }
 
-    private static TypescriptFile generateEnumFile(String typeName, EnumTypeDefinition typeDef,
-            String packageLocation, String parentFolderPath, TypeMapper mapper) {
+    private static TypescriptFile generateEnumFile(
+            String typeName, EnumTypeDefinition typeDef, String parentFolderPath) {
         RawExpression typeRhs = RawExpression.of(Joiner.on(" | ").join(
                 typeDef.values().stream().map(value -> StringExpression.of(value.value()).emitToString()).collect(
                         Collectors.toList())));
@@ -159,7 +162,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     }
 
     private TypescriptFile generateUnionTypeFile(String typeName, UnionTypeDefinition baseTypeDef,
-            String packageLocation, String parentFolderPath, TypeMapper mapper) {
+            ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
         List<ConjureType> referencedTypes = Lists.newArrayList();
         SortedSet<TypescriptTypeSignature> propertySignatures = new TreeSet<TypescriptTypeSignature>();
         propertySignatures.add(TypescriptTypeSignature.builder()

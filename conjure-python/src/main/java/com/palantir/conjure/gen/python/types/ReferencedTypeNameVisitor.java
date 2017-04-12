@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
@@ -53,9 +54,9 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     @Override
     public Set<PythonClassName> visit(MapType mapType) {
         return ImmutableSet.<PythonClassName>builder()
-            .addAll(mapType.keyType().visit(this))
-            .addAll(mapType.valueType().visit(this))
-            .build();
+                .addAll(mapType.keyType().visit(this))
+                .addAll(mapType.valueType().visit(this))
+                .build();
     }
 
     @Override
@@ -74,7 +75,7 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
             // Types without namespace are either defined locally in this conjure definition, or raw imports.
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
-                String packageName = packageNameProcessor.getPackageName(type.packageName());
+                ConjurePackage packageName = packageNameProcessor.getPackageName(type.conjurePackage());
                 return ImmutableSet.of(PythonClassName.of(packageName, refType.type()));
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());

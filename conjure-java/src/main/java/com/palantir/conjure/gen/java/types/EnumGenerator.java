@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Iterables;
 import com.palantir.conjure.defs.ObjectDefinitions;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -30,13 +31,13 @@ public final class EnumGenerator {
     private EnumGenerator() {}
 
     public static JavaFile generateEnumType(
-            Optional<String> defaultPackage,
+            Optional<ConjurePackage> defaultPackage,
             String typeName,
             EnumTypeDefinition typeDef,
             boolean supportUnknownEnumValues) {
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage, typeName);
-        ClassName thisClass = ClassName.get(typePackage, typeName);
-        ClassName enumClass = ClassName.get(typePackage, typeName, "Value");
+        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ClassName thisClass = ClassName.get(typePackage.name(), typeName);
+        ClassName enumClass = ClassName.get(typePackage.name(), typeName, "Value");
 
         TypeSpec spec;
         if (supportUnknownEnumValues) {
@@ -49,7 +50,7 @@ public final class EnumGenerator {
             }
         }
 
-        return JavaFile.builder(typePackage, spec)
+        return JavaFile.builder(typePackage.name(), spec)
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
@@ -169,12 +170,12 @@ public final class EnumGenerator {
         for (EnumValueDefinition value : values) {
             parser.add("case $S:\n", value.value())
                     .indent()
-                        .addStatement("return $L", value.value())
+                    .addStatement("return $L", value.value())
                     .unindent();
         }
         parser.add("default:\n")
                 .indent()
-                    .addStatement("return new $T(upperCasedValue)", thisClass)
+                .addStatement("return new $T(upperCasedValue)", thisClass)
                 .unindent()
                 .endControlFlow();
 

@@ -4,8 +4,7 @@
 
 package com.palantir.conjure.gen.python;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,13 +17,12 @@ public final class TwoComponentStrippingPackageNameProcessor implements PackageN
     }
 
     @Override
-    public String getPackageName(Optional<String> packageName) {
-        String delegatePackageName = delegate.getPackageName(packageName);
-
-        List<String> components = Splitter.on(".").splitToList(delegatePackageName);
+    public ConjurePackage getPackageName(Optional<ConjurePackage> conjurePackage) {
+        ConjurePackage delegatePackageName = delegate.getPackageName(conjurePackage);
+        List<String> components = delegatePackageName.components();
 
         if (components.size() > 2) {
-            return Joiner.on(".").join(components.subList(2, components.size()));
+            return ConjurePackage.of(components.subList(2, components.size()));
         } else {
             return delegatePackageName;
         }

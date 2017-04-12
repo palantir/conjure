@@ -15,6 +15,7 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
@@ -46,7 +47,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
     @Override
     public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition, ConjureImports conjureImports) {
         TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), conjureImports,
-                conjureDefinition.types().definitions().defaultPackage());
+                conjureDefinition.types().definitions().defaultConjurePackage());
         return conjureDefinition.services()
                 .entrySet()
                 .stream()
@@ -55,8 +56,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
     }
 
     private TypescriptFile generate(String clazz, ServiceDefinition serviceDef, TypeMapper typeMapper) {
-        String packageLocation = serviceDef.packageName();
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        ConjurePackage packageLocation = serviceDef.conjurePackage();
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
                 AssignStatement.builder()
                         .lhs("this.bridge")
@@ -153,8 +154,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
     }
 
     private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
-        String packageLocation = serviceDef.packageName();
-        String parentFolderPath = GenerationUtils.packageNameToFolderPath(packageLocation);
+        ConjurePackage packageLocation = serviceDef.conjurePackage();
+        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         return GenerationUtils.createExportStatementRelativeToRoot(clazz, parentFolderPath, getFilename(clazz));
     }
 

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ObjectDefinitions;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.UnionMemberTypeDefinition;
 import com.palantir.conjure.defs.types.UnionTypeDefinition;
@@ -49,10 +50,13 @@ public final class UnionGenerator {
     private static final String VISIT_UNKNOWN_METHOD_NAME = "visitUnknown";
     private static final TypeVariableName TYPE_VARIABLE = TypeVariableName.get("T");
 
-    public static JavaFile generateUnionType(ClassNameVisitor classNameVisitor,
-            TypeMapper typeMapper, Optional<String> defaultPackage, String typeName, UnionTypeDefinition typeDef) {
-        String typePackage = ObjectDefinitions.getPackageName(typeDef.packageName(), defaultPackage);
-        ClassName unionClass = ClassName.get(typePackage, typeName);
+    public static JavaFile generateUnionType(
+            TypeMapper typeMapper,
+            Optional<ConjurePackage> defaultPackage,
+            String typeName,
+            UnionTypeDefinition typeDef) {
+        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage);
+        ClassName unionClass = ClassName.get(typePackage.name(), typeName);
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
         Map<String, TypeName> memberTypes = typeDef.union().entrySet().stream()
@@ -81,7 +85,7 @@ public final class UnionGenerator {
 
         typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 
-        return JavaFile.builder(typePackage, typeBuilder.build())
+        return JavaFile.builder(typePackage.name(), typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();

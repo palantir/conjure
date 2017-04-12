@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface BaseObjectTypeDefinition {
 
     @JsonProperty("package")
-    Optional<String> packageName();
+    Optional<ConjurePackage> conjurePackage();
 
     @JsonProperty("docs")
     Optional<String> docs();

@@ -5,19 +5,20 @@
 package com.palantir.conjure.gen.python;
 
 import com.palantir.conjure.defs.ObjectDefinitions;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.Optional;
 
 public final class DefaultPackageNameProcessor implements PackageNameProcessor {
 
-    private final Optional<String> defaultPackage;
+    private final Optional<ConjurePackage> defaultPackage;
 
-    public DefaultPackageNameProcessor(Optional<String> defaultPackage) {
+    public DefaultPackageNameProcessor(Optional<ConjurePackage> defaultPackage) {
         this.defaultPackage = defaultPackage;
     }
 
     @Override
-    public String getPackageName(Optional<String> packageName) {
-        return ObjectDefinitions.getPackageName(packageName, defaultPackage);
+    public ConjurePackage getPackageName(Optional<ConjurePackage> conjurePackage) {
+        return ObjectDefinitions.getPackage(conjurePackage, defaultPackage);
     }
 
 }

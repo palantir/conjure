@@ -4,15 +4,19 @@
 
 package com.palantir.conjure.defs;
 
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.Optional;
 
 public final class ObjectDefinitions {
 
-    public static String getPackageName(Optional<String> packageName, Optional<String> defaultPackageName) {
-        return getPackageName(packageName, defaultPackageName, "");
+    public static ConjurePackage getPackage(
+            Optional<ConjurePackage> packageName, Optional<ConjurePackage> defaultPackageName) {
+        return getPackage(packageName, defaultPackageName, "<unknown>");
     }
 
-    public static String getPackageName(Optional<String> packageName, Optional<String> defaultPackageName,
+    public static ConjurePackage getPackage(
+            Optional<ConjurePackage> packageName,
+            Optional<ConjurePackage> defaultPackageName,
             String typeName) {
         return packageName.orElseGet(() -> defaultPackageName.orElseThrow(
                 () -> new IllegalStateException(

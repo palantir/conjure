@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import com.palantir.conjure.defs.types.ConjurePackage;
 import org.junit.Test;
 
 public final class GenerationUtilsTests {
@@ -24,11 +25,11 @@ public final class GenerationUtilsTests {
 
     @Test
     public void packageToFolderPathTest() {
-        assertEquals("c", GenerationUtils.packageNameToFolderPath("a.b.c"));
-        assertEquals("c/d", GenerationUtils.packageNameToFolderPath("a.b.c.d"));
-        assertEquals("c/d/e", GenerationUtils.packageNameToFolderPath("a.b.c.d.e"));
+        assertEquals("c", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c")));
+        assertEquals("c/d", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c.d")));
+        assertEquals("c/d/e", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c.d.e")));
         try {
-            GenerationUtils.packageNameToFolderPath("a.b");
+            GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b"));
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage()).contains("at least 3");

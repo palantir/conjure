@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -18,12 +19,12 @@ import org.immutables.value.Value;
 public interface PythonBean extends PythonClass {
 
     ImmutableSet<PythonImport> DEFAULT_IMPORTS = ImmutableSet.of(
-            PythonImport.of(PythonClassName.of("typing", "List"), Optional.empty()),
-            PythonImport.of(PythonClassName.of("typing", "Set"), Optional.empty()),
-            PythonImport.of(PythonClassName.of("typing", "Dict"), Optional.empty()),
-            PythonImport.of(PythonClassName.of("typing", "Tuple"), Optional.empty()),
-            PythonImport.of(PythonClassName.of("typing", "Optional"), Optional.empty()),
-            PythonImport.of(PythonClassName.of("conjure", "*"), Optional.empty()));
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "List"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Set"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Dict"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Tuple"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Optional"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("conjure"), "*"), Optional.empty()));
 
     @Override
     String packageName();

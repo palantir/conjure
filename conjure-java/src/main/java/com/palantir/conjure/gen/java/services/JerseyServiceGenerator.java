@@ -71,7 +71,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         serviceDefinition.defaultAuth(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toList()));
 
-        return JavaFile.builder(serviceDefinition.packageName(), serviceBuilder.build())
+        return JavaFile.builder(serviceDefinition.conjurePackage().name(), serviceBuilder.build())
                 .indent("    ")
                 .build();
     }

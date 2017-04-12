@@ -7,6 +7,7 @@ package com.palantir.conjure.defs;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import java.util.Map;
 import org.immutables.value.Value;
@@ -32,7 +33,7 @@ public interface TypesDefinition {
     @JsonProperty("definitions")
     @Value.Default
     default ObjectsDefinition definitions() {
-        return ObjectsDefinition.builder().defaultPackage("").build();
+        return ObjectsDefinition.builder().defaultConjurePackage(ConjurePackage.NONE).build();
     }
 
     static Builder builder() {

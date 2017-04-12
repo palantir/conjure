@@ -7,6 +7,7 @@ package com.palantir.conjure.defs.services;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -20,7 +21,7 @@ public interface ServiceDefinition {
     String name();
 
     @JsonProperty("package")
-    String packageName();
+    ConjurePackage conjurePackage();
 
     @JsonProperty("docs")
     Optional<String> docs();

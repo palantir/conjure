@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.DateTimeType;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.ListType;
@@ -111,9 +112,9 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             // Types without namespace are either defined locally in this conjure definition, or raw imports.
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
-                String packageName = ObjectDefinitions.getPackageName(type.packageName(),
-                        types.definitions().defaultPackage(), refType.type());
-                return ClassName.get(packageName, refType.type());
+                ConjurePackage conjurePackage = ObjectDefinitions.getPackage(type.conjurePackage(),
+                        types.definitions().defaultConjurePackage(), refType.type());
+                return ClassName.get(conjurePackage.name(), refType.type());
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
@@ -121,7 +122,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             }
         } else {
             // Types with namespace are imported Conjure types.
-            return ClassName.get(importedTypes.getPackage(refType), refType.type());
+            return ClassName.get(importedTypes.getPackage(refType).name(), refType.type());
         }
     }
 
