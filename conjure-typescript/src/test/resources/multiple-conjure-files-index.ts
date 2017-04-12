@@ -1,2 +1,2 @@
-export { IX } from "./test/api/objects/x";
-export { IY } from "./test/api/objects/y";
+export { IBar } from "./test/api/objects/bar";
+export { IFoo } from "./test/api/objects/foo";

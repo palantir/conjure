@@ -2,16 +2,16 @@ types:
   definitions: 
     default-package: com.palantir.package1
     objects:
-      X:
+      Foo:
         fields:
-          fy: Y
-          fz: Z
+          fy: Bar
+          fz: Boom
           fe: EnumObject
-      Y:
+      Bar:
         package: com.palantir.package1.folder
         fields:
           fstring: string
-      Z:
+      Boom:
         package: com.palantir.package2.folder
         fields:
           fstring: string

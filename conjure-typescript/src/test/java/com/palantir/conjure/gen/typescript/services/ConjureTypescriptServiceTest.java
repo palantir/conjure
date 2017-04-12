@@ -59,7 +59,7 @@ public final class ConjureTypescriptServiceTest {
 
         // duplicate names are fine at this level; they are expected to be handled by caller
         assertThat(exports.size()).isEqualTo(4);
-        assertThat(exports).containsAll(ImmutableSet.of(
+        assertThat(exports).containsExactlyInAnyOrder(
                 ExportStatement.builder()
                         .addNamesToExport("IDuplicateService")
                         .filepathToExport("./test/api/duplicateService")
@@ -69,14 +69,12 @@ public final class ConjureTypescriptServiceTest {
                         .filepathToExport("./test/api/duplicateServiceImpl")
                         .build(),
                 ExportStatement.builder()
-                        .addNamesToExport("IIDuplicateService")
-                        .filepathToExport("./test/api/iDuplicateService")
+                        .addNamesToExport("IMyDuplicateService")
+                        .filepathToExport("./test/api/myDuplicateService")
                         .build(),
                 ExportStatement.builder()
-                        .addNamesToExport("IDuplicateService")
-                        .filepathToExport("./test/api/iDuplicateServiceImpl")
-                        .build()));
-
-
+                        .addNamesToExport("MyDuplicateService")
+                        .filepathToExport("./test/api/myDuplicateServiceImpl")
+                        .build());
     }
 }

@@ -2,7 +2,7 @@ types:
   definitions:
     default-package: com.palantir.package
     objects:
-      X:
+      Foo:
         fields:
           fstring: string
           fmap: map<string, string>

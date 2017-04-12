@@ -163,7 +163,7 @@ public final class ServiceDefinitionTests {
             // TODO(melliot): improve error reporting
             assertThat(e.getMessage()).startsWith(
                     "Can not construct instance of com.palantir.conjure.defs.types.PrimitiveType, "
-                            + "problem: Unknown primitive type: bummer");
+                            + "problem: TypeNames must be a primitive type [unknown, string, ");
         }
     }
 

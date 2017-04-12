@@ -79,8 +79,8 @@ class ConjurePluginTest extends GradleTestSpec {
                 fields:
                   string: string
         services:
-          TestServiceA:
-            name: Test Service A
+          TestServiceFoo:
+            name: Test Service Foo
             package: test.test.api
 
             endpoints:
@@ -238,8 +238,8 @@ class ConjurePluginTest extends GradleTestSpec {
             objects:
 
         services:
-          TestServiceA:
-            name: Test Service A
+          TestServiceFoo:
+            name: Test Service Foo
             package: test.x.api
 
             endpoints:
@@ -281,8 +281,8 @@ class ConjurePluginTest extends GradleTestSpec {
         file('api/build/conjure/internal-import.yml').exists()
         file('api/build/conjure/conjure.yml').exists()
 
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.a.api.InternalImport;")
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceA.java').text.contains("import test.b.api.ExternalImport;")
+        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains("import test.a.api.InternalImport;")
+        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains("import test.b.api.ExternalImport;")
     }
 
     def 'omitting a project from settings is sufficient to disable'() {

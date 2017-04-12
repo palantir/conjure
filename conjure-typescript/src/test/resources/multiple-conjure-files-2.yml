@@ -2,6 +2,6 @@ types:
   definitions:
     default-package: com.palantir.test.api.objects
     objects:
-      Y:
+      Bar:
         fields:
           string: string

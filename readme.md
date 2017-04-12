@@ -77,6 +77,7 @@ By convention, all primitive and built-in types use camel case, while all
 user-defined types (e.g. imports and object definitions) use pascal case.
 
 ### Rules
+* Type names must be in `CamelCase` over `[a-z0-9]`.
 * Type names must be unique with case-insensitive comparison. For example,
   it is not legal for an imported type and an enum type to have the same type
   name, even though the Conjure JSON format itself would not prevent this.
@@ -85,8 +86,6 @@ user-defined types (e.g. imports and object definitions) use pascal case.
   language specification of the generated code. The requirement that all type
   names be unique in a case-insensitive comparison guarantees that changing the
   case will not introduce collisions.
-* Type names must contain only alphanumeric characters and underscores and must
-  start with a letter ([A-Za-z]).
 
 ### Primitives
 Base types in the system are:

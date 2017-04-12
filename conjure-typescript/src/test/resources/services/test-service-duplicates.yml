@@ -7,6 +7,6 @@ services:
   DuplicateService:
     name: DuplicateService
     package: com.palantir.test.api
-  IDuplicateService:
-    name: IDuplicateService
+  MyDuplicateService:
+    name: MyDuplicateService
     package: com.palantir.test.api

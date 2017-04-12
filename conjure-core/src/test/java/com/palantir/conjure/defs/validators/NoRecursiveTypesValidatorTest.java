@@ -25,15 +25,15 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        TypeName.of("foo"),
+                        TypeName.of("Foo"),
                         ObjectTypeDefinition.builder().putFields(FieldName.of("self"), FieldDefinition.of(
-                                ConjureType.fromString("foo"))).build()
+                                ConjureType.fromString("Foo"))).build()
                 )
         );
 
         assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Illegal recursive data type: foo -> foo");
+                .hasMessage("Illegal recursive data type: Foo -> Foo");
     }
 
     @Test
@@ -41,12 +41,12 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        TypeName.of("foo"),
+                        TypeName.of("Foo"),
                         ObjectTypeDefinition.builder().putAllFields(ImmutableMap.of(
-                                FieldName.of("selfOptional"), field("optional<foo>"),
-                                FieldName.of("selfMap"), field("map<string, foo>"),
-                                FieldName.of("selfSet"), field("set<foo>"),
-                                FieldName.of("selfList"), field("list<foo>")
+                                FieldName.of("selfOptional"), field("optional<Foo>"),
+                                FieldName.of("selfMap"), field("map<string, Foo>"),
+                                FieldName.of("selfSet"), field("set<Foo>"),
+                                FieldName.of("selfList"), field("list<Foo>")
                         )).build()
                 )
         );
@@ -59,16 +59,16 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        TypeName.of("foo"),
-                        ObjectTypeDefinition.builder().putFields(FieldName.of("bar"), field("bar")).build(),
-                        TypeName.of("bar"),
-                        ObjectTypeDefinition.builder().putFields(FieldName.of("foo"), field("foo")).build()
+                        TypeName.of("Foo"),
+                        ObjectTypeDefinition.builder().putFields(FieldName.of("bar"), field("Bar")).build(),
+                        TypeName.of("Bar"),
+                        ObjectTypeDefinition.builder().putFields(FieldName.of("foo"), field("Foo")).build()
                 )
         );
 
         assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Illegal recursive data type: bar -> foo -> bar");
+                .hasMessage("Illegal recursive data type: Bar -> Foo -> Bar");
     }
 
     private static FieldDefinition field(String type) throws ParseException {

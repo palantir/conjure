@@ -10,7 +10,7 @@ import groovy.transform.TypeCheckingMode
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Specification
 
-public class GradleTestSpec extends Specification {
+class GradleTestSpec extends Specification {
     @TempDirectory
     protected File testDir
 
@@ -18,7 +18,7 @@ public class GradleTestSpec extends Specification {
         println("Build directory: " + testDir.absolutePath)
     }
 
-    protected def run(String... tasks) {
+    protected run(String... tasks) {
         return GradleRunner.create()
                 .withProjectDir(testDir)
                 .withArguments(tasks)

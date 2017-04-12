@@ -8,7 +8,7 @@ import com.google.common.io.Resources
 import java.nio.charset.Charset
 import org.gradle.testkit.runner.TaskOutcome
 
-public class ConjurePublishPluginTest extends GradleTestSpec {
+class ConjurePublishPluginTest extends GradleTestSpec {
 
     def setup() {
         file('build.gradle') << """
@@ -43,7 +43,7 @@ public class ConjurePublishPluginTest extends GradleTestSpec {
         result.task(':bundleJavaScript').outcome == TaskOutcome.SUCCESS
         bundledJavascriptOutputFile('api/testServiceAImpl.js').text.contains('var TestServiceA = ')
         bundledJavascriptOutputFile('package.json').text.contains(String.format('"name": "@my-scope/%s-conjure"',
-                testDir.getName()));
+                testDir.getName()))
     }
 
     def readResource(String name) {
@@ -51,10 +51,10 @@ public class ConjurePublishPluginTest extends GradleTestSpec {
     }
 
     def compiledTypescriptOutputFile(String fileName) {
-        return file('build/conjurePublish/typescriptClient/compileTypeScriptOutput/' + fileName);
+        return file('build/conjurePublish/typescriptClient/compileTypeScriptOutput/' + fileName)
     }
 
     def bundledJavascriptOutputFile(String fileName) {
-        return file('build/conjurePublish/typescriptClient/bundleJavaScriptOutput/' + fileName);
+        return file('build/conjurePublish/typescriptClient/bundleJavaScriptOutput/' + fileName)
     }
 }

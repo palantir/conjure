@@ -39,8 +39,8 @@ public final class ConjureTypeParserTests {
 
     @Test
     public void testParser_refType() throws ParseException {
-        assertThat(TypeParser.INSTANCE.parse("ref"))
-                .isEqualTo(ReferenceType.of(TypeName.of("ref")));
+        assertThat(TypeParser.INSTANCE.parse("Foo"))
+                .isEqualTo(ReferenceType.of(TypeName.of("Foo")));
 
     }
 
@@ -59,7 +59,7 @@ public final class ConjureTypeParserTests {
     @Test
     public void testParser_listType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("list<string>"))
-             .isEqualTo(ListType.of(PrimitiveType.STRING));
+                .isEqualTo(ListType.of(PrimitiveType.STRING));
 
         assertThat(TypeParser.INSTANCE.parse("list < string >"))
                 .isEqualTo(ListType.of(PrimitiveType.STRING));
@@ -71,7 +71,7 @@ public final class ConjureTypeParserTests {
     @Test
     public void testParser_setType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("set<string>"))
-             .isEqualTo(SetType.of(PrimitiveType.STRING));
+                .isEqualTo(SetType.of(PrimitiveType.STRING));
 
         assertThat(TypeParser.INSTANCE.parse("set < string >"))
                 .isEqualTo(SetType.of(PrimitiveType.STRING));

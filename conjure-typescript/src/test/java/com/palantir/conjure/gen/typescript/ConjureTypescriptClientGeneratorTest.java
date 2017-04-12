@@ -46,9 +46,9 @@ public final class ConjureTypescriptClientGeneratorTest {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/native-types.conjure"));
         ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
         generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
-        String xfile = "package/x.ts";
+        String xfile = "package/foo.ts";
         assertThat(compiledFileContent(src, xfile))
-                .contains("interface IX");
+                .contains("interface IFoo");
         assertThat(compiledFileContent(src, xfile))
                 .contains("fdouble: number");
         assertThat(compiledFileContent(src, xfile))
@@ -66,24 +66,24 @@ public final class ConjureTypescriptClientGeneratorTest {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/reference-types.conjure"));
         ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
         generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
-        String xfile = "package1/x.ts";
-        String yfile = "package1/folder/y.ts";
-        String zfile = "package2/folder/z.ts";
+        String fooFile = "package1/foo.ts";
+        String barFile = "package1/folder/bar.ts";
+        String boomFile = "package2/folder/boom.ts";
 
         // Assert all files are generated
-        assertThat(compiledFileContent(src, xfile))
-                .contains("interface IX");
-        assertThat(compiledFileContent(src, yfile))
-                .contains("interface IY");
-        assertThat(compiledFileContent(src, zfile))
-                .contains("interface IZ");
+        assertThat(compiledFileContent(src, fooFile))
+                .contains("interface IFoo");
+        assertThat(compiledFileContent(src, barFile))
+                .contains("interface IBar");
+        assertThat(compiledFileContent(src, boomFile))
+                .contains("interface IBoom");
 
-        // Assert expected references to Y, Z, and EnumObject from X
-        assertThat(compiledFileContent(src, xfile))
-                .contains("import { IY } from \"./folder/y\"");
-        assertThat(compiledFileContent(src, xfile))
-                .contains("import { IZ } from \"../package2/folder/z\"");
-        assertThat(compiledFileContent(src, xfile))
+        // Assert expected references to Bar/Boom, and EnumObject from Foo
+        assertThat(compiledFileContent(src, fooFile))
+                .contains("import { IBar } from \"./folder/bar\"");
+        assertThat(compiledFileContent(src, fooFile))
+                .contains("import { IBoom } from \"../package2/folder/boom\"");
+        assertThat(compiledFileContent(src, fooFile))
                 .contains("import { EnumObject } from \"./enumObject\"");
     }
 
