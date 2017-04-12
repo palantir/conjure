@@ -10,6 +10,7 @@ import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
@@ -51,6 +52,6 @@ public interface TypeGenerator {
             TypesDefinition allTypes,
             ConjureImports importedTypes,
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            TypeName typeName,
             BaseObjectTypeDefinition typeDef);
 }

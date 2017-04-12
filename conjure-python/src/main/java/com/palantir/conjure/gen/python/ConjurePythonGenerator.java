@@ -42,13 +42,12 @@ public final class ConjurePythonGenerator {
                 .entrySet()
                 .stream()
                 .map(entry -> {
-                    String name = entry.getKey();
                     BaseObjectTypeDefinition objectDefinition = entry.getValue();
                     return beanGenerator.generateObject(
                             types,
                             importedTypes,
                             packageNameProcessor,
-                            name,
+                            entry.getKey(),
                             objectDefinition);
                 })
                 .collect(Collectors.toList());
@@ -62,7 +61,7 @@ public final class ConjurePythonGenerator {
 
         Map<String, List<PythonClass>> classesByPackageName =
                 Streams.concat(beanClasses.stream(), serviceClasses.stream())
-                    .collect(Collectors.groupingBy(PythonClass::packageName));
+                        .collect(Collectors.groupingBy(PythonClass::packageName));
 
         // group into files
         return classesByPackageName.entrySet()

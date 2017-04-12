@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
@@ -50,9 +51,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition,
+    private JavaFile generateService(TypeName serviceName, ServiceDefinition serviceDefinition,
             TypeMapper typeMapper, TypeMapper returnTypeMapper) {
-        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName)
+        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName.name())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
 

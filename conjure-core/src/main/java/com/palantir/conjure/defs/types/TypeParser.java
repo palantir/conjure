@@ -56,7 +56,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public ReferenceType parse(ParserState input) throws ParseException {
-            return ReferenceType.of(REF_PARSER.parse(input));
+            return ReferenceType.of(TypeName.of(REF_PARSER.parse(input)));
         }
     }
 
@@ -84,7 +84,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
-            return ReferenceType.of(namespace, ref);
+            return ReferenceType.of(namespace, TypeName.of(ref));
         }
     }
 

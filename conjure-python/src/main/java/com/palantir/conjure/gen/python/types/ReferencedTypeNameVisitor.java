@@ -76,7 +76,7 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
                 ConjurePackage packageName = packageNameProcessor.getPackageName(type.conjurePackage());
-                return ImmutableSet.of(PythonClassName.of(packageName, refType.type()));
+                return ImmutableSet.of(PythonClassName.of(packageName, refType.type().name()));
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
@@ -86,7 +86,7 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
             // Types with namespace are imported Conjure types.
             return ImmutableSet.of(PythonClassName.of(
                     packageNameProcessor.getPackageName(Optional.of(importedTypes.getPackage(refType))),
-                    refType.type()));
+                    refType.type().name()));
         }
     }
 

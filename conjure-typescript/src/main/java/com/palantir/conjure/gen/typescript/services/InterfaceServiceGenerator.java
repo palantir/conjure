@@ -8,6 +8,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
@@ -31,7 +32,7 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private TypescriptFile generate(String clazz, ServiceDefinition serviceDef, TypeMapper typeMapper) {
+    private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         Set<TypescriptFunctionSignature> methodSignatures = serviceDef.endpoints().entrySet()
@@ -39,13 +40,13 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                 .map(e -> ServiceUtils.generateFunctionSignature(e.getKey(), e.getValue(), typeMapper))
                 .collect(Collectors.toSet());
         TypescriptInterface serviceInterface = TypescriptInterface.builder()
-                .name(getInterfaceName(clazz))
+                .name(getInterfaceName(typeName))
                 .methodSignatures(new TreeSet<>(methodSignatures))
                 .build();
         return TypescriptFile.builder()
                 .addEmittables(serviceInterface)
-                .imports(ServiceUtils.generateImportStatements(serviceDef, clazz, packageLocation, typeMapper))
-                .name(clazz)
+                .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
+                .name(typeName.name())
                 .parentFolderPath(parentFolderPath)
                 .build();
     }
@@ -59,13 +60,14 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
+    private ExportStatement generateExport(TypeName typeName, ServiceDefinition serviceDef) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
-        return GenerationUtils.createExportStatementRelativeToRoot(getInterfaceName(clazz), parentFolderPath, clazz);
+        return GenerationUtils.createExportStatementRelativeToRoot(
+                getInterfaceName(typeName), parentFolderPath, typeName.name());
     }
 
-    private String getInterfaceName(String clazz) {
-        return "I" + clazz;
+    private String getInterfaceName(TypeName typeName) {
+        return "I" + typeName.name();
     }
 }

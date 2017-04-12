@@ -16,6 +16,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ReferenceType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.JerseyReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
@@ -46,9 +47,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private JavaFile generateService(String serviceName, ServiceDefinition serviceDefinition,
+    private JavaFile generateService(TypeName serviceName, ServiceDefinition serviceDefinition,
             TypeMapper typeMapper, TypeMapper returnTypeMapper) {
-        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName)
+        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName.name())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", serviceDefinition.basePath())

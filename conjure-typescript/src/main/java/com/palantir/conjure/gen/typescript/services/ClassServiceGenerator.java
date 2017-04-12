@@ -16,6 +16,7 @@ import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
@@ -55,7 +56,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private TypescriptFile generate(String clazz, ServiceDefinition serviceDef, TypeMapper typeMapper) {
+    private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
@@ -85,17 +86,17 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         TypescriptClass typescriptClass = TypescriptClass.builder()
                 .constructor(Optional.of(constructor))
                 .fields(fields)
-                .name(clazz)
+                .name(typeName.name())
                 .methods(methods)
                 .build();
         return TypescriptFile.builder()
                 .addEmittables(typescriptClass)
-                .imports(ServiceUtils.generateImportStatements(serviceDef, clazz, packageLocation, typeMapper))
+                .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
                 .addImports(ImportStatement.builder()
                         .addNamesToImport("IHttpApiBridge")
                         .filepathToImport("@elements/conjure-fe-lib")
                         .build())
-                .name(getFilename(clazz))
+                .name(getFilename(typeName))
                 .parentFolderPath(parentFolderPath)
                 .build();
     }
@@ -153,13 +154,14 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private ExportStatement generateExport(String clazz, ServiceDefinition serviceDef) {
+    private ExportStatement generateExport(TypeName typeName, ServiceDefinition serviceDef) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
-        return GenerationUtils.createExportStatementRelativeToRoot(clazz, parentFolderPath, getFilename(clazz));
+        return GenerationUtils.createExportStatementRelativeToRoot(
+                typeName.name(), parentFolderPath, getFilename(typeName));
     }
 
-    private String getFilename(String clazz) {
-        return clazz + "Impl";
+    private String getFilename(TypeName typeName) {
+        return typeName.name() + "Impl";
     }
 }

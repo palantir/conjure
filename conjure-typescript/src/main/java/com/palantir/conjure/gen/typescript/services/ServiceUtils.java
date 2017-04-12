@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.OptionalType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
@@ -29,7 +30,7 @@ public final class ServiceUtils {
     }
 
     public static List<ImportStatement> generateImportStatements(ServiceDefinition serviceDef,
-            String name, ConjurePackage packageLocation, TypeMapper typeMapper) {
+            TypeName name, ConjurePackage packageLocation, TypeMapper typeMapper) {
         List<ConjureType> usedTypes = serviceDef.endpoints().values().stream()
                 .flatMap(endpoint -> {
                     Stream<ConjureType> endpointTypes = endpoint.argsWithAutoDefined().orElse(

@@ -40,7 +40,8 @@ public final class ConjureTypeParserTests {
     @Test
     public void testParser_refType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("ref"))
-                .isEqualTo(ReferenceType.of("ref"));
+                .isEqualTo(ReferenceType.of(TypeName.of("ref")));
+
     }
 
     @Test

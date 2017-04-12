@@ -17,6 +17,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ServiceDefinition {
 
+    /** Human-readable name of the service. */
+    // TODO(rfink): This is unused. Remove?
     String name();
 
     @JsonProperty("package")

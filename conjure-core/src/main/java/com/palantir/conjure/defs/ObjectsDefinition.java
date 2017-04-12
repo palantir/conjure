@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.defs.validators.ObjectsDefinitionValidator;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +24,8 @@ public interface ObjectsDefinition {
     @JsonProperty("default-package")
     Optional<ConjurePackage> defaultConjurePackage();
 
-    Map<String, BaseObjectTypeDefinition> objects();
+    // TODO(rfink): Rename to "types" [backcompat break], https://github.palantir.build/foundry/conjure/issues/351
+    Map<TypeName, BaseObjectTypeDefinition> objects();
 
     static Builder builder() {
         return new Builder();

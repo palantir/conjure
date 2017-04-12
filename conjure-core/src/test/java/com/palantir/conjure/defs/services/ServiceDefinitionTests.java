@@ -24,8 +24,10 @@ import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.EnumValueDefinition;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.PrimitiveType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
@@ -188,16 +190,17 @@ public final class ServiceDefinitionTests {
         assertThat(def).isEqualTo(
                 ConjureDefinition.builder()
                         .types(TypesDefinition.builder()
-                                .putImports("ResourceIdentifier",
+                                .putImports(TypeName.of("ResourceIdentifier"),
                                         ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
                                 .definitions(ObjectsDefinition.builder()
                                         .defaultConjurePackage(ConjurePackage.of("test.api"))
-                                        .putObjects("SimpleObject", ObjectTypeDefinition.builder()
-                                                .putFields("stringField", FieldDefinition.of(PrimitiveType.STRING))
+                                        .putObjects(TypeName.of("SimpleObject"), ObjectTypeDefinition.builder()
+                                                .putFields(FieldName.of("stringField"),
+                                                        FieldDefinition.of(PrimitiveType.STRING))
                                                 .build())
                                         .build())
                                 .build())
-                        .putServices("TestService", ServiceDefinition.builder()
+                        .putServices(TypeName.of("TestService"), ServiceDefinition.builder()
                                 .name("Test Service")
                                 .conjurePackage(ConjurePackage.of("test.api"))
                                 .putEndpoints("get", EndpointDefinition.builder()

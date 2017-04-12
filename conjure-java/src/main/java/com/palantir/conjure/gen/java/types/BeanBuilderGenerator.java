@@ -11,6 +11,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.FieldDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
@@ -87,16 +88,19 @@ public final class BeanBuilderGenerator {
                 .build();
     }
 
-    private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
+    private static Collection<EnrichedField> createFields(
+            TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                .map(e -> createField(typeMapper, e.getKey(), e.getValue()))
+                // TODO(rfink): Use JSON key when available.
+                .map(e -> createField(typeMapper, e.getKey(), e.getKey().name(), e.getValue()))
                 .collect(Collectors.toList());
     }
 
-    private static EnrichedField createField(TypeMapper typeMapper, String jsonKey, FieldDefinition field) {
+    private static EnrichedField createField(
+            TypeMapper typeMapper, FieldName fieldName, String jsonKey, FieldDefinition field) {
         FieldSpec.Builder spec = FieldSpec.builder(
                 typeMapper.getClassName(field.type()),
-                Fields.toSafeFieldName(jsonKey),
+                Fields.toSafeFieldName(fieldName),
                 Modifier.PRIVATE);
 
         if (field.type() instanceof ListType) {

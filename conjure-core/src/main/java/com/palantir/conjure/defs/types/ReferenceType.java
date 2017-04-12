@@ -14,22 +14,22 @@ public interface ReferenceType extends ConjureType {
 
     Optional<String> namespace();
 
-    String type();
+    TypeName type();
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
         return visitor.visit(this);
     }
 
-    static ReferenceType of(String type) {
-        Optional<PrimitiveType> primitiveType = PrimitiveType.fromTypeString(type);
+    static ReferenceType of(TypeName type) {
+        Optional<PrimitiveType> primitiveType = PrimitiveType.fromTypeName(type);
         if (primitiveType.isPresent()) {
             return primitiveType.get();
         }
         return ImmutableReferenceType.builder().type(type).build();
     }
 
-    static ReferenceType of(String namespace, String type) {
+    static ReferenceType of(String namespace, TypeName type) {
         return ImmutableReferenceType.builder().namespace(namespace).type(type).build();
     }
 

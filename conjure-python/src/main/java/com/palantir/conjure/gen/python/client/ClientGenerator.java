@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
@@ -30,10 +31,12 @@ import java.util.stream.Collectors;
 
 public final class ClientGenerator {
 
-    public PythonClass generateClient(TypesDefinition types,
+    public PythonClass generateClient(
+            TypesDefinition types,
             ConjureImports importedTypes,
             PackageNameProcessor packageNameProvider,
-            String serviceName, ServiceDefinition serviceDefinition) {
+            TypeName serviceName,
+            ServiceDefinition serviceDefinition) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
@@ -93,7 +96,7 @@ public final class ClientGenerator {
                 .packageName(packageName.name())
                 .addAllRequiredImports(PythonService.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
-                .className(serviceName)
+                .className(serviceName.name())
                 .addAllEndpointDefinitions(endpoints)
                 .build();
 

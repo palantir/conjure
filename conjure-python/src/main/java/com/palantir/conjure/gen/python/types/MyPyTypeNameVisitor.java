@@ -56,11 +56,16 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
     @Override
     public String visit(PrimitiveType primitiveType) {
         switch (primitiveType) {
-            case STRING: return "str";
-            case BOOLEAN: return "bool";
-            case DOUBLE: return "float";
-            case INTEGER: return "int";
-            default: throw new IllegalArgumentException("unknown type: " + primitiveType);
+            case STRING:
+                return "str";
+            case BOOLEAN:
+                return "bool";
+            case DOUBLE:
+                return "float";
+            case INTEGER:
+                return "int";
+            default:
+                throw new IllegalArgumentException("unknown type: " + primitiveType);
         }
     }
 
@@ -70,7 +75,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             // Types without namespace are either defined locally in this conjure definition, or raw imports.
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
-                return refType.type();
+                return refType.type().name();
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
@@ -78,7 +83,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             }
         } else {
             // Types with namespace are imported Conjure types.
-            return refType.type();
+            return refType.type().name();
         }
     }
 

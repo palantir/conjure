@@ -5,23 +5,23 @@
 package com.palantir.conjure.defs;
 
 import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeName;
 import java.util.Optional;
 
 public final class ObjectDefinitions {
 
     public static ConjurePackage getPackage(
             Optional<ConjurePackage> packageName, Optional<ConjurePackage> defaultPackageName) {
-        return getPackage(packageName, defaultPackageName, "<unknown>");
+        return getPackage(packageName, defaultPackageName, TypeName.UNKNOWN);
     }
 
     public static ConjurePackage getPackage(
             Optional<ConjurePackage> packageName,
             Optional<ConjurePackage> defaultPackageName,
-            String typeName) {
+            TypeName typeName) {
         return packageName.orElseGet(() -> defaultPackageName.orElseThrow(
                 () -> new IllegalStateException(
-                        "Neither explicit nor default package configured" + (typeName.isEmpty() ? ""
-                                : " for type " + typeName))));
+                        "Neither explicit nor default package configured for type " + typeName.name())));
     }
 
     private ObjectDefinitions() {

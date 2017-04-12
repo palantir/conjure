@@ -6,12 +6,15 @@ package com.palantir.conjure.defs.validators;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ReferenceType;
+import com.palantir.conjure.defs.types.TypeName;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +37,11 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         @Override
         public void validate(ObjectsDefinition definition) {
             // create mapping from object type name -> names of reference types that are fields of that type
-            Multimap<String, String> typeToRefFields = HashMultimap.create();
-            for (Map.Entry<String, BaseObjectTypeDefinition> currEntry : definition.objects().entrySet()) {
+            Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
+            for (Map.Entry<TypeName, BaseObjectTypeDefinition> currEntry : definition.objects().entrySet()) {
                 if (currEntry.getValue() instanceof ObjectTypeDefinition) {
                     ObjectTypeDefinition objectDef = (ObjectTypeDefinition) currEntry.getValue();
-                    for (Map.Entry<String, FieldDefinition> currField : objectDef.fields().entrySet()) {
+                    for (Map.Entry<FieldName, FieldDefinition> currField : objectDef.fields().entrySet()) {
                         if (currField.getValue().type() instanceof ReferenceType) {
                             typeToRefFields.put(
                                     currEntry.getKey(),
@@ -49,20 +52,21 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
                 }
             }
 
-            for (String currType : typeToRefFields.keySet()) {
+            for (TypeName currType : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(currType, typeToRefFields, new ArrayList<>());
             }
         }
 
-        private void verifyTypeHasNoRecursiveDefinitions(String typeName, Multimap<String, String> typeMap,
-                List<String> path) {
+        private void verifyTypeHasNoRecursiveDefinitions(
+                TypeName typeName, Multimap<TypeName, TypeName> typeMap, List<TypeName> path) {
             if (path.contains(typeName)) {
                 path.add(typeName);
-                throw new IllegalStateException("Illegal recursive data type: " + Joiner.on(" -> ").join(path));
+                throw new IllegalStateException("Illegal recursive data type: "
+                        + Joiner.on(" -> ").join(Lists.transform(path, p -> p.name())));
             }
 
             path.add(typeName);
-            for (String currField : typeMap.get(typeName)) {
+            for (TypeName currField : typeMap.get(typeName)) {
                 verifyTypeHasNoRecursiveDefinitions(currField, typeMap, path);
             }
             path.remove(path.size() - 1);

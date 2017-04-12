@@ -53,10 +53,10 @@ public final class UnionGenerator {
     public static JavaFile generateUnionType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            com.palantir.conjure.defs.types.TypeName typeName,
             UnionTypeDefinition typeDef) {
         ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage);
-        ClassName unionClass = ClassName.get(typePackage.name(), typeName);
+        ClassName unionClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
         Map<String, TypeName> memberTypes = typeDef.union().entrySet().stream()
@@ -66,7 +66,7 @@ public final class UnionGenerator {
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(fields)

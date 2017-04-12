@@ -10,7 +10,9 @@ import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonBean;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
@@ -28,7 +30,7 @@ public final class DefaultBeanGenerator implements BeanGenerator {
     public PythonClass generateObject(TypesDefinition types,
             ConjureImports importedTypes,
             PackageNameProcessor packageNameProcessor,
-            String typeName,
+            TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateObject(types, importedTypes, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
@@ -41,14 +43,14 @@ public final class DefaultBeanGenerator implements BeanGenerator {
 
     private PythonEnum generateObject(
             PackageNameProcessor packageNameProcessor,
-            String typeName,
+            TypeName typeName,
             EnumTypeDefinition typeDef) {
 
         ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
 
         return PythonEnum.builder()
                 .packageName(packageName.name())
-                .className(typeName)
+                .className(typeName.name())
                 .docs(typeDef.docs())
                 .values(typeDef.values().stream()
                         .map(value -> PythonEnumValue.of(value.value(), value.docs()))
@@ -59,7 +61,7 @@ public final class DefaultBeanGenerator implements BeanGenerator {
     private PythonBean generateObject(TypesDefinition types,
             ConjureImports importedTypes,
             PackageNameProcessor packageNameProcessor,
-            String typeName,
+            TypeName typeName,
             ObjectTypeDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
@@ -80,14 +82,14 @@ public final class DefaultBeanGenerator implements BeanGenerator {
                 .packageName(packageName.name())
                 .addAllRequiredImports(PythonBean.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
-                .className(typeName)
+                .className(typeName.name())
                 .docs(typeDef.docs())
                 .fields(typeDef.fields()
                         .entrySet()
                         .stream()
                         .map(entry -> PythonField.builder()
                                 .attributeName(pythonAttributeName(entry.getKey()))
-                                .jsonIdentifier(entry.getKey())
+                                .jsonIdentifier(entry.getKey().name())  // TODO(rfink): Use JSON key here.
                                 .docs(entry.getValue().docs())
                                 .pythonType(mapper.getTypeName(entry.getValue().type()))
                                 .myPyType(myPyMapper.getTypeName(entry.getValue().type()))
@@ -96,7 +98,7 @@ public final class DefaultBeanGenerator implements BeanGenerator {
                 .build();
     }
 
-    private static String pythonAttributeName(String jsonFieldName) {
-        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, jsonFieldName);
+    private static String pythonAttributeName(FieldName fieldName) {
+        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, fieldName.name());
     }
 }

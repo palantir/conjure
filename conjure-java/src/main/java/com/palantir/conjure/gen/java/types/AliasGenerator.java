@@ -29,14 +29,14 @@ public final class AliasGenerator {
     public static JavaFile generateAliasType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            com.palantir.conjure.defs.types.TypeName typeName,
             AliasTypeDefinition typeDef) {
         TypeName aliasType = typeMapper.getClassName(typeDef.alias());
 
         ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
-        ClassName thisClass = ClassName.get(typePackage.name(), typeName);
+        ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
 
-        TypeSpec.Builder spec = TypeSpec.classBuilder(typeName)
+        TypeSpec.Builder spec = TypeSpec.classBuilder(typeName.name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(AliasGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(aliasType, "value", Modifier.PRIVATE, Modifier.FINAL)

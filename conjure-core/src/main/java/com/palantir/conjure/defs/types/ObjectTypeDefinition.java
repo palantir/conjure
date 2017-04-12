@@ -14,7 +14,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
 
-    Map<String, FieldDefinition> fields();
+    Map<FieldName, FieldDefinition> fields();
 
     static Builder builder() {
         return new Builder();

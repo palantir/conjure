@@ -197,7 +197,7 @@ public final class TypeMapper {
         @Override
         public String visit(ReferenceType refType) {
             if (refType.namespace().isPresent()) {
-                return refType.type();
+                return refType.type().name();
             } else {
                 BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
                 if (defType != null) {
@@ -205,10 +205,10 @@ public final class TypeMapper {
                         // in typescript we collapse alias types to concrete types
                         return visit(((AliasTypeDefinition) defType).alias());
                     } else if (defType instanceof EnumTypeDefinition) {
-                        return refType.type();
+                        return refType.type().name();
                     } else {
                         // Interfaces are prepended with "I"
-                        return "I" + refType.type();
+                        return "I" + refType.type().name();
                     }
                 } else {
                     ExternalTypeDefinition depType = types.imports().get(refType.type());

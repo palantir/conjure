@@ -12,7 +12,9 @@ import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.ObjectsDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.FieldDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.parsec.ParseException;
 import org.junit.Test;
 
@@ -23,15 +25,15 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        "foo",
-                        ObjectTypeDefinition.builder().putFields("self", FieldDefinition.of(
+                        TypeName.of("foo"),
+                        ObjectTypeDefinition.builder().putFields(FieldName.of("self"), FieldDefinition.of(
                                 ConjureType.fromString("foo"))).build()
                 )
         );
 
         assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Illegal recursive data type: foo -> foo");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Illegal recursive data type: foo -> foo");
     }
 
     @Test
@@ -39,12 +41,12 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        "foo",
+                        TypeName.of("foo"),
                         ObjectTypeDefinition.builder().putAllFields(ImmutableMap.of(
-                                "selfOptional", field("optional<foo>"),
-                                "selfMap", field("map<string, foo>"),
-                                "selfSet", field("set<foo>"),
-                                "selfList", field("list<foo>")
+                                FieldName.of("selfOptional"), field("optional<foo>"),
+                                FieldName.of("selfMap"), field("map<string, foo>"),
+                                FieldName.of("selfSet"), field("set<foo>"),
+                                FieldName.of("selfList"), field("list<foo>")
                         )).build()
                 )
         );
@@ -57,8 +59,10 @@ public final class NoRecursiveTypesValidatorTest {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         when(imports.objects()).thenReturn(
                 ImmutableMap.of(
-                        "foo", ObjectTypeDefinition.builder().putFields("bar", field("bar")).build(),
-                        "bar", ObjectTypeDefinition.builder().putFields("foo", field("foo")).build()
+                        TypeName.of("foo"),
+                        ObjectTypeDefinition.builder().putFields(FieldName.of("bar"), field("bar")).build(),
+                        TypeName.of("bar"),
+                        ObjectTypeDefinition.builder().putFields(FieldName.of("foo"), field("foo")).build()
                 )
         );
 

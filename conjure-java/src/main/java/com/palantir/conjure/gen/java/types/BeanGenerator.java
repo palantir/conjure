@@ -15,10 +15,12 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.FieldDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ListType;
 import com.palantir.conjure.defs.types.MapType;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.defs.types.UnionTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
@@ -30,7 +32,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +62,7 @@ public final class BeanGenerator implements TypeGenerator {
             TypesDefinition types,
             ConjureImports importedTypes,
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            com.palantir.conjure.defs.types.TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
         TypeMapper typeMapper = new TypeMapper(types, importedTypes);
         if (typeDef instanceof ObjectTypeDefinition) {
@@ -82,18 +83,18 @@ public final class BeanGenerator implements TypeGenerator {
     private JavaFile generateBeanType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            TypeName typeName,
             ObjectTypeDefinition typeDef) {
 
         ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
-        ClassName objectClass = ClassName.get(typePackage.name(), typeName);
+        ClassName objectClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
         Collection<FieldSpec> nonPrimitivePoetFields = Collections2.filter(poetFields, f -> !f.type.isPrimitive());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName)
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
                         .addMember("builder", "$T.class", builderClass).build())
@@ -103,7 +104,7 @@ public final class BeanGenerator implements TypeGenerator {
                 .addMethod(MethodSpecs.createEquals(objectClass))
                 .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
                 .addMethod(MethodSpecs.createHashCode(poetFields))
-                .addMethod(MethodSpecs.createToString(typeName, poetFields));
+                .addMethod(MethodSpecs.createToString(typeName.name(), poetFields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
@@ -130,9 +131,11 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    private static Collection<EnrichedField> createFields(TypeMapper typeMapper, Map<String, FieldDefinition> fields) {
+    private static Collection<EnrichedField> createFields(
+            TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
+                // TODO(rfink): Use JSON field here instead of name.
+                .map(e -> EnrichedField.of(e.getKey().name(), e.getValue(), FieldSpec.builder(
                         typeMapper.getClassName(e.getValue().type()),
                         Fields.toSafeFieldName(e.getKey()),
                         Modifier.PRIVATE, Modifier.FINAL)
@@ -236,7 +239,8 @@ public final class BeanGenerator implements TypeGenerator {
     private static MethodSpec createAddFieldIfMissing(int fieldCount) {
         ParameterizedTypeName listOfStringType = ParameterizedTypeName.get(List.class, String.class);
         ParameterSpec listParam = ParameterSpec.builder(listOfStringType, "prev").build();
-        ParameterSpec fieldValueParam = ParameterSpec.builder(TypeName.OBJECT, "fieldValue").build();
+        ParameterSpec fieldValueParam =
+                ParameterSpec.builder(com.squareup.javapoet.TypeName.OBJECT, "fieldValue").build();
         ParameterSpec fieldNameParam = ParameterSpec.builder(ClassName.get(String.class), "fieldName").build();
 
         return MethodSpec.methodBuilder("addFieldIfMissing")
@@ -268,7 +272,7 @@ public final class BeanGenerator implements TypeGenerator {
         return "get" + StringUtils.capitalize(fieldName);
     }
 
-    private static TypeName getTypeNameWithoutOptional(FieldSpec spec) {
+    private static com.squareup.javapoet.TypeName getTypeNameWithoutOptional(FieldSpec spec) {
         if (!isOptional(spec)) {
             return spec.type;
         }

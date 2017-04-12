@@ -6,6 +6,7 @@ package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -19,7 +20,7 @@ public interface ConjureDefinition {
         return TypesDefinition.builder().build();
     }
 
-    Map<String, ServiceDefinition> services();
+    Map<TypeName, ServiceDefinition> services();
 
     static Builder builder() {
         return new Builder();

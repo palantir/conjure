@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -18,7 +19,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface TypesDefinition {
 
-    Map<String, ExternalTypeDefinition> imports();
+    Map<TypeName, ExternalTypeDefinition> imports();
 
     /**
      * A list of Conjure definitions from which Conjure types are made available ("imported") for this Conjure

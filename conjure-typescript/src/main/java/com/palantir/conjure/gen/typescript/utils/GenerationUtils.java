@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
@@ -80,7 +81,7 @@ public final class GenerationUtils {
     }
 
     public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
-            String sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
+            TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
         String folderLocation = GenerationUtils.packageToFolderPath(sourcePackage);
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
@@ -91,8 +92,8 @@ public final class GenerationUtils {
                     return maybeDestName.map(destName -> {
                         String destFolder = GenerationUtils.packageToFolderPath(destName);
                         return GenerationUtils.createImportStatement(mapper.getTypescriptType(referenceType),
-                                getTypescriptFilePath(folderLocation, sourceName),
-                                getTypescriptFilePath(destFolder, referenceType.type()));
+                                getTypescriptFilePath(folderLocation, sourceName.name()),
+                                getTypescriptFilePath(destFolder, referenceType.type().name()));
                     });
                 })
                 .filter(Optional::isPresent)

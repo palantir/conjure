@@ -32,12 +32,12 @@ public final class EnumGenerator {
 
     public static JavaFile generateEnumType(
             Optional<ConjurePackage> defaultPackage,
-            String typeName,
+            com.palantir.conjure.defs.types.TypeName typeName,
             EnumTypeDefinition typeDef,
             boolean supportUnknownEnumValues) {
         ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
-        ClassName thisClass = ClassName.get(typePackage.name(), typeName);
-        ClassName enumClass = ClassName.get(typePackage.name(), typeName, "Value");
+        ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
+        ClassName enumClass = ClassName.get(typePackage.name(), typeName.name(), "Value");
 
         TypeSpec spec;
         if (supportUnknownEnumValues) {
@@ -56,9 +56,12 @@ public final class EnumGenerator {
                 .build();
     }
 
-    private static TypeSpec createSafeEnum(String typeName, EnumTypeDefinition typeDef, ClassName thisClass,
+    private static TypeSpec createSafeEnum(
+            com.palantir.conjure.defs.types.TypeName typeName,
+            EnumTypeDefinition typeDef,
+            ClassName thisClass,
             ClassName enumClass) {
-        TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName)
+        TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName.name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addType(createEnum(enumClass, typeDef.values(), true))

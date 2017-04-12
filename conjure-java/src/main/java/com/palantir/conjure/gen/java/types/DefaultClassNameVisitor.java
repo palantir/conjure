@@ -114,7 +114,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             if (type != null) {
                 ConjurePackage conjurePackage = ObjectDefinitions.getPackage(type.conjurePackage(),
                         types.definitions().defaultConjurePackage(), refType.type());
-                return ClassName.get(conjurePackage.name(), refType.type());
+                return ClassName.get(conjurePackage.name(), refType.type().name());
             } else {
                 ExternalTypeDefinition depType = types.imports().get(refType.type());
                 checkNotNull(depType, "Unable to resolve type %s", refType.type());
@@ -122,7 +122,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             }
         } else {
             // Types with namespace are imported Conjure types.
-            return ClassName.get(importedTypes.getPackage(refType).name(), refType.type());
+            return ClassName.get(importedTypes.getPackage(refType).name(), refType.type().name());
         }
     }
 
