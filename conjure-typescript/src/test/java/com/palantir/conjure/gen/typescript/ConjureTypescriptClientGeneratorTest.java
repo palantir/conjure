@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;

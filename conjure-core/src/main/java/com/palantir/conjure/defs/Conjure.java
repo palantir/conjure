@@ -11,6 +11,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

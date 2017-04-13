@@ -4,6 +4,16 @@
 
 package com.palantir.conjure.defs.types;
 
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.builtin.DateTimeType;
+import com.palantir.conjure.defs.types.builtin.SafeLongType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;

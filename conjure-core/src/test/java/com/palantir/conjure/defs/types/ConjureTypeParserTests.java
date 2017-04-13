@@ -7,6 +7,15 @@ package com.palantir.conjure.defs.types;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import org.junit.Test;

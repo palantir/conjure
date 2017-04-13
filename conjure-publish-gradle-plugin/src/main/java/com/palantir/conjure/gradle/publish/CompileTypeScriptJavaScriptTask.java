@@ -29,6 +29,7 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
     public final File getInputDirectory() {
         return inputDirectory;
     }
+
     @OutputDirectory
     public final File getOutputDirectory() {
         return outputDirectory;

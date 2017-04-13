@@ -8,7 +8,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;

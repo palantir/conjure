@@ -6,5 +6,5 @@ include 'conjure-publish-gradle-plugin'
 include 'conjure-python'
 include 'conjure-python-lib'
 include 'conjure-typescript'
+include 'extras:immutables-style'
 include 'parsec'
-

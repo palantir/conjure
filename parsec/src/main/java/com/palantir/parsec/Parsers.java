@@ -28,9 +28,9 @@ public final class Parsers {
     /**
      * Runs the prefix parser, followed by the `parser`, returning result of the latter.
      *
-     * @param <T>     the type the target parser returns
-     * @param prefix  a parser to consume some prefix
-     * @param parser  the target parser to run
+     * @param <T> the type the target parser returns
+     * @param prefix a parser to consume some prefix
+     * @param parser the target parser to run
      * @return the specified parser
      */
     public static <T> Parser<T> prefix(final Parser<?> prefix, final Parser<T> parser) {
@@ -60,8 +60,8 @@ public final class Parsers {
     /**
      * Runs the whitespace parser followed by `parser`, returning result of the latter.
      *
-     * @param <T>     the type the target parser returns
-     * @param parser  the target parser to run
+     * @param <T> the type the target parser returns
+     * @param parser the target parser to run
      * @return the specified parser
      */
     public static <T> Parser<T> whitespace(Parser<T> parser) {
@@ -72,8 +72,8 @@ public final class Parsers {
      * Attempts to parse using parser; if the parser returns null or is a expectant parser and returns false, then the
      * CompilerInput state is reset. Otherwise, the state remains unchanged.
      *
-     * @param <T>     the type the target parser returns
-     * @param parser  the target parser to run
+     * @param <T> the type the target parser returns
+     * @param parser the target parser to run
      * @return the specified parser
      */
     public static <T> Parser<T> gingerly(final Parser<T> parser) {
@@ -96,9 +96,9 @@ public final class Parsers {
     /**
      * Parse either firstOption or iterate through otherOptions and return result.
      *
-     * @param <T>           the type the parsers return
-     * @param firstOption   the first parser to try
-     * @param otherOptions  additional parsers to try
+     * @param <T> the type the parsers return
+     * @param firstOption the first parser to try
+     * @param otherOptions additional parsers to try
      * @return the specified parser
      */
     @SafeVarargs
@@ -140,7 +140,7 @@ public final class Parsers {
     /**
      * Returns true when the argument is null or is equal to {@link ExpectationResult#INCORRECT}.
      *
-     * @param obj  object to compare
+     * @param obj object to compare
      * @return true when the argument is null or is equal to {@link ExpectationResult#INCORRECT}
      */
     public static boolean nullOrUnexpected(Object obj) {
@@ -150,7 +150,7 @@ public final class Parsers {
     /**
      * Returns true when the argument is null or is a String and is empty.
      *
-     * @param string  the string to test
+     * @param string the string to test
      * @return true when {@code string} is null or empty
      */
     public static boolean nullOrEmpty(String string) {

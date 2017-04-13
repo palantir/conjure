@@ -11,7 +11,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonFile;
 import com.palantir.conjure.gen.python.poet.PythonPoetWriter;

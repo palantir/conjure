@@ -6,7 +6,8 @@ package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.TypeName;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 

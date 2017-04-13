@@ -4,8 +4,8 @@
 
 package com.palantir.conjure.gen.typescript.types;
 
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import java.io.File;

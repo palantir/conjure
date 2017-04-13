@@ -15,19 +15,19 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ObjectsDefinition;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.EnumValueDefinition;
-import com.palantir.conjure.defs.types.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.FieldDefinition;
-import com.palantir.conjure.defs.types.FieldName;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.TypeName;
+import com.palantir.conjure.defs.types.ObjectsDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
+import com.palantir.conjure.defs.types.complex.FieldDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
@@ -150,7 +150,7 @@ public final class ServiceDefinitionTests {
         } catch (JsonMappingException e) {
             // TODO(melliot): improve error reporting
             assertThat(e.getMessage()).startsWith(
-                    "Can not construct instance of com.palantir.conjure.defs.types.PrimitiveType, "
+                    "Can not construct instance of com.palantir.conjure.defs.types.primitive.PrimitiveType, "
                             + "problem: TypeNames must be a primitive type [unknown, string, ");
         }
     }

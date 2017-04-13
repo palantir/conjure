@@ -7,10 +7,10 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Iterables;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.EnumValueDefinition;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -31,10 +31,10 @@ public final class EnumGenerator {
 
     public static JavaFile generateEnumType(
             Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.TypeName typeName,
+            com.palantir.conjure.defs.types.names.TypeName typeName,
             EnumTypeDefinition typeDef,
             boolean supportUnknownEnumValues) {
-        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName enumClass = ClassName.get(typePackage.name(), typeName.name(), "Value");
 
@@ -56,7 +56,7 @@ public final class EnumGenerator {
     }
 
     private static TypeSpec createSafeEnum(
-            com.palantir.conjure.defs.types.TypeName typeName,
+            com.palantir.conjure.defs.types.names.TypeName typeName,
             EnumTypeDefinition typeDef,
             ClassName thisClass,
             ClassName enumClass) {

@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import java.io.File;
 import java.io.IOException;

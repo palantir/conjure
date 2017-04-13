@@ -5,7 +5,7 @@
 package com.palantir.conjure.gen.python.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
 import org.immutables.value.Value;
 
 @Value.Immutable

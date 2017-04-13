@@ -11,6 +11,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition.BaseObjectTypeDefinitionDeserializer;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -23,22 +28,17 @@ public interface BaseObjectTypeDefinition {
     Optional<String> docs();
 
     class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
-        @SuppressWarnings("deprecation")
         @Override
         public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
             TreeNode tree = parser.readValueAsTree();
             if (tree.get("fields") != null) {
-                return ImmutableObjectTypeDefinition.fromJson(
-                        parser.getCodec().treeToValue(tree, ImmutableObjectTypeDefinition.Json.class));
+                return ObjectTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("values") != null) {
-                return ImmutableEnumTypeDefinition.fromJson(
-                        parser.getCodec().treeToValue(tree, ImmutableEnumTypeDefinition.Json.class));
+                return EnumTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("alias") != null) {
-                return ImmutableAliasTypeDefinition.fromJson(
-                        parser.getCodec().treeToValue(tree, ImmutableAliasTypeDefinition.Json.class));
+                return AliasTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("union") != null) {
-                return ImmutableUnionTypeDefinition.fromJson(
-                        parser.getCodec().treeToValue(tree, ImmutableUnionTypeDefinition.Json.class));
+                return UnionTypeDefinition.fromJson(parser, tree);
             } else {
                 throw new IllegalArgumentException(
                         "Unrecognized definition, objects must have either fields, values or an alias defined.");

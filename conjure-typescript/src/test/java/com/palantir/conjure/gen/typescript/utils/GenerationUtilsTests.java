@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
 import org.junit.Test;
 
 public final class GenerationUtilsTests {

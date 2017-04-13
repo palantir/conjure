@@ -16,7 +16,7 @@ public interface TypescriptEqualityBinaryOperatorStatement extends TypescriptEqu
     String operator();
 
     static TypescriptEqualityBinaryOperatorStatement or(TypescriptEqualityStatement lhs,
-                                                        TypescriptEqualityStatement rhs) {
+            TypescriptEqualityStatement rhs) {
         return ImmutableTypescriptEqualityBinaryOperatorStatement.builder()
                 .leftHandStatement(lhs)
                 .rightHandStatement(rhs)
@@ -25,7 +25,7 @@ public interface TypescriptEqualityBinaryOperatorStatement extends TypescriptEqu
     }
 
     static TypescriptEqualityBinaryOperatorStatement and(TypescriptEqualityStatement lhs,
-                                                         TypescriptEqualityStatement rhs) {
+            TypescriptEqualityStatement rhs) {
         return ImmutableTypescriptEqualityBinaryOperatorStatement.builder()
                 .leftHandStatement(lhs)
                 .rightHandStatement(rhs)

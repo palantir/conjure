@@ -6,11 +6,11 @@ package com.palantir.conjure.gen.java.types;
 
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.TypeName;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;

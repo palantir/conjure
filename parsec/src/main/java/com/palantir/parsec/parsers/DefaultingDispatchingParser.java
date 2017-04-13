@@ -41,7 +41,7 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
      * Allows for graceful handling of unknown directives. Because the default parser will need to know what the
      * directive was, it will handle the entire line.
      *
-     * @param defaultParser  the default parser to apply
+     * @param defaultParser the default parser to apply
      */
     public void setDefaultParser(Parser<T> defaultParser) {
         this.defaultParser = defaultParser;

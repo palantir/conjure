@@ -4,9 +4,9 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.squareup.javapoet.TypeName;
 
 /**

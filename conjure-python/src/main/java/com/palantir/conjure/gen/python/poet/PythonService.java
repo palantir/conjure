@@ -6,7 +6,7 @@ package com.palantir.conjure.gen.python.poet;
 
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

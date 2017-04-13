@@ -6,9 +6,9 @@ package com.palantir.conjure.gen.python;
 
 import com.google.common.collect.Streams;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonFile;

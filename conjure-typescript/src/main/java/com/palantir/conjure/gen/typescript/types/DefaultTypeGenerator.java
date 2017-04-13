@@ -6,21 +6,21 @@ package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.FieldName;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.OptionalType;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.TypeName;
-import com.palantir.conjure.defs.types.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
 import com.palantir.conjure.gen.typescript.poet.EqualityStatement;
@@ -83,7 +83,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     private Optional<TypescriptFile> generateType(TypesDefinition types, ConjureImports imports,
             Optional<ConjurePackage> defaultPackage, TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
         ConjurePackage packageLocation =
-                ObjectDefinitions.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
+                ConjurePackages.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         TypeMapper mapper = new TypeMapper(types, imports, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
@@ -105,7 +105,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     private Optional<ExportStatement> generateExport(TypesDefinition types, Optional<ConjurePackage> defaultPackage,
             TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
         ConjurePackage packageLocation =
-                ObjectDefinitions.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
+                ConjurePackages.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(

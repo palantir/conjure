@@ -7,21 +7,21 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.Collections2;
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.FieldDefinition;
-import com.palantir.conjure.defs.types.FieldName;
-import com.palantir.conjure.defs.types.ListType;
-import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.SetType;
-import com.palantir.conjure.defs.types.TypeName;
-import com.palantir.conjure.defs.types.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.FieldDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
@@ -62,7 +62,7 @@ public final class BeanGenerator implements TypeGenerator {
             TypesDefinition types,
             ConjureImports importedTypes,
             Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.TypeName typeName,
+            TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
         TypeMapper typeMapper = new TypeMapper(types, importedTypes);
         if (typeDef instanceof ObjectTypeDefinition) {
@@ -86,7 +86,7 @@ public final class BeanGenerator implements TypeGenerator {
             TypeName typeName,
             ObjectTypeDefinition typeDef) {
 
-        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName objectClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 

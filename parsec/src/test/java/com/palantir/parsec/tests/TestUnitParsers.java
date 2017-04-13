@@ -75,7 +75,7 @@ public final class TestUnitParsers {
                 new BetweenParser<String>(new ExpectantParser("{"),
                         Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                         Parsers.prefix(Parsers.whitespace(), new ExpectantParser("}")))
-                                .parse(new StringParserState("{ abcdef }")));
+                        .parse(new StringParserState("{ abcdef }")));
     }
 
     @Test
@@ -93,14 +93,14 @@ public final class TestUnitParsers {
         map.put("abc", "def");
         assertEquals(map, new MapParser<String, String>(new RawStringParser(),
                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                        new StringParserState("abc def")));
+                new StringParserState("abc def")));
         assertEquals(map, new MapParser<String, String>(Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                        new StringParserState(" abc def")));
+                new StringParserState(" abc def")));
         map.put("ghi", "jkl");
         assertEquals(map, new MapParser<String, String>(Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                        new StringParserState("abc def  ghi jkl")));
+                new StringParserState("abc def  ghi jkl")));
     }
 
     @Test

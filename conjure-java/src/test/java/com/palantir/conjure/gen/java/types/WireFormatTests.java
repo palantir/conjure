@@ -75,13 +75,13 @@ public final class WireFormatTests {
     @Test
     public void testBinaryFieldsDeserializeFromBase64() throws Exception {
         assertThat(mapper.readValue("{\"binary\": \"AAEC\"}", BinaryExample.class).getBinary())
-                .isEqualTo(ByteBuffer.wrap(new byte[]{0, 1, 2}));
+                .isEqualTo(ByteBuffer.wrap(new byte[] {0, 1, 2}));
     }
 
     @Test
     public void testBinaryFieldsSerializeToBase64() throws Exception {
         assertThat(mapper.writeValueAsString(
-                    BinaryExample.builder().binary(ByteBuffer.wrap(new byte[]{0, 1, 2})).build()))
+                BinaryExample.builder().binary(ByteBuffer.wrap(new byte[] {0, 1, 2})).build()))
                 .isEqualTo("{\"binary\":\"AAEC\"}");
     }
 
@@ -102,8 +102,8 @@ public final class WireFormatTests {
 
     @Test
     public void testObjectsThatImplementHashCodeImplementDeepHashCode() {
-        assertThat(BinaryExample.of(ByteBuffer.wrap(new byte[]{0, 1, 2})).hashCode())
-                .isEqualTo(BinaryExample.of(ByteBuffer.wrap(new byte[]{0, 1, 2})).hashCode());
+        assertThat(BinaryExample.of(ByteBuffer.wrap(new byte[] {0, 1, 2})).hashCode())
+                .isEqualTo(BinaryExample.of(ByteBuffer.wrap(new byte[] {0, 1, 2})).hashCode());
 
         assertThat(OptionalExample.builder().item("a").build().hashCode())
                 .isEqualTo(OptionalExample.builder().item("a").build().hashCode());
@@ -129,7 +129,7 @@ public final class WireFormatTests {
     @Test
     public void testEnumRoundTripsUnknownValue() throws Exception {
         assertThat(mapper.writeValueAsString(mapper.readValue("\"FAKE_FAKE_FAKE\"", EnumExample.class)))
-            .isEqualTo("\"FAKE_FAKE_FAKE\"");
+                .isEqualTo("\"FAKE_FAKE_FAKE\"");
         // nb: we upper-case incoming values to sanitize, so fake_FAKE_fake would fail here
     }
 

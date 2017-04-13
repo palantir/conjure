@@ -2,6 +2,7 @@ apply from: "${rootDir}/gradle/publish-libs.gradle"
 
 dependencies {
     compile project(':parsec')
+    compile project(':extras:immutables-style')
 
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'

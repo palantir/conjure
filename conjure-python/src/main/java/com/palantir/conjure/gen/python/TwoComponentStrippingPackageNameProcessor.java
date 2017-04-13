@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.gen.python;
 
-import com.palantir.conjure.defs.types.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
 

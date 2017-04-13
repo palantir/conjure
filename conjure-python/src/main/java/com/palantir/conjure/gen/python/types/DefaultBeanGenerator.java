@@ -4,14 +4,14 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.FieldName;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.TypeName;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonBean;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;

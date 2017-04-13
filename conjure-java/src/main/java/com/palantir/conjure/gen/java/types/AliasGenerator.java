@@ -6,10 +6,10 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.types.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.PrimitiveType;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -29,11 +29,11 @@ public final class AliasGenerator {
     public static JavaFile generateAliasType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.TypeName typeName,
+            com.palantir.conjure.defs.types.names.TypeName typeName,
             AliasTypeDefinition typeDef) {
         TypeName aliasType = typeMapper.getClassName(typeDef.alias());
 
-        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
+        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
 
         TypeSpec.Builder spec = TypeSpec.classBuilder(typeName.name())

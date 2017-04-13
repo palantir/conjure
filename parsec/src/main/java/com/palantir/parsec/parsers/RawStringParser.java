@@ -22,8 +22,7 @@ public final class RawStringParser implements Parser<String> {
     /**
      * Parses a "raw" string where raw is specified by the supplied condition.
      *
-     * @param condition
-     *        specifies the allowable characters in this string
+     * @param condition specifies the allowable characters in this string
      */
     public RawStringParser(AllowableCharacters condition) {
         this.condition = condition;

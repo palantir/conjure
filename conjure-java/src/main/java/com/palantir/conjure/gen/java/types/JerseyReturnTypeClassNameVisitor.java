@@ -4,18 +4,18 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AnyType;
-import com.palantir.conjure.defs.types.BinaryType;
-import com.palantir.conjure.defs.types.DateTimeType;
-import com.palantir.conjure.defs.types.ListType;
-import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.OptionalType;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.ReferenceType;
-import com.palantir.conjure.defs.types.SafeLongType;
-import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.builtin.DateTimeType;
+import com.palantir.conjure.defs.types.builtin.SafeLongType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 

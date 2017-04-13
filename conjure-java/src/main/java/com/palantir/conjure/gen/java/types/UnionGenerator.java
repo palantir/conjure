@@ -14,11 +14,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
-import com.palantir.conjure.defs.types.UnionMemberTypeDefinition;
-import com.palantir.conjure.defs.types.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.parsec.ParseException;
 import com.squareup.javapoet.AnnotationSpec;
@@ -53,9 +53,9 @@ public final class UnionGenerator {
     public static JavaFile generateUnionType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.TypeName typeName,
+            com.palantir.conjure.defs.types.names.TypeName typeName,
             UnionTypeDefinition typeDef) {
-        ConjurePackage typePackage = ObjectDefinitions.getPackage(typeDef.conjurePackage(), defaultPackage);
+        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage);
         ClassName unionClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");

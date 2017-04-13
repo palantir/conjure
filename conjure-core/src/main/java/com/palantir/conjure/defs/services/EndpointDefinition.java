@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.ConjureType;
-import com.palantir.conjure.defs.validators.EndpointDefinitionValidator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;

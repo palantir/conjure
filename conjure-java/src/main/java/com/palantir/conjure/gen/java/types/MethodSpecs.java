@@ -47,8 +47,8 @@ public final class MethodSpecs {
     public static MethodSpec createHashCode(Collection<FieldSpec> fields) {
         CodeBlock hashInput = CodeBlocks.of(
                 fields.stream()
-                .map(MethodSpecs::createHashInput)
-                .collect(joining(CodeBlock.of(", "))));
+                        .map(MethodSpecs::createHashInput)
+                        .collect(joining(CodeBlock.of(", "))));
 
         return MethodSpec.methodBuilder("hashCode")
                 .addAnnotation(Override.class)

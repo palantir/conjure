@@ -8,28 +8,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.BinaryType;
-import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.DateTimeType;
-import com.palantir.conjure.defs.types.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.ListType;
-import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.OptionalType;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.ReferenceType;
-import com.palantir.conjure.defs.types.SafeLongType;
-import com.palantir.conjure.defs.types.SetType;
-import com.palantir.conjure.defs.types.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.builtin.DateTimeType;
+import com.palantir.conjure.defs.types.builtin.SafeLongType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import java.util.Optional;
 import java.util.Set;
@@ -141,7 +141,7 @@ public final class TypeMapper {
         if (defType != null) {
             if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
                     || defType instanceof UnionTypeDefinition) {
-                return Optional.of(ObjectDefinitions.getPackage(
+                return Optional.of(ConjurePackages.getPackage(
                         defType.conjurePackage(), defaultPackage, referenceType.type()));
             } else if (!(defType instanceof AliasTypeDefinition)) {
                 throw new IllegalArgumentException("Unknown base object type definition");

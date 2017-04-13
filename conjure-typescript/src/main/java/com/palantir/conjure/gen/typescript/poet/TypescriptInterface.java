@@ -27,7 +27,7 @@ public interface TypescriptInterface extends Emittable {
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        writer.writeIndentedLine("export interface "  + name() +  " {")
+        writer.writeIndentedLine("export interface " + name() + " {")
                 .increaseIndent();
         propertySignatures().forEach(property -> {
             writer.writeIndented();

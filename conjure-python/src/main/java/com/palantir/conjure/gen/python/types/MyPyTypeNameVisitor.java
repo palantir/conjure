@@ -6,20 +6,20 @@ package com.palantir.conjure.gen.python.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.BinaryType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.DateTimeType;
-import com.palantir.conjure.defs.types.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.ListType;
-import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.OptionalType;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.ReferenceType;
-import com.palantir.conjure.defs.types.SafeLongType;
-import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.builtin.DateTimeType;
+import com.palantir.conjure.defs.types.builtin.SafeLongType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 
 /**
  * The mypy type for the conjure type.

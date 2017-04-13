@@ -6,22 +6,22 @@ package com.palantir.conjure.gen.java.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.palantir.conjure.defs.ConjureImports;
-import com.palantir.conjure.defs.ObjectDefinitions;
-import com.palantir.conjure.defs.TypesDefinition;
-import com.palantir.conjure.defs.types.AnyType;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.BinaryType;
-import com.palantir.conjure.defs.types.ConjurePackage;
-import com.palantir.conjure.defs.types.DateTimeType;
-import com.palantir.conjure.defs.types.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.ListType;
-import com.palantir.conjure.defs.types.MapType;
-import com.palantir.conjure.defs.types.OptionalType;
-import com.palantir.conjure.defs.types.PrimitiveType;
-import com.palantir.conjure.defs.types.ReferenceType;
-import com.palantir.conjure.defs.types.SafeLongType;
-import com.palantir.conjure.defs.types.SetType;
+import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.builtin.DateTimeType;
+import com.palantir.conjure.defs.types.builtin.SafeLongType;
+import com.palantir.conjure.defs.types.collect.ListType;
+import com.palantir.conjure.defs.types.collect.MapType;
+import com.palantir.conjure.defs.types.collect.OptionalType;
+import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.lib.SafeLong;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -112,7 +112,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             // Types without namespace are either defined locally in this conjure definition, or raw imports.
             BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
             if (type != null) {
-                ConjurePackage conjurePackage = ObjectDefinitions.getPackage(type.conjurePackage(),
+                ConjurePackage conjurePackage = ConjurePackages.getPackage(type.conjurePackage(),
                         types.definitions().defaultConjurePackage(), refType.type());
                 return ClassName.get(conjurePackage.name(), refType.type().name());
             } else {

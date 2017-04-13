@@ -1,0 +1,6 @@
+apply from: "${rootDir}/gradle/publish-libs.gradle"
+
+dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'org.immutables:value'
+}

@@ -31,6 +31,7 @@ public class BundleJavascriptTask extends ConventionTask {
     public final File getInputDirectory() {
         return inputDirectory;
     }
+
     @OutputDirectory
     public final File getOutputDirectory() {
         return outputDirectory;
@@ -49,9 +50,9 @@ public class BundleJavascriptTask extends ConventionTask {
                     .getByType(ConjurePublishPluginExtension.class);
             String packageJsonText = template.apply(
                     ImmutableMap.of(
-                        "scopeName", extension.getScopeName(),
-                        "projectName", getProject().getName(),
-                        "version", getProject().getVersion()
+                            "scopeName", extension.getScopeName(),
+                            "projectName", getProject().getName(),
+                            "version", getProject().getVersion()
                     )
             );
             ConjurePublishPlugin.makeFile(new File(getOutputDirectory(), "package.json"), packageJsonText);

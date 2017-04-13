@@ -8,7 +8,7 @@ package com.palantir.conjure.gen.java;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
 import java.io.File;
@@ -48,7 +48,7 @@ public final class ConjureYmlParsingTest {
         File[] files = dir.listFiles();
         Arrays.sort(files);
         for (File f : files) {
-            objects.add(new Object[]{f, isValid});
+            objects.add(new Object[] {f, isValid});
         }
         return objects;
     }

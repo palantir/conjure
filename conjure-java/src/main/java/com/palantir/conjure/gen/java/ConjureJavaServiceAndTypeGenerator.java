@@ -7,7 +7,7 @@ package com.palantir.conjure.gen.java;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.ConjureImports;
+import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import com.palantir.conjure.gen.java.util.Goethe;

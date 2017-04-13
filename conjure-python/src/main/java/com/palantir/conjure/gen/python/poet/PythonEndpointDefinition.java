@@ -49,14 +49,14 @@ public interface PythonEndpointDefinition extends Emittable {
             // if auth type is header, insert it as a fake param
             List<PythonEndpointParam> paramsWithHeader = authDefinition().type() == AuthType.HEADER
                     ? ImmutableList.<PythonEndpointParam>builder()
-                                .add(PythonEndpointParam.builder()
-                                        .paramName("authHeader")
-                                        .paramId("Authorization")
-                                        .myPyType("str")
-                                        .paramType(ArgumentDefinition.ParamType.HEADER)
-                                        .build())
-                                .addAll(params())
-                                .build() : params();
+                    .add(PythonEndpointParam.builder()
+                            .paramName("authHeader")
+                            .paramId("Authorization")
+                            .myPyType("str")
+                            .paramType(ArgumentDefinition.ParamType.HEADER)
+                            .build())
+                    .addAll(params())
+                    .build() : params();
             paramsWithHeader = paramsWithHeader.stream()
                     .collect(Collectors.toList());
 
@@ -64,14 +64,14 @@ public interface PythonEndpointDefinition extends Emittable {
                     methodName(),
                     Joiner.on(", ").join(
                             paramsWithHeader.stream()
-                                .map(PythonEndpointParam::paramName)
-                                .collect(Collectors.toList())));
+                                    .map(PythonEndpointParam::paramName)
+                                    .collect(Collectors.toList())));
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine("# type: (%s) -> %s",
                     Joiner.on(", ").join(
                             paramsWithHeader.stream()
-                                .map(PythonEndpointParam::myPyType)
-                                .collect(Collectors.toList())),
+                                    .map(PythonEndpointParam::myPyType)
+                                    .collect(Collectors.toList())),
                     myPyReturnType().orElse("None"));
 
             // header
