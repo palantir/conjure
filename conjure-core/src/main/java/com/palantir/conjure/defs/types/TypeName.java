@@ -11,9 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.ObjectsDefinition;
-import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.concurrent.Immutable;
 import org.immutables.value.Value;
 
 /**
@@ -22,12 +20,11 @@ import org.immutables.value.Value;
  */
 @Value.Immutable
 @ConjureImmutablesStyle
-@Immutable
 public abstract class TypeName {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
     @VisibleForTesting
-    static final Set<String> PRIMITIVE_TYPES =
+    static final ImmutableSet<String> PRIMITIVE_TYPES =
             ImmutableSet.of("unknown", "string", "integer", "double", "boolean");
 
 
