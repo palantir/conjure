@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.13.0-rc2'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.13.0-rc4'
         classpath 'gradle.plugin.com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.2.0'
         classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.6.0'
         classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.9'
