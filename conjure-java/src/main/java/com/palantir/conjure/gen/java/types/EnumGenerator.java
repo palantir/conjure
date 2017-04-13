@@ -22,7 +22,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -107,7 +106,7 @@ public final class EnumGenerator {
         return wrapper.build();
     }
 
-    private static Iterable<FieldSpec> createConstants(Set<EnumValueDefinition> values,
+    private static Iterable<FieldSpec> createConstants(Iterable<EnumValueDefinition> values,
             ClassName thisClass, ClassName enumClass) {
         return Iterables.transform(values,
                 v -> {
@@ -121,7 +120,7 @@ public final class EnumGenerator {
                 });
     }
 
-    private static TypeSpec createEnum(ClassName enumClass, Set<EnumValueDefinition> values, boolean withUnknown) {
+    private static TypeSpec createEnum(ClassName enumClass, Iterable<EnumValueDefinition> values, boolean withUnknown) {
         TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(enumClass.simpleName())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC);
@@ -165,7 +164,7 @@ public final class EnumGenerator {
                 .build();
     }
 
-    private static MethodSpec createValueOf(ClassName thisClass, Set<EnumValueDefinition> values) {
+    private static MethodSpec createValueOf(ClassName thisClass, Iterable<EnumValueDefinition> values) {
         ParameterSpec param = ParameterSpec.builder(ClassName.get(String.class), "value").build();
 
         CodeBlock.Builder parser = CodeBlock.builder()

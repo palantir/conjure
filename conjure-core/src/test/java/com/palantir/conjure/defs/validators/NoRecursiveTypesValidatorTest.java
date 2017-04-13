@@ -68,7 +68,7 @@ public final class NoRecursiveTypesValidatorTest {
 
         assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Illegal recursive data type: Bar -> Foo -> Bar");
+                .hasMessageStartingWith("Illegal recursive data type: ");
     }
 
     private static FieldDefinition field(String type) throws ParseException {

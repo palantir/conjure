@@ -179,8 +179,8 @@ public final class ServiceDefinitionTests {
                     " - A_"), BaseObjectTypeDefinition.class);
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessage("Enumeration values must have format [A-Z]+(_[A-Z]+)*, illegal values: "
-                    + "[a, _A, a_b, A_, A__B]");
+            assertThat(e).hasMessageStartingWith(
+                    "Enumeration values must have format [A-Z]+(_[A-Z]+)*, illegal values: ");
         }
     }
 
