@@ -134,10 +134,9 @@ public final class BeanGenerator implements TypeGenerator {
     private static Collection<EnrichedField> createFields(
             TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                // TODO(rfink): Use JSON field here instead of name.
                 .map(e -> EnrichedField.of(e.getKey().name(), e.getValue(), FieldSpec.builder(
                         typeMapper.getClassName(e.getValue().type()),
-                        Fields.toSafeFieldName(e.getKey()),
+                        e.getKey().toCase(FieldName.Case.LOWER_CAMEL_CASE).name(),
                         Modifier.PRIVATE, Modifier.FINAL)
                         .build()))
                 .collect(Collectors.toList());

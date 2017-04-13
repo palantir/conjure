@@ -12,31 +12,31 @@ class BackingFileSystem(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'fileSystemId': ConjureFieldDefinition('fileSystemId', str),
-            'baseUri': ConjureFieldDefinition('baseUri', str),
+            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
+            'base_uri': ConjureFieldDefinition('baseUri', str),
             'configuration': ConjureFieldDefinition('configuration', DictType(str, str))
         }
 
-    _fileSystemId = None # type: str
-    _baseUri = None # type: str
+    _file_system_id = None # type: str
+    _base_uri = None # type: str
     _configuration = None # type: Dict[str, str]
 
-    def __init__(self, fileSystemId, baseUri, configuration):
+    def __init__(self, file_system_id, base_uri, configuration):
         # type: (str, str, Dict[str, str]) -> None
-        self._fileSystemId = fileSystemId
-        self._baseUri = baseUri
+        self._file_system_id = file_system_id
+        self._base_uri = base_uri
         self._configuration = configuration
 
     @property
-    def fileSystemId(self):
+    def file_system_id(self):
         # type: () -> str
         '''The name by which this file system is identified.'''
-        return self._fileSystemId
+        return self._file_system_id
 
     @property
-    def baseUri(self):
+    def base_uri(self):
         # type: () -> str
-        return self._baseUri
+        return self._base_uri
 
     @property
     def configuration(self):
@@ -49,22 +49,22 @@ class Dataset(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'fileSystemId': ConjureFieldDefinition('fileSystemId', str),
+            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
             'rid': ConjureFieldDefinition('rid', str)
         }
 
-    _fileSystemId = None # type: str
+    _file_system_id = None # type: str
     _rid = None # type: str
 
-    def __init__(self, fileSystemId, rid):
+    def __init__(self, file_system_id, rid):
         # type: (str, str) -> None
-        self._fileSystemId = fileSystemId
+        self._file_system_id = file_system_id
         self._rid = rid
 
     @property
-    def fileSystemId(self):
+    def file_system_id(self):
         # type: () -> str
-        return self._fileSystemId
+        return self._file_system_id
 
     @property
     def rid(self):

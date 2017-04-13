@@ -15,6 +15,7 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjurePackage;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.FieldName;
 import com.palantir.conjure.defs.types.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.OptionalType;
 import com.palantir.conjure.defs.types.PrimitiveType;
@@ -126,7 +127,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .stream()
                 .map(e -> TypescriptTypeSignature.builder()
                         .isOptional(e.getValue().type() instanceof OptionalType)
-                        .name(Identifiers.safeMemberName(e.getKey().name()))
+                        .name(e.getKey().toCase(FieldName.Case.LOWER_CAMEL_CASE).name())
                         .typescriptType(mapper.getTypescriptType(e.getValue().type()))
                         .build())
                 .collect(Collectors.toSet());

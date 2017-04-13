@@ -15,22 +15,22 @@ class CreateDatasetRequest(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'fileSystemId': ConjureFieldDefinition('fileSystemId', str),
+            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
             'path': ConjureFieldDefinition('path', str)
         }
 
-    _fileSystemId = None # type: str
+    _file_system_id = None # type: str
     _path = None # type: str
 
-    def __init__(self, fileSystemId, path):
+    def __init__(self, file_system_id, path):
         # type: (str, str) -> None
-        self._fileSystemId = fileSystemId
+        self._file_system_id = file_system_id
         self._path = path
 
     @property
-    def fileSystemId(self):
+    def file_system_id(self):
         # type: () -> str
-        return self._fileSystemId
+        return self._file_system_id
 
     @property
     def path(self):
@@ -43,22 +43,22 @@ class ExplicitCreateDatasetRequest(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'backingFileSystem': ConjureFieldDefinition('backingFileSystem', BackingFileSystem),
+            'backing_file_system': ConjureFieldDefinition('backingFileSystem', BackingFileSystem),
             'path': ConjureFieldDefinition('path', str)
         }
 
-    _backingFileSystem = None # type: BackingFileSystem
+    _backing_file_system = None # type: BackingFileSystem
     _path = None # type: str
 
-    def __init__(self, backingFileSystem, path):
+    def __init__(self, backing_file_system, path):
         # type: (BackingFileSystem, str) -> None
-        self._backingFileSystem = backingFileSystem
+        self._backing_file_system = backing_file_system
         self._path = path
 
     @property
-    def backingFileSystem(self):
+    def backing_file_system(self):
         # type: () -> BackingFileSystem
-        return self._backingFileSystem
+        return self._backing_file_system
 
     @property
     def path(self):

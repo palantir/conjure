@@ -174,7 +174,6 @@
         </module>
         <module name="MethodParamPad"/> <!-- Java Style Guide: Horizontal whitespace -->
         <module name="MissingDeprecated"/> <!-- Java Coding Guide: Deprecate per annotation and Javadoc -->
-        <module name="MissingSwitchDefault"/> <!-- Java Style Guide: The default case is present -->
         <module name="ModifiedControlVariable"/> <!-- Java Coding Guide: For-loop control variables: never modified -->
         <module name="ModifierOrder"/> <!-- Java Style Guide: Modifiers -->
         <module name="MultipleVariableDeclarations"/> <!-- Java Style Guide: One variable per declaration -->

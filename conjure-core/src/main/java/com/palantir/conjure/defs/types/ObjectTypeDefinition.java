@@ -6,6 +6,7 @@ package com.palantir.conjure.defs.types;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.validators.ObjectTypeDefinitionValidator;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -15,6 +16,13 @@ import org.immutables.value.Value;
 public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
 
     Map<FieldName, FieldDefinition> fields();
+
+    @Value.Check
+    default void check() {
+        for (ObjectTypeDefinitionValidator validator : ObjectTypeDefinitionValidator.values()) {
+            validator.validate(this);
+        }
+    }
 
     static Builder builder() {
         return new Builder();

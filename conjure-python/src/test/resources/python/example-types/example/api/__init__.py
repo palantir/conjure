@@ -52,19 +52,19 @@ class SafeLongExample(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'safeLongValue': ConjureFieldDefinition('safeLongValue', int)
+            'safe_long_value': ConjureFieldDefinition('safeLongValue', int)
         }
 
-    _safeLongValue = None # type: int
+    _safe_long_value = None # type: int
 
-    def __init__(self, safeLongValue):
+    def __init__(self, safe_long_value):
         # type: (int) -> None
-        self._safeLongValue = safeLongValue
+        self._safe_long_value = safe_long_value
 
     @property
-    def safeLongValue(self):
+    def safe_long_value(self):
         # type: () -> int
-        return self._safeLongValue
+        return self._safe_long_value
 
 class DoubleExample(ConjureBeanType):
 
@@ -72,19 +72,19 @@ class DoubleExample(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'doubleValue': ConjureFieldDefinition('doubleValue', float)
+            'double_value': ConjureFieldDefinition('doubleValue', float)
         }
 
-    _doubleValue = None # type: float
+    _double_value = None # type: float
 
-    def __init__(self, doubleValue):
+    def __init__(self, double_value):
         # type: (float) -> None
-        self._doubleValue = doubleValue
+        self._double_value = double_value
 
     @property
-    def doubleValue(self):
+    def double_value(self):
         # type: () -> float
-        return self._doubleValue
+        return self._double_value
 
 class BinaryExample(ConjureBeanType):
 
@@ -301,9 +301,9 @@ class ManyFieldExample(ConjureBeanType):
         return {
             'string': ConjureFieldDefinition('string', str),
             'integer': ConjureFieldDefinition('integer', int),
-            'integerExample': ConjureFieldDefinition('integerExample', IntegerExample),
-            'doubleValue': ConjureFieldDefinition('doubleValue', float),
-            'optionalItem': ConjureFieldDefinition('optionalItem', str),
+            'integer_example': ConjureFieldDefinition('integerExample', IntegerExample),
+            'double_value': ConjureFieldDefinition('doubleValue', float),
+            'optional_item': ConjureFieldDefinition('optionalItem', str),
             'items': ConjureFieldDefinition('items', ListType(str)),
             'set': ConjureFieldDefinition('set', ListType(str)),
             'map': ConjureFieldDefinition('map', DictType(str, str))
@@ -311,20 +311,20 @@ class ManyFieldExample(ConjureBeanType):
 
     _string = None # type: str
     _integer = None # type: int
-    _integerExample = None # type: IntegerExample
-    _doubleValue = None # type: float
-    _optionalItem = None # type: str
+    _integer_example = None # type: IntegerExample
+    _double_value = None # type: float
+    _optional_item = None # type: str
     _items = None # type: List[str]
     _set = None # type: List[str]
     _map = None # type: Dict[str, str]
 
-    def __init__(self, string, integer, integerExample, doubleValue, optionalItem, items, set, map):
+    def __init__(self, string, integer, integer_example, double_value, optional_item, items, set, map):
         # type: (str, int, IntegerExample, float, str, List[str], List[str], Dict[str, str]) -> None
         self._string = string
         self._integer = integer
-        self._integerExample = integerExample
-        self._doubleValue = doubleValue
-        self._optionalItem = optionalItem
+        self._integer_example = integer_example
+        self._double_value = double_value
+        self._optional_item = optional_item
         self._items = items
         self._set = set
         self._map = map
@@ -340,19 +340,19 @@ class ManyFieldExample(ConjureBeanType):
         return self._integer
 
     @property
-    def integerExample(self):
+    def integer_example(self):
         # type: () -> IntegerExample
-        return self._integerExample
+        return self._integer_example
 
     @property
-    def doubleValue(self):
+    def double_value(self):
         # type: () -> float
-        return self._doubleValue
+        return self._double_value
 
     @property
-    def optionalItem(self):
+    def optional_item(self):
         # type: () -> str
-        return self._optionalItem
+        return self._optional_item
 
     @property
     def items(self):

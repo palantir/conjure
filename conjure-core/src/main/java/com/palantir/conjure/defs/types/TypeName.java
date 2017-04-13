@@ -16,7 +16,6 @@ import org.immutables.value.Value;
 
 /**
  * Represents the name of a conjure {@link ObjectsDefinition#objects() object}.
- * TODO
  */
 @Value.Immutable
 @ConjureImmutablesStyle

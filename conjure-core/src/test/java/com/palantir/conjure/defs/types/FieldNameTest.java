@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.Test;
@@ -39,11 +40,30 @@ public final class FieldNameTest {
                 }) {
             assertThatThrownBy(() -> FieldName.of(invalid))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("FieldNames must be in "
-                                    + "lowerCamelCase (^[a-z][a-z0-9]+([A-Z][a-z0-9]+)*$), "
-                                    + "kebab-case (^[a-z][a-z0-9]+(-[a-z][a-z0-9]+)*$), or "
-                                    + "snake_case (^[a-z][a-z0-9]+(_[a-z][a-z0-9]+)*$): %s",
+                    .hasMessage("FieldName \"%s\" must follow one of the following patterns: "
+                                    + "[LOWER_CAMEL_CASE[^[a-z][a-z0-9]+([A-Z][a-z0-9]+)*$], "
+                                    + "KEBAB_CASE[^[a-z][a-z0-9]+(-[a-z][a-z0-9]+)*$], "
+                                    + "SNAKE_CASE[^[a-z][a-z0-9]+(_[a-z][a-z0-9]+)*$]]",
                             invalid);
         }
+    }
+
+    @Test
+    public void testConversion() throws Exception {
+        FieldName camelCase = FieldName.of("fooBar");
+        FieldName kebabCase = FieldName.of("foo-bar");
+        FieldName snakeCase = FieldName.of("foo_bar");
+
+        assertThat(camelCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(camelCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(camelCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
+
+        assertThat(kebabCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(kebabCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(kebabCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
+
+        assertThat(snakeCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(snakeCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(snakeCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
     }
 }

@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.google.common.base.CaseFormat;
 import com.palantir.conjure.defs.ConjureImports;
 import com.palantir.conjure.defs.TypesDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -88,17 +87,13 @@ public final class DefaultBeanGenerator implements BeanGenerator {
                         .entrySet()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(pythonAttributeName(entry.getKey()))
-                                .jsonIdentifier(entry.getKey().name())  // TODO(rfink): Use JSON key here.
+                                .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
+                                .jsonIdentifier(entry.getKey().name())
                                 .docs(entry.getValue().docs())
                                 .pythonType(mapper.getTypeName(entry.getValue().type()))
                                 .myPyType(myPyMapper.getTypeName(entry.getValue().type()))
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
-    }
-
-    private static String pythonAttributeName(FieldName fieldName) {
-        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, fieldName.name());
     }
 }

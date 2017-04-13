@@ -91,7 +91,6 @@ public final class BeanBuilderGenerator {
     private static Collection<EnrichedField> createFields(
             TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                // TODO(rfink): Use JSON key when available.
                 .map(e -> createField(typeMapper, e.getKey(), e.getKey().name(), e.getValue()))
                 .collect(Collectors.toList());
     }
@@ -100,7 +99,7 @@ public final class BeanBuilderGenerator {
             TypeMapper typeMapper, FieldName fieldName, String jsonKey, FieldDefinition field) {
         FieldSpec.Builder spec = FieldSpec.builder(
                 typeMapper.getClassName(field.type()),
-                Fields.toSafeFieldName(fieldName),
+                fieldName.toCase(FieldName.Case.LOWER_CAMEL_CASE).name(),
                 Modifier.PRIVATE);
 
         if (field.type() instanceof ListType) {
