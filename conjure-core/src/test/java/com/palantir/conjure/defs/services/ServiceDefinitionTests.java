@@ -137,18 +137,6 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    public void testParseEnum_usesUnknown() throws IOException {
-        try {
-            mapper.readValue(multiLineString(
-                    "values:",
-                    " - A",
-                    " - Unknown"), BaseObjectTypeDefinition.class);
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessage("UNKNOWN is a reserved enumeration value");
-        }
-    }
-
-    @Test
     public void testParseAlias_validPrimitiveType() throws IOException {
         assertThat(mapper.readValue("alias: string", BaseObjectTypeDefinition.class))
                 .isEqualTo(AliasTypeDefinition.builder().alias(PrimitiveType.STRING).build());
@@ -164,23 +152,6 @@ public final class ServiceDefinitionTests {
             assertThat(e.getMessage()).startsWith(
                     "Can not construct instance of com.palantir.conjure.defs.types.PrimitiveType, "
                             + "problem: TypeNames must be a primitive type [unknown, string, ");
-        }
-    }
-
-    @Test
-    public void testParseEnum_illegalFormat() throws IOException {
-        try {
-            mapper.readValue(multiLineString(
-                    "values:",
-                    " - a",
-                    " - a_b",
-                    " - A__B",
-                    " - _A",
-                    " - A_"), BaseObjectTypeDefinition.class);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessageStartingWith(
-                    "Enumeration values must have format [A-Z]+(_[A-Z]+)*, illegal values: ");
         }
     }
 

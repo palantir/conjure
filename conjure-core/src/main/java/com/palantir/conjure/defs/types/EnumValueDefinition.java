@@ -5,12 +5,13 @@
 package com.palantir.conjure.defs.types;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.EnumValueDefinition.EnumValueDeserializer;
+import com.palantir.conjure.defs.validators.ConjureValidator;
+import com.palantir.conjure.defs.validators.EnumValueDefinitionValidator;
 import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -24,6 +25,13 @@ public interface EnumValueDefinition {
 
     Optional<String> docs();
 
+    @Value.Check
+    default void check() {
+        for (ConjureValidator<EnumValueDefinition> validator : EnumValueDefinitionValidator.values()) {
+            validator.validate(this);
+        }
+    }
+
     static EnumValueDefinition.Builder builder() {
         return new Builder();
     }
@@ -34,7 +42,7 @@ public interface EnumValueDefinition {
         @SuppressWarnings("deprecation")
         @Override
         public EnumValueDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
-                throws IOException, JsonProcessingException {
+                throws IOException {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 return builder().value(candidate).build();
