@@ -12,6 +12,8 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the name of an {@link ObjectTypeDefinition#fields() field} of an {@link ObjectTypeDefinition}.
@@ -19,6 +21,8 @@ import org.immutables.value.Value;
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class FieldName {
+
+    private static final Logger log = LoggerFactory.getLogger(FieldName.class);
 
     private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("^[a-z][a-z0-9]+([A-Z][a-z0-9]+)*$");
     private static final Pattern KEBAB_CASE_PATTERN = Pattern.compile("^[a-z][a-z0-9]+(-[a-z][a-z0-9]+)*$");
@@ -93,6 +97,11 @@ public abstract class FieldName {
                         || Case.SNAKE_CASE.pattern.matcher(name()).matches(),
                 "FieldName \"%s\" must follow one of the following patterns: %s",
                 name(), Arrays.toString(Case.values()));
+
+        if (!Case.LOWER_CAMEL_CASE.pattern.matcher(name()).matches()) {
+            log.warn("{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
+                    + "legacy endpoints only: {}", FieldName.class, name());
+        }
     }
 
     /** Returns the case of this field name. */

@@ -8,6 +8,7 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     compile 'com.google.guava:guava'
     compile 'org.glassfish.jersey.core:jersey-common'
+    compile 'org.slf4j:slf4j-api'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
