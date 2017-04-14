@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.parsec.ParseException;
@@ -94,7 +95,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
-            return ReferenceType.of(namespace, TypeName.of(ref));
+            return ReferenceType.of(Namespace.of(namespace), TypeName.of(ref));
         }
     }
 

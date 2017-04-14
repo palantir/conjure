@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import java.util.Comparator;
@@ -38,7 +39,7 @@ public enum PrimitiveType implements ReferenceType {
     }
 
     @Override
-    public Optional<String> namespace() {
+    public Optional<Namespace> namespace() {
         return Optional.empty();
     }
 

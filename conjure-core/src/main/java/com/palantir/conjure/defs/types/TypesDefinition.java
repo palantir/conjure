@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import java.util.Map;
@@ -29,7 +30,7 @@ public interface TypesDefinition {
      * available as {@code <namespace>.<type>}.
      */
     @JsonProperty("conjure-imports")
-    Map<String, String> conjureImports();
+    Map<Namespace, String> conjureImports();
 
     @Value.Default
     default ObjectsDefinition definitions() {
