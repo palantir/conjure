@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet.Builder;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.ThrowingConjureTypeVisitor;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -28,6 +29,8 @@ import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import java.util.Optional;
@@ -60,125 +63,139 @@ public final class TypeMapper {
         return result.build();
     }
 
+    public Optional<ConjurePackage> getContainingPackage(ReferenceType referenceType) {
+        return referenceType.visit(new ContainingPackageVisitor());
+    }
+
     private static class ReferencedNameVisitor implements ConjureTypeVisitor<Void> {
 
         private final Stack<ConjureType> stack;
         private final Builder<ReferenceType> result;
 
-        ReferencedNameVisitor(
-                Stack<ConjureType> stack, ImmutableSet.Builder<ReferenceType> result) {
+        ReferencedNameVisitor(Stack<ConjureType> stack, ImmutableSet.Builder<ReferenceType> result) {
             this.stack = stack;
             this.result = result;
         }
 
         @Override
-        public Void visit(AnyType anyType) {
+        public Void visit(AnyType type) {
             return null;
         }
 
         @Override
-        public Void visit(ListType listType) {
-            stack.add(listType.itemType());
+        public Void visit(ListType type) {
+            stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(MapType mapType) {
-            stack.add(mapType.keyType());
-            stack.add(mapType.valueType());
+        public Void visit(MapType type) {
+            stack.add(type.keyType());
+            stack.add(type.valueType());
             return null;
         }
 
         @Override
-        public Void visit(OptionalType optionalType) {
-            stack.add(optionalType.itemType());
+        public Void visit(OptionalType type) {
+            stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(PrimitiveType primitiveType) {
+        public Void visit(PrimitiveType type) {
             return null;
         }
 
         @Override
-        public Void visit(ReferenceType referenceType) {
-            result.add(referenceType);
+        public Void visit(LocalReferenceType type) {
+            result.add(type);
             return null;
         }
 
         @Override
-        public Void visit(SetType setType) {
-            stack.add(setType.itemType());
+        public Void visit(ForeignReferenceType type) {
+            result.add(type);
             return null;
         }
 
         @Override
-        public Void visit(BinaryType binaryType) {
+        public Void visit(SetType type) {
+            stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(SafeLongType safeLongType) {
+        public Void visit(BinaryType type) {
             return null;
         }
 
         @Override
-        public Void visit(DateTimeType dateTimeType) {
+        public Void visit(SafeLongType type) {
             return null;
         }
 
-    }
-
-    public Optional<ConjurePackage> getContainingPackage(ReferenceType referenceType) {
-        if (referenceType.namespace().isPresent()) {
-            return Optional.of(types.getImportsForRefNameSpace(referenceType).getPackageForImportedType(referenceType));
+        @Override
+        public Void visit(DateTimeType type) {
+            return null;
         }
 
-        BaseObjectTypeDefinition defType = types.definitions().objects().get(referenceType.type());
-        if (defType != null) {
-            if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
-                    || defType instanceof UnionTypeDefinition) {
-                return Optional.of(ConjurePackages.getPackage(
-                        defType.conjurePackage(), defaultPackage, referenceType.type()));
-            } else if (!(defType instanceof AliasTypeDefinition)) {
-                throw new IllegalArgumentException("Unknown base object type definition");
-            }
-        }
-        // TODO(rmcnamara): for now assume to generate primitive types for external definitions
-        return Optional.empty();
     }
 
     private String getTypeNameFromConjureType(ConjureType conjureType) {
         return conjureType.visit(new TypeNameVisitor());
     }
 
+
+    private class ContainingPackageVisitor implements ThrowingConjureTypeVisitor<Optional<ConjurePackage>> {
+        @Override
+        public Optional<ConjurePackage> visit(LocalReferenceType type) {
+            BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
+            if (defType != null) {
+                if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
+                        || defType instanceof UnionTypeDefinition) {
+                    return Optional.of(ConjurePackages.getPackage(
+                            defType.conjurePackage(), defaultPackage, type.type()));
+                } else if (!(defType instanceof AliasTypeDefinition)) {
+                    throw new IllegalArgumentException("Unknown base object type definition");
+                }
+            }
+            // TODO(rmcnamara): for now assume to generate primitive types for external definitions
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ConjurePackage> visit(ForeignReferenceType type) {
+            return Optional.of(types.getImportsForRefNameSpace(type).getPackageForImportedType(type));
+        }
+    }
+
     private class TypeNameVisitor implements ConjureTypeVisitor<String> {
 
         @Override
-        public String visit(AnyType anyType) {
+        public String visit(AnyType type) {
             return "any";
         }
 
         @Override
-        public String visit(ListType listType) {
-            return getTypeNameFromConjureType(listType.itemType()) + "[]";
+        public String visit(ListType type) {
+            return getTypeNameFromConjureType(type.itemType()) + "[]";
         }
 
         @Override
-        public String visit(MapType mapType) {
-            String keyType = getTypeNameFromConjureType(mapType.keyType());
-            String valueType = getTypeNameFromConjureType(mapType.valueType());
+        public String visit(MapType type) {
+            String keyType = getTypeNameFromConjureType(type.keyType());
+            String valueType = getTypeNameFromConjureType(type.valueType());
             return "{ [key: " + keyType + "]: " + valueType + " }";
         }
 
         @Override
-        public String visit(OptionalType optionalType) {
-            return getTypeNameFromConjureType(optionalType.itemType());
+        public String visit(OptionalType type) {
+            return getTypeNameFromConjureType(type.itemType());
         }
 
         @Override
-        public String visit(PrimitiveType primitiveType) {
-            switch (primitiveType) {
+        public String visit(PrimitiveType type) {
+            switch (type) {
                 case DOUBLE:
                 case INTEGER:
                     return "number";
@@ -187,52 +204,53 @@ public final class TypeMapper {
                 case BOOLEAN:
                     return "boolean";
                 default:
-                    throw new IllegalArgumentException("Unknown primitive type" + primitiveType);
+                    throw new IllegalArgumentException("Unknown primitive type" + type);
             }
         }
 
         @Override
-        public String visit(ReferenceType refType) {
-            if (refType.namespace().isPresent()) {
-                return refType.type().name();
-            } else {
-                BaseObjectTypeDefinition defType = types.definitions().objects().get(refType.type());
-                if (defType != null) {
-                    if (defType instanceof AliasTypeDefinition) {
-                        // in typescript we collapse alias types to concrete types
-                        return visit(((AliasTypeDefinition) defType).alias());
-                    } else if (defType instanceof EnumTypeDefinition) {
-                        return refType.type().name();
-                    } else {
-                        // Interfaces are prepended with "I"
-                        return "I" + refType.type().name();
-                    }
+        public String visit(LocalReferenceType type) {
+            BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
+            if (defType != null) {
+                if (defType instanceof AliasTypeDefinition) {
+                    // in typescript we collapse alias types to concrete types
+                    return visit(((AliasTypeDefinition) defType).alias());
+                } else if (defType instanceof EnumTypeDefinition) {
+                    return type.type().name();
                 } else {
-                    ExternalTypeDefinition depType = types.imports().get(refType.type());
-                    checkNotNull(depType, "Unable to resolve type %s", refType.type());
-                    return getTypeNameFromConjureType(depType.baseType());
+                    // Interfaces are prepended with "I"
+                    return "I" + type.type().name();
                 }
+            } else {
+                ExternalTypeDefinition depType = types.imports().get(type.type());
+                checkNotNull(depType, "Unable to resolve type %s", type.type());
+                return getTypeNameFromConjureType(depType.baseType());
             }
         }
 
         @Override
-        public String visit(SetType setType) {
-            return getTypeNameFromConjureType(setType.itemType()) + "[]";
+        public String visit(ForeignReferenceType type) {
+            return type.type().name();
         }
 
         @Override
-        public String visit(BinaryType binaryType) {
+        public String visit(SetType type) {
+            return getTypeNameFromConjureType(type.itemType()) + "[]";
+        }
+
+        @Override
+        public String visit(BinaryType type) {
             // TODO(jellis): support this
             throw new RuntimeException("BinaryType not supported by conjure-typescript");
         }
 
         @Override
-        public String visit(SafeLongType safeLongType) {
+        public String visit(SafeLongType type) {
             return "number";
         }
 
         @Override
-        public String visit(DateTimeType dateTimeType) {
+        public String visit(DateTimeType type) {
             return "string";
         }
 

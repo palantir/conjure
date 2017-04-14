@@ -14,7 +14,8 @@ import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
@@ -43,13 +44,13 @@ public enum TypeParser implements Parser<ConjureType> {
                 TypeFromString.of("binary", BinaryType.of()),
                 TypeFromString.of("safelong", SafeLongType.of()),
                 TypeFromString.of("datetime", DateTimeType.of()),
-                ImportedTypeReferenceParser.INSTANCE,
+                ForeignReferenceTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
 
         return parser.parse(input);
     }
 
-    private enum TypeReferenceParser implements Parser<ReferenceType> {
+    private enum TypeReferenceParser implements Parser<LocalReferenceType> {
         INSTANCE;
 
         public static final Parser<String> REF_PARSER = new RawStringParser(
@@ -66,12 +67,12 @@ public enum TypeParser implements Parser<ConjureType> {
                 });
 
         @Override
-        public ReferenceType parse(ParserState input) throws ParseException {
-            return ReferenceType.of(TypeName.of(REF_PARSER.parse(input)));
+        public LocalReferenceType parse(ParserState input) throws ParseException {
+            return LocalReferenceType.of(TypeName.of(REF_PARSER.parse(input)));
         }
     }
 
-    private enum ImportedTypeReferenceParser implements Parser<ReferenceType> {
+    private enum ForeignReferenceTypeParser implements Parser<ForeignReferenceType> {
         INSTANCE;
 
         public static final Parser<String> NAMESPACE_PARSER = new RawStringParser(
@@ -89,13 +90,13 @@ public enum TypeParser implements Parser<ConjureType> {
                 });
 
         @Override
-        public ReferenceType parse(ParserState input) throws ParseException {
+        public ForeignReferenceType parse(ParserState input) throws ParseException {
             String namespace = NAMESPACE_PARSER.parse(input);
             if (Parsers.nullOrUnexpected(Parsers.expect(".").parse(input))) {
                 return null;
             }
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
-            return ReferenceType.of(Namespace.of(namespace), TypeName.of(ref));
+            return ForeignReferenceType.of(Namespace.of(namespace), TypeName.of(ref));
         }
     }
 

@@ -32,10 +32,7 @@ public interface ImportedTypes {
     ObjectsDefinition importedTypes();
 
     @Value.Lazy
-    default ConjurePackage getPackageForImportedType(ReferenceType type) {
-        // TODO(rfink): Introduce ExternalReferenceType to obviate this check.
-        Verify.verifyNotNull(type.namespace().isPresent(),
-                "Must not call ConjureImports methods for ReferenceType without namespace: %s", type);
+    default ConjurePackage getPackageForImportedType(ForeignReferenceType type) {
         BaseObjectTypeDefinition typeDef = Verify.verifyNotNull(importedTypes().objects().get(type.type()),
                 "Imported type not found: %s", type);
         return ConjurePackages.getPackage(

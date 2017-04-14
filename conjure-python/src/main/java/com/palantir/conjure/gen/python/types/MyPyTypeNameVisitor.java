@@ -19,7 +19,8 @@ import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 /**
  * The mypy type for the conjure type.
@@ -34,28 +35,28 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
 
 
     @Override
-    public String visit(AnyType anyType) {
+    public String visit(AnyType type) {
         return "Any";
     }
 
     @Override
-    public String visit(ListType listType) {
-        return "List[" + listType.itemType().visit(this) + "]";
+    public String visit(ListType type) {
+        return "List[" + type.itemType().visit(this) + "]";
     }
 
     @Override
-    public String visit(MapType mapType) {
-        return "Dict[" + mapType.keyType().visit(this) + ", " + mapType.valueType().visit(this) + "]";
+    public String visit(MapType type) {
+        return "Dict[" + type.keyType().visit(this) + ", " + type.valueType().visit(this) + "]";
     }
 
     @Override
-    public String visit(OptionalType optionalType) {
-        return optionalType.itemType().visit(this);
+    public String visit(OptionalType type) {
+        return type.itemType().visit(this);
     }
 
     @Override
-    public String visit(PrimitiveType primitiveType) {
-        switch (primitiveType) {
+    public String visit(PrimitiveType type) {
+        switch (type) {
             case STRING:
                 return "str";
             case BOOLEAN:
@@ -65,46 +66,46 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             case INTEGER:
                 return "int";
             default:
-                throw new IllegalArgumentException("unknown type: " + primitiveType);
+                throw new IllegalArgumentException("unknown type: " + type);
         }
     }
 
     @Override
-    public String visit(ReferenceType refType) {
-        if (!refType.namespace().isPresent()) {
-            // Types without namespace are either defined locally in this conjure definition, or raw imports.
-            BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
-            if (type != null) {
-                return refType.type().name();
-            } else {
-                ExternalTypeDefinition depType = types.imports().get(refType.type());
-                checkNotNull(depType, "Unable to resolve type %s", refType.type());
-                return visit(depType.baseType());
-            }
+    public String visit(LocalReferenceType type) {
+        // Types without namespace are either defined locally in this conjure definition, or raw imports.
+        BaseObjectTypeDefinition baseType = types.definitions().objects().get(type.type());
+        if (baseType != null) {
+            return type.type().name();
         } else {
-            // Types with namespace are imported Conjure types.
-            return refType.type().name();
+            ExternalTypeDefinition depType = types.imports().get(type.type());
+            checkNotNull(depType, "Unable to resolve type %s", type.type());
+            return visit(depType.baseType());
         }
     }
 
     @Override
-    public String visit(SetType setType) {
-        // TODO (bduffield): real sets
-        return ListType.of(setType.itemType()).visit(this);
+    public String visit(ForeignReferenceType type) {
+        return type.type().name();
     }
 
     @Override
-    public String visit(BinaryType binaryType) {
+    public String visit(SetType type) {
+        // TODO (bduffield): real sets
+        return ListType.of(type.itemType()).visit(this);
+    }
+
+    @Override
+    public String visit(BinaryType type) {
         return "Any";
     }
 
     @Override
-    public String visit(SafeLongType safeLongType) {
+    public String visit(SafeLongType type) {
         return "int";
     }
 
     @Override
-    public String visit(DateTimeType dateTimeType) {
+    public String visit(DateTimeType type) {
         return "str";
     }
 

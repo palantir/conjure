@@ -13,9 +13,11 @@ import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import org.junit.Test;
@@ -49,8 +51,13 @@ public final class ConjureTypeParserTests {
     @Test
     public void testParser_refType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("Foo"))
-                .isEqualTo(ReferenceType.of(TypeName.of("Foo")));
+                .isEqualTo(LocalReferenceType.of(TypeName.of("Foo")));
+    }
 
+    @Test
+    public void testParser_foreignRefType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("bar.Foo"))
+                .isEqualTo(ForeignReferenceType.of(Namespace.of("bar"), TypeName.of("Foo")));
     }
 
     @Test

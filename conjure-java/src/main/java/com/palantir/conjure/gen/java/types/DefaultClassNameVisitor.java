@@ -20,7 +20,8 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.lib.SafeLong;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -104,25 +105,25 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(ReferenceType refType) {
-        if (!refType.namespace().isPresent()) {
-            // Types without namespace are either defined locally in this conjure definition, or raw imports.
-            BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
-            if (type != null) {
-                ConjurePackage conjurePackage = ConjurePackages.getPackage(type.conjurePackage(),
-                        types.definitions().defaultConjurePackage(), refType.type());
-                return ClassName.get(conjurePackage.name(), refType.type().name());
-            } else {
-                ExternalTypeDefinition depType = types.imports().get(refType.type());
-                checkNotNull(depType, "Unable to resolve type %s", refType.type());
-                return ClassName.bestGuess(depType.external().get("java"));
-            }
+    public TypeName visit(LocalReferenceType type) {
+        // Types without namespace are either defined locally in this conjure definition, or raw imports.
+        BaseObjectTypeDefinition baseType = types.definitions().objects().get(type.type());
+        if (baseType != null) {
+            ConjurePackage conjurePackage = ConjurePackages.getPackage(baseType.conjurePackage(),
+                    types.definitions().defaultConjurePackage(), type.type());
+            return ClassName.get(conjurePackage.name(), type.type().name());
         } else {
-            // Types with namespace are imported Conjure types.
-            return ClassName.get(
-                    types.getImportsForRefNameSpace(refType).getPackageForImportedType(refType).name(),
-                    refType.type().name());
+            ExternalTypeDefinition depType = types.imports().get(type.type());
+            checkNotNull(depType, "Unable to resolve type %s", type.type());
+            return ClassName.bestGuess(depType.external().get("java"));
         }
+    }
+
+    @Override
+    public TypeName visit(ForeignReferenceType type) {
+        return ClassName.get(
+                types.getImportsForRefNameSpace(type).getPackageForImportedType(type).name(),
+                type.type().name());
     }
 
     @Override
@@ -132,17 +133,17 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(BinaryType binaryType) {
+    public TypeName visit(BinaryType type) {
         return ClassName.get(ByteBuffer.class);
     }
 
     @Override
-    public TypeName visit(SafeLongType safeLongType) {
+    public TypeName visit(SafeLongType type) {
         return ClassName.get(SafeLong.class);
     }
 
     @Override
-    public TypeName visit(DateTimeType dateTimeType) {
+    public TypeName visit(DateTimeType type) {
         return ClassName.get(ZonedDateTime.class);
     }
 

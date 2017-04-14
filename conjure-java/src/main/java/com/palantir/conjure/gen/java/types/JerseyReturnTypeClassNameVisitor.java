@@ -14,7 +14,8 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
@@ -27,53 +28,58 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
     }
 
     @Override
-    public TypeName visit(AnyType anyType) {
-        return delegate.visit(anyType);
+    public TypeName visit(AnyType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(ListType listType) {
-        return delegate.visit(listType);
+    public TypeName visit(ListType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(MapType mapType) {
-        return delegate.visit(mapType);
+    public TypeName visit(MapType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(OptionalType optionalType) {
-        return delegate.visit(optionalType);
+    public TypeName visit(OptionalType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(PrimitiveType primitiveType) {
-        return delegate.visit(primitiveType);
+    public TypeName visit(PrimitiveType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(ReferenceType referenceType) {
-        return delegate.visit(referenceType);
+    public TypeName visit(LocalReferenceType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(SetType setType) {
-        return delegate.visit(setType);
+    public TypeName visit(ForeignReferenceType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(SafeLongType safeLongType) {
-        return delegate.visit(safeLongType);
+    public TypeName visit(SetType type) {
+        return delegate.visit(type);
     }
 
     @Override
-    public TypeName visit(BinaryType binaryType) {
+    public TypeName visit(SafeLongType type) {
+        return delegate.visit(type);
+    }
+
+    @Override
+    public TypeName visit(BinaryType type) {
         return ClassName.get(javax.ws.rs.core.StreamingOutput.class);
     }
 
     @Override
-    public TypeName visit(DateTimeType dateTimeType) {
-        return delegate.visit(dateTimeType);
+    public TypeName visit(DateTimeType type) {
+        return delegate.visit(type);
     }
 
 }

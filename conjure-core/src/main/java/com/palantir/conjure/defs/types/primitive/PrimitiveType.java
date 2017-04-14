@@ -8,9 +8,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public enum PrimitiveType implements ReferenceType {
+public enum PrimitiveType implements LocalReferenceType {
     STRING(TypeName.of("string")),
     INTEGER(TypeName.of("integer")),
     DOUBLE(TypeName.of("double")),
@@ -36,11 +35,6 @@ public enum PrimitiveType implements ReferenceType {
 
     PrimitiveType(TypeName type) {
         this.type = type;
-    }
-
-    @Override
-    public Optional<Namespace> namespace() {
-        return Optional.empty();
     }
 
     @Override
