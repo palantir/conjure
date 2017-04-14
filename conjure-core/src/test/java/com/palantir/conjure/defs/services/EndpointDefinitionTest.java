@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.ConjureType;
 import java.util.Optional;
+import javax.ws.rs.HttpMethod;
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -134,4 +136,18 @@ public final class EndpointDefinitionTest {
         EndpointDefinitionValidator.PATH_PARAM.validate(endpoint);
     }
 
+    @Test
+    public void testNoGetBodyValidator() throws Exception {
+        ArgumentDefinition bodyArg = ArgumentDefinition.builder()
+                .type(ConjureType.fromString("string"))
+                .paramType(ArgumentDefinition.ParamType.BODY)
+                .build();
+        RequestLineDefinition requestLine = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
+        EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
+                .args(ImmutableMap.of("bodyArg", bodyArg))
+                .http(requestLine);
+        Assertions.assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> endpoint.build())
+                .withMessage("Endpoint cannot be a GET and contain a body: " + requestLine);
+    }
 }

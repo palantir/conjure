@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.ws.rs.HttpMethod;
 
 public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefinition> {
     ARGUMENT_TYPE(new ArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
-    PATH_PARAM(new PathParamValidator()),;
+    PATH_PARAM(new PathParamValidator()),
+    NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
+    ;
 
     private final ConjureValidator<EndpointDefinition> validator;
 
@@ -71,6 +74,22 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                     "Endpoint cannot have multiple body parameters: " + bodyParams.stream().map(
                             e -> e.getKey()).collect(
                             Collectors.toList()));
+        }
+    }
+
+    private static final class NoGetBodyParamValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            String method = definition.http().method();
+            if (method.equals(HttpMethod.GET)) {
+                boolean hasBody = definition.argsWithAutoDefined()
+                        .orElse(ImmutableMap.of()).entrySet()
+                        .stream()
+                        .anyMatch(entry -> entry.getValue().paramType().equals(ArgumentDefinition.ParamType.BODY));
+
+                Preconditions.checkState(!hasBody, "Endpoint cannot be a GET and contain a body: %s",
+                        definition.http());
+            }
         }
     }
 

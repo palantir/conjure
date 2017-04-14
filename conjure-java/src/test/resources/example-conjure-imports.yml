@@ -17,7 +17,7 @@ services:
     base-path: /catalog
     endpoints:
       testEndpoint:
-        http: GET /testEndpoint
+        http: POST /testEndpoint
         args:
           importedString: importedTypes.StringExample
         returns: importedServices.BackingFileSystem

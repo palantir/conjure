@@ -84,8 +84,8 @@ class ConjurePluginTest extends GradleTestSpec {
             package: test.test.api
 
             endpoints:
-              get:
-                http: GET /get
+              post:
+                http: POST /post
                 args:
                   object: StringExample
                 returns: StringExample
@@ -243,8 +243,8 @@ class ConjurePluginTest extends GradleTestSpec {
             package: test.x.api
 
             endpoints:
-              get:
-                http: GET /get
+              post:
+                http: POST /post
                 args:
                   object: externalImport.ExternalImport
                 returns: internalImport.InternalImport
