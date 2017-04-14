@@ -4,150 +4,127 @@
 
 package com.palantir.conjure.defs.services;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.ConjureType;
-import java.util.Optional;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
 import javax.ws.rs.HttpMethod;
-import org.assertj.core.api.Assertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public final class EndpointDefinitionTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    private static final RequestLineDefinition GET_REQUEST = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
+    private static final ArgumentDefinition BODY_ARG = ArgumentDefinition.builder()
+            .type(AnyType.of())
+            .paramType(ArgumentDefinition.ParamType.BODY)
+            .build();
 
     @Test
     public void testArgumentTypeValidator() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Endpoint cannot have argument with type 'BinaryType{}'");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map("testArg", ArgumentDefinition.of(BinaryType.of())))
+                .http(mock(RequestLineDefinition.class));
 
-        ArgumentDefinition binaryArg = mock(ArgumentDefinition.class);
-        when(binaryArg.type()).thenReturn(ConjureType.fromString("binary"));
-
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.args()).thenReturn(Optional.of(ImmutableMap.of("testArg", binaryArg)));
-
-        EndpointDefinitionValidator.ARGUMENT_TYPE.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Endpoint cannot have argument with type 'BinaryType{}'");
     }
 
     @Test
     public void testSingleBodyParamValidator() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Endpoint cannot have multiple body parameters: [bodyArg1, bodyArg2]");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map("bodyArg1", BODY_ARG, "bodyArg2", BODY_ARG))
+                .http(GET_REQUEST);
 
-        ArgumentDefinition bodyArg = mock(ArgumentDefinition.class);
-        when(bodyArg.paramType()).thenReturn(ArgumentDefinition.ParamType.BODY);
-
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.argsWithAutoDefined()).thenReturn(Optional.of(ImmutableMap.of(
-                "bodyArg1", bodyArg,
-                "bodyArg2", bodyArg
-        )));
-
-        EndpointDefinitionValidator.SINGLE_BODY_PARAM.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Endpoint cannot have multiple body parameters: [bodyArg1, bodyArg2]");
     }
 
     @Test
     public void testPathParamValidatorUniquePathParams() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage(
-                "Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
+        ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
+                .type(AnyType.of())
+                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramId("paramName")
+                .build();
 
-        ArgumentDefinition pathArgWithParamId = mock(ArgumentDefinition.class);
-        when(pathArgWithParamId.paramType()).thenReturn(ArgumentDefinition.ParamType.PATH);
-        when(pathArgWithParamId.paramId()).thenReturn(Optional.of("paramName"));
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map("pathArg1", paramDefinition, "pathArg2", paramDefinition))
+                .http(GET_REQUEST);
 
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.argsWithAutoDefined()).thenReturn(Optional.of(ImmutableMap.of(
-                "pathArg1", pathArgWithParamId,
-                "pathArg2", pathArgWithParamId
-        )));
-
-        EndpointDefinitionValidator.PATH_PARAM.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
     }
 
     @Test
     public void testPathParamValidatorUniquePathParamsIdInferred() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage(
-                "Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
+        ArgumentDefinition namedParameter = ArgumentDefinition.builder()
+                .type(AnyType.of())
+                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramId("paramName")
+                .build();
+        ArgumentDefinition unNamedParameter = ArgumentDefinition.builder()
+                .type(AnyType.of())
+                .paramType(ArgumentDefinition.ParamType.PATH)
+                .build();
 
-        // path argument without an explicit paramId
-        ArgumentDefinition pathArgNoParamId = mock(ArgumentDefinition.class);
-        when(pathArgNoParamId.paramType()).thenReturn(ArgumentDefinition.ParamType.PATH);
-        when(pathArgNoParamId.paramId()).thenReturn(Optional.empty());
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map("someName", namedParameter, "paramName", unNamedParameter))
+                .http(GET_REQUEST);
 
-        // path argument with explicit paramId of "paramName"
-        ArgumentDefinition pathArgWithParamId = mock(ArgumentDefinition.class);
-        when(pathArgWithParamId.paramType()).thenReturn(ArgumentDefinition.ParamType.PATH);
-        when(pathArgWithParamId.paramId()).thenReturn(Optional.of("paramName"));
-
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.argsWithAutoDefined()).thenReturn(Optional.of(ImmutableMap.of(
-                "paramName", pathArgNoParamId,
-                "pathArg2", pathArgWithParamId
-        )));
-
-        EndpointDefinitionValidator.PATH_PARAM.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
     }
 
     @Test
     public void testPathParamValidatorExtraParams() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage(
-                "Path parameters defined in endpoint but not present in path template: [paramName]");
+        ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
+                .type(AnyType.of())
+                .paramType(ArgumentDefinition.ParamType.PATH)
+                .build();
 
-        ArgumentDefinition pathArg = mock(ArgumentDefinition.class);
-        when(pathArg.paramType()).thenReturn(ArgumentDefinition.ParamType.PATH);
-        when(pathArg.paramId()).thenReturn(Optional.empty());
+        RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map("paramName", paramDefinition))
+                .http(noParamRequest);
 
-        // requestLine with no path parameters
-        RequestLineDefinition requestLine = mock(RequestLineDefinition.class);
-        when(requestLine.pathArgs()).thenReturn(ImmutableSet.of());
-
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.argsWithAutoDefined()).thenReturn(Optional.of(ImmutableMap.of(
-                "paramName", pathArg
-        )));
-        when(endpoint.http()).thenReturn(requestLine);
-
-        EndpointDefinitionValidator.PATH_PARAM.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Path parameters defined in endpoint but not present in path template: [paramName]");
     }
 
     @Test
     public void testPathParamValidatorMissingParams() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Path parameters defined path template but not present in endpoint: [pathArg]");
+        RequestLineDefinition requestWithPathParam = RequestLineDefinition.of(HttpMethod.GET, "/a/path/{paramName}");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .http(requestWithPathParam);
 
-        // requestLine with no path parameters
-        RequestLineDefinition requestLine = mock(RequestLineDefinition.class);
-        when(requestLine.pathArgs()).thenReturn(ImmutableSet.of("pathArg"));
-
-        EndpointDefinition endpoint = mock(EndpointDefinition.class);
-        when(endpoint.argsWithAutoDefined()).thenReturn(Optional.of(ImmutableMap.of()));
-        when(endpoint.http()).thenReturn(requestLine);
-
-        EndpointDefinitionValidator.PATH_PARAM.validate(endpoint);
+        assertThatThrownBy(definition::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Path parameters defined path template but not present in endpoint: [paramName]");
     }
 
     @Test
     public void testNoGetBodyValidator() throws Exception {
-        ArgumentDefinition bodyArg = ArgumentDefinition.builder()
-                .type(ConjureType.fromString("string"))
-                .paramType(ArgumentDefinition.ParamType.BODY)
-                .build();
-        RequestLineDefinition requestLine = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
         EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
-                .args(ImmutableMap.of("bodyArg", bodyArg))
-                .http(requestLine);
-        Assertions.assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> endpoint.build())
-                .withMessage("Endpoint cannot be a GET and contain a body: " + requestLine);
+                .args(map("bodyArg", BODY_ARG))
+                .http(GET_REQUEST);
+
+        assertThatThrownBy(endpoint::build)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Endpoint cannot be a GET and contain a body: " + GET_REQUEST);
+    }
+
+    private static <K, V> ImmutableMap<K, V> map(K key, V value) {
+        return ImmutableMap.of(key, value);
+    }
+
+    private static <K, V> ImmutableMap<K, V> map(K key, V value, K key2, V value2) {
+        return ImmutableMap.of(key, value, key2, value2);
     }
 }
