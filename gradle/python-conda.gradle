@@ -21,9 +21,5 @@ miniconda {
 }
 tasks.build.dependsOn condaBuild
 
-tasks.setupPython.doFirst {
-    environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
-}
-
 condaBuildCheck.environment.put('GIT_VERSION_STRING', project.version.replace('-', '_'))
 condaBuild.environment.put('GIT_VERSION_STRING', project.version.replace('-', '_'))

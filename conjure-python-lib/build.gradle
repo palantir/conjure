@@ -3,8 +3,13 @@ apply from: "${rootDir}/gradle/python-conda.gradle"
 def runTypeCheck = { ->
     def environmentFilePath = "./mypy.yml"
     def location = "${project.buildDir}/envs/mypy-env"
+    // the conda env create (as opposed to the conda create) command does not take custom channels
+    miniconda.channels.each { channel ->
+        exec {
+            commandLine "${miniconda.buildEnvironmentDirectory}/bin/conda", "config", "--add", "channels", channel
+        }
+    }
     exec {
-        environment << ['REQUESTS_CA_BUNDLE': "${rootDir}/gradle/ca-bundle.crt"]
         commandLine "${miniconda.buildEnvironmentDirectory}/bin/conda", "env", "create",
             "--prefix", location, "-f", environmentFilePath, "--force"
     }
