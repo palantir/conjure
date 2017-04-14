@@ -12,6 +12,7 @@ import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
+import java.io.File;
 import java.util.Collections;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
@@ -22,6 +23,7 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.Copy;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 
@@ -39,18 +41,24 @@ public class ConjurePlugin implements Plugin<Project> {
 
         project.evaluationDependsOnChildren();
 
-        // conjure code source set
+        // Conjure code source set
         SourceDirectorySet conjureSourceSet = sourceDirectorySetFactory.create("conjure");
         conjureSourceSet.setSrcDirs(Collections.singleton("src/main/conjure"));
         conjureSourceSet.setIncludes(Collections.singleton("**/*.yml"));
 
-        ProcessConjureImportsTask processConjureImports = project.getTasks().create(
-                "processConjureImports", ProcessConjureImportsTask.class);
-        processConjureImports.setSource(conjureSourceSet);
-        processConjureImports.setConjureImports(() -> extension.getConjureImports());
+        // Copy conjure imports into build directory
+        File buildDir = new File(project.getBuildDir(), "conjure");
+        Task processConjureImports = project.getTasks().create("processConjureImports", DefaultTask.class);
+        processConjureImports.doLast(task ->
+                project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, "external-imports")))
+                        .from(extension.getConjureImports())));
 
+        // Copy conjure sources into build directory
+        Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);
+        copyConjureSourcesTask.into(project.file(buildDir)).from(conjureSourceSet);
+
+        // Set up conjure compile task
         Task conjureTask = project.getTasks().create("compileConjure", DefaultTask.class);
-
         applyDependencyForIdeTasks(project, conjureTask);
 
         final String objectsProjectName = project.getName() + "-objects";
@@ -66,11 +74,12 @@ public class ConjurePlugin implements Plugin<Project> {
 
                 addGeneratedToMainSourceSet(subproj);
 
+
                 project.getTasks().create("compileConjureObjects",
                         CompileConjureJavaObjectsTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
-                            task.setSource(conjureSourceSet);
+                            task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
                             Settings settings = Settings.builder()
                                     .ignoreUnknownProperties(true)
@@ -102,7 +111,7 @@ public class ConjurePlugin implements Plugin<Project> {
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
-                            task.setSource(conjureSourceSet);
+                            task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
                             task.setServiceGenerator(new Retrofit2ServiceGenerator());
                             conjureTask.dependsOn(task);
@@ -129,7 +138,7 @@ public class ConjurePlugin implements Plugin<Project> {
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
-                            task.setSource(conjureSourceSet);
+                            task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
                             task.setServiceGenerator(new JerseyServiceGenerator());
                             conjureTask.dependsOn(task);
@@ -149,7 +158,7 @@ public class ConjurePlugin implements Plugin<Project> {
                 project.getTasks().create("compileConjureTypeScript",
                         CompileConjureTypeScriptTask.class,
                         (task) -> {
-                            task.setSource(conjureSourceSet);
+                            task.setSource(copyConjureSourcesTask);
                             task.dependsOn(processConjureImports);
                             task.setOutputDirectory(subproj.file("src"));
                             task.setServiceGenerator(new DefaultServiceGenerator());
@@ -166,7 +175,7 @@ public class ConjurePlugin implements Plugin<Project> {
                 project.getTasks().create("compileConjurePython",
                         CompileConjurePythonTask.class,
                         (task) -> {
-                            task.setSource(conjureSourceSet);
+                            task.setSource(copyConjureSourcesTask);
                             task.dependsOn(processConjureImports);
                             task.setOutputDirectory(subproj.file("python"));
                             task.setClientGenerator(new ClientGenerator());

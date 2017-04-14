@@ -6,22 +6,18 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.ConjureTypescriptClientGenerator;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -55,23 +51,17 @@ public class CompileConjureTypeScriptTask extends SourceTask {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
 
-        Project project = getProject();
-        File baseDir = new File(project.getBuildDir(), "conjure");
-
-        compileFiles(getSource().getFiles(), baseDir.toPath());
-
+        compileFiles(getSource().getFiles());
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.ts\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
 
-    private void compileFiles(Collection<File> files, Path baseDir) {
+    private void compileFiles(Collection<File> files) {
         ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
                 serviceGenerator, typeGenerator);
 
         List<ConjureDefinition> conjureDefinitions = files.stream().map(Conjure::parse).collect(Collectors.toList());
-        List<ConjureImports> conjureImports = Lists.transform(conjureDefinitions,
-                def -> Conjure.parseImportsFromConjureDefinition(def, baseDir));
-        generator.emit(conjureDefinitions, conjureImports, outputDirectory);
+        generator.emit(conjureDefinitions, outputDirectory);
     }
 
 }

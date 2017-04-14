@@ -1,4 +1,2 @@
 types:
-  # valid: "definitions" property is optional
-  conjure-imports:
-    importedTypes: path/to/definition.yml
+  # valid: "definitions" and "conjure-imports' properties are optional

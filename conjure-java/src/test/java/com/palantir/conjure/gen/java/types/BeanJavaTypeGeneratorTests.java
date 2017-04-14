@@ -28,7 +28,7 @@ public final class BeanJavaTypeGeneratorTests {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
 
         List<Path> files = new BeanGenerator(Settings.builder().ignoreUnknownProperties(true).build())
-                .emit(def, null, folder.getRoot());
+                .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files);
     }
@@ -47,7 +47,7 @@ public final class BeanJavaTypeGeneratorTests {
                         + "          - TWO\n");
 
         List<Path> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
-                .emit(def, null, folder.getRoot());
+                .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files);
     }

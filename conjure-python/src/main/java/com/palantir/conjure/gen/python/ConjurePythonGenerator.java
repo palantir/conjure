@@ -8,7 +8,6 @@ import com.google.common.collect.Streams;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonFile;
@@ -27,11 +26,11 @@ public final class ConjurePythonGenerator {
         this.clientGenerator = clientGenerator;
     }
 
-    public void write(ConjureDefinition conjureDefinition, ConjureImports importedTypes, PythonFileWriter writer) {
-        generate(conjureDefinition, importedTypes).forEach(writer::writePythonFile);
+    public void write(ConjureDefinition conjureDefinition, PythonFileWriter writer) {
+        generate(conjureDefinition).forEach(writer::writePythonFile);
     }
 
-    public List<PythonFile> generate(ConjureDefinition conjureDefinition, ConjureImports importedTypes) {
+    public List<PythonFile> generate(ConjureDefinition conjureDefinition) {
         TypesDefinition types = conjureDefinition.types();
 
         PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor(
@@ -45,7 +44,6 @@ public final class ConjurePythonGenerator {
                     BaseObjectTypeDefinition objectDefinition = entry.getValue();
                     return beanGenerator.generateObject(
                             types,
-                            importedTypes,
                             packageNameProcessor,
                             entry.getKey(),
                             objectDefinition);
@@ -56,7 +54,7 @@ public final class ConjurePythonGenerator {
                 .entrySet()
                 .stream()
                 .map(entry -> clientGenerator.generateClient(
-                        types, importedTypes, packageNameProcessor, entry.getKey(), entry.getValue()))
+                        types, packageNameProcessor, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
         Map<String, List<PythonClass>> classesByPackageName =

@@ -6,7 +6,6 @@ package com.palantir.conjure.gen.java.types;
 
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.TypesDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.squareup.javapoet.TypeName;
 
 /**
@@ -15,6 +14,6 @@ import com.squareup.javapoet.TypeName;
 public interface ClassNameVisitor extends ConjureTypeVisitor<TypeName> {
 
     interface Factory {
-        ClassNameVisitor create(TypesDefinition types, ConjureImports importedTypes);
+        ClassNameVisitor create(TypesDefinition types);
     }
 }

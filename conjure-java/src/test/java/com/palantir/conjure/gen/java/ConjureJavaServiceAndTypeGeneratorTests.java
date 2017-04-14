@@ -9,12 +9,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
+import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
@@ -22,7 +21,6 @@ import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -44,28 +42,25 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
                 .types(types)
                 .build();
 
-        ConjureImports imports = new ConjureImports(ImmutableMap.of());
-
-        generator.generate(conjureDefinition, imports);
-        verify(serviceGenerator).generate(conjureDefinition, imports);
-        verify(typeGenerator).generate(conjureDefinition, imports);
+        generator.generate(conjureDefinition);
+        verify(serviceGenerator).generate(conjureDefinition);
+        verify(typeGenerator).generate(conjureDefinition);
 
         File outputDir = folder.newFolder();
-        generator.emit(conjureDefinition, imports, outputDir);
-        verify(serviceGenerator, times(2)).generate(conjureDefinition, imports);
-        verify(typeGenerator, times(2)).generate(conjureDefinition, imports);
+        generator.emit(conjureDefinition, outputDir);
+        verify(serviceGenerator, times(2)).generate(conjureDefinition);
+        verify(typeGenerator, times(2)).generate(conjureDefinition);
     }
 
     @Test
     public void smokeTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-service.yml"));
-        ConjureImports imports = new ConjureImports(ImmutableMap.of());
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(),
                 new BeanGenerator(settings));
-        generator.emit(conjure, imports, src);
+        generator.emit(conjure, src);
 
         assertThat(compiledFileContent(src, "com/palantir/foundry/catalog/api/CreateDatasetRequest.java"))
                 .contains("public final class CreateDatasetRequest");
@@ -78,15 +73,21 @@ public final class ConjureJavaServiceAndTypeGeneratorTests {
     }
 
     @Test
+    public void testConjureInlinedImports() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        assertThat(conjure.types().conjureImports()).containsKey(Namespace.of("importedTypes"));
+        assertThat(conjure.types().conjureImports()).containsKey(Namespace.of("importedServices"));
+    }
+
+    @Test
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                 new JerseyServiceGenerator(),
                 new BeanGenerator(settings));
-        generator.emit(conjure, imports, src);
+        generator.emit(conjure, src);
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "test/api/with/imports/ComplexObjectWithImports.java"))

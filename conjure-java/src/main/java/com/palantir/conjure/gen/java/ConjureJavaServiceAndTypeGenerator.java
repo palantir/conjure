@@ -7,7 +7,6 @@ package com.palantir.conjure.gen.java;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import com.palantir.conjure.gen.java.util.Goethe;
@@ -31,19 +30,19 @@ public final class ConjureJavaServiceAndTypeGenerator {
      * Generates and returns all services and types of the given conjure definition, using the instance's service and
      * type generators.
      */
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         return Sets.union(
-                serviceGenerator.generate(conjureDefinition, imports),
-                typeGenerator.generate(conjureDefinition, imports));
+                serviceGenerator.generate(conjureDefinition),
+                typeGenerator.generate(conjureDefinition));
     }
 
     /**
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
      */
-    public List<Path> emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+    public List<Path> emit(ConjureDefinition conjureDefinition, File outputDir) {
         List<Path> emittedPaths = Lists.newArrayList();
-        generate(conjureDefinition, imports).forEach(f -> {
+        generate(conjureDefinition).forEach(f -> {
             Path emittedPath = Goethe.formatAndEmit(f, outputDir.toPath());
             emittedPaths.add(emittedPath);
         });

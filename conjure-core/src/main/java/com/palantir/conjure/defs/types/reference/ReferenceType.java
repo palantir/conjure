@@ -15,6 +15,7 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
+// TODO(rfink): Split into LocalReferenceType [no namespace] and ImportedReferenceType [has namespace].
 public interface ReferenceType extends ConjureType {
 
     Optional<Namespace> namespace();

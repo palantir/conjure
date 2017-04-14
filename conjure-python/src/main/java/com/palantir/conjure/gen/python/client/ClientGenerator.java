@@ -13,7 +13,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
@@ -33,7 +32,6 @@ public final class ClientGenerator {
 
     public PythonClass generateClient(
             TypesDefinition types,
-            ConjureImports importedTypes,
             PackageNameProcessor packageNameProvider,
             TypeName serviceName,
             ServiceDefinition serviceDefinition) {
@@ -41,7 +39,7 @@ public final class ClientGenerator {
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
-                types, importedTypes, packageNameProvider);
+                types, packageNameProvider);
 
         Builder<PythonClassName> referencedTypesBuilder = ImmutableSet.<PythonClassName>builder();
 

@@ -27,7 +27,6 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
@@ -38,12 +37,10 @@ import java.util.Stack;
 public final class TypeMapper {
 
     private final Optional<ConjurePackage> defaultPackage;
-    private final ConjureImports importedTypes;
     private final TypesDefinition types;
 
-    public TypeMapper(TypesDefinition types, ConjureImports importedTypes, Optional<ConjurePackage> defaultPackage) {
+    public TypeMapper(TypesDefinition types, Optional<ConjurePackage> defaultPackage) {
         this.types = types;
-        this.importedTypes = importedTypes;
         this.defaultPackage = defaultPackage;
     }
 
@@ -134,7 +131,7 @@ public final class TypeMapper {
 
     public Optional<ConjurePackage> getContainingPackage(ReferenceType referenceType) {
         if (referenceType.namespace().isPresent()) {
-            return Optional.of(importedTypes.getPackage(referenceType));
+            return Optional.of(types.getImportsForRefNameSpace(referenceType).getPackageForImportedType(referenceType));
         }
 
         BaseObjectTypeDefinition defType = types.definitions().objects().get(referenceType.type());

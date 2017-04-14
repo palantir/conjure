@@ -11,7 +11,6 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonFile;
 import com.palantir.conjure.gen.python.poet.PythonPoetWriter;
@@ -37,14 +36,11 @@ public final class ConjurePythonGeneratorTest {
     @Test
     public void testGenerateTypes() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-types.yml"));
-        File src = folder.newFolder("src");
-
         ConjurePythonGenerator generator = new ConjurePythonGenerator(
                 new DefaultBeanGenerator(), new ClientGenerator());
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, src.toPath());
 
         InMemoryPythonFileWriter pythonFileWriter = new InMemoryPythonFileWriter();
-        generator.write(conjure, imports, pythonFileWriter);
+        generator.write(conjure, pythonFileWriter);
 
         Path referenceCodeLocation = Paths.get("src/test/resources/python/example-types");
 
@@ -62,14 +58,11 @@ public final class ConjurePythonGeneratorTest {
     @Test
     public void testGenerateService() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-service.yml"));
-        File src = folder.newFolder("src");
-
         ConjurePythonGenerator generator = new ConjurePythonGenerator(
                 new DefaultBeanGenerator(), new ClientGenerator());
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, src.toPath());
 
         InMemoryPythonFileWriter pythonFileWriter = new InMemoryPythonFileWriter();
-        generator.write(conjure, imports, pythonFileWriter);
+        generator.write(conjure, pythonFileWriter);
 
         Path referenceCodeLocation = Paths.get("src/test/resources/python/example-service");
 
@@ -125,8 +118,7 @@ public final class ConjurePythonGeneratorTest {
             Files.createParentDirs(referenceCodeLocation.toFile());
             ConjurePythonGenerator generator = new ConjurePythonGenerator(
                     new DefaultBeanGenerator(), new ClientGenerator());
-            ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, referenceCodeLocation);
-            generator.write(conjure, imports, new DefaultPythonFileWriter(referenceCodeLocation));
+            generator.write(conjure, new DefaultPythonFileWriter(referenceCodeLocation));
         }
 
     }

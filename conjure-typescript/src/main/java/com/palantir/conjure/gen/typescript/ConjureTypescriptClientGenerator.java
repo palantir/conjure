@@ -4,11 +4,8 @@
 
 package com.palantir.conjure.gen.typescript;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
@@ -36,15 +33,11 @@ public final class ConjureTypescriptClientGenerator {
      * <p>
      * Takes in a list of {@link ConjureDefinition}s in order to produce a single index file.
      */
-    public void emit(List<ConjureDefinition> conjureDefinitions, List<ConjureImports> conjureImports, File outputDir) {
-        checkArgument(conjureDefinitions.size() == conjureImports.size(),
-                "conjureDefinitions and conjureImports must be of the same size");
+    public void emit(List<ConjureDefinition> conjureDefinitions, File outputDir) {
         for (int i = 0; i < conjureDefinitions.size(); i++) {
             ConjureDefinition definition = conjureDefinitions.get(i);
-            ConjureImports imports = conjureImports.get(i);
-
-            serviceGenerator.emit(definition, imports, outputDir);
-            typeGenerator.emit(definition.types(), imports, outputDir);
+            serviceGenerator.emit(definition, outputDir);
+            typeGenerator.emit(definition.types(), outputDir);
         }
 
         // write index file

@@ -19,7 +19,6 @@ import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.lib.SafeLong;
@@ -40,11 +39,9 @@ import java.util.OptionalInt;
 public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     private final TypesDefinition types;
-    private final ConjureImports importedTypes;
 
-    DefaultClassNameVisitor(TypesDefinition types, ConjureImports importedTypes) {
+    DefaultClassNameVisitor(TypesDefinition types) {
         this.types = types;
-        this.importedTypes = importedTypes;
     }
 
     @Override
@@ -122,7 +119,9 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
             }
         } else {
             // Types with namespace are imported Conjure types.
-            return ClassName.get(importedTypes.getPackage(refType).name(), refType.type().name());
+            return ClassName.get(
+                    types.getImportsForRefNameSpace(refType).getPackageForImportedType(refType).name(),
+                    refType.type().name());
         }
     }
 

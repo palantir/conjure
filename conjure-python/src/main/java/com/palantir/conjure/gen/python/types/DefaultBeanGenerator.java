@@ -11,7 +11,6 @@ import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonBean;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
@@ -27,12 +26,11 @@ public final class DefaultBeanGenerator implements BeanGenerator {
 
     @Override
     public PythonClass generateObject(TypesDefinition types,
-            ConjureImports importedTypes,
             PackageNameProcessor packageNameProcessor,
             TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
         if (typeDef instanceof ObjectTypeDefinition) {
-            return generateObject(types, importedTypes, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
+            return generateObject(types, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return generateObject(packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
         } else {
@@ -57,8 +55,8 @@ public final class DefaultBeanGenerator implements BeanGenerator {
                 .build();
     }
 
-    private PythonBean generateObject(TypesDefinition types,
-            ConjureImports importedTypes,
+    private PythonBean generateObject(
+            TypesDefinition types,
             PackageNameProcessor packageNameProcessor,
             TypeName typeName,
             ObjectTypeDefinition typeDef) {
@@ -66,7 +64,7 @@ public final class DefaultBeanGenerator implements BeanGenerator {
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
-                types, importedTypes, packageNameProcessor);
+                types, packageNameProcessor);
 
         ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
 

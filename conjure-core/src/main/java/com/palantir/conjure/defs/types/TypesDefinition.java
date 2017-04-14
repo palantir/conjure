@@ -7,11 +7,14 @@ package com.palantir.conjure.defs.types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Verify;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ImportedTypes;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -30,7 +33,15 @@ public interface TypesDefinition {
      * available as {@code <namespace>.<type>}.
      */
     @JsonProperty("conjure-imports")
-    Map<Namespace, String> conjureImports();
+    Map<Namespace, ImportedTypes> conjureImports();
+
+    @Value.Lazy
+    default ImportedTypes getImportsForRefNameSpace(ReferenceType type) {
+        // TODO(rfink): Introduce ExternalReferenceType to obviate this check.
+        Verify.verify(type.namespace().isPresent(), "Cannot call getImportsForRefNameSpace for non-import types");
+        return Verify.verifyNotNull(conjureImports().get(type.namespace().get()),
+                "No imported namespace found for reference type: %s", type);
+    }
 
     @Value.Default
     default ObjectsDefinition definitions() {

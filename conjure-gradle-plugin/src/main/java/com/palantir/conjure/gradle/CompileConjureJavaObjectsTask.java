@@ -9,7 +9,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -54,13 +53,12 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
     }
 
     private void compileFiles(Collection<File> files, Path baseDir) {
-        files.forEach(f -> compileFile(f.toPath(), baseDir));
+        files.forEach(f -> compileFile(f.toPath()));
     }
 
-    private void compileFile(Path path, Path baseDir) {
+    private void compileFile(Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, baseDir);
-        typeGenerator.emit(conjure, imports, outputDirectory);
+        typeGenerator.emit(conjure, outputDirectory);
     }
 
 }

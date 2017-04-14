@@ -15,7 +15,6 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.JerseyReturnTypeClassNameVisitor;
@@ -37,11 +36,12 @@ import org.apache.commons.lang3.StringUtils;
 public final class JerseyServiceGenerator implements ServiceGenerator {
 
     @Override
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypeMapper typeMapper =
-                new TypeMapper(conjureDefinition.types(), imports);
+                new TypeMapper(conjureDefinition.types());
         TypeMapper returnTypeMapper =
-                new TypeMapper(conjureDefinition.types(), imports, JerseyReturnTypeClassNameVisitor::new);
+                new TypeMapper(conjureDefinition.types(),
+                        (types) -> new JerseyReturnTypeClassNameVisitor(types));
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

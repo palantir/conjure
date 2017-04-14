@@ -20,7 +20,6 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
 import com.palantir.conjure.gen.typescript.poet.EqualityStatement;
@@ -54,11 +53,10 @@ import org.apache.commons.lang3.StringUtils;
 public final class DefaultTypeGenerator implements TypeGenerator {
 
     @Override
-    public Set<TypescriptFile> generate(TypesDefinition types, ConjureImports imports) {
+    public Set<TypescriptFile> generate(TypesDefinition types) {
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateType(
                         types,
-                        imports,
                         types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
@@ -80,12 +78,12 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .collect(Collectors.toSet());
     }
 
-    private Optional<TypescriptFile> generateType(TypesDefinition types, ConjureImports imports,
+    private Optional<TypescriptFile> generateType(TypesDefinition types,
             Optional<ConjurePackage> defaultPackage, TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
         ConjurePackage packageLocation =
                 ConjurePackages.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
-        TypeMapper mapper = new TypeMapper(types, imports, defaultPackage);
+        TypeMapper mapper = new TypeMapper(types, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(generateEnumFile(
                     typeName, (EnumTypeDefinition) baseTypeDef, parentFolderPath));

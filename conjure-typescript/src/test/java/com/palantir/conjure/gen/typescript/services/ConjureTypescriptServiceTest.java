@@ -25,7 +25,7 @@ public final class ConjureTypescriptServiceTest {
     public void testTypescriptServiceGenerator_generate_testService() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.yml"));
 
-        Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def, null);
+        Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def);
 
         for (TypescriptFile file : files) {
             assertThat(file.writeToString()).isEqualTo(CharStreams.toString(new InputStreamReader(

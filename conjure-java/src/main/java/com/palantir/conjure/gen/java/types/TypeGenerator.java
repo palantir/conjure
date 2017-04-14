@@ -10,7 +10,6 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
@@ -23,12 +22,11 @@ import java.util.stream.Collectors;
 
 public interface TypeGenerator {
 
-    default Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
+    default Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypesDefinition types = conjureDefinition.types();
         return types.definitions().objects().entrySet().stream().map(
                 type -> generateType(
                         types,
-                        imports,
                         types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
@@ -39,9 +37,9 @@ public interface TypeGenerator {
      * Generates and emits to the given output directory all services and types of the given conjure definition, using
      * the instance's service and type generators.
      */
-    default List<Path> emit(ConjureDefinition conjureDefinition, ConjureImports imports, File outputDir) {
+    default List<Path> emit(ConjureDefinition conjureDefinition, File outputDir) {
         List<Path> emittedPaths = Lists.newArrayList();
-        generate(conjureDefinition, imports).forEach(f -> {
+        generate(conjureDefinition).forEach(f -> {
             Path emittedPath = Goethe.formatAndEmit(f, outputDir.toPath());
             emittedPaths.add(emittedPath);
         });
@@ -50,7 +48,6 @@ public interface TypeGenerator {
 
     JavaFile generateType(
             TypesDefinition allTypes,
-            ConjureImports importedTypes,
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
             BaseObjectTypeDefinition typeDef);

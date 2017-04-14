@@ -27,7 +27,7 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
     public void testComposition() throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-service.yml"));
 
-        List<Path> files = new Retrofit2ServiceGenerator().emit(def, null, folder.getRoot());
+        List<Path> files = new Retrofit2ServiceGenerator().emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {

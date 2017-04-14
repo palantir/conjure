@@ -21,7 +21,6 @@ import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
@@ -60,11 +59,10 @@ public final class BeanGenerator implements TypeGenerator {
     @Override
     public JavaFile generateType(
             TypesDefinition types,
-            ConjureImports importedTypes,
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
-        TypeMapper typeMapper = new TypeMapper(types, importedTypes);
+        TypeMapper typeMapper = new TypeMapper(types);
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {

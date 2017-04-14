@@ -34,7 +34,7 @@ public final class JerseyServiceGeneratorTests extends TestBase {
 
     private void testServiceGeneration(String resource) throws IOException {
         ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream(resource));
-        List<Path> files = new JerseyServiceGenerator().emit(def, null, folder.getRoot());
+        List<Path> files = new JerseyServiceGenerator().emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {

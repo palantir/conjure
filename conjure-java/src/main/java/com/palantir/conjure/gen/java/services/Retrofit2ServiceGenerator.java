@@ -13,7 +13,6 @@ import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
@@ -42,10 +41,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     private static final Logger log = LoggerFactory.getLogger(Retrofit2ServiceGenerator.class);
 
     @Override
-    public Set<JavaFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(), imports);
+    public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types());
         TypeMapper returnTypeMapper =
-                new TypeMapper(conjureDefinition.types(), imports, Retrofit2ReturnTypeClassNameVisitor::new);
+                new TypeMapper(conjureDefinition.types(),
+                        (types) -> new Retrofit2ReturnTypeClassNameVisitor(types));
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());

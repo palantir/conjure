@@ -1,7 +1,7 @@
 types:
   conjure-imports:
-    importedTypes: resources/example-types.yml
-    importedServices: resources/services/test-service.yml
+    importedTypes: example-types.yml
+    importedServices: services/test-service.yml
   definitions:
     default-package: test.api.with.imports
     objects:

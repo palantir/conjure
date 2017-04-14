@@ -20,7 +20,6 @@ import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
@@ -31,13 +30,11 @@ import java.util.Set;
 public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<PythonClassName>> {
 
     private final TypesDefinition types;
-    private final ConjureImports importedTypes;
     private final PackageNameProcessor packageNameProcessor;
 
-    public ReferencedTypeNameVisitor(TypesDefinition types, ConjureImports importedTypes,
+    public ReferencedTypeNameVisitor(TypesDefinition types,
             PackageNameProcessor packageNameProcessor) {
         this.types = types;
-        this.importedTypes = importedTypes;
         this.packageNameProcessor = packageNameProcessor;
     }
 
@@ -84,8 +81,9 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
             }
         } else {
             // Types with namespace are imported Conjure types.
+            ConjurePackage importPackage = types.getImportsForRefNameSpace(refType).getPackageForImportedType(refType);
             return ImmutableSet.of(PythonClassName.of(
-                    packageNameProcessor.getPackageName(Optional.of(importedTypes.getPackage(refType))),
+                    packageNameProcessor.getPackageName(Optional.of(importPackage)),
                     refType.type().name()));
         }
     }

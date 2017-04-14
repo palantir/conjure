@@ -14,7 +14,6 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -23,8 +22,8 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
 
     private final DefaultClassNameVisitor delegate;
 
-    public JerseyReturnTypeClassNameVisitor(TypesDefinition types, ConjureImports importedTypes) {
-        this.delegate = new DefaultClassNameVisitor(types, importedTypes);
+    public JerseyReturnTypeClassNameVisitor(TypesDefinition types) {
+        this.delegate = new DefaultClassNameVisitor(types);
     }
 
     @Override

@@ -7,10 +7,8 @@ package com.palantir.conjure.gen.typescript;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
@@ -18,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,8 +41,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void nativeTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/native-types.conjure"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
-        generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
+        generator.emit(ImmutableList.of(conjure), src);
         String xfile = "package/foo.ts";
         assertThat(compiledFileContent(src, xfile))
                 .contains("interface IFoo");
@@ -64,8 +60,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void referenceTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/reference-types.conjure"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
-        generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
+        generator.emit(ImmutableList.of(conjure), src);
         String fooFile = "package1/foo.ts";
         String barFile = "package1/folder/bar.ts";
         String boomFile = "package2/folder/boom.ts";
@@ -90,8 +85,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void indexFileTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services/test-service.yml"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
-        generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
+        generator.emit(ImmutableList.of(conjure), src);
 
         assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
                 new File("src/test/resources/services/test-service-index.ts").toPath()), StandardCharsets.UTF_8));
@@ -100,8 +94,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void indexFileTest_duplicate() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services-types-duplicates.yml"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
-        generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
+        generator.emit(ImmutableList.of(conjure), src);
 
         assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
                 new File("src/test/resources/services-types-duplicates-index.ts").toPath()), StandardCharsets.UTF_8));
@@ -112,9 +105,7 @@ public final class ConjureTypescriptClientGeneratorTest {
         ConjureDefinition conjure1 = Conjure.parse(new File("src/test/resources/multiple-conjure-files-1.yml"));
         ConjureDefinition conjure2 = Conjure.parse(new File("src/test/resources/multiple-conjure-files-2.yml"));
         List<ConjureDefinition> definitions = ImmutableList.of(conjure1, conjure2);
-        List<ConjureImports> imports = Lists.transform(definitions,
-                def -> Conjure.parseImportsFromConjureDefinition(def, Paths.get("src/test")));
-        generator.emit(definitions, imports, src);
+        generator.emit(definitions, src);
 
         assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
                 new File("src/test/resources/multiple-conjure-files-index.ts").toPath()), StandardCharsets.UTF_8));
@@ -123,8 +114,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
-        ConjureImports imports = Conjure.parseImportsFromConjureDefinition(conjure, Paths.get("src/test"));
-        generator.emit(ImmutableList.of(conjure), ImmutableList.of(imports), src);
+        generator.emit(ImmutableList.of(conjure), src);
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "with/imports/complexObjectWithImports.ts"))

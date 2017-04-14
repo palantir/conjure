@@ -5,10 +5,8 @@
 package com.palantir.conjure.gen.java;
 
 
-import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
 import java.io.File;
@@ -66,13 +64,12 @@ public final class ConjureYmlParsingTest {
         boolean exceptionThrown = false;
         try {
             ConjureDefinition conjure = Conjure.parse(file);
-            ConjureImports imports = new ConjureImports(ImmutableMap.of());
             File src = folder.newFolder("src");
             Settings settings = Settings.standard();
             ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
                     new JerseyServiceGenerator(),
                     new BeanGenerator(settings));
-            generator.emit(conjure, imports, src);
+            generator.emit(conjure, src);
         } catch (RuntimeException e) {
             exceptionThrown = true;
             if (valid) {

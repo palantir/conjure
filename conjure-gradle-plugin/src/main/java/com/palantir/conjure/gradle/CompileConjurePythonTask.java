@@ -9,7 +9,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.python.ConjurePythonGenerator;
 import com.palantir.conjure.gen.python.DefaultPythonFileWriter;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -53,26 +51,19 @@ public class CompileConjurePythonTask extends SourceTask {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
 
-        Project project = getProject();
-        File baseDir = new File(project.getBuildDir(), "conjure");
-
-        compileFiles(getSource().getFiles(), baseDir.toPath());
-
+        compileFiles(getSource().getFiles());
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.py\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
 
-    private void compileFiles(Collection<File> files, Path baseDir) {
-        files.forEach(f -> compileFile(f.toPath(), baseDir));
+    private void compileFiles(Collection<File> files) {
+        files.forEach(f -> compileFile(f.toPath()));
     }
 
-    private void compileFile(Path path, Path baseDir) {
+    private void compileFile(Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        ConjureImports conjureImports = Conjure.parseImportsFromConjureDefinition(conjure, baseDir);
-
         ConjurePythonGenerator generator = new ConjurePythonGenerator(beanGenerator, clientGenerator);
-
-        generator.write(conjure, conjureImports, new DefaultPythonFileWriter(outputDirectory.toPath()));
+        generator.write(conjure, new DefaultPythonFileWriter(outputDirectory.toPath()));
     }
 
 }

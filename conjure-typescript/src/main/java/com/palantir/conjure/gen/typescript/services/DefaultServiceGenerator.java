@@ -5,7 +5,6 @@
 package com.palantir.conjure.gen.typescript.services;
 
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.reference.ConjureImports;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import java.util.Set;
@@ -23,9 +22,9 @@ public final class DefaultServiceGenerator implements ServiceGenerator {
     }
 
     @Override
-    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition, ConjureImports imports) {
-        return Stream.concat(interfaceDelegate.generate(conjureDefinition, imports).stream(),
-                classDelegate.generate(conjureDefinition, imports).stream()).collect(Collectors.toSet());
+    public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
+        return Stream.concat(interfaceDelegate.generate(conjureDefinition).stream(),
+                classDelegate.generate(conjureDefinition).stream()).collect(Collectors.toSet());
     }
 
     @Override

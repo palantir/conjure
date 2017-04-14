@@ -16,7 +16,7 @@ class GradleTestSpec extends Specification {
     File testDir
 
     def setup() {
-        println("Build directory: " + testDir.absolutePath)
+        println("Build directory: \n" + testDir.absolutePath)
     }
 
     protected BuildResult run(String... tasks) {
