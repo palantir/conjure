@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.Settings;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +37,7 @@ public final class BeanJavaTypeGeneratorTests {
 
     @Test
     public void testEnumJavaGenerator_withNoUnknown() throws IOException {
-        ConjureDefinition def = Conjure.parse(
+        File conjureFile = writeToTempFile(
                 "types:\n"
                         + "  definitions:\n"
                         + "    default-package: test.api\n"
@@ -46,6 +48,7 @@ public final class BeanJavaTypeGeneratorTests {
                         + "          - ONE\n"
                         + "          - TWO\n");
 
+        ConjureDefinition def = Conjure.parse(conjureFile);
         List<Path> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
                 .emit(def, folder.getRoot());
 
@@ -62,6 +65,16 @@ public final class BeanJavaTypeGeneratorTests {
                 Files.copy(file, expectedFile);
             }
             assertThat(file).hasSameContentAs(expectedFile);
+        }
+    }
+
+    private File writeToTempFile(String content) {
+        try {
+            File file = folder.newFile();
+            com.google.common.io.Files.write(content, file, StandardCharsets.UTF_8);
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

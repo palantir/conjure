@@ -28,7 +28,6 @@ public final class ConjurePackageTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("Conjure package names must match pattern ^([a-z][a-z0-9]+(\\.[a-z][a-z0-9]*)*)?$: "
                             + illegal);
-
         }
     }
 

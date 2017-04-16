@@ -29,28 +29,34 @@ public final class Conjure {
 
     /**
      * Deserializes a {@link ConjureDefinition} from its YAML representation in the given file. Unlike {@link
-     * #parse(InputStream)} and {@link #parse(String)}, this variant deserializes {@link ImportedTypes#file refernced
-     * conjure imports} into {@link ImportedTypes#importedTypes}
+     * #parse(InputStream)} this variant deserializes {@link ImportedTypes#file refernced conjure imports} into {@link
+     * ImportedTypes#importedTypes}. Note that imports are not transitive, i.e., only types defined directly in the
+     * declared import are made available as imported types.
      */
     public static ConjureDefinition parse(File file) {
+        return parse(file, true /* inline imports */);
+    }
+
+    private static ConjureDefinition parse(File file, boolean inlineImports) {
         // Note(rfink): The mechanism of parsing the ConjureDefinition and the imports separately isn't pretty, but it's
         // better than the previous implementation where ConjureImports objects were passed around all over the place.
         // Main obstacle to simpler parsing is that Jackson parsers don't have context, i.e., it's impossible to know
         // the base-path w.r.t. which the imported file is declared.
         try {
             ConjureDefinition definition = MAPPER.readValue(file, ConjureDefinition.class);
-            // TODO(rfink): https://github.palantir.build/foundry/conjure/issues/367
-            // This is a recursive invocation of Conjure#parse which is going to fail with a stack overflow error
-            // when imports are circular. Should detect circles and fail with a more helpful error message.
-            Map<Namespace, ImportedTypes> imports =
-                    Conjure.parseImports(definition.types().conjureImports(), file.toPath().getParent());
-            return ConjureDefinition.builder()
-                    .from(definition)
-                    .types(TypesDefinition.builder()
-                            .from(definition.types())
-                            .conjureImports(imports)
-                            .build())
-                    .build();
+            if (!inlineImports) {
+                return definition;
+            } else {
+                Map<Namespace, ImportedTypes> imports =
+                        Conjure.parseImports(definition.types().conjureImports(), file.toPath().getParent());
+                return ConjureDefinition.builder()
+                        .from(definition)
+                        .types(TypesDefinition.builder()
+                                .from(definition.types())
+                                .conjureImports(imports)
+                                .build())
+                        .build();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,22 +65,11 @@ public final class Conjure {
     /**
      * Like {@link #parse(File)}, but does not deserialize and inline {@link ImportedTypes#importedTypes conjure
      * imports}.
+     * TODO(rfink): Consider removing this method since it does not have access to imports.
      */
     public static ConjureDefinition parse(InputStream stream) {
         try {
             return MAPPER.readValue(stream, ConjureDefinition.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Like {@link #parse(File)}, but does not deserialize and inline {@link ImportedTypes#importedTypes conjure
-     * imports}.
-     */
-    public static ConjureDefinition parse(String string) {
-        try {
-            return MAPPER.readValue(string, ConjureDefinition.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -90,8 +85,9 @@ public final class Conjure {
         for (Namespace namespace : declaredImports.keySet()) {
             String importedFile = declaredImports.get(namespace).file();
             try {
-                ObjectsDefinition importedObjects =
-                        Conjure.parse(baseDir.resolve(importedFile).toFile()).types().definitions();
+                ConjureDefinition importedConjure =
+                        parse(baseDir.resolve(importedFile).toFile(), false /* do not parse imports recursively */);
+                ObjectsDefinition importedObjects = importedConjure.types().definitions();
                 parsedImports.put(namespace, ImportedTypes.withResolvedImports(importedFile, importedObjects));
             } catch (RuntimeException e) {
                 throw new RuntimeException("Failed to open imported Conjure definition: + " + importedFile, e);

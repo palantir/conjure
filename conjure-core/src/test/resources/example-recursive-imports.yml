@@ -1,0 +1,8 @@
+types:
+  conjure-imports:
+    imports: example-recursive-imports.yml
+  definitions:
+    default-package: test.api.with.imports
+    objects:
+      SimpleObject:
+        alias: string
