@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +24,7 @@ public final class ConjureTypescriptServiceTest {
 
     @Test
     public void testTypescriptServiceGenerator_generate_testService() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/services/test-service.yml"));
 
         Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def);
 
@@ -36,7 +37,7 @@ public final class ConjureTypescriptServiceTest {
 
     @Test
     public void testTypescriptServiceGenerator_generateExports_testService() {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/services/test-service.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/services/test-service.yml"));
         Set<ExportStatement> exports = new DefaultServiceGenerator().generateExports(def);
 
         assertThat(exports.size()).isEqualTo(2);
@@ -53,8 +54,7 @@ public final class ConjureTypescriptServiceTest {
 
     @Test
     public void testTypescriptServiceGenerator_generateExports_testServiceDuplicate() {
-        ConjureDefinition def = Conjure.parse(
-                getClass().getResourceAsStream("/services/test-service-duplicates.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/services/test-service-duplicates.yml"));
         Set<ExportStatement> exports = new DefaultServiceGenerator().generateExports(def);
 
         // duplicate names are fine at this level; they are expected to be handled by caller

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +26,7 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
 
     @Test
     public void testComposition() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-service.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
 
         List<Path> files = new Retrofit2ServiceGenerator().emit(def, folder.getRoot());
 

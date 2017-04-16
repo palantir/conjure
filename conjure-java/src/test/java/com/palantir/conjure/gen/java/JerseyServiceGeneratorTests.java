@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,16 +25,16 @@ public final class JerseyServiceGeneratorTests extends TestBase {
 
     @Test
     public void testServiceGeneration_exampleService() throws IOException {
-        testServiceGeneration("/example-service.yml");
+        testServiceGeneration("example-service.yml");
     }
 
     @Test
     public void testServiceGeneration_cookieService() throws IOException {
-        testServiceGeneration("/cookie-service.yml");
+        testServiceGeneration("cookie-service.yml");
     }
 
-    private void testServiceGeneration(String resource) throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream(resource));
+    private void testServiceGeneration(String conjureFile) throws IOException {
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/" + conjureFile));
         List<Path> files = new JerseyServiceGenerator().emit(def, folder.getRoot());
 
         for (Path file : files) {

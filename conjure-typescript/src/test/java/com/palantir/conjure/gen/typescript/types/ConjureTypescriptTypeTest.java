@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +23,7 @@ public final class ConjureTypescriptTypeTest {
 
     @Test
     public void testTypescriptTypeGenerator_generate_allExamples() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         Set<TypescriptFile> files = new DefaultTypeGenerator().generate(def.types());
         for (TypescriptFile file : files) {
             assertThat(file.writeToString()).isEqualTo(CharStreams.toString(new InputStreamReader(
@@ -33,7 +34,7 @@ public final class ConjureTypescriptTypeTest {
 
     @Test
     public void testTypescriptTypeGenerator_generateExports_allExamples() {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         Set<ExportStatement> exports = new DefaultTypeGenerator().generateExports(def.types());
 
         assertThat(exports).containsExactlyInAnyOrder(exportStatement("IStringExample", "stringExample"),

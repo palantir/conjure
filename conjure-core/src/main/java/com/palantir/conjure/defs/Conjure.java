@@ -17,7 +17,6 @@ import com.palantir.conjure.defs.types.names.Namespace;
 import com.palantir.conjure.defs.types.reference.ImportedTypes;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -28,8 +27,8 @@ public final class Conjure {
     private Conjure() {}
 
     /**
-     * Deserializes a {@link ConjureDefinition} from its YAML representation in the given file. Unlike {@link
-     * #parse(InputStream)} this variant deserializes {@link ImportedTypes#file refernced conjure imports} into {@link
+     * Deserializes a {@link ConjureDefinition} from its YAML representation in the given file.
+     * The {@link ImportedTypes#file refernced conjure imports} are deserialized into {@link
      * ImportedTypes#importedTypes}. Note that imports are not transitive, i.e., only types defined directly in the
      * declared import are made available as imported types.
      */
@@ -57,19 +56,6 @@ public final class Conjure {
                                 .build())
                         .build();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Like {@link #parse(File)}, but does not deserialize and inline {@link ImportedTypes#importedTypes conjure
-     * imports}.
-     * TODO(rfink): Consider removing this method since it does not have access to imports.
-     */
-    public static ConjureDefinition parse(InputStream stream) {
-        try {
-            return MAPPER.readValue(stream, ConjureDefinition.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

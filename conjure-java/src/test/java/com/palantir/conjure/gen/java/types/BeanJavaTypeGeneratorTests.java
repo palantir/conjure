@@ -27,8 +27,7 @@ public final class BeanJavaTypeGeneratorTests {
 
     @Test
     public void testBeanJavaTypeGenerator_allExamples() throws IOException {
-        ConjureDefinition def = Conjure.parse(getClass().getResourceAsStream("/example-types.yml"));
-
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         List<Path> files = new BeanGenerator(Settings.builder().ignoreUnknownProperties(true).build())
                 .emit(def, folder.getRoot());
 
