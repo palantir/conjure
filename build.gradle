@@ -74,6 +74,12 @@ subprojects {
     if (System.env.CIRCLE_TEST_REPORTS) {
         test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
     }
+
+    configurations.errorprone {
+        resolutionStrategy {
+            force 'com.google.guava:guava:21.0'
+        }
+    }
 }
 
 dependencies {

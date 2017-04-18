@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.python;
 
-import com.google.common.collect.Streams;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
@@ -15,6 +14,7 @@ import com.palantir.conjure.gen.python.types.BeanGenerator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class ConjurePythonGenerator {
 
@@ -58,7 +58,7 @@ public final class ConjurePythonGenerator {
                 .collect(Collectors.toList());
 
         Map<String, List<PythonClass>> classesByPackageName =
-                Streams.concat(beanClasses.stream(), serviceClasses.stream())
+                Stream.concat(beanClasses.stream(), serviceClasses.stream())
                         .collect(Collectors.groupingBy(PythonClass::packageName));
 
         // group into files
