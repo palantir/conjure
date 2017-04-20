@@ -5,6 +5,9 @@ package:
 source:
   path: ../python
 
+build:
+  noarch_python: True
+
 requirements:
   build:
     - python

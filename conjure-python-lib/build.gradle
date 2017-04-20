@@ -28,3 +28,18 @@ task runMyPyTypeCheck {
 }
 
 tasks.check.dependsOn(runMyPyTypeCheck)
+tasks.check.dependsOn condaBuildCheck
+
+task condaPublish {
+    doLast {
+        def modifiedVersion = project.version.replace('-', '_')
+        // TODO(bduffield): modify conda gradle plugin to provide this as output file
+        def modulePath = "${project.buildDir}/conda-dist/noarch/conjure-python-lib-${modifiedVersion}-py_0.tar.bz2"
+        exec {
+            // TODO(bduffield): use snapshot repo for snapshots
+            commandLine "curl", "-k", "--upload-file", modulePath,
+                "https://publish.artifactory.palantir.build/artifactory/internal-conda-release/noarch/"
+        }
+    }
+}
+condaPublish.dependsOn tasks.condaBuild
