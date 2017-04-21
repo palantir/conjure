@@ -37,11 +37,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper =
-                new TypeMapper(conjureDefinition.types());
-        TypeMapper returnTypeMapper =
-                new TypeMapper(conjureDefinition.types(),
-                        (types) -> new JerseyReturnTypeClassNameVisitor(types));
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types());
+        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyReturnTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
                 .collect(Collectors.toSet());
@@ -215,5 +212,4 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 throw new IllegalArgumentException("Unrecognized HTTP method: " + method);
         }
     }
-
 }

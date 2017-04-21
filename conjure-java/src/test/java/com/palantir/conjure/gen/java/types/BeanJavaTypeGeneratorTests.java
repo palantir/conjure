@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.Settings;
@@ -28,7 +29,9 @@ public final class BeanJavaTypeGeneratorTests {
     @Test
     public void testBeanJavaTypeGenerator_allExamples() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
-        List<Path> files = new BeanGenerator(Settings.builder().ignoreUnknownProperties(true).build())
+        List<Path> files = new BeanGenerator(
+                Settings.builder().ignoreUnknownProperties(true).build(),
+                ImmutableSet.of(BeanGenerator.ExperimentalFeatures.UnionTypes))
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files);

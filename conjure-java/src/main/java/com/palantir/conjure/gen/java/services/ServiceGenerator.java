@@ -46,5 +46,4 @@ public interface ServiceGenerator {
         depr.ifPresent(sb::append);
         return sb.length() > 0 ? Optional.of(sb.toString()) : Optional.empty();
     }
-
 }

@@ -9,13 +9,16 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.gen.java.Settings;
+import com.palantir.conjure.gen.java.types.BeanGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
-import org.gradle.api.Project;
+import java.util.Set;
+import java.util.function.Supplier;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -26,15 +29,19 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
     @OutputDirectory
     private File outputDirectory;
 
-    @Input
-    private TypeGenerator typeGenerator;
+    private Supplier<Set<BeanGenerator.ExperimentalFeatures>> experimentalFeatures;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
-    public final void setTypeGenerator(TypeGenerator beanGenerator) {
-        this.typeGenerator = beanGenerator;
+    public final void setExperimentalFeatures(Supplier<Set<BeanGenerator.ExperimentalFeatures>> experimentalFeatures) {
+        this.experimentalFeatures = experimentalFeatures;
+    }
+
+    @Input
+    public final Set<BeanGenerator.ExperimentalFeatures> getExperimentalFeatures() {
+        return experimentalFeatures.get();
     }
 
     @TaskAction
@@ -42,23 +49,24 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
 
-        Project project = getProject();
+        Settings settings = Settings.builder()
+                .ignoreUnknownProperties(true)
+                .supportUnknownEnumValues(true)
+                .build();
 
-        File baseDir = new File(project.getBuildDir(), "conjure");
-
-        compileFiles(getSource().getFiles(), baseDir.toPath());
+        TypeGenerator generator = new BeanGenerator(settings, experimentalFeatures.get());
+        compileFiles(generator, getSource().getFiles());
 
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.java\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
 
-    private void compileFiles(Collection<File> files, Path baseDir) {
-        files.forEach(f -> compileFile(f.toPath()));
+    private void compileFiles(TypeGenerator generator, Collection<File> files) {
+        files.forEach(f -> compileFile(generator, f.toPath()));
     }
 
-    private void compileFile(Path path) {
+    private void compileFile(TypeGenerator generator, Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        typeGenerator.emit(conjure, outputDirectory);
+        generator.emit(conjure, outputDirectory);
     }
-
 }

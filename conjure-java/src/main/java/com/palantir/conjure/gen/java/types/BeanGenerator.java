@@ -4,9 +4,12 @@
 
 package com.palantir.conjure.gen.java.types;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.collect.ListType;
@@ -40,6 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -47,13 +51,23 @@ import org.immutables.value.Value;
 
 public final class BeanGenerator implements TypeGenerator {
 
+    public enum ExperimentalFeatures {
+        UnionTypes
+    }
+
+    private final Set<ExperimentalFeatures> enabledExperimentalFeatures;
     private final Settings settings;
 
     /** The maximum number of parameters for which a static factory method is generated in addition to the builder. */
     private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
 
     public BeanGenerator(Settings settings) {
+        this(settings, ImmutableSet.of());
+    }
+
+    public BeanGenerator(Settings settings, Set<ExperimentalFeatures> enabledExperimentalFeatures) {
         this.settings = settings;
+        this.enabledExperimentalFeatures = ImmutableSet.copyOf(enabledExperimentalFeatures);
     }
 
     @Override
@@ -66,6 +80,9 @@ public final class BeanGenerator implements TypeGenerator {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
+            Preconditions.checkState(enabledExperimentalFeatures.contains(ExperimentalFeatures.UnionTypes),
+                    "Error: %s is an experimental feature of conjure-java that has not been enabled.",
+                    ExperimentalFeatures.UnionTypes);
             return UnionGenerator.generateUnionType(
                     typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
@@ -265,7 +282,7 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    public static String generateGetterName(String fieldName) {
+    static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
     }
 

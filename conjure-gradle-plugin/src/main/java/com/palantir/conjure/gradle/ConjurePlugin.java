@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gradle;
 
-import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
@@ -14,6 +13,9 @@ import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.File;
 import java.util.Collections;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
@@ -38,7 +40,6 @@ public class ConjurePlugin implements Plugin<Project> {
     @Override
     public final void apply(Project project) {
         ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class);
-
         project.evaluationDependsOnChildren();
 
         // Conjure code source set
@@ -73,19 +74,21 @@ public class ConjurePlugin implements Plugin<Project> {
                 subproj.getPluginManager().apply(JavaPlugin.class);
 
                 addGeneratedToMainSourceSet(subproj);
-
-
                 project.getTasks().create("compileConjureObjects",
                         CompileConjureJavaObjectsTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
-                            Settings settings = Settings.builder()
-                                    .ignoreUnknownProperties(true)
-                                    .supportUnknownEnumValues(true)
-                                    .build();
-                            task.setTypeGenerator(new BeanGenerator(settings));
+                            task.setExperimentalFeatures(new Supplier<Set<BeanGenerator.ExperimentalFeatures>>() {
+                                @Override
+                                public Set<BeanGenerator.ExperimentalFeatures> get() {
+                                    return extension.getExperimentalFeatures()
+                                            .stream()
+                                            .map(BeanGenerator.ExperimentalFeatures::valueOf)
+                                            .collect(Collectors.toSet());
+                                }
+                            });
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);

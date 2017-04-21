@@ -209,9 +209,12 @@ class ConjurePluginTest extends GradleTestSpec {
         result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
 
         new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/').exists()
-        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/api-jersey/0.1.0/api-jersey-0.1.0.pom').exists()
-        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').exists()
-        new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').text.contains('>api-jersey<')
+        new File(System.getProperty('user.home') +
+                '/.m2/repository/com/palantir/conjure/test/api-jersey/0.1.0/api-jersey-0.1.0.pom').exists()
+        new File(System.getProperty('user.home') +
+                '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').exists()
+        new File(System.getProperty('user.home') +
+                '/.m2/repository/com/palantir/conjure/test/server/0.1.0/server-0.1.0.pom').text.contains('>api-jersey<')
     }
 
     def 'copies conjure imports into build directory and provides imports to conjure compiler'() {
@@ -281,8 +284,10 @@ class ConjurePluginTest extends GradleTestSpec {
         file('api/build/conjure/internal-import.yml').exists()
         file('api/build/conjure/conjure.yml').exists()
 
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains("import test.a.api.InternalImport;")
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains("import test.b.api.ExternalImport;")
+        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains(
+                "import test.a.api.InternalImport;")
+        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains(
+                "import test.b.api.ExternalImport;")
     }
 
     def 'omitting a project from settings is sufficient to disable'() {
@@ -317,6 +322,51 @@ class ConjurePluginTest extends GradleTestSpec {
 
         then:
         result.task(':api:compileConjureJersey') == null
+    }
+
+    def 'experimental features are disabled by default'() {
+        given:
+        createFile('api/src/main/conjure/union.yml') << """
+        types:
+          definitions:
+            default-package: test.a.api
+            objects:
+              UnionTypeExample:
+                union:
+                  number: integer
+        """
+
+        when:
+        def result = fail(':api:compileConjureObjects')
+
+        then:
+        result.task(':api:compileConjureObjects').outcome == TaskOutcome.FAILED
+        result.output.contains(
+                "Error: UnionTypes is an experimental feature of conjure-java that has not been enabled.")
+    }
+
+    def 'can enable experimental features'() {
+        given:
+        createFile('api/src/main/conjure/union.yml') << """
+        types:
+          definitions:
+            default-package: test.a.api
+            objects:
+              UnionTypeExample:
+                union:
+                  number: integer
+        """
+        file('api/build.gradle') << """
+        conjure {
+            experimentalFeature "UnionTypes"
+        }
+        """
+
+        when:
+        def result = run(':api:compileConjureObjects')
+
+        then:
+        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
     }
 
     def readResource(String name) {
