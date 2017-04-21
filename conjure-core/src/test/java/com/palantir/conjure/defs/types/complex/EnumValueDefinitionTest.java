@@ -26,6 +26,8 @@ public final class EnumValueDefinitionTest {
     public void testFormat() {
         EnumValueDefinition.builder().value("FOO").build();
         EnumValueDefinition.builder().value("FOO_BAR").build();
+        EnumValueDefinition.builder().value("FOO_123_BAR").build();
+        EnumValueDefinition.builder().value("F12").build();
 
         for (String value : new String[] {
                 "foo",
@@ -35,11 +37,12 @@ public final class EnumValueDefinitionTest {
                 " - a_b",
                 " - A__B",
                 " - _A",
-                " - A_"
+                " - A_",
+                "123_FOO"
         }) {
             assertThatThrownBy(() -> EnumValueDefinition.builder().value(value).build())
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Enumeration values must match format [A-Z]+(_[A-Z]+)*: " + value);
+                    .hasMessage("Enumeration values must match format [A-Z][A-Z0-9]*(_[A-Z0-9]+)*: %s", value);
         }
     }
 }

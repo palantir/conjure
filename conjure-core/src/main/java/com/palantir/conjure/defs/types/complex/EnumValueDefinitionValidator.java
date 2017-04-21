@@ -34,7 +34,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
     }
 
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
-        private static final Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z]+(_[A-Z]+)*");
+        private static final Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z][A-Z0-9]*(_[A-Z0-9]+)*");
 
         @Override
         public void validate(EnumValueDefinition definition) {
