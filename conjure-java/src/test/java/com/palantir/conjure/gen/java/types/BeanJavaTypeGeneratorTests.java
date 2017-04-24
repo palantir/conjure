@@ -63,7 +63,7 @@ public final class BeanJavaTypeGeneratorTests {
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
                 // help make shrink-wrapping output sane
                 Files.createDirectories(expectedFile.getParent());
-                Files.delete(expectedFile);
+                Files.deleteIfExists(expectedFile);
                 Files.copy(file, expectedFile);
             }
             assertThat(file).hasSameContentAs(expectedFile);
