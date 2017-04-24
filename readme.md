@@ -318,7 +318,7 @@ _either_ a service log _or_ a request log. Using the above format, this object c
 Payload:
   union:
     serviceLog: ServiceLog
-    requestLog: RequestLog
+    notAServiceLog: RequestLog
 ```
 
 Docs may be included by using the long form:
@@ -330,14 +330,14 @@ union:
     docs: [docs]
 ```
 
-The serialized format includes two fields: a `type` field with a value corresponding to the member type as specified in
-the Conjure definition, and member name field with a value corresponding to the serialized, wrapped object.
+The serialized format includes two fields: a `type` field with a value corresponding to the member name
+ and a member name field with a value corresponding to the serialized, wrapped object.
 
 For the above example, an instance of the `Payload` object containing a `ServiceLog` would be serialized as:
 
 ```javascript
 {
-  "type": "ServiceLog", 
+  "type": "serviceLog",
   "serviceLog": {
     // fields of ServiceLog object
   }
@@ -348,8 +348,8 @@ An instance of the `Payload` object containing a `RequestLog` would be serialize
 
 ```javascript
 {
-  "type": "RequestLog",
-  "requestLog": {
+  "type": "notAServiceLog",
+  "notAServiceLog": {
     // fields of RequestLog object
   }
 }
