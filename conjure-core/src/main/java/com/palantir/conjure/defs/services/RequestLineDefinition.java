@@ -29,9 +29,12 @@ public interface RequestLineDefinition {
     String path();
 
     @Value.Derived
-    default Set<String> pathArgs() {
+    default Set<ParameterName> pathArgs() {
         UriTemplate uriTemplate = new UriTemplate(path());
-        return uriTemplate.getTemplateVariables().stream().collect(Collectors.toSet());
+        return uriTemplate.getTemplateVariables()
+                .stream()
+                .map(ParameterName::of)
+                .collect(Collectors.toSet());
     }
 
     static RequestLineDefinition of(String method, String path) {

@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -41,7 +42,7 @@ public final class ClientGenerator {
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProvider);
 
-        Builder<PythonClassName> referencedTypesBuilder = ImmutableSet.<PythonClassName>builder();
+        Builder<PythonClassName> referencedTypesBuilder = ImmutableSet.builder();
 
         List<PythonEndpointDefinition> endpoints = serviceDefinition.endpoints()
                 .entrySet()
@@ -61,8 +62,8 @@ public final class ClientGenerator {
                             .stream()
                             .map(argEntry -> PythonEndpointParam
                                     .builder()
-                                    .paramName(argEntry.getKey())
-                                    .paramId(argEntry.getValue().paramId())
+                                    .paramName(argEntry.getKey().name())
+                                    .paramId(argEntry.getValue().paramId().map(ParameterName::name))
                                     .paramType(argEntry.getValue().paramType())
                                     .myPyType(myPyMapper.getTypeName(argEntry.getValue().type()))
                                     .build())

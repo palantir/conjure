@@ -24,7 +24,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testArgumentTypeValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map("testArg", ArgumentDefinition.of(BinaryType.of())))
+                .args(map(ParameterName.of("testArg"), ArgumentDefinition.of(BinaryType.of())))
                 .http(mock(RequestLineDefinition.class));
 
         assertThatThrownBy(definition::build)
@@ -35,7 +35,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testSingleBodyParamValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map("bodyArg1", BODY_ARG, "bodyArg2", BODY_ARG))
+                .args(map(ParameterName.of("bodyArg1"), BODY_ARG, ParameterName.of("bodyArg2"), BODY_ARG))
                 .http(GET_REQUEST);
 
         assertThatThrownBy(definition::build)
@@ -48,11 +48,11 @@ public final class EndpointDefinitionTest {
         ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
                 .type(AnyType.of())
                 .paramType(ArgumentDefinition.ParamType.PATH)
-                .paramId("paramName")
+                .paramId(ParameterName.of("paramName"))
                 .build();
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map("pathArg1", paramDefinition, "pathArg2", paramDefinition))
+                .args(map(ParameterName.of("pathArg1"), paramDefinition, ParameterName.of("pathArg2"), paramDefinition))
                 .http(GET_REQUEST);
 
         assertThatThrownBy(definition::build)
@@ -65,7 +65,7 @@ public final class EndpointDefinitionTest {
         ArgumentDefinition namedParameter = ArgumentDefinition.builder()
                 .type(AnyType.of())
                 .paramType(ArgumentDefinition.ParamType.PATH)
-                .paramId("paramName")
+                .paramId(ParameterName.of("paramName"))
                 .build();
         ArgumentDefinition unNamedParameter = ArgumentDefinition.builder()
                 .type(AnyType.of())
@@ -73,7 +73,8 @@ public final class EndpointDefinitionTest {
                 .build();
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map("someName", namedParameter, "paramName", unNamedParameter))
+                .args(map(ParameterName.of("someName"), namedParameter, ParameterName.of("paramName"),
+                        unNamedParameter))
                 .http(GET_REQUEST);
 
         assertThatThrownBy(definition::build)
@@ -90,7 +91,7 @@ public final class EndpointDefinitionTest {
 
         RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map("paramName", paramDefinition))
+                .args(map(ParameterName.of("paramName"), paramDefinition))
                 .http(noParamRequest);
 
         assertThatThrownBy(definition::build)
@@ -112,7 +113,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testNoGetBodyValidator() throws Exception {
         EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
-                .args(map("bodyArg", BODY_ARG))
+                .args(map(ParameterName.of("bodyArg"), BODY_ARG))
                 .http(GET_REQUEST);
 
         assertThatThrownBy(endpoint::build)

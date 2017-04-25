@@ -10,6 +10,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -82,7 +83,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             AuthDefinition defaultAuth,
             TypeMapper typeMapper,
             TypeMapper returnTypeMapper) {
-        Set<String> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
+        Set<ParameterName> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
@@ -107,9 +108,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             methodBuilder.returns(ParameterizedTypeName.get(CALL_TYPE, ClassName.get(Void.class)));
         }
 
-        Set<String> pathArgs = endpointDef.http().pathArgs();
-
-        getAuthParameter(methodBuilder, endpointDef.auth().orElse(defaultAuth)).ifPresent(methodBuilder::addParameter);
+        getAuthParameter(endpointDef.auth().orElse(defaultAuth)).ifPresent(methodBuilder::addParameter);
 
         endpointDef.argsWithAutoDefined().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
                 .map(arg -> createEndpointParameter(
@@ -119,46 +118,50 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return methodBuilder.build();
     }
 
-    private Set<String> extractEncodedPathArgs(String path) {
+    private Set<ParameterName> extractEncodedPathArgs(String path) {
         Pattern pathArg = Pattern.compile("\\{([^\\}]+)\\}");
         Matcher matcher = pathArg.matcher(path);
-        ImmutableSet.Builder<String> encodedArgs = ImmutableSet.builder();
+        ImmutableSet.Builder<ParameterName> encodedArgs = ImmutableSet.builder();
         while (matcher.find()) {
             String arg = matcher.group(1);
             if (arg.contains(":")) {
                 // Strip everything after first colon
-                encodedArgs.add(arg.substring(0, arg.indexOf(':')));
+                encodedArgs.add(ParameterName.of(arg.substring(0, arg.indexOf(':'))));
             }
         }
         return encodedArgs.build();
     }
 
-    private String constructPath(String basePath, String endpointPath, Set<String> encodedPathArgs) {
+    // TODO(rfink): Remember to use PathDefinition here in the next PR.
+    private String constructPath(String basePath, String endpointPath, Set<ParameterName> encodedPathArgs) {
         // For encoded arguments, strip everything after argument name in endpointPath
         String purifiedEndpointPath = replaceEncodedPathArgs(endpointPath, 0, Lists.newArrayList(encodedPathArgs));
         return basePath + StringUtils.prependIfMissing(purifiedEndpointPath, "/");
     }
 
-    private String replaceEncodedPathArgs(String path, int currentArg, List<String> encodedPathArgs) {
+    private String replaceEncodedPathArgs(String path, int currentArg, List<ParameterName> encodedPathArgs) {
         if (currentArg >= encodedPathArgs.size()) {
             return path;
         }
-        String pattern = String.format("\\{%s([^\\}]+)\\}", encodedPathArgs.get(currentArg));
-        String replacement = String.format("{%s}", encodedPathArgs.get(currentArg));
+        String pattern = String.format("\\{%s([^\\}]+)\\}", encodedPathArgs.get(currentArg).name());
+        String replacement = String.format("{%s}", encodedPathArgs.get(currentArg).name());
         return replaceEncodedPathArgs(path.replaceFirst(pattern, replacement), currentArg + 1, encodedPathArgs);
     }
 
-    private ParameterSpec createEndpointParameter(TypeMapper typeMapper, Set<String> encodedPathArgs, String paramKey,
+    private ParameterSpec createEndpointParameter(
+            TypeMapper typeMapper,
+            Set<ParameterName> encodedPathArgs,
+            ParameterName paramKey,
             ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
                 typeMapper.getClassName(def.type()),
-                paramKey);
+                paramKey.name());
 
         switch (def.paramType()) {
             case PATH:
-                String pathParamKey = def.paramId().orElse(paramKey);
+                ParameterName pathParamKey = def.paramId().orElse(paramKey);
                 AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                        .addMember("value", "$S", pathParamKey);
+                        .addMember("value", "$S", pathParamKey.name());
                 if (encodedPathArgs.contains(pathParamKey)) {
                     builder.addMember("encoded", "$L", true);
                 }
@@ -166,12 +169,12 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 break;
             case QUERY:
                 param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))
-                        .addMember("value", "$S", def.paramId().orElse(paramKey))
+                        .addMember("value", "$S", def.paramId().orElse(paramKey).name())
                         .build());
                 break;
             case HEADER:
                 param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                        .addMember("value", "$S", def.paramId().orElse(paramKey))
+                        .addMember("value", "$S", def.paramId().orElse(paramKey).name())
                         .build());
                 break;
             case BODY:
@@ -183,7 +186,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return param.build();
     }
 
-    private Optional<ParameterSpec> getAuthParameter(MethodSpec.Builder methodBuilder, AuthDefinition auth) {
+    private Optional<ParameterSpec> getAuthParameter(AuthDefinition auth) {
         switch (auth.type()) {
             case HEADER:
                 return Optional.of(

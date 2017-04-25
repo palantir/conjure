@@ -345,12 +345,12 @@ class TestService(Service):
         } # type: Dict[str, Any]
 
         _path_params = {
-            'dataset-rid': datasetRid,
+            'datasetRid': datasetRid,
         } # type: Dict[str, Any]
 
         _json = None # type: Any
 
-        _path = '/datasets/{dataset-rid}/testParam'
+        _path = '/datasets/{datasetRid}/testParam'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore

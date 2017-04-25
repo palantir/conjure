@@ -74,10 +74,10 @@ public interface TestService {
             @Path("datasetRid") ResourceIdentifier datasetRid,
             @Path(value = "branch", encoded = true) String branch);
 
-    @GET("/catalog/datasets/{dataset-rid}/testParam")
+    @GET("/catalog/datasets/{datasetRid}/testParam")
     Call<Optional<String>> testParam(
             @Header("Authorization") AuthHeader authHeader,
-            @Path("dataset-rid") ResourceIdentifier datasetRid);
+            @Path("datasetRid") ResourceIdentifier datasetRid);
 
     @GET("/catalog/boolean")
     Call<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);

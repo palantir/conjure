@@ -128,11 +128,11 @@ services:
         returns: optional<string>
 
       testParam:
-        http: GET /datasets/{dataset-rid}/testParam
+        http: GET /datasets/{datasetRid}/testParam
         args:
           datasetRid:
             type: ResourceIdentifier
-            param-id: dataset-rid
+            param-id: datasetRid
             param-type: path
         returns: optional<string>
         
@@ -147,4 +147,3 @@ services:
       testInteger:
         http: GET /integer
         returns: integer
-       

@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -98,7 +99,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 ClassName.get("java.lang", "Deprecated")));
 
         ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
-                content -> methodBuilder.addJavadoc("$L", content.toString()));
+                content -> methodBuilder.addJavadoc("$L", content));
 
         endpointDef.returns().ifPresent(type -> methodBuilder.returns(returnTypeMapper.getClassName(type)));
 
@@ -115,9 +116,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
         if (endpointDef.argsWithAutoDefined().isPresent()) {
-            Set<String> pathArgs = endpointDef.http().pathArgs();
             endpointDef.argsWithAutoDefined().get().forEach((name, def) -> {
-                parameterSpecs.add(createServiceMethodParameterArg(typeMapper, pathArgs, name, def));
+                parameterSpecs.add(createServiceMethodParameterArg(typeMapper, name, def));
             });
         }
         return ImmutableList.copyOf(parameterSpecs);
@@ -125,11 +125,10 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     private static ParameterSpec createServiceMethodParameterArg(
             TypeMapper typeMapper,
-            Set<String> pathArgs,
-            String argumentName,
+            ParameterName argumentName,
             ArgumentDefinition def) {
-        ParameterSpec.Builder param = ParameterSpec.builder(typeMapper.getClassName(def.type()), argumentName);
-        getParamTypeAnnotation(argumentName, def, pathArgs).ifPresent(param::addAnnotation);
+        ParameterSpec.Builder param = ParameterSpec.builder(typeMapper.getClassName(def.type()), argumentName.name());
+        getParamTypeAnnotation(argumentName, def).ifPresent(param::addAnnotation);
 
         param.addAnnotations(createMarkers(typeMapper, def.markers()));
         return param.build();
@@ -162,9 +161,8 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     }
 
     private static Optional<AnnotationSpec> getParamTypeAnnotation(
-            String argName,
-            ArgumentDefinition def,
-            Set<String> pathArgs) {
+            ParameterName argName,
+            ArgumentDefinition def) {
         final String annotationType;
         switch (def.paramType()) {
             case PATH:

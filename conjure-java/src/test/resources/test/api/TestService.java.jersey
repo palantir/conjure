@@ -85,10 +85,10 @@ public interface TestService {
             @PathParam("branch") String branch);
 
     @GET
-    @Path("/datasets/{dataset-rid}/testParam")
+    @Path("/datasets/{datasetRid}/testParam")
     Optional<String> testParam(
             @HeaderParam("Authorization") AuthHeader authHeader,
-            @PathParam("dataset-rid") ResourceIdentifier datasetRid);
+            @PathParam("datasetRid") ResourceIdentifier datasetRid);
 
     @GET
     @Path("/boolean")

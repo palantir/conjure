@@ -24,8 +24,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     ARGUMENT_TYPE(new ArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
-    NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
-    ;
+    NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator());
 
     private final ConjureValidator<EndpointDefinition> validator;
 
@@ -64,7 +63,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class SingleBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            List<Map.Entry<String, ArgumentDefinition>> bodyParams = definition.argsWithAutoDefined()
+            List<Map.Entry<ParameterName, ArgumentDefinition>> bodyParams = definition.argsWithAutoDefined()
                     .orElse(ImmutableMap.of()).entrySet()
                     .stream()
                     .filter(entry -> entry.getValue().paramType().equals(ArgumentDefinition.ParamType.BODY))
@@ -96,23 +95,22 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            Set<String> pathParamIds = new HashSet<>();
+            Set<ParameterName> pathParamIds = new HashSet<>();
             definition.argsWithAutoDefined().orElse(ImmutableMap.of()).entrySet().stream()
                     .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
                     .forEach(entry -> {
-                        String paramId = entry.getValue().paramId().orElse(entry.getKey());
+                        ParameterName paramId = entry.getValue().paramId().orElse(entry.getKey());
                         boolean added = pathParamIds.add(paramId);
                         Preconditions.checkState(added,
-                                "Path parameter with identifier \"" + paramId
-                                        + "\" is defined multiple times for endpoint");
-
+                                "Path parameter with identifier \"%s\" is defined multiple times for endpoint",
+                                paramId.name());
                     });
 
-            Set<String> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
+            Set<ParameterName> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
             Preconditions.checkState(extraParams.isEmpty(),
                     "Path parameters defined in endpoint but not present in path template: " + extraParams);
 
-            Set<String> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
+            Set<ParameterName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
                     "Path parameters defined path template but not present in endpoint: " + missingParams);
         }

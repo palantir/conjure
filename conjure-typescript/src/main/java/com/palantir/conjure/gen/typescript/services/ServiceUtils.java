@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -56,13 +57,13 @@ public final class ServiceUtils {
                 .build();
     }
 
-    private static List<TypescriptTypeSignature> generateParameters(Map<String, ArgumentDefinition> parameters,
-            TypeMapper typeMapper) {
+    private static List<TypescriptTypeSignature> generateParameters(
+            Map<ParameterName, ArgumentDefinition> parameters, TypeMapper typeMapper) {
         return parameters.entrySet()
                 .stream()
-                .map(e -> (TypescriptTypeSignature) TypescriptTypeSignature.builder()
+                .map(e -> TypescriptTypeSignature.builder()
                         .isOptional(e.getValue().type() instanceof OptionalType)
-                        .name(e.getKey())
+                        .name(e.getKey().name())
                         .typescriptType(typeMapper.getTypescriptType(e.getValue().type()))
                         .build()
                 )

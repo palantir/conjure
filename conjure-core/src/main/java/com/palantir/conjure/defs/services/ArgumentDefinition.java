@@ -30,7 +30,7 @@ public interface ArgumentDefinition {
     Optional<String> docs();
 
     @JsonProperty("param-id")
-    Optional<String> paramId();
+    Optional<ParameterName> paramId();
 
     @JsonProperty("param-type")
     @Value.Default

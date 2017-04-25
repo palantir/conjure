@@ -119,20 +119,20 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .put("pathArguments", ArrayExpression.of(
                         value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
                                 .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
-                                .map(e -> e.getKey())
+                                .map(e -> e.getKey().name())
                                 .map(RawExpression::of)
                                 .collect(Collectors.toList())))
                 .put("queryArguments", JsonExpression.builder().keyValues(
                         value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
                                 .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
-                                .map(e -> e.getKey())
+                                .map(e -> e.getKey().name())
                                 .collect(Collectors.toMap(identifier -> identifier,
                                         identifier -> RawExpression.of(identifier))))
                         .build())
                 .put("data", Iterables.getOnlyElement(
                         value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
                                 .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.BODY)
-                                .map(e -> e.getKey())
+                                .map(e -> e.getKey().name())
                                 .map(RawExpression::of)
                                 .collect(Collectors.toList()), RawExpression.of("undefined")))
                 .build();

@@ -24,7 +24,7 @@ public interface EndpointDefinition {
 
     Optional<AuthDefinition> auth();
 
-    Optional<Map<String, ArgumentDefinition>> args();
+    Optional<Map<ParameterName, ArgumentDefinition>> args();
 
     /**
      * Returns the arguments for this endpoint where all instances of ParamType.AUTO have been set to
@@ -33,13 +33,13 @@ public interface EndpointDefinition {
      * @return the arguments for this endpoint
      */
     @Value.Derived
-    default Optional<Map<String, ArgumentDefinition>> argsWithAutoDefined() {
+    default Optional<Map<ParameterName, ArgumentDefinition>> argsWithAutoDefined() {
         if (!args().isPresent()) {
             return Optional.empty();
         }
 
-        Set<String> pathArgs = http().pathArgs();
-        Map<String, ArgumentDefinition> outputMap = new LinkedHashMap<>();
+        Set<ParameterName> pathArgs = http().pathArgs();
+        Map<ParameterName, ArgumentDefinition> outputMap = new LinkedHashMap<>();
         args().orElse(ImmutableMap.of()).entrySet().stream()
                 .map(entry -> {
                     ArgumentDefinition origArgDef = entry.getValue();
