@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.services;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -11,6 +12,7 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ParameterName;
+import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -79,7 +81,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     private MethodSpec generateServiceMethod(
             String endpointName,
             EndpointDefinition endpointDef,
-            String basePath,
+            PathDefinition basePath,
             AuthDefinition defaultAuth,
             TypeMapper typeMapper,
             TypeMapper returnTypeMapper) {
@@ -87,7 +89,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
-                        .addMember("value", "$S", constructPath(basePath, endpointDef.http().path(), encodedPathArgs))
+                        .addMember("value", "$S", constructPath(basePath, endpointDef.http().path()))
                         .build());
 
         if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
@@ -98,7 +100,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 ClassName.get("java.lang", "Deprecated")));
 
         ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
-                content -> methodBuilder.addJavadoc("$L", content.toString()));
+                content -> methodBuilder.addJavadoc("$L", content));
 
         if (endpointDef.returns().isPresent()) {
             methodBuilder.returns(
@@ -118,9 +120,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return methodBuilder.build();
     }
 
-    private Set<ParameterName> extractEncodedPathArgs(String path) {
+    private Set<ParameterName> extractEncodedPathArgs(PathDefinition path) {
         Pattern pathArg = Pattern.compile("\\{([^\\}]+)\\}");
-        Matcher matcher = pathArg.matcher(path);
+        Matcher matcher = pathArg.matcher(path.toString());
         ImmutableSet.Builder<ParameterName> encodedArgs = ImmutableSet.builder();
         while (matcher.find()) {
             String arg = matcher.group(1);
@@ -132,20 +134,23 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return encodedArgs.build();
     }
 
-    // TODO(rfink): Remember to use PathDefinition here in the next PR.
-    private String constructPath(String basePath, String endpointPath, Set<ParameterName> encodedPathArgs) {
-        // For encoded arguments, strip everything after argument name in endpointPath
-        String purifiedEndpointPath = replaceEncodedPathArgs(endpointPath, 0, Lists.newArrayList(encodedPathArgs));
-        return basePath + StringUtils.prependIfMissing(purifiedEndpointPath, "/");
+    private PathDefinition constructPath(PathDefinition basePath, PathDefinition endpointPath) {
+        PathDefinition endpointPathWithoutRegex = replaceEncodedPathArgs(endpointPath);
+        return basePath.resolve(endpointPathWithoutRegex);
     }
 
-    private String replaceEncodedPathArgs(String path, int currentArg, List<ParameterName> encodedPathArgs) {
-        if (currentArg >= encodedPathArgs.size()) {
-            return path;
+    private PathDefinition replaceEncodedPathArgs(PathDefinition path) {
+        List<String> newSegments = Lists.newArrayList();
+        Pattern pattern = Pattern.compile("\\{([^:]+):(.*)}");
+        for (String segment : path.path().getSegments()) {
+            Matcher matcher = pattern.matcher(segment);
+            if (matcher.matches()) {
+                newSegments.add("{" + matcher.group(1) + "}");
+            } else {
+                newSegments.add(segment);
+            }
         }
-        String pattern = String.format("\\{%s([^\\}]+)\\}", encodedPathArgs.get(currentArg).name());
-        String replacement = String.format("{%s}", encodedPathArgs.get(currentArg).name());
-        return replaceEncodedPathArgs(path.replaceFirst(pattern, replacement), currentArg + 1, encodedPathArgs);
+        return PathDefinition.of("/" + Joiner.on("/").join(newSegments));
     }
 
     private ParameterSpec createEndpointParameter(

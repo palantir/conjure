@@ -131,7 +131,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
             // fix the path, add path params
             poetWriter.writeLine();
-            String fixedPath = http().path().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
+            String fixedPath = http().path().toString().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
             poetWriter.writeIndentedLine("_path = '%s'", fixedPath);
             poetWriter.writeIndentedLine("_path = _path.format(**_path_params)");
 

@@ -56,7 +56,7 @@ public final class ServiceDefinitionTests {
     public void testEndpointDefinition_optionals() throws IOException {
         assertThat(mapper.readValue("http: GET /", EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
-                        .http(RequestLineDefinition.of("GET", "/"))
+                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/")))
                         .build());
     }
 
@@ -75,7 +75,7 @@ public final class ServiceDefinitionTests {
                 "docs: |",
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
-                        .http(RequestLineDefinition.of("GET", "/{foo}"))
+                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/{foo}")))
                         .auth(AuthDefinition.header())
                         .args(ImmutableMap.of(ParameterName.of("arg"), ArgumentDefinition.builder()
                                 .type(PrimitiveType.STRING)
@@ -175,7 +175,7 @@ public final class ServiceDefinitionTests {
                                 .name("Test Service")
                                 .conjurePackage(ConjurePackage.of("test.api"))
                                 .putEndpoints("get", EndpointDefinition.builder()
-                                        .http(RequestLineDefinition.of("GET", "/get"))
+                                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/get")))
                                         .build())
                                 .build())
                         .build());

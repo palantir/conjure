@@ -6,6 +6,7 @@ com.google.guava:guava = 19.0
 com.palantir.baseline:* = 0.13.0-rc4
 com.palantir.remoting2:jackson-support = 2.0.0
 com.palantir.ri:* = 1.0.0
+com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 1.0.1
 com.squareup:javapoet = 1.7.0
 commons-io:commons-io = 2.5

@@ -18,15 +18,17 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public abstract class ParameterName {
 
-    private static final Pattern PATTERN = Pattern.compile("^[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*$");
+    static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
+    private static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
 
     @JsonValue
     public abstract String name();
 
     @Value.Check
     protected final void check() {
-        Preconditions.checkArgument(PATTERN.matcher(name()).matches(), "Parameter names in endpoint paths and service "
-                + "definitions must match pattern %s: %s", PATTERN, name());
+        Preconditions.checkArgument(ANCHORED_PATTERN.matcher(name()).matches(),
+                "Parameter names in endpoint paths and service "
+                        + "definitions must match pattern %s: %s", ANCHORED_PATTERN, name());
     }
 
     @JsonCreator

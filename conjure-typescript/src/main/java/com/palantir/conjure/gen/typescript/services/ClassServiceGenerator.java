@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -100,12 +101,12 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .build();
     }
 
-    private TypescriptFunctionBody generateFunctionBody(String serviceBasePath, String name, EndpointDefinition value,
-            AuthDefinition defaultAuth, TypeMapper typeMapper) {
+    private TypescriptFunctionBody generateFunctionBody(PathDefinition serviceBasePath, String name,
+            EndpointDefinition value, AuthDefinition defaultAuth, TypeMapper typeMapper) {
         AuthDefinition authDefinition = value.auth().orElse(defaultAuth);
 
         Map<String, TypescriptExpression> keyValues = ImmutableMap.<String, TypescriptExpression>builder()
-                .put("endpointPath", StringExpression.of(serviceBasePath + value.http().path()))
+                .put("endpointPath", StringExpression.of(serviceBasePath + value.http().path().path().toString()))
                 .put("endpointName", StringExpression.of(name))
                 .put("method", StringExpression.of(value.http().method()))
                 // TODO(rmcnamara): support other request types

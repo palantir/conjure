@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public final class ParameterNameTest {
     @Test
-    public void testValidPackageNames() {
+    public void testValidNames() {
         ParameterName.of("f");
         ParameterName.of("foo");
         ParameterName.of("fooBar");
@@ -19,7 +19,7 @@ public final class ParameterNameTest {
     }
 
     @Test
-    public void testInvalidPackageNames() {
+    public void testInvalidNames() {
         for (String illegal : new String[] {"AB", "123", "foo_bar", "foo-bar", "foo.bar"}) {
             assertThatThrownBy(() -> ParameterName.of(illegal))
                     .isInstanceOf(IllegalArgumentException.class)

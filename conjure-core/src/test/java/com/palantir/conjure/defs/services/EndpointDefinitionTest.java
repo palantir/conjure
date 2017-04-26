@@ -15,7 +15,8 @@ import org.junit.Test;
 
 public final class EndpointDefinitionTest {
 
-    private static final RequestLineDefinition GET_REQUEST = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
+    private static final RequestLineDefinition GET_REQUEST =
+            RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
     private static final ArgumentDefinition BODY_ARG = ArgumentDefinition.builder()
             .type(AnyType.of())
             .paramType(ArgumentDefinition.ParamType.BODY)
@@ -89,7 +90,7 @@ public final class EndpointDefinitionTest {
                 .paramType(ArgumentDefinition.ParamType.PATH)
                 .build();
 
-        RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, "/a/path");
+        RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(map(ParameterName.of("paramName"), paramDefinition))
                 .http(noParamRequest);
@@ -101,7 +102,8 @@ public final class EndpointDefinitionTest {
 
     @Test
     public void testPathParamValidatorMissingParams() throws Exception {
-        RequestLineDefinition requestWithPathParam = RequestLineDefinition.of(HttpMethod.GET, "/a/path/{paramName}");
+        RequestLineDefinition requestWithPathParam =
+                RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path/{paramName}"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .http(requestWithPathParam);
 

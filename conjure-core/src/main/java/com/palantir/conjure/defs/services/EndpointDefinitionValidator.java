@@ -37,7 +37,6 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         validator.validate(definition);
     }
 
-
     private static final class ArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
         private static final Set<Class<? extends ConjureType>> ILLEGAL_ARG_TYPES = ImmutableSet.of(BinaryType.class);
 

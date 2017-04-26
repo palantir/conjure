@@ -7,7 +7,6 @@ package com.palantir.conjure.defs.services;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,18 +25,18 @@ public interface RequestLineDefinition {
 
     String method();
 
-    String path();
+    PathDefinition path();
 
     @Value.Derived
     default Set<ParameterName> pathArgs() {
-        UriTemplate uriTemplate = new UriTemplate(path());
+        UriTemplate uriTemplate = new UriTemplate(path().path().toString());
         return uriTemplate.getTemplateVariables()
                 .stream()
                 .map(ParameterName::of)
                 .collect(Collectors.toSet());
     }
 
-    static RequestLineDefinition of(String method, String path) {
+    static RequestLineDefinition of(String method, PathDefinition path) {
         return ImmutableRequestLineDefinition.builder().method(method).path(path).build();
     }
 
@@ -45,14 +44,13 @@ public interface RequestLineDefinition {
     class RequestLineDefinitionDeserializer extends JsonDeserializer<RequestLineDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public RequestLineDefinition deserialize(JsonParser parser, DeserializationContext context)
-                throws IOException, JsonProcessingException {
+        public RequestLineDefinition deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 String[] parts = candidate.split(" ", 2);
                 checkArgument(parts.length == 2, "Request line must be of the form: [METHOD] [PATH]");
-                return of(parts[0], parts[1]);
+                return of(parts[0], PathDefinition.of(parts[1]));
             }
 
             return ImmutableRequestLineDefinition.fromJson(
