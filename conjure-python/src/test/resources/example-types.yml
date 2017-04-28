@@ -68,3 +68,11 @@ types:
           set: set<string>
           map: map<string, string>
           # alias: StringAliasExample
+      UnionTypeExample:
+        docs: A type which can either be a StringExample, a set of strings, or an integer.
+        union:
+          stringExample:
+            type: StringExample
+            docs: Docs for when UnionTypeExample is of type StringExample.
+          set: set<string>
+          number: integer

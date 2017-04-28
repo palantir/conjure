@@ -12,12 +12,15 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.python.ConjurePythonGenerator;
 import com.palantir.conjure.gen.python.DefaultPythonFileWriter;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
-import com.palantir.conjure.gen.python.types.BeanGenerator;
+import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
+import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Set;
+import java.util.function.Supplier;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -31,8 +34,7 @@ public class CompileConjurePythonTask extends SourceTask {
     @Input
     private ClientGenerator clientGenerator;
 
-    @Input
-    private BeanGenerator beanGenerator;
+    private Supplier<Set<PythonBeanGenerator.ExperimentalFeatures>> experimentalFeatures;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
@@ -42,8 +44,14 @@ public class CompileConjurePythonTask extends SourceTask {
         this.clientGenerator = clientGenerator;
     }
 
-    public final void setBeanGenerator(BeanGenerator beanGenerator) {
-        this.beanGenerator = beanGenerator;
+    public final void setExperimentalFeatures(
+            Supplier<Set<PythonBeanGenerator.ExperimentalFeatures>> experimentalFeatures) {
+        this.experimentalFeatures = experimentalFeatures;
+    }
+
+    @Input
+    public final Set<PythonBeanGenerator.ExperimentalFeatures> getExperimentalFeatures() {
+        return experimentalFeatures.get();
     }
 
     @TaskAction
@@ -51,16 +59,18 @@ public class CompileConjurePythonTask extends SourceTask {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
 
-        compileFiles(getSource().getFiles());
+        PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
+
+        compileFiles(beanGenerator, getSource().getFiles());
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.py\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
 
-    private void compileFiles(Collection<File> files) {
-        files.forEach(f -> compileFile(f.toPath()));
+    private void compileFiles(PythonBeanGenerator beanGenerator, Collection<File> files) {
+        files.forEach(f -> compileFile(beanGenerator, f.toPath()));
     }
 
-    private void compileFile(Path path) {
+    private void compileFile(PythonBeanGenerator beanGenerator, Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
         ConjurePythonGenerator generator = new ConjurePythonGenerator(beanGenerator, clientGenerator);
         generator.write(conjure, new DefaultPythonFileWriter(outputDirectory.toPath()));

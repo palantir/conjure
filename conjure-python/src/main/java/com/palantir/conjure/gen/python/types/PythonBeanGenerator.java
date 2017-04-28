@@ -10,7 +10,11 @@ import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 
-public interface BeanGenerator {
+public interface PythonBeanGenerator {
+
+    enum ExperimentalFeatures {
+        UnionTypes
+    }
 
     PythonClass generateObject(
             TypesDefinition types,

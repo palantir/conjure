@@ -8,7 +8,7 @@ import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
-import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
+import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.File;
@@ -38,6 +38,7 @@ public class ConjurePlugin implements Plugin<Project> {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:methodlength")
     public final void apply(Project project) {
         ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class);
         project.evaluationDependsOnChildren();
@@ -182,7 +183,15 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.dependsOn(processConjureImports);
                             task.setOutputDirectory(subproj.file("python"));
                             task.setClientGenerator(new ClientGenerator());
-                            task.setBeanGenerator(new DefaultBeanGenerator());
+                            task.setExperimentalFeatures(new Supplier<Set<PythonBeanGenerator.ExperimentalFeatures>>() {
+                                @Override
+                                public Set<PythonBeanGenerator.ExperimentalFeatures> get() {
+                                    return extension.getExperimentalFeatures()
+                                            .stream()
+                                            .map(PythonBeanGenerator.ExperimentalFeatures::valueOf)
+                                            .collect(Collectors.toSet());
+                                }
+                            });
                             conjureTask.dependsOn(task);
                         });
             });

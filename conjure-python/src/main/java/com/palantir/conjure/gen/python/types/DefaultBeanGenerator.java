@@ -4,10 +4,15 @@
 
 package com.palantir.conjure.gen.python.types;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition;
+import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -18,11 +23,20 @@ import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonEnum;
 import com.palantir.conjure.gen.python.poet.PythonEnum.PythonEnumValue;
 import com.palantir.conjure.gen.python.poet.PythonImport;
+import com.palantir.conjure.gen.python.poet.PythonUnionTypeDefinition;
+import com.palantir.parsec.ParseException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class DefaultBeanGenerator implements BeanGenerator {
+public final class DefaultBeanGenerator implements PythonBeanGenerator {
+
+    private final Set<ExperimentalFeatures> enabledExperimentalFeatures;
+
+    public DefaultBeanGenerator(Set<ExperimentalFeatures> enabledExperimentalFeatures) {
+        this.enabledExperimentalFeatures = ImmutableSet.copyOf(enabledExperimentalFeatures);
+    }
 
     @Override
     public PythonClass generateObject(TypesDefinition types,
@@ -33,9 +47,52 @@ public final class DefaultBeanGenerator implements BeanGenerator {
             return generateObject(types, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return generateObject(packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
+        } else if (typeDef instanceof UnionTypeDefinition) {
+            Preconditions.checkState(enabledExperimentalFeatures.contains(ExperimentalFeatures.UnionTypes),
+                    "Error: %s is an experimental feature of conjure-python that has not been enabled.",
+                    ExperimentalFeatures.UnionTypes);
+            return generateObject(types, packageNameProcessor, typeName, (UnionTypeDefinition) typeDef);
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
         }
+    }
+
+    private PythonClass generateObject(TypesDefinition types, PackageNameProcessor packageNameProcessor,
+            TypeName typeName, UnionTypeDefinition typeDef) {
+
+        TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
+        TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
+        ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
+                types, packageNameProcessor);
+
+        List<PythonField> options = typeDef.union()
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    UnionMemberTypeDefinition unionMember = entry.getValue();
+                    try {
+                        ConjureType conjureType = ConjureType.fromString(unionMember.type());
+                        return PythonField.builder()
+                            .attributeName(entry.getKey())
+                            .docs(unionMember.docs())
+                            .jsonIdentifier(entry.getKey())
+                            .myPyType(myPyMapper.getTypeName(conjureType))
+                            .pythonType(mapper.getTypeName(conjureType))
+                            .build();
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
+
+        return PythonUnionTypeDefinition.builder()
+            .packageName(packageName.name())
+            .className(typeName.name())
+            .docs(typeDef.docs())
+            .addAllOptions(options)
+            .build();
     }
 
     private PythonEnum generateObject(

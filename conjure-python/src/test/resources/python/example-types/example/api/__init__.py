@@ -369,3 +369,49 @@ class ManyFieldExample(ConjureBeanType):
         # type: () -> Dict[str, str]
         return self._map
 
+class UnionTypeExample(ConjureUnionType):
+    '''A type which can either be a StringExample, a set of strings, or an integer.'''
+
+    _stringExample = None # type: StringExample
+    _set = None # type: List[str]
+    _number = None # type: int
+
+    @classmethod
+    def _options(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'stringExample': ConjureFieldDefinition('stringExample', StringExample),
+            'set': ConjureFieldDefinition('set', ListType(str)),
+            'number': ConjureFieldDefinition('number', int)
+        }
+
+    def __init__(self, stringExample=None, set=None, number=None):
+        if (stringExample is not None) + (set is not None) + (number is not None) != 1:
+            raise ValueError('a union must contain a single member')
+
+        if stringExample is not None:
+            self._stringExample = stringExample
+            self._type = 'stringExample'
+        if set is not None:
+            self._set = set
+            self._type = 'set'
+        if number is not None:
+            self._number = number
+            self._type = 'number'
+
+    @property
+    def stringExample(self):
+        # type: () -> StringExample
+        '''Docs for when UnionTypeExample is of type StringExample.'''
+        return self._stringExample
+
+    @property
+    def set(self):
+        # type: () -> List[str]
+        return self._set
+
+    @property
+    def number(self):
+        # type: () -> int
+        return self._number
+

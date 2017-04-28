@@ -10,7 +10,7 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonFile;
-import com.palantir.conjure.gen.python.types.BeanGenerator;
+import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +18,10 @@ import java.util.stream.Stream;
 
 public final class ConjurePythonGenerator {
 
-    private final BeanGenerator beanGenerator;
+    private final PythonBeanGenerator beanGenerator;
     private final ClientGenerator clientGenerator;
 
-    public ConjurePythonGenerator(BeanGenerator beanGenerator, ClientGenerator clientGenerator) {
+    public ConjurePythonGenerator(PythonBeanGenerator beanGenerator, ClientGenerator clientGenerator) {
         this.beanGenerator = beanGenerator;
         this.clientGenerator = clientGenerator;
     }
