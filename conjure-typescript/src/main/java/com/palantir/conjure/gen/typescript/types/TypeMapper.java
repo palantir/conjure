@@ -26,10 +26,12 @@ import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
+import com.palantir.conjure.defs.types.reference.ImportedTypes;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
@@ -212,15 +214,7 @@ public final class TypeMapper {
         public String visit(LocalReferenceType type) {
             BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
             if (defType != null) {
-                if (defType instanceof AliasTypeDefinition) {
-                    // in typescript we collapse alias types to concrete types
-                    return visit(((AliasTypeDefinition) defType).alias());
-                } else if (defType instanceof EnumTypeDefinition) {
-                    return type.type().name();
-                } else {
-                    // Interfaces are prepended with "I"
-                    return "I" + type.type().name();
-                }
+                return extractTypescriptName(type.type(), defType);
             } else {
                 ExternalTypeDefinition depType = types.imports().get(type.type());
                 checkNotNull(depType, "Unable to resolve type %s", type.type());
@@ -230,7 +224,16 @@ public final class TypeMapper {
 
         @Override
         public String visit(ForeignReferenceType type) {
-            return type.type().name();
+            ImportedTypes importedTypes = types.conjureImports().get(type.namespace());
+            if (importedTypes != null) {
+                BaseObjectTypeDefinition defType = importedTypes.importedTypes().objects().get(type.type());
+                checkNotNull(defType, "Unable to resolve imported conjure type %s", type.type());
+                return extractTypescriptName(type.type(), defType);
+            } else {
+                ExternalTypeDefinition depType = types.imports().get(type.type());
+                checkNotNull(depType, "Unable to resolve type %s", type.type());
+                return getTypeNameFromConjureType(depType.baseType());
+            }
         }
 
         @Override
@@ -252,6 +255,18 @@ public final class TypeMapper {
         @Override
         public String visit(DateTimeType type) {
             return "string";
+        }
+
+        private String extractTypescriptName(TypeName conjureTypeName, BaseObjectTypeDefinition defType) {
+            if (defType instanceof AliasTypeDefinition) {
+                // in typescript we collapse alias types to concrete types
+                return visit(((AliasTypeDefinition) defType).alias());
+            } else if (defType instanceof EnumTypeDefinition) {
+                return conjureTypeName.name();
+            } else {
+                // Interfaces are prepended with "I"
+                return "I" + conjureTypeName.name();
+            }
         }
 
     }

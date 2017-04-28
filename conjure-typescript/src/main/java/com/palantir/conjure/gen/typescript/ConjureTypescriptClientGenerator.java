@@ -34,11 +34,10 @@ public final class ConjureTypescriptClientGenerator {
      * Takes in a list of {@link ConjureDefinition}s in order to produce a single index file.
      */
     public void emit(List<ConjureDefinition> conjureDefinitions, File outputDir) {
-        for (int i = 0; i < conjureDefinitions.size(); i++) {
-            ConjureDefinition definition = conjureDefinitions.get(i);
+        conjureDefinitions.forEach(definition -> {
             serviceGenerator.emit(definition, outputDir);
             typeGenerator.emit(definition.types(), outputDir);
-        }
+        });
 
         // write index file
         Set<ExportStatement> serviceExports = conjureDefinitions.stream()

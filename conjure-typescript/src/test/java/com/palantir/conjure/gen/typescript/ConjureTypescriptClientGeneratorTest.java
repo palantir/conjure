@@ -118,10 +118,10 @@ public final class ConjureTypescriptClientGeneratorTest {
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "with/imports/complexObjectWithImports.ts"))
-                .contains("import { StringExample } from \"../../test/api/stringExample\"");
+                .contains("import { IStringExample } from \"../../test/api/stringExample\"");
         assertThat(compiledFileContent(src, "with/imports/testService.ts"))
-                .contains("import { BackingFileSystem } from \"../../foundry/catalog/api/datasets/backingFileSystem\"")
-                .contains("import { StringExample } from \"../../test/api/stringExample\"");
+                .contains("import { IBackingFileSystem } from \"../../foundry/catalog/api/datasets/backingFileSystem\"")
+                .contains("import { IStringExample } from \"../../test/api/stringExample\"");
 
         // Imported files are not generated
         assertThat(compiledFile(src, "foundry/catalog/api/datasets/backingFileSystem.ts")).doesNotExist();
