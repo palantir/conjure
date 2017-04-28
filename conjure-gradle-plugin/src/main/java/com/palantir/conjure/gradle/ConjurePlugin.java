@@ -191,7 +191,7 @@ public class ConjurePlugin implements Plugin<Project> {
 
     private void addGeneratedToMainSourceSet(Project subproj) {
         JavaPluginConvention javaPlugin = subproj.getConvention().findPlugin(JavaPluginConvention.class);
-        javaPlugin.getSourceSets().getByName("main").getJava().setSrcDirs(subproj.files("src/generated/java"));
+        javaPlugin.getSourceSets().getByName("main").getJava().srcDir(subproj.files("src/generated/java"));
     }
 
     private void applyDependencyForIdeTasks(Project project, Task conjureTask) {
