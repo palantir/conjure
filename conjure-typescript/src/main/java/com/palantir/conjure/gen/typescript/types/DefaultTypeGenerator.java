@@ -195,7 +195,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                             .name(StringUtils.uncapitalize(memberName))
                             .build();
             TypescriptEqualityClause typescriptEqualityClause = TypescriptEqualityClause.builder()
-                    .clause("obj.type === " + StringExpression.of(memberType.type()).emitToString())
+                    .clause("obj.type === " + StringExpression.of(memberName).emitToString())
                     .build();
             EqualityStatement equalityStatement = EqualityStatement.builder()
                     .typescriptEqualityStatement(typescriptEqualityClause)

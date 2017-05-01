@@ -11,7 +11,7 @@ export interface IUnionTypeExample {
 export function map(
     obj: IUnionTypeExample
 ) {
-    if (obj.type === "map<string, string>") {
+    if (obj.type === "map") {
         return obj["map"];
     }
     return undefined;
@@ -19,7 +19,7 @@ export function map(
 export function number(
     obj: IUnionTypeExample
 ) {
-    if (obj.type === "integer") {
+    if (obj.type === "number") {
         return obj["number"];
     }
     return undefined;
@@ -27,7 +27,7 @@ export function number(
 export function set(
     obj: IUnionTypeExample
 ) {
-    if (obj.type === "set<string>") {
+    if (obj.type === "set") {
         return obj["set"];
     }
     return undefined;
@@ -35,7 +35,7 @@ export function set(
 export function stringExample(
     obj: IUnionTypeExample
 ) {
-    if (obj.type === "StringExample") {
+    if (obj.type === "stringExample") {
         return obj["stringExample"];
     }
     return undefined;
