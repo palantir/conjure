@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.ws.rs.HttpMethod;
 
@@ -24,7 +26,9 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     ARGUMENT_TYPE(new ArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
-    NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator());
+    NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
+    PARAMETER_NAME(new ParameterNameValidator()),
+    PARAM_ID(new ParamIdValidator());
 
     private final ConjureValidator<EndpointDefinition> validator;
 
@@ -115,4 +119,41 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    private static final class ParameterNameValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            definition.argsWithAutoDefined().orElse(ImmutableMap.of()).keySet().forEach(name -> {
+                Matcher matcher = ParameterName.ANCHORED_PATTERN.matcher(name.name());
+                Preconditions.checkState(matcher.matches(),
+                        "Parameter names in endpoint paths and service definitions must match pattern %s: %s",
+                        ParameterName.ANCHORED_PATTERN,
+                        name);
+            });
+        }
+    }
+
+    private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            definition.argsWithAutoDefined().orElse(ImmutableMap.of()).forEach((name, arg) -> {
+                final Pattern pattern;
+                switch (arg.paramType()) {
+                    case AUTO:
+                    case BODY:
+                    case PATH:
+                    case QUERY:
+                        pattern = ParameterName.ANCHORED_PATTERN;
+                        break;
+                    case HEADER:
+                        pattern = ParameterName.HEADER_PATTERN;
+                        break;
+                    default:
+                        throw new IllegalStateException("Validation for paramType does not exist: " + arg.paramType());
+                }
+                ParameterName paramId = arg.paramId().orElse(name);
+                Preconditions.checkState(pattern.matcher(paramId.name()).matches(),
+                        "Parameter ids with type %s must match pattern %s: %s", arg.paramType(), pattern, paramId);
+            });
+        }
+    }
 }

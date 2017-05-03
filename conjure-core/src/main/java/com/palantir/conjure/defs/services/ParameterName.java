@@ -6,7 +6,6 @@ package com.palantir.conjure.defs.services;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
@@ -18,18 +17,12 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public abstract class ParameterName {
 
-    static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
-    private static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
+    public static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
+    public static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
+    public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
 
     @JsonValue
     public abstract String name();
-
-    @Value.Check
-    protected final void check() {
-        Preconditions.checkArgument(ANCHORED_PATTERN.matcher(name()).matches(),
-                "Parameter names in endpoint paths and service "
-                        + "definitions must match pattern %s: %s", ANCHORED_PATTERN, name());
-    }
 
     @JsonCreator
     public static ParameterName of(String name) {
