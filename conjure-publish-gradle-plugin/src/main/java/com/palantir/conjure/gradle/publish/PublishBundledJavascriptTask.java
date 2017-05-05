@@ -47,9 +47,13 @@ public class PublishBundledJavascriptTask extends ConventionTask {
         ConjurePublishPlugin.copyFile(new File(getInputDirectory(), "package.json"),
                 new File(publishWorkingDirectory, "package.json"));
 
+        // Determine scope to publish under
+        ConjurePublishPluginExtension extension = getProject().getExtensions()
+                .getByType(ConjurePublishPluginExtension.class);
+
         // Execute publish script
         getProject().exec(execSpec -> {
-            execSpec.commandLine("./scripts/publish.sh");
+            execSpec.commandLine("./scripts/publish.sh", extension.getScopeName());
             execSpec.setWorkingDir(publishWorkingDirectory);
         });
     }

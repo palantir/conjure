@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
 cd $(dirname $0)/..
-set -e
+set -eux
 
+if [ $# -ne 1 ]; then
+    echo "publish.sh <scope name>"
+    exit 1
+fi
+
+NPM_SCOPE=$1
 NPM_API_PATH="artifactory.palantir.build/artifactory/api/npm/all-npm"
-NPM_SCOPE="elements"
 
 # get npm auth token
 curl -sS -u${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD} "https://$NPM_API_PATH/auth/$NPM_SCOPE" >> .npmrc
@@ -14,4 +19,3 @@ chmod 0600 .npmrc
 
 echo "Publishing to NPM..."
 npm publish ./dist
-
