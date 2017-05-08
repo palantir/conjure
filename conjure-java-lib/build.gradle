@@ -2,6 +2,7 @@ apply from: "${rootDir}/gradle/publish-libs.gradle"
 
 dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'com.palantir.redaction:redaction-annotations'
     compile 'com.palantir.ri:resource-identifier'
     compile 'com.palantir.tokens:auth-tokens'
 
