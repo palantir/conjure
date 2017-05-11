@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.HttpMethod;
 
 public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefinition> {
-    ARGUMENT_TYPE(new ArgumentTypeValidator()),
+    ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
@@ -41,11 +41,12 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         validator.validate(definition);
     }
 
-    private static final class ArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
-        private static final Set<Class<? extends ConjureType>> ILLEGAL_ARG_TYPES = ImmutableSet.of(BinaryType.class);
+    private static final class NonBodyArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
+        private static final Set<Class<? extends ConjureType>> ILLEGAL_NON_BODY_ARG_TYPES
+                = ImmutableSet.of(BinaryType.class);
 
         private static boolean isIllegal(ConjureType type) {
-            return ILLEGAL_ARG_TYPES.stream()
+            return ILLEGAL_NON_BODY_ARG_TYPES.stream()
                     .filter(illegalClass -> illegalClass.isAssignableFrom(type.getClass()))
                     .count() > 0;
         }
@@ -55,10 +56,11 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
             definition.args().orElse(ImmutableMap.of())
                     .values()
                     .stream()
+                    .filter(arg -> !arg.paramType().equals(ArgumentDefinition.ParamType.BODY))
                     .map(ArgumentDefinition::type)
                     .forEach(type -> checkArgument(
                             !isIllegal(type),
-                            "Endpoint cannot have argument with type '%s'",
+                            "Endpoint cannot have non-body argument with type '%s'",
                             type));
         }
     }

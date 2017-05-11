@@ -15,6 +15,7 @@ import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.ws.rs.core.MediaType;
 
 public final class ClassServiceGenerator implements ServiceGenerator {
 
@@ -105,14 +107,31 @@ public final class ClassServiceGenerator implements ServiceGenerator {
             EndpointDefinition value, AuthDefinition defaultAuth, TypeMapper typeMapper) {
         AuthDefinition authDefinition = value.auth().orElse(defaultAuth);
 
+        String responseMediaType;
+        if (value.returns().map(type -> type instanceof BinaryType).orElse(false)) {
+            responseMediaType = MediaType.APPLICATION_OCTET_STREAM;
+        } else {
+            responseMediaType = MediaType.APPLICATION_JSON;
+        }
+
+        boolean consumesTypeIsBinary = value.args().map(
+                args -> args.values().stream()
+                        .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
+                                ArgumentDefinition.ParamType.BODY))).orElse(false);
+
+        String requestMediaType;
+        if (consumesTypeIsBinary) {
+            requestMediaType = MediaType.APPLICATION_OCTET_STREAM;
+        } else {
+            requestMediaType = MediaType.APPLICATION_JSON;
+        }
+
         Map<String, TypescriptExpression> keyValues = ImmutableMap.<String, TypescriptExpression>builder()
                 .put("endpointPath", StringExpression.of(serviceBasePath + value.http().path().path().toString()))
                 .put("endpointName", StringExpression.of(name))
                 .put("method", StringExpression.of(value.http().method()))
-                // TODO(rmcnamara): support other request types
-                .put("requestMediaType", StringExpression.of("application/json"))
-                // TODO(rmcnamara): support other request types
-                .put("responseMediaType", StringExpression.of("application/json"))
+                .put("requestMediaType", StringExpression.of(requestMediaType))
+                .put("responseMediaType", StringExpression.of(responseMediaType))
                 .put("requiredHeaders", ArrayExpression.of(
                         authDefinition.type() == AuthDefinition.AuthType.HEADER
                                 ? Lists.newArrayList(StringExpression.of("Authorization"))

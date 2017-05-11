@@ -91,4 +91,24 @@ export class TestService {
             responseMediaType: "application/json",
         });
     }
+
+    public uploadRawData(
+        input: any
+    ): Promise<void> {
+        return this.bridge.callEndpoint<void>({
+            data: input,
+            endpointName: "uploadRawData",
+            endpointPath: "/catalog/datasets/upload-raw",
+            method: "POST",
+            pathArguments: [
+            ],
+            queryArguments: {
+            },
+            requestMediaType: "application/octet-stream",
+            requiredHeaders: [
+                "Authorization",
+            ],
+            responseMediaType: "application/json",
+        });
+    }
 }

@@ -18,6 +18,7 @@ import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.types.JerseyMethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.JerseyReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
@@ -38,15 +39,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types());
         TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyReturnTypeClassNameVisitor::new);
+        TypeMapper methodTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyMethodTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
-                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
+                .map(entry -> generateService(entry.getKey(), entry.getValue(), returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toSet());
     }
 
     private JavaFile generateService(TypeName serviceName, ServiceDefinition serviceDefinition,
-            TypeMapper typeMapper, TypeMapper returnTypeMapper) {
+            TypeMapper returnTypeMapper, TypeMapper methodTypeMapper) {
         TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName.name())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
@@ -67,7 +68,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .map(endpoint -> generateServiceMethod(
                         endpoint.getKey(),
                         endpoint.getValue(),
-                        serviceDefinition.defaultAuth(), typeMapper, returnTypeMapper))
+                        serviceDefinition.defaultAuth(), returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.conjurePackage().name(), serviceBuilder.build())
@@ -79,18 +80,29 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             String endpointName,
             EndpointDefinition endpointDef,
             AuthDefinition defaultAuth,
-            TypeMapper typeMapper,
-            TypeMapper returnTypeMapper) {
+            TypeMapper returnTypeMapper,
+            TypeMapper methodTypeMapper) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", endpointDef.http().path())
                         .build())
-                .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, typeMapper));
+                .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, methodTypeMapper));
 
         if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
+                    .addMember("value", "$T.APPLICATION_OCTET_STREAM", ClassName.get("javax.ws.rs.core", "MediaType"))
+                    .build());
+        }
+
+        boolean consumesTypeIsBinary = endpointDef.args().map(
+                args -> args.values().stream()
+                        .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
+                                ArgumentDefinition.ParamType.BODY))).orElse(false);
+
+        if (consumesTypeIsBinary) {
+            methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Consumes"))
                     .addMember("value", "$T.APPLICATION_OCTET_STREAM", ClassName.get("javax.ws.rs.core", "MediaType"))
                     .build());
         }

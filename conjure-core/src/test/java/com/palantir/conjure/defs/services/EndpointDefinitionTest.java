@@ -30,7 +30,20 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Endpoint cannot have argument with type 'BinaryType{}'");
+                .hasMessage("Endpoint cannot have non-body argument with type 'BinaryType{}'");
+    }
+
+    @Test
+    public void testArgumentBodyTypeValidator() throws Exception {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(map(ParameterName.of("testArg"), ArgumentDefinition.builder()
+                        .type(BinaryType.of())
+                        .paramType(ArgumentDefinition.ParamType.BODY)
+                        .build()))
+                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")));
+
+        // Should not throw exception
+        definition.build();
     }
 
     @Test

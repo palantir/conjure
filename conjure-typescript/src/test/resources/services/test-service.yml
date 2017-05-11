@@ -71,3 +71,10 @@ services:
             docs: |
               A valid dataset resource identifier.
         returns: set<string>
+
+      uploadRawData:
+        http: POST /datasets/upload-raw
+        args:
+          input:
+            type: binary
+            param-type: body

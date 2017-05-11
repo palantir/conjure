@@ -87,7 +87,14 @@ services:
             markers:
              - Safe
         returns: optional<binary>
-        
+
+      uploadRawData:
+        http: POST /datasets/upload-raw
+        args:
+          input:
+            type: binary
+            param-type: body
+
       getBranches:
         http: GET /datasets/{datasetRid}/branches
         args:

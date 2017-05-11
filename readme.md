@@ -526,7 +526,7 @@ this service.
    ```
 
    and for:
-    * `type`: a valid Conjure type (`binary` not allowed)
+    * `type`: a valid Conjure type (`binary` only allowed when `param-type` is explicitly set to `body`)
     * (optional) `docs`: a standard string and generally treated throughout
       rendering as Markdown.
     * (optional) `deprecated`: a string that indicates that this endpoint

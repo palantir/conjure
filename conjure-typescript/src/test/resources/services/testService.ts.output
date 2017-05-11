@@ -13,4 +13,7 @@ export interface ITestService {
         datasetRid: string
     ): Promise<IDataset>;
     getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;
+    uploadRawData(
+        input: any
+    ): Promise<void>;
 }

@@ -243,8 +243,7 @@ public final class TypeMapper {
 
         @Override
         public String visit(BinaryType type) {
-            // TODO(jellis): support this
-            throw new RuntimeException("BinaryType not supported by conjure-typescript");
+            return "any";
         }
 
         @Override

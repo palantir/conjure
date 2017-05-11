@@ -6,6 +6,7 @@ import com.palantir.foundry.catalog.api.datasets.Dataset;
 import com.palantir.redaction.Safe;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
+import java.io.InputStream;
 import java.lang.Deprecated;
 import java.lang.String;
 import java.nio.ByteBuffer;
@@ -58,6 +59,11 @@ public interface TestService {
     Optional<ByteBuffer> maybeGetRawData(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
+
+    @POST
+    @Path("/datasets/upload-raw")
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    void uploadRawData(@HeaderParam("Authorization") AuthHeader authHeader, InputStream input);
 
     @GET
     @Path("/datasets/{datasetRid}/branches")

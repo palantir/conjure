@@ -10,11 +10,13 @@ import java.lang.Deprecated;
 import java.lang.Double;
 import java.lang.Integer;
 import java.lang.String;
+import java.lang.Void;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Generated;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -51,6 +53,10 @@ public interface TestService {
     Call<Optional<ByteBuffer>> maybeGetRawData(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    @POST("/catalog/datasets/upload-raw")
+    Call<Void> uploadRawData(
+            @Header("Authorization") AuthHeader authHeader, @Body RequestBody input);
 
     @GET("/catalog/datasets/{datasetRid}/branches")
     Call<Set<String>> getBranches(

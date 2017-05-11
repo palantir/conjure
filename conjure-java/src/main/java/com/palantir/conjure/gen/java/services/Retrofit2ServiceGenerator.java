@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.types.Retrofit2MethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
 import com.squareup.javapoet.AnnotationSpec;
@@ -45,16 +46,17 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types());
         TypeMapper returnTypeMapper =
                 new TypeMapper(conjureDefinition.types(), Retrofit2ReturnTypeClassNameVisitor::new);
+        TypeMapper methodTypeMapper =
+                new TypeMapper(conjureDefinition.types(), Retrofit2MethodTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
-                .map(entry -> generateService(entry.getKey(), entry.getValue(), typeMapper, returnTypeMapper))
+                .map(entry -> generateService(entry.getKey(), entry.getValue(), returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toSet());
     }
 
     private JavaFile generateService(TypeName serviceName, ServiceDefinition serviceDefinition,
-            TypeMapper typeMapper, TypeMapper returnTypeMapper) {
+            TypeMapper returnTypeMapper, TypeMapper methodTypeMapper) {
         TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName.name())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
@@ -69,8 +71,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                         endpoint.getValue(),
                         serviceDefinition.basePath(),
                         serviceDefinition.defaultAuth(),
-                        typeMapper,
-                        returnTypeMapper))
+                        returnTypeMapper,
+                        methodTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.conjurePackage().name(), serviceBuilder.build())
@@ -83,8 +85,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             EndpointDefinition endpointDef,
             PathDefinition basePath,
             AuthDefinition defaultAuth,
-            TypeMapper typeMapper,
-            TypeMapper returnTypeMapper) {
+            TypeMapper returnTypeMapper,
+            TypeMapper methodTypeMapper) {
         Set<ParameterName> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -114,7 +116,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         endpointDef.argsWithAutoDefined().ifPresent(args -> methodBuilder.addParameters(args.entrySet().stream()
                 .map(arg -> createEndpointParameter(
-                        typeMapper, encodedPathArgs, arg.getKey(), arg.getValue()))
+                        methodTypeMapper, encodedPathArgs, arg.getKey(), arg.getValue()))
                 .collect(Collectors.toList())));
 
         return methodBuilder.build();
@@ -154,12 +156,12 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     }
 
     private ParameterSpec createEndpointParameter(
-            TypeMapper typeMapper,
+            TypeMapper methodTypeMapper,
             Set<ParameterName> encodedPathArgs,
             ParameterName paramKey,
             ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
-                typeMapper.getClassName(def.type()),
+                methodTypeMapper.getClassName(def.type()),
                 paramKey.name());
 
         switch (def.paramType()) {
