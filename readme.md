@@ -707,7 +707,7 @@ Common strategies for specifying versions include:
 ### TypeScript Publication
 The TypeScript Publication plugin enables publishing typescript artifacts from projects using Conjure.
 
-When run, an npm package is published to ``@elements/${projectName}-conjure`
+When run, an npm package is published to the specified scope and package, defaulting to the `@elements` scope and the project name as the package name.
 
 To add the plugin, depend on it in your root project build.gradle:
 
@@ -723,6 +723,13 @@ Apply the plugin on projects containing generated TypeScript:
 
 ```gradle
 apply plugin: 'com.palantir.typescript-publish'
+```
+
+To configure the scope and package names:
+
+```gradle
+publishTypeScript.packageName = 'my-package'
+publishTypeScript.scopeName = 'my-scope'
 ```
 
 To publish, run the `publishTypeScript` task.

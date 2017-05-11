@@ -16,6 +16,7 @@ class ConjurePublishPluginTest extends GradleTestSpec {
             id 'com.palantir.typescript-publish'
         }
 
+        publishTypeScript.packageName = 'my-package'
         publishTypeScript.scopeName = 'my-scope'
         """
 
@@ -42,8 +43,7 @@ class ConjurePublishPluginTest extends GradleTestSpec {
         result.task(':compileTypeScriptJavaScript').outcome == TaskOutcome.SUCCESS
         result.task(':bundleJavaScript').outcome == TaskOutcome.SUCCESS
         bundledJavascriptOutputFile('api/testServiceAImpl.js').text.contains('var TestServiceA = ')
-        bundledJavascriptOutputFile('package.json').text.contains(String.format('"name": "@my-scope/%s-conjure"',
-                testDir.getName()))
+        bundledJavascriptOutputFile('package.json').text.contains('"name": "@my-scope/my-package"');
     }
 
     def readResource(String name) {
