@@ -41,14 +41,14 @@ public final class UnionTypeExample {
     }
 
     public static UnionTypeExample of(int value) {
-        return new UnionTypeExample(new NumberWrapper(value));
+        return new UnionTypeExample(new ThisFieldIsAnIntegerWrapper(value));
     }
 
     public <T> T accept(Visitor<T> visitor) {
-        if (value instanceof NumberWrapper) {
-            return visitor.visit(((NumberWrapper) value).value);
-        } else if (value instanceof SetWrapper) {
+        if (value instanceof SetWrapper) {
             return visitor.visit(((SetWrapper) value).value);
+        } else if (value instanceof ThisFieldIsAnIntegerWrapper) {
+            return visitor.visit(((ThisFieldIsAnIntegerWrapper) value).value);
         } else if (value instanceof StringExampleWrapper) {
             return visitor.visit(((StringExampleWrapper) value).value);
         } else if (value instanceof UnknownWrapper) {
@@ -62,12 +62,12 @@ public final class UnionTypeExample {
     public boolean equals(Object other) {
         return this == other
                 || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
-                || (other instanceof Integer
-                        && value instanceof NumberWrapper
-                        && Objects.equals(((NumberWrapper) value).value, other))
                 || (other instanceof Set
                         && value instanceof SetWrapper
                         && Objects.equals(((SetWrapper) value).value, other))
+                || (other instanceof Integer
+                        && value instanceof ThisFieldIsAnIntegerWrapper
+                        && Objects.equals(((ThisFieldIsAnIntegerWrapper) value).value, other))
                 || (other instanceof StringExample
                         && value instanceof StringExampleWrapper
                         && Objects.equals(((StringExampleWrapper) value).value, other));
@@ -94,9 +94,9 @@ public final class UnionTypeExample {
     }
 
     public interface Visitor<T> {
-        T visit(int value);
-
         T visit(Set<String> value);
+
+        T visit(int value);
 
         T visit(StringExample value);
 
@@ -110,8 +110,8 @@ public final class UnionTypeExample {
         defaultImpl = UnknownWrapper.class
     )
     @JsonSubTypes({
-        @JsonSubTypes.Type(NumberWrapper.class),
         @JsonSubTypes.Type(SetWrapper.class),
+        @JsonSubTypes.Type(ThisFieldIsAnIntegerWrapper.class),
         @JsonSubTypes.Type(StringExampleWrapper.class)
     })
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -201,17 +201,17 @@ public final class UnionTypeExample {
         }
     }
 
-    @JsonTypeName("number")
-    private static class NumberWrapper implements Base {
+    @JsonTypeName("thisFieldIsAnInteger")
+    private static class ThisFieldIsAnIntegerWrapper implements Base {
         private final int value;
 
         @JsonCreator
-        private NumberWrapper(@JsonProperty("number") int value) {
+        private ThisFieldIsAnIntegerWrapper(@JsonProperty("thisFieldIsAnInteger") int value) {
             Objects.requireNonNull(value);
             this.value = value;
         }
 
-        @JsonProperty("number")
+        @JsonProperty("thisFieldIsAnInteger")
         private int getValue() {
             return value;
         }
@@ -219,10 +219,11 @@ public final class UnionTypeExample {
         @Override
         public boolean equals(Object other) {
             return this == other
-                    || (other instanceof NumberWrapper && equalTo((NumberWrapper) other));
+                    || (other instanceof ThisFieldIsAnIntegerWrapper
+                            && equalTo((ThisFieldIsAnIntegerWrapper) other));
         }
 
-        private boolean equalTo(NumberWrapper other) {
+        private boolean equalTo(ThisFieldIsAnIntegerWrapper other) {
             return this.value == other.value;
         }
 
@@ -233,7 +234,7 @@ public final class UnionTypeExample {
 
         @Override
         public String toString() {
-            return new StringBuilder("NumberWrapper")
+            return new StringBuilder("ThisFieldIsAnIntegerWrapper")
                     .append("{")
                     .append("value")
                     .append(": ")

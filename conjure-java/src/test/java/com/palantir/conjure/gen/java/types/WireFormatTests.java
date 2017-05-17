@@ -155,7 +155,7 @@ public final class WireFormatTests {
         UnionTypeExample unionTypeInt = UnionTypeExample.of(5);
         String serializedUnionTypeStringExample = "{\"type\":\"stringExample\",\"stringExample\":{\"string\":\"foo\"}}";
         String serializedUnionTypeSet = "{\"type\":\"set\",\"set\":[\"item\"]}";
-        String serializedUnionTypeInt = "{\"type\":\"number\",\"number\":5}";
+        String serializedUnionTypeInt = "{\"type\":\"thisFieldIsAnInteger\",\"thisFieldIsAnInteger\":5}";
 
         // serialization
         assertThat(mapper.writeValueAsString(unionTypeStringExample)).isEqualTo(serializedUnionTypeStringExample);

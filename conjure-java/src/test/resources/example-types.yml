@@ -77,4 +77,4 @@ types:
             type: StringExample
             docs: Docs for when UnionTypeExample is of type StringExample.
           set: set<string>
-          number: integer
+          thisFieldIsAnInteger: integer
