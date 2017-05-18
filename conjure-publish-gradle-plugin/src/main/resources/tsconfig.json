@@ -9,7 +9,8 @@
     "outDir": "build",
     "removeComments": false,
     "stripInternal": true,
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": []
   },
   "exclude": [
     "build",
