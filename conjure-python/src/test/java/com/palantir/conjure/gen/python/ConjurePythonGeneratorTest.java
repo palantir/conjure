@@ -119,7 +119,7 @@ public final class ConjurePythonGeneratorTest {
                     file.getName().replaceAll(".yml$", ""));
             Files.createParentDirs(referenceCodeLocation.toFile());
             ConjurePythonGenerator generator = new ConjurePythonGenerator(
-                    new DefaultBeanGenerator(ImmutableSet.of()), new ClientGenerator());
+                    new DefaultBeanGenerator(ImmutableSet.of(ExperimentalFeatures.UnionTypes)), new ClientGenerator());
             generator.write(conjure, new DefaultPythonFileWriter(referenceCodeLocation));
         }
 

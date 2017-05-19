@@ -72,6 +72,7 @@ public final class ClientGenerator {
 
                     return PythonEndpointDefinition.builder()
                             .methodName(entry.getKey())
+                            .basePath(serviceDefinition.basePath())
                             .http(ed.http())
                             .authDefinition(ed.auth().orElse(serviceDefinition.defaultAuth()))
                             .params(params)
@@ -96,8 +97,8 @@ public final class ClientGenerator {
                 .addAllRequiredImports(PythonService.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
                 .className(serviceName.name())
+                .docs(serviceDefinition.docs())
                 .addAllEndpointDefinitions(endpoints)
                 .build();
-
     }
 }

@@ -66,6 +66,7 @@ class ExplicitCreateDatasetRequest(ConjureBeanType):
         return self._path
 
 class TestService(Service):
+    '''A Markdown description of the service.'''
 
     def getFileSystems(self, authHeader):
         # type: (str) -> Dict[str, BackingFileSystem]
@@ -84,7 +85,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/fileSystems'
+        _path = '/catalog/fileSystems'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -116,7 +117,7 @@ class TestService(Service):
 
         _json = ConjureEncoder().default(request) # type: Any
 
-        _path = '/datasets'
+        _path = '/catalog/datasets'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -149,7 +150,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}'
+        _path = '/catalog/datasets/{datasetRid}'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -182,7 +183,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/raw'
+        _path = '/catalog/datasets/{datasetRid}/raw'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -217,7 +218,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/raw-maybe'
+        _path = '/catalog/datasets/{datasetRid}/raw-maybe'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -250,7 +251,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/branches'
+        _path = '/catalog/datasets/{datasetRid}/branches'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -283,7 +284,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/branchesDeprecated'
+        _path = '/catalog/datasets/{datasetRid}/branchesDeprecated'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -317,7 +318,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/branches/{branch}/resolve'
+        _path = '/catalog/datasets/{datasetRid}/branches/{branch}/resolve'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -350,7 +351,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/datasets/{datasetRid}/testParam'
+        _path = '/catalog/datasets/{datasetRid}/testParam'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -382,7 +383,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/boolean'
+        _path = '/catalog/boolean'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -414,7 +415,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/double'
+        _path = '/catalog/double'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore
@@ -446,7 +447,7 @@ class TestService(Service):
 
         _json = None # type: Any
 
-        _path = '/integer'
+        _path = '/catalog/integer'
         _path = _path.format(**_path_params)
 
         _response = self._requests_session.request( # type: ignore

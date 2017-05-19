@@ -44,8 +44,8 @@ public interface PythonService extends PythonClass {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.maintainingIndent(() -> {
             poetWriter.writeIndentedLine(String.format("class %s(Service):", className()));
-            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
             poetWriter.increaseIndent();
+            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.trim())));
 
             endpointDefinitions().forEach(endpointDefinition -> {
                 poetWriter.writeLine();

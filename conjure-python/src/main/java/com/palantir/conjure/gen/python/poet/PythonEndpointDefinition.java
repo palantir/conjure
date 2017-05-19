@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition.AuthType;
+import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.RequestLineDefinition;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,8 @@ import org.immutables.value.Value;
 public interface PythonEndpointDefinition extends Emittable {
 
     String methodName();
+
+    PathDefinition basePath();
 
     RequestLineDefinition http();
 
@@ -131,7 +134,9 @@ public interface PythonEndpointDefinition extends Emittable {
 
             // fix the path, add path params
             poetWriter.writeLine();
-            String fixedPath = http().path().toString().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
+
+            PathDefinition fullPath = basePath().resolve(http().path());
+            String fixedPath = fullPath.toString().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
             poetWriter.writeIndentedLine("_path = '%s'", fixedPath);
             poetWriter.writeIndentedLine("_path = _path.format(**_path_params)");
 
