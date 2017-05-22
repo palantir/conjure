@@ -35,6 +35,7 @@ Contents:
  - [Gradle Plugin](#gradle-plugin)
    - [Compilation](#conjure-compilation)
    - [TypeScript Publishing](#typescript-publishing)
+ - [Feature Requests](#feature-requests)
 
 Why?
 ----
@@ -733,3 +734,25 @@ publishTypeScript.scopeName = 'my-scope'
 ```
 
 To publish, run the `publishTypeScript` task.
+
+
+Feature Requests
+----------------
+
+Conjure is a widely-used framework and as such has comparatively strict back-compatibility requirements. Further, since
+Conjure supports multiple language, features can only be added if we have confidence in its implementation across
+supported languages. This implies that the default position regarding new features is conservative: we prefer Conjure to
+be as small as possible. If you would like to propose a feature, please reach out to conjure-interest@palantir.com or
+start a discussion on a Github issue.
+
+Below is a list of features that we have considered but are unlikely to support:
+
+### Support for TEXT_PLAIN endpoints
+Conjure is an opinionated RPC library, not a generic HTTP IDL. As such, we prefer homogeneous APIs and today support
+only APPLICATION_JSON endpoints. Service authors migrating existing APIs with TEXT_PLAIN endpoints to Conjure are
+advised to split the API in two parts and implement the TEXT_PLAIN endpoints outside Conjure.
+
+### Support for polymorphic types
+Polymorphic types are hard to implement, in particular across languages. Following prior art from Google's Protocol
+Buffers, we do not support polymorphic types or interfaces. Union types offer a limited form of polymorphism that allows
+library authors to encode alternative return values.
