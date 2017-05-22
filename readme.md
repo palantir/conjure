@@ -750,9 +750,11 @@ Below is a list of features that we have considered but are unlikely to support:
 ### Support for TEXT_PLAIN endpoints
 Conjure is an opinionated RPC library, not a generic HTTP IDL. As such, we prefer homogeneous APIs and today support
 only APPLICATION_JSON endpoints. Service authors migrating existing APIs with TEXT_PLAIN endpoints to Conjure are
-advised to split the API in two parts and implement the TEXT_PLAIN endpoints outside Conjure.
+advised to split the API in two parts and implement the TEXT_PLAIN endpoints outside Conjure. For example, see
+https://github.palantir.build/foundry/conjure/issues/418 .
 
 ### Support for polymorphic types
 Polymorphic types are hard to implement, in particular across languages. Following prior art from Google's Protocol
 Buffers, we do not support polymorphic types or interfaces. Union types offer a limited form of polymorphism that allows
-library authors to encode alternative return values.
+library authors to encode alternative return values. For example, see
+https://github.palantir.build/foundry/conjure/issues/201 .
