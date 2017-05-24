@@ -77,4 +77,14 @@ public final class ConjureTypescriptServiceTest {
                         .filepathToExport("./test/api/myDuplicateServiceImpl")
                         .build());
     }
+
+    @Test
+    public void testTypescriptServiceGenerator_doesNotProduceMultipleSlashes() throws IOException {
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/services/test-service-root-path.yml"));
+        Set<TypescriptFile> files = new DefaultServiceGenerator().generate(def);
+        String implFile = files.stream().filter(file -> file.name().equals("MyServiceImpl"))
+                .findFirst().get().writeToString();
+        assertThat(implFile).contains("/foo");
+        assertThat(implFile).doesNotContain("//foo");
+    }
 }

@@ -127,7 +127,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         }
 
         Map<String, TypescriptExpression> keyValues = ImmutableMap.<String, TypescriptExpression>builder()
-                .put("endpointPath", StringExpression.of(serviceBasePath + value.http().path().path().toString()))
+                .put("endpointPath", StringExpression.of(
+                        serviceBasePath.resolve(value.http().path()).path().toString()))
                 .put("endpointName", StringExpression.of(name))
                 .put("method", StringExpression.of(value.http().method()))
                 .put("requestMediaType", StringExpression.of(requestMediaType))

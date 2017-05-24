@@ -1,0 +1,13 @@
+types:
+  definitions:
+    default-package: com.palantir.test.api
+    objects: {}
+
+services:
+  MyService:
+    name: RootPathService
+    package: com.palantir.test.api
+    base-path: /
+    endpoints:
+      getFoo:
+        http: GET /foo
