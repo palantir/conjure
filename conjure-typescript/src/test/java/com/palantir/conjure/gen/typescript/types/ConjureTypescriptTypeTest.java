@@ -50,7 +50,8 @@ public final class ConjureTypescriptTypeTest {
                 exportStatement("IAnyMapExample", "anyMapExample"),
                 exportStatement("IManyFieldExample", "manyFieldExample"),
                 exportStatement("IUnionTypeExample", "unionTypeExample"),
-                exportStatement("IUnionReferenceExample", "unionReferenceExample"));
+                exportStatement("IUnionReferenceExample", "unionReferenceExample"),
+                exportStatement("IEmptyObjectExample", "emptyObjectExample"));
     }
 
     private ExportStatement exportStatement(String typeName, String filename) {

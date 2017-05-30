@@ -78,3 +78,5 @@ types:
             docs: Docs for when UnionTypeExample is of type StringExample.
           set: set<string>
           thisFieldIsAnInteger: integer
+      EmptyObjectExample:
+        fields: {}

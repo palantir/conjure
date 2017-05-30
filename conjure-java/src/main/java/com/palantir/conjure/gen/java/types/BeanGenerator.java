@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.java.types;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
@@ -61,6 +62,9 @@ public final class BeanGenerator implements TypeGenerator {
     /** The maximum number of parameters for which a static factory method is generated in addition to the builder. */
     private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
 
+    /** The name of the singleton instance field generated for empty objects. */
+    private static final String SINGLETON_INSTANCE_NAME = "INSTANCE";
+
     public BeanGenerator(Settings settings) {
         this(settings, ImmutableSet.of());
     }
@@ -111,14 +115,18 @@ public final class BeanGenerator implements TypeGenerator {
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
-                        .addMember("builder", "$T.class", builderClass).build())
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
-                .addMethods(createGetters(fields))
+                .addMethods(createGetters(fields));
+
+        if (!poetFields.isEmpty()) {
+            typeBuilder
                 .addMethod(MethodSpecs.createEquals(objectClass))
                 .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
-                .addMethod(MethodSpecs.createHashCode(poetFields))
+                .addMethod(MethodSpecs.createHashCode(poetFields));
+        }
+
+        typeBuilder
                 .addMethod(MethodSpecs.createToString(typeName.name(), poetFields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
@@ -131,10 +139,16 @@ public final class BeanGenerator implements TypeGenerator {
                     .addMethod(createAddFieldIfMissing(nonPrimitivePoetFields.size()));
         }
 
-        typeBuilder
-                .addMethod(createBuilder(builderClass))
-                .addType(BeanBuilderGenerator.generate(
-                        typeMapper, objectClass, builderClass, typeDef, settings.ignoreUnknownProperties()));
+        if (poetFields.isEmpty()) {
+            typeBuilder.addField(createSingletonField(objectClass));
+        } else {
+            typeBuilder
+                    .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
+                            .addMember("builder", "$T.class", builderClass).build())
+                    .addMethod(createBuilder(builderClass))
+                    .addType(BeanBuilderGenerator.generate(
+                            typeMapper, objectClass, builderClass, typeDef, settings.ignoreUnknownProperties()));
+        }
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 
@@ -143,6 +157,13 @@ public final class BeanGenerator implements TypeGenerator {
         return JavaFile.builder(typePackage.name(), typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
+                .build();
+    }
+
+    private static FieldSpec createSingletonField(ClassName objectClass) {
+        return FieldSpec
+                .builder(objectClass, SINGLETON_INSTANCE_NAME, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("new $T()", objectClass)
                 .build();
     }
 
@@ -237,16 +258,23 @@ public final class BeanGenerator implements TypeGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(objectClass);
 
-        builder.addCode("return builder()");
-        for (FieldSpec spec : fields) {
-            if (isOptional(spec)) {
-                builder.addCode("\n    .$L(Optional.of($L))", spec.name, spec.name);
-            } else {
-                builder.addCode("\n    .$L($L)", spec.name, spec.name);
+        if (fields.isEmpty()) {
+            builder
+                    .addAnnotation(JsonCreator.class)
+                    .addCode("return $L;", SINGLETON_INSTANCE_NAME);
+        } else {
+            builder.addCode("return builder()");
+            for (FieldSpec spec : fields) {
+                if (isOptional(spec)) {
+                    builder.addCode("\n    .$L(Optional.of($L))", spec.name, spec.name);
+                } else {
+                    builder.addCode("\n    .$L($L)", spec.name, spec.name);
+                }
+                builder.addParameter(ParameterSpec.builder(getTypeNameWithoutOptional(spec), spec.name).build());
             }
-            builder.addParameter(ParameterSpec.builder(getTypeNameWithoutOptional(spec), spec.name).build());
+            builder.addCode("\n    .build();\n");
         }
-        builder.addCode("\n    .build();\n");
+
         return builder.build();
     }
 

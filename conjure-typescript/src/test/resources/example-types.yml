@@ -58,3 +58,5 @@ types:
       UnionReferenceExample:
         fields:
           unionField: UnionTypeExample
+      EmptyObjectExample:
+        fields: {}

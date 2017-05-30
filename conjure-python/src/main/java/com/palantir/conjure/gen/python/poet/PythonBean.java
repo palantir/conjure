@@ -79,16 +79,20 @@ public interface PythonBean extends PythonClass {
 
         poetWriter.writeLine();
 
-        // constructor
-        poetWriter.writeIndentedLine(String.format("def __init__(self, %s):",
-                Joiner.on(", ").join(fields().stream().map(PythonField::attributeName).collect(Collectors.toList()))));
-        poetWriter.increaseIndent();
-        poetWriter.writeIndentedLine(String.format("# type: (%s) -> None",
-                Joiner.on(", ").join(fields().stream().map(PythonField::myPyType).collect(Collectors.toList()))));
-        fields().forEach(field -> {
-            poetWriter.writeIndentedLine(String.format("self._%s = %s", field.attributeName(), field.attributeName()));
-        });
-        poetWriter.decreaseIndent();
+        // constructor -- only if there are fields
+        if (!fields().isEmpty()) {
+            poetWriter.writeIndentedLine(String.format("def __init__(self, %s):",
+                    Joiner.on(", ").join(
+                            fields().stream().map(PythonField::attributeName).collect(Collectors.toList()))));
+            poetWriter.increaseIndent();
+            poetWriter.writeIndentedLine(String.format("# type: (%s) -> None",
+                    Joiner.on(", ").join(fields().stream().map(PythonField::myPyType).collect(Collectors.toList()))));
+            fields().forEach(field -> {
+                poetWriter.writeIndentedLine(
+                        String.format("self._%s = %s", field.attributeName(), field.attributeName()));
+            });
+            poetWriter.decreaseIndent();
+        }
 
         // each property
         fields().forEach(field -> {

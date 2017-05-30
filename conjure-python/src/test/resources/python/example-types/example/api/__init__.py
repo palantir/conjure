@@ -415,3 +415,13 @@ class UnionTypeExample(ConjureUnionType):
         # type: () -> int
         return self._number
 
+class EmptyObjectExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+        }
+
+
+

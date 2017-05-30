@@ -32,9 +32,7 @@ public final class MethodSpecs {
     }
 
     public static MethodSpec createEqualTo(TypeName thisClass, Collection<FieldSpec> fields) {
-        CodeBlock equalsTo = CodeBlocks.of(fields.stream()
-                .map(MethodSpecs::createEqualsStatement)
-                .collect(joining(CodeBlock.of(" && "))));
+        CodeBlock equalsTo = createEqualsToStatement(fields);
 
         return MethodSpec.methodBuilder("equalTo")
                 .addModifiers(Modifier.PRIVATE)
@@ -88,6 +86,16 @@ public final class MethodSpecs {
                 .add(".append($N)", fieldName)
                 .add("\n")
                 .build();
+    }
+
+    private static CodeBlock createEqualsToStatement(Collection<FieldSpec> fields) {
+        if (fields.isEmpty()) {
+            return CodeBlock.of("$L", true);
+        }
+
+        return CodeBlocks.of(fields.stream()
+                .map(MethodSpecs::createEqualsStatement)
+                .collect(joining(CodeBlock.of(" && "))));
     }
 
     private static CodeBlock createEqualsStatement(FieldSpec field) {
