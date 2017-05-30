@@ -42,7 +42,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     }
 
     private static final class NonBodyArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
-        private static final Set<Class<? extends ConjureType>> ILLEGAL_NON_BODY_ARG_TYPES
+        private static final ImmutableSet<Class<? extends ConjureType>> ILLEGAL_NON_BODY_ARG_TYPES
                 = ImmutableSet.of(BinaryType.class);
 
         private static boolean isIllegal(ConjureType type) {
