@@ -1,4 +1,6 @@
 machine:
+  post:
+    - wget -qO- https://artifactory.palantir.build/artifactory/internal-dist-thirdparty/oracle/jce_policy/8/jce_policy-8.zip | bsdtar -xvf- -C /tmp && sudo cp /tmp/UnlimitedJCEPolicyJDK8/* $JAVA_HOME/jre/lib/security/
   java:
     version: oraclejdk8
   environment:
@@ -20,11 +22,11 @@ deployment:
     owner: foundry
     commands:
       - git clean -xfd
-      - ./gradlew -i artifactoryPublish condaPublish
+      - ./gradlew -i artifactoryPublish condaPublish exartisi
   releases:
     tag: /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/
     owner: foundry
     commands:
       - git clean -xfd
-      - ./gradlew -i artifactoryPublish condaPublish
+      - ./gradlew -i artifactoryPublish condaPublish exartisi
 
