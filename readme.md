@@ -593,22 +593,6 @@ project.
 The Conjure compilation plugin generates code for pre-defined output types
 and enables importing of remote Conjure types for inclusion in definitions.
 
-To help manage multiple output targets, the plugin will detect and configure
-subprojects with standard names defined beneath the project where the plugin
-is applied. Omitting a subproject will omit the output target.
-
-Available output targets using the plugin:
- * `<proj>:<proj>-objects`: Java
-   * all of the defined bean types
-   * ignores unknown properties on objects during deserialization
-   * safely encapsulates unknown enumeration values during deserialization
- * `<proj>:<proj>-jersey`: Java client/service definitions using Jersey
-   * requires and automatically depends on `-objects` project
- * `<proj>:<proj>-retrofit`: Java client definitions using Retrofit
-   * requires and automatically depends on `-objects` project
- * `<proj>:<proj>-typescript`: TypeScript
- * (Experimental) `<proj>:<proj>-python`: Python
-
 Apply the following buildscript configuration to your root project to make the plugin
 available to subprojects:
 ```gradle
@@ -627,7 +611,11 @@ Apply the Conjure compilation plugin to the project where Conjure source will be
 apply plugin: 'com.palantir.conjure'
 ```
 
-In the root directory `settings.gradle` file, include expected output targets:
+To help manage multiple output targets, the plugin will detect and configure
+subprojects with standard names defined beneath the project where the plugin is
+applied. Omitting a subproject will omit the output target. Example of a
+`settings.gradle` file with all Conjure output targets enabled:
+
 ```gradle
 // project where com.palantir.conjure plugin is applied
 include '<proj>'
@@ -646,7 +634,9 @@ The plugin then emits tailored outputs to each of these subprojects:
    * ignores unknown properties on objects during deserialization
    * safely encapsulates unknown enumeration values during deserialization
  * `<proj>-jersey` (Java client/service definitions using Jersey)
+   * requires and automatically depends on `-objects` project
  * `<proj>-retrofit` (Java client definitions using Retrofit)
+   * requires and automatically depends on `-objects` project
  * `<proj>-typescript` (TypeScript)
  * (Experimental) `<proj>-python` (Python)
 
@@ -697,8 +687,8 @@ Common strategies for specifying versions include:
    subprojects {
        configurations.compile {
            resolutionStrategy {
-               force 'com.palantir.conjure:conjure-java-lib:0.26.0'
-               force 'com.squareup.retrofit2:retrofit:2.1.0'
+               force 'com.palantir.conjure:conjure-java-lib:0.31.0'
+               force 'com.squareup.retrofit2:retrofit:2.2.0'
                force 'javax.ws.rs:javax.ws.rs-api:2.0.1'
            }
        }
