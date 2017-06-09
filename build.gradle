@@ -41,6 +41,10 @@ allprojects {
 
     dependencyRecommendations {
         propertiesFile file: project.rootProject.file('versions.props')
+        def subprojectVersions = project.file('versions.props')
+        if (subprojectVersions.exists()) {
+            propertiesFile file: subprojectVersions
+        }
     }
 
     configurations.all {
