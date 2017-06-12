@@ -8,6 +8,7 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
@@ -140,7 +141,13 @@ public final class BeanGenerator implements TypeGenerator {
         }
 
         if (poetFields.isEmpty()) {
-            typeBuilder.addField(createSingletonField(objectClass));
+            // Need to add JsonSerialize annotation which indicates that the empty bean serializer should be used to
+            // serialize this class. Without this annotation no serializer will be set for this class, thus preventing
+            // serialization.
+            // See https://github.palantir.build/foundry/conjure/pull/444.
+            typeBuilder
+                    .addAnnotation(JsonSerialize.class)
+                    .addField(createSingletonField(objectClass));
         } else {
             typeBuilder
                     .addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)

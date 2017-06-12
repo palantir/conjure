@@ -21,6 +21,7 @@ import org.junit.rules.ExpectedException;
 import test.api.BinaryExample;
 import test.api.DateTimeExample;
 import test.api.DoubleAliasExample;
+import test.api.EmptyObjectExample;
 import test.api.EnumExample;
 import test.api.IntegerAliasExample;
 import test.api.ListExample;
@@ -110,6 +111,16 @@ public final class WireFormatTests {
 
         assertThat(SetExample.builder().items("a").items("b").build().hashCode())
                 .isEqualTo(SetExample.builder().items("b").items("a").build().hashCode());
+    }
+
+    @Test
+    public void testEmptyObjectsSerialize() throws Exception {
+        assertThat(mapper.writeValueAsString(EmptyObjectExample.of())).isEqualTo("{}");
+    }
+
+    @Test
+    public void testEmptyObjectsDeserialize() throws Exception {
+        assertThat(mapper.readValue("{}", EmptyObjectExample.class)).isEqualTo(EmptyObjectExample.of());
     }
 
     @Test
