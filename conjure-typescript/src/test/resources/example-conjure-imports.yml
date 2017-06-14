@@ -9,6 +9,7 @@ types:
         fields:
           string: string
           imported: importedTypes.StringExample
+          aliased: importedTypes.AliasExample
 
 services:
   TestService:

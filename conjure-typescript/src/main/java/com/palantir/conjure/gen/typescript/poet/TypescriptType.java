@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.typescript.poet;
 
+import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import org.immutables.value.Value;
 
@@ -11,6 +12,11 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface TypescriptType extends Emittable {
     String name();
+
+    @Value.Derived
+    default boolean isPrimitive() {
+        return ImmutableList.of("number", "string", "boolean").contains(name());
+    }
 
     @Override
     default void emit(TypescriptPoetWriter writer) {

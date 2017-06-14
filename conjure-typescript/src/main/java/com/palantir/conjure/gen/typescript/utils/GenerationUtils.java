@@ -87,6 +87,7 @@ public final class GenerationUtils {
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
                 .filter(referenceType -> !referenceType.type().equals(sourceName))
+                .filter(referenceType -> !mapper.getTypescriptType(referenceType).isPrimitive())
                 .map(referenceType -> {
                     Optional<ConjurePackage> maybeDestName = mapper.getContainingPackage(referenceType);
                     return maybeDestName.map(destName -> {
