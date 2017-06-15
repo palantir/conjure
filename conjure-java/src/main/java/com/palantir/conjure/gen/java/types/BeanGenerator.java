@@ -14,6 +14,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.SetType;
@@ -233,8 +234,13 @@ public final class BeanGenerator implements TypeGenerator {
                 .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
                         .addMember("value", "$S", field.jsonKey())
                         .build())
-                .addStatement("return this.$N", field.poetSpec().name)
                 .returns(field.poetSpec().type);
+
+        if (field.conjureDef().type() instanceof BinaryType) {
+            getterBuilder.addStatement("return this.$N.asReadOnlyBuffer()", field.poetSpec().name);
+        } else {
+            getterBuilder.addStatement("return this.$N", field.poetSpec().name);
+        }
 
         if (field.conjureDef().docs().isPresent()) {
             getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(field.conjureDef().docs().get(), "\n"));

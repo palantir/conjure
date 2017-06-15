@@ -22,7 +22,7 @@ public final class BinaryExample {
 
     @JsonProperty("binary")
     public ByteBuffer getBinary() {
-        return this.binary;
+        return this.binary.asReadOnlyBuffer();
     }
 
     @Override
@@ -92,7 +92,9 @@ public final class BinaryExample {
 
         @JsonSetter("binary")
         public Builder binary(ByteBuffer binary) {
-            this.binary = Objects.requireNonNull(binary, "binary cannot be null");
+            Objects.requireNonNull(binary, "binary cannot be null");
+            this.binary = ByteBuffer.allocate(binary.remaining()).put(binary.duplicate());
+            this.binary.rewind();
             return this;
         }
 

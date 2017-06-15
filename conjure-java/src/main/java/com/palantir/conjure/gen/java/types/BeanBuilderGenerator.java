@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -27,6 +28,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -197,6 +199,14 @@ public final class BeanBuilderGenerator {
                     "this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))", spec.name, Objects.class);
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
+        } else if (type instanceof BinaryType) {
+            return CodeBlock.builder()
+                    .addStatement("$2T.requireNonNull($1N, \"$1N cannot be null\")", spec.name, Objects.class)
+                    .addStatement("this.$1N = $2T.allocate($1N.remaining()).put($1N.duplicate())",
+                            spec.name,
+                            ByteBuffer.class)
+                    .addStatement("this.$1N.rewind()", spec.name)
+                    .build();
         } else if (spec.type.isPrimitive()) {
             // primitive type non-nullity already enforced
             return CodeBlocks.statement("this.$1N = $1N", spec.name);
