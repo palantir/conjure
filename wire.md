@@ -1,6 +1,46 @@
 Conjure Wire Format
 -------------------
 
+This document explains the JSON serialization format for Conjure-defined types. Every Conjure object (including
+primitives, complex objects, containers, etc.) is representable as a JSON object such that, intuitively,
+`deserialize(serialize(object)) == object`.
+
+
+## Recursive definition of the JSON serialization format
+
+The JSON format `json(o)` for a Conjure object `o` can be recursively defined as follows:
+- If `o` is a primitive Conjure type, then `json(o)` is the corresponding primitive JSON type:
+  - Conjure `string` → JSON `string`
+  - Conjure `integer` → JSON `number`
+  - Conjure `double` → JSON `number`
+  - Conjure `boolean` → JSON `boolean`.
+- If `o` is a Conjure `object`, then `json(o)` is a JSON `object` whose keys and values are obtained from `o`'s keys and
+  values using `json(·)`. For any key with Conjure type `optional<?>`, the key/value pair may be omitted from the JSON map
+  if the value is absent in `o`; alternatively, the value may be serialized using the serialization definition of
+  `optional`, see below.
+- If `o` is a Conjure `union` object `Union[<name>: <value>]` (where <name> is the name of one of the variants and
+<value> is the corresponding value), then `json(o)` is the JSON `object`
+  `{ "type" : "<name>", "<name>" : json(<value>) }` (with slight abuse of notation).
+- If `o` is a Conjure `map`, then `json(o)` is a JSON `object` whose keys and values are serialized using `json(·)`
+- If `o` is a Conjure collection (`list`, `set`), then `json(o)` is a JSON `array` whose elements are serialized using
+  `json(.)`
+- If `o` is a Conjure `alias` object `alias[v]`, then `json(o) = json(v)`
+- If `o` is a Conjure `optional` object `optional[v]`, then `json(o)` is JSON `null` if `v` is absent, and `json(v)`
+  otherwise
+- If `o` is a Conjure `safelong`, then `json(o)` is a JSON `number` representing `o`; for example,
+  `json(safelong[10]) = 10`
+- If `o` is a Conjure `binary` object `binary[d]`, then `json(o)` is the Base64-encoded JSON `string` representation
+  of the binary data `d`
+- If `o` is a Conjure `datetime`, then `json(o)` is the ISO-8601-formatted JSON `string` representation of the date
+- If `o` is a Conjure `enum`, then `json(o)` is the JSON `string` representing the enum value
+- If `o` is a Conjure `any` object, then the serialization format is undefined. Implementations should strive to
+  serialize nested or complex `any` objects as naturally corresponding JSON `objects`.
+
+
+## Edge cases considered
+
+The following is a non-exhaustive list of serialization/deserialization edge cases.
+
 ### Empty or null `optional`, `map`, `set` and `list` deserialize without error.
 
 given:
