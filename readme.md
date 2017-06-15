@@ -301,7 +301,7 @@ has not yet been an issue, but please file an issue if this is something that yo
 encounter that causes pain. In the mean time, this can be worked around by
 defining an imported type that imports a compatible type that is defined externally.
 
-#### Union Definitions
+#### (Experimental) Union Definitions
 Conjure supports unions, where a union contains exactly one of several possible types. Each union definition consists of
 a type alias, an optional package, and a `union` block, which is a map of name (used for serialization of the union
 type) to a member type definition. Member types may include any other Conjure type (built-ins, imports, etc.).
@@ -364,6 +364,14 @@ depending on the wrapped type. The interface includes a `visit()` method for eac
 `visitUnknown(String unknownType)` method which is executed when the wrapped object does not match any of the known
 member types. Clients should implement the `visitUnknown` method by logging a warning, while servers should treat the
 execution of this method as an exceptional state.
+
+Because union types are an experimental feature, to use them, add the following to `build.gradle`:
+
+```gradle
+conjure {
+  experimentalFeature "UnionTypes"
+}
+```
 
 #### Enum Definitions
 Each enum definition consists of a type alias, an optional package, and a list
