@@ -6,9 +6,11 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
+import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,10 +27,10 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testComposition() throws IOException {
+    public void testCompositionVanilla() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
 
-        List<Path> files = new Retrofit2ServiceGenerator().emit(def, folder.getRoot());
+        List<Path> files = new Retrofit2ServiceGenerator(ImmutableSet.of()).emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
@@ -38,6 +40,27 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
             }
 
             assertThat(readFromFile(file)).isEqualTo(readFromResource("/test/api/" + file.getFileName() + ".retrofit"));
+        }
+    }
+
+    @Test
+    public void testCompositionCompletableFuture() throws IOException {
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
+
+        List<Path> files = new Retrofit2ServiceGenerator(
+                ImmutableSet.of(ExperimentalFeatures.RetrofitCompletableFutures))
+                .emit(def, folder.getRoot());
+
+        for (Path file : files) {
+            if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
+                Path output = Paths.get("src/test/resources/test/api/"
+                        + file.getFileName() + ".retrofit_completable_future");
+                Files.delete(output);
+                Files.copy(file, output);
+            }
+
+            assertThat(readFromFile(file)).isEqualTo(
+                    readFromResource("/test/api/" + file.getFileName() + ".retrofit_completable_future"));
         }
     }
 }

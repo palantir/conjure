@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.Supplier;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -26,13 +27,13 @@ public class CompileConjureJavaServiceTask extends SourceTask {
     private File outputDirectory;
 
     @Input
-    private ServiceGenerator serviceGenerator;
+    private Supplier<ServiceGenerator> serviceGenerator;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
-    public final void setServiceGenerator(ServiceGenerator serviceGenerator) {
+    public final void setServiceGenerator(Supplier<ServiceGenerator> serviceGenerator) {
         this.serviceGenerator = serviceGenerator;
     }
 
@@ -52,7 +53,7 @@ public class CompileConjureJavaServiceTask extends SourceTask {
 
     private void compileFile(Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        serviceGenerator.emit(conjure, outputDirectory);
+        serviceGenerator.get().emit(conjure, outputDirectory);
     }
 
 }

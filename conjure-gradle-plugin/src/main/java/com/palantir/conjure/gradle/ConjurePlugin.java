@@ -6,7 +6,7 @@ package com.palantir.conjure.gradle;
 
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
-import com.palantir.conjure.gen.java.types.BeanGenerator;
+import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
@@ -69,6 +69,12 @@ public class ConjurePlugin implements Plugin<Project> {
         final String typescriptProjectName = project.getName() + "-typescript";
         final String pythonProjectName = project.getName() + "-python";
 
+        final Supplier<Set<ExperimentalFeatures>> experimentalFeaturesSupplier =
+                () -> extension.getExperimentalFeatures()
+                        .stream()
+                        .map(ExperimentalFeatures::valueOf)
+                        .collect(Collectors.toSet());
+
         final Project objectsProject;
         if (project.findProject(objectsProjectName) != null) {
             objectsProject = project.project(objectsProjectName, (subproj) -> {
@@ -81,15 +87,7 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
-                            task.setExperimentalFeatures(new Supplier<Set<BeanGenerator.ExperimentalFeatures>>() {
-                                @Override
-                                public Set<BeanGenerator.ExperimentalFeatures> get() {
-                                    return extension.getExperimentalFeatures()
-                                            .stream()
-                                            .map(BeanGenerator.ExperimentalFeatures::valueOf)
-                                            .collect(Collectors.toSet());
-                                }
-                            });
+                            task.setExperimentalFeatures(experimentalFeaturesSupplier);
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
@@ -117,7 +115,8 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
-                            task.setServiceGenerator(new Retrofit2ServiceGenerator());
+                            task.setServiceGenerator(
+                                    () -> new Retrofit2ServiceGenerator(experimentalFeaturesSupplier.get()));
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
@@ -144,7 +143,7 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             task.setOutputDirectory(subproj.file("src/generated/java"));
-                            task.setServiceGenerator(new JerseyServiceGenerator());
+                            task.setServiceGenerator(JerseyServiceGenerator::new);
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);

@@ -31,7 +31,7 @@ public final class BeanJavaTypeGeneratorTests {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         List<Path> files = new BeanGenerator(
                 Settings.builder().ignoreUnknownProperties(true).build(),
-                ImmutableSet.of(BeanGenerator.ExperimentalFeatures.UnionTypes))
+                ImmutableSet.of(ExperimentalFeatures.UnionTypes))
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files);

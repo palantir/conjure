@@ -17,6 +17,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.Retrofit2MethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
@@ -40,9 +41,16 @@ import org.slf4j.LoggerFactory;
 
 public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
+    private static final ClassName COMPLETABLE_FUTURE_TYPE = ClassName.get("java.util.concurrent", "CompletableFuture");
     private static final ClassName CALL_TYPE = ClassName.get("retrofit2", "Call");
 
     private static final Logger log = LoggerFactory.getLogger(Retrofit2ServiceGenerator.class);
+
+    private final Set<ExperimentalFeatures> experimentalFeatures;
+
+    public Retrofit2ServiceGenerator(Set<ExperimentalFeatures> experimentalFeatures) {
+        this.experimentalFeatures = ImmutableSet.copyOf(experimentalFeatures);
+    }
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
@@ -80,6 +88,14 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .build();
     }
 
+    private ClassName getReturnType() {
+        if (experimentalFeatures.contains(ExperimentalFeatures.RetrofitCompletableFutures)) {
+            return COMPLETABLE_FUTURE_TYPE;
+        } else {
+            return CALL_TYPE;
+        }
+    }
+
     private MethodSpec generateServiceMethod(
             String endpointName,
             EndpointDefinition endpointDef,
@@ -106,10 +122,10 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         if (endpointDef.returns().isPresent()) {
             methodBuilder.returns(
-                    ParameterizedTypeName.get(CALL_TYPE,
+                    ParameterizedTypeName.get(getReturnType(),
                             returnTypeMapper.getClassName(endpointDef.returns().get()).box()));
         } else {
-            methodBuilder.returns(ParameterizedTypeName.get(CALL_TYPE, ClassName.get(Void.class)));
+            methodBuilder.returns(ParameterizedTypeName.get(getReturnType(), ClassName.get(Void.class)));
         }
 
         getAuthParameter(endpointDef.auth().orElse(defaultAuth)).ifPresent(methodBuilder::addParameter);

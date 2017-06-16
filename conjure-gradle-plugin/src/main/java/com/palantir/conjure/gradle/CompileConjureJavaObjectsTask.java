@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
+import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -29,18 +30,18 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
     @OutputDirectory
     private File outputDirectory;
 
-    private Supplier<Set<BeanGenerator.ExperimentalFeatures>> experimentalFeatures;
+    private Supplier<Set<ExperimentalFeatures>> experimentalFeatures;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
-    public final void setExperimentalFeatures(Supplier<Set<BeanGenerator.ExperimentalFeatures>> experimentalFeatures) {
+    public final void setExperimentalFeatures(Supplier<Set<ExperimentalFeatures>> experimentalFeatures) {
         this.experimentalFeatures = experimentalFeatures;
     }
 
     @Input
-    public final Set<BeanGenerator.ExperimentalFeatures> getExperimentalFeatures() {
+    public final Set<ExperimentalFeatures> getExperimentalFeatures() {
         return experimentalFeatures.get();
     }
 

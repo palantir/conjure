@@ -54,10 +54,6 @@ import org.immutables.value.Value;
 
 public final class BeanGenerator implements TypeGenerator {
 
-    public enum ExperimentalFeatures {
-        UnionTypes
-    }
-
     private final Set<ExperimentalFeatures> enabledExperimentalFeatures;
     private final Settings settings;
 
