@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
-import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

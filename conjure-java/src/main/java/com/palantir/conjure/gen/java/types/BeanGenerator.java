@@ -28,6 +28,7 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;

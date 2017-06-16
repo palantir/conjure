@@ -17,7 +17,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
-import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.Retrofit2MethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;

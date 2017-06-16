@@ -4,9 +4,9 @@
 
 package com.palantir.conjure.gradle;
 
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
-import com.palantir.conjure.gen.java.types.ExperimentalFeatures;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
