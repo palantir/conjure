@@ -71,6 +71,11 @@ subprojects {
         }
     }
 
+    // can be removed after https://github.com/palantir/gradle-baseline/issues/183
+    checkstyle {
+        configDir = new File("${rootProject.rootDir}/.baseline/")
+    }
+
     tasks.jacocoTestReport.dependsOn(tasks.test)
     tasks.check.dependsOn(tasks.jacocoTestReport)
     tasks.check.dependsOn(javadoc)
