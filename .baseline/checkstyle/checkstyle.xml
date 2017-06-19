@@ -40,7 +40,7 @@
         <property name="message" value="Whitespace at end-of-line"/>
     </module>
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
-        <property name="file" value="${samedir}/checkstyle-suppressions.xml"/>
+        <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
     <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
@@ -73,7 +73,16 @@
         </module>
         <module name="AvoidStarImport"/> <!-- Java Style Guide: No wildcard imports -->
         <module name="AvoidStaticImport"> <!-- Java Style Guide: No static imports -->
-            <property name="excludes" value="org.junit.Assert.*,org.junit.Assume.*,org.hamcrest.Matchers.*,org.mockito.ArgumentMatchers.*,org.mockito.Mockito.*,org.mockito.Matchers.*,org.assertj.core.api.Assertions.*,com.google.common.base.Preconditions.*,org.apache.commons.lang3.Validate.*,com.google.common.truth.Truth.*"/>
+            <property name="excludes" value="
+                java.util.Collections.*,java.util.Collectors.*,
+                org.junit.Assert.*,org.junit.Assume.*,
+                org.hamcrest.CoreMatchers.*,org.hamcrest.Matchers.*,org.hamcrest.MatcherAssert.*,
+                org.hamcrest.core.AllOf.*,org.hamcrest.core.Is.*,org.hamcrest.core.StringContains.*,org.hamcrest.core.IsEqual.*,
+                org.hamcrest.collection.IsMapContaining.*,
+                org.mockito.ArgumentMatchers.*,org.mockito.Mockito.*,org.mockito.Matchers.*,
+                org.assertj.core.api.Assertions.*,
+                com.google.common.base.Preconditions.*,com.google.common.truth.Truth.*,
+                org.apache.commons.lang3.Validate.*"/>
         </module>
         <module name="ClassTypeParameterName"> <!-- Java Style Guide: Type variable names -->
             <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
