@@ -1,34 +1,13 @@
 apply from: "${rootDir}/gradle/python-conda.gradle"
 
-def runTypeCheck = { ->
-    def environmentFilePath = "./mypy.yml"
-    def location = "${project.buildDir}/envs/mypy-env"
-    // the conda env create (as opposed to the conda create) command does not take custom channels
-    miniconda.channels.each { channel ->
-        exec {
-            commandLine "${miniconda.buildEnvironmentDirectory}/bin/conda", "config", "--add", "channels", channel
-        }
-    }
-    exec {
-        commandLine "${miniconda.buildEnvironmentDirectory}/bin/conda", "env", "create",
-            "--prefix", location, "-f", environmentFilePath, "--force"
-    }
-    exec {
-        commandLine location + "/bin/mypy",
-            "--config-file", "python/mypy.ini",
-            "python/conjure"
-    }
-}
+task tox(type: Exec) {
+    inputs.dir("python")
+    outputs.dir("${buildDir}/tox/log")
 
-task runMyPyTypeCheck {
-    dependsOn 'setupPython'
-    doLast {
-        runTypeCheck()
-    }
-}
+    workingDir 'python'
 
-tasks.check.dependsOn(runMyPyTypeCheck)
-tasks.check.dependsOn condaBuildCheck
+    commandLine 'tox', '--workdir', "${buildDir}/tox"
+}
 
 task condaPublish {
     doLast {
@@ -42,4 +21,7 @@ task condaPublish {
         }
     }
 }
+
+tasks.test.dependsOn tox
+tasks.check.dependsOn condaBuildCheck
 condaPublish.dependsOn tasks.condaBuild

@@ -74,13 +74,13 @@ class RequestsClient:
 
     @classmethod
     def create(cls, service_class, user_agent, service_config):
-        # type: (Type[T], str, ServiceConfig) -> T
-        
+        # type: (Type[T], str, ServiceConfiguration) -> T
+
         transport_adapter = TransportAdapter()
 
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()
-        
+
         session.headers = {
             'User-Agent': user_agent
         }

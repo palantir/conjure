@@ -77,6 +77,7 @@ class ConjureUnionType(ConjureType):
         # type: (Any) -> bool
         if not isinstance(other, self.__class__):
             return False
+        assert isinstance(other, ConjureUnionType)
         return other.type == self.type \
             and getattr(self, self.type) == getattr(other, self.type)
 

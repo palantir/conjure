@@ -1,6 +1,7 @@
 machine:
   post:
     - wget -qO- https://artifactory.palantir.build/artifactory/internal-dist-thirdparty/oracle/jce_policy/8/jce_policy-8.zip | bsdtar -xvf- -C /tmp && sudo cp /tmp/UnlimitedJCEPolicyJDK8/* $JAVA_HOME/jre/lib/security/
+    - pyenv global 2.7.10 3.5.0
   java:
     version: oraclejdk8
   environment:
@@ -9,8 +10,11 @@ machine:
     version: 6.3.1
 
 dependencies:
+  cache_directories:
+    - "~/.cache/pip"
   override:
     - ./gradlew --parallel resolveConfigurations
+    - pip install tox
 
 test:
   override:
