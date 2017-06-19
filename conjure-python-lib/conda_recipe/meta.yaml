@@ -6,18 +6,15 @@ source:
   path: ../python
 
 build:
-  noarch_python: True
+  noarch: python
 
 requirements:
   build:
     - python
     - setuptools
-    - pytest
-    - requests
-    - typing
 
   run:
+    - enum34
     - python
     - requests
     - typing
-    - enum34

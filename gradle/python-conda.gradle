@@ -12,6 +12,7 @@ repositories {
 
 miniconda {
     minicondaVersion = '4.3.11'
+    condaBuildVersion = '2.1.9'
     packages = ['python']
     channels = [
         'https://artifactory.palantir.build/artifactory/external-conda-anaconda',

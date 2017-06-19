@@ -20,17 +20,9 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        'enum34',
         'requests',
         'typing',
-        'enum34',
     ],
-
-    # List additional groups of dependencies here (e.g. development
-    # dependencies). You can install these using the following syntax,
-    # for example:
-    # $ pip install -e .[test]
-    extras_require={
-        'test': ['pytest', 'pytest-cov', 'coverage', 'pylint'],
-    },
 
 )
