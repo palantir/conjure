@@ -22,6 +22,7 @@ setup(
     install_requires=[
         'requests',
         'typing',
+        'enum34',
     ],
 
     # List additional groups of dependencies here (e.g. development
