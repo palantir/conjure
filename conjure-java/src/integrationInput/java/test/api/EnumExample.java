@@ -2,6 +2,7 @@ package test.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Generated;
 
@@ -63,7 +64,7 @@ public final class EnumExample {
     @JsonCreator
     public static EnumExample valueOf(String value) {
         Objects.requireNonNull(value, "value cannot be null");
-        String upperCasedValue = value.toUpperCase();
+        String upperCasedValue = value.toUpperCase(Locale.ROOT);
         switch (upperCasedValue) {
             case "ONE":
                 return ONE;

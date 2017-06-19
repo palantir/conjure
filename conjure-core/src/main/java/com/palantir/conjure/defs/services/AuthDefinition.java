@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Locale;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = AuthDefinition.class)
@@ -30,7 +31,7 @@ public interface AuthDefinition {
 
         @JsonCreator
         public static AuthType fromString(String value) {
-            return AuthType.valueOf(value.toUpperCase());
+            return AuthType.valueOf(value.toUpperCase(Locale.ROOT));
         }
     }
 
@@ -79,6 +80,6 @@ public interface AuthDefinition {
 
     @JsonValue
     default String value() {
-        return type().name().toLowerCase() + ":" + id();
+        return type().name().toLowerCase(Locale.ROOT) + ":" + id();
     }
 }

@@ -20,6 +20,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
@@ -139,7 +140,7 @@ public final class EnumGenerator {
                     .addAnnotation(JsonCreator.class)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(ClassName.get(String.class), "value")
-                    .addStatement("return $T.valueOf(value.toUpperCase())", enumClass)
+                    .addStatement("return $T.valueOf(value.toUpperCase($T.ROOT))", enumClass, Locale.class)
                     .returns(enumClass)
                     .build());
         }
@@ -188,7 +189,7 @@ public final class EnumGenerator {
                 .addParameter(param)
                 .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
                 // uppercase param for backwards compatibility
-                .addStatement("String upperCasedValue = $N.toUpperCase()", param)
+                .addStatement("String upperCasedValue = $N.toUpperCase($T.ROOT)", param, Locale.class)
                 .addCode(parser.build())
                 .build();
     }

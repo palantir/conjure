@@ -16,6 +16,7 @@ import com.palantir.conjure.defs.services.ArgumentDefinition.ArgumentDefinitionD
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import org.immutables.value.Value;
@@ -64,7 +65,7 @@ public interface ArgumentDefinition {
 
         @JsonCreator
         public static ParamType fromString(String val) {
-            return ParamType.valueOf(val.toUpperCase());
+            return ParamType.valueOf(val.toUpperCase(Locale.ROOT));
         }
     }
 
