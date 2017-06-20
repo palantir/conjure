@@ -179,11 +179,11 @@ public final class BeanBuilderGenerator {
 
     private static TypeName widenToCollectionIfPossible(TypeName current, ConjureType type, TypeMapper typeMapper) {
         if (type instanceof ListType) {
-            return ParameterizedTypeName.get(ClassName.get(Collection.class),
-                    typeMapper.getClassName(((ListType) type).itemType()));
+            TypeName itemType = typeMapper.getClassName(((ListType) type).itemType()).box();
+            return ParameterizedTypeName.get(ClassName.get(Collection.class), itemType);
         } else if (type instanceof SetType) {
-            return ParameterizedTypeName.get(ClassName.get(Collection.class),
-                    typeMapper.getClassName(((SetType) type).itemType()));
+            TypeName itemType = typeMapper.getClassName(((SetType) type).itemType()).box();
+            return ParameterizedTypeName.get(ClassName.get(Collection.class), itemType);
         }
         return current;
     }

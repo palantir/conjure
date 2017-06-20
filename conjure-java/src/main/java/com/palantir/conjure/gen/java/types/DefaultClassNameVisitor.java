@@ -52,15 +52,15 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(ListType type) {
-        TypeName itemType = boxIfPrimitive(type.itemType().visit(this));
+        TypeName itemType = type.itemType().visit(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
     }
 
     @Override
     public TypeName visit(MapType type) {
         return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
-                boxIfPrimitive(type.keyType().visit(this)),
-                boxIfPrimitive(type.valueType().visit(this)));
+                type.keyType().visit(this).box(),
+                type.valueType().visit(this).box());
     }
 
     @Override
@@ -128,7 +128,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     @Override
     public TypeName visit(SetType type) {
-        TypeName itemType = boxIfPrimitive(type.itemType().visit(this));
+        TypeName itemType = type.itemType().visit(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
     }
 
@@ -145,12 +145,5 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     @Override
     public TypeName visit(DateTimeType type) {
         return ClassName.get(ZonedDateTime.class);
-    }
-
-    private static TypeName boxIfPrimitive(TypeName type) {
-        if (type.isPrimitive()) {
-            return type.box();
-        }
-        return type;
     }
 }

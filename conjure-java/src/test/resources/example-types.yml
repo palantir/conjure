@@ -26,6 +26,7 @@ types:
       ListExample:
         fields:
           items: list<string>
+          primitiveItems: list<integer>
       SetExample:
         fields:
           items: set<string>
