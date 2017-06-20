@@ -4,37 +4,49 @@ import inspect
 import json
 from enum import Enum
 
+
 class ConjureType:
     pass
 
-DecodableType = Union[int, float, bool, str, ConjureType, List[Any], Dict[Any, Any]]
+
+DecodableType = Union[
+    int, float, bool, str,
+    ConjureType, List[Any], Dict[Any, Any]]
+
 
 class ListType(ConjureType):
-    item_type = None # type: Type[DecodableType]
+    item_type = None  # type: Type[DecodableType]
+
     def __init__(self, item_type):
         # type: (Type[DecodableType]) -> None
         self.item_type = item_type
 
+
 class DictType(ConjureType):
-    key_type = None # type: Type[DecodableType]
-    value_type = None # type: Type[DecodableType]
+    key_type = None  # type: Type[DecodableType]
+    value_type = None  # type: Type[DecodableType]
+
     def __init__(self, key_type, value_type):
         # type: (Type[DecodableType], Type[DecodableType]) -> None
         self.key_type = key_type
         self.value_type = value_type
 
+
 class BinaryType(ConjureType):
     pass
 
+
 class ConjureEnumType(ConjureType, Enum):
     pass
+
 
 class ConjureBeanType(ConjureType):
 
     @classmethod
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
-        '''_fields is a mapping from constructor argument name to the field definition'''
+        '''_fields is a mapping from constructor argument
+        name to the field definition'''
         return {}
 
     def __eq__(self, other):
@@ -53,13 +65,15 @@ class ConjureBeanType(ConjureType):
     def __repr__(self):
         # type: () -> str
         fields = ['{}={}'.format(field_def.identifier, getattr(self, attr))
-            for attr, field_def in self._fields().items()]
+                  for attr, field_def in self._fields().items()]
         return "{}({})".format(self.__class__.__name__, ', '.join(fields))
+
 
 ConjureTypeType = Union[ConjureType, Type[DecodableType]]
 
+
 class ConjureUnionType(ConjureType):
-    _type = None # type: str
+    _type = None  # type: str
 
     @property
     def type(self):
@@ -70,7 +84,8 @@ class ConjureUnionType(ConjureType):
     @classmethod
     def _options(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
-        '''_options defines a mapping from each member in the union to the field definition for that type'''
+        '''_options defines a mapping from each member in the union
+        to the field definition for that type'''
         return {}
 
     def __eq__(self, other):
@@ -88,18 +103,22 @@ class ConjureUnionType(ConjureType):
     def __repr__(self):
         # type: () -> str
         fields = ['{}={}'.format(field_def.identifier, getattr(self, attr))
-            for attr, field_def in self._options().items() if getattr(self, attr) is not None]
+                  for attr, field_def in self._options().items()
+                  if getattr(self, attr) is not None]
         return "{}({})".format(self.__class__.__name__, ', '.join(fields))
 
+
 class ConjureFieldDefinition:
-    identifier = None # type: str
-    field_type = None # type: ConjureTypeType
-    optional = None # type: bool
-    def __init__(self, identifier, field_type, optional = False):
+    identifier = None  # type: str
+    field_type = None  # type: ConjureTypeType
+    optional = None  # type: bool
+
+    def __init__(self, identifier, field_type, optional=False):
         # type: (str, ConjureTypeType, bool) -> None
         self.identifier = identifier
         self.field_type = field_type
         self.optional = optional
+
 
 class ConjureEncoder(json.JSONEncoder):
     '''Transforms a conjure type into json'''
@@ -108,20 +127,22 @@ class ConjureEncoder(json.JSONEncoder):
     def encode_conjure_bean_type(cls, obj):
         # type: (ConjureBeanType) -> Any
         '''Encodes a conjure bean into json'''
-        encoded = {} # type: Dict[str, Any]
+        encoded = {}  # type: Dict[str, Any]
         for attribute_name, field_definition in obj._fields().items():
-            encoded[field_definition.identifier] = cls.do_encode(getattr(obj, attribute_name))
+            encoded[field_definition.identifier] = cls.do_encode(
+                getattr(obj, attribute_name))
         return encoded
 
     @classmethod
     def encode_conjure_union_type(cls, obj):
         # type: (ConjureUnionType) -> Any
         '''Encodes a conjure union into json'''
-        encoded = {} # type: Dict[str, Any]
+        encoded = {}  # type: Dict[str, Any]
         encoded['type'] = obj.type
 
         defined_field_definition = obj._options()[obj.type]
-        encoded[defined_field_definition.identifier] = cls.do_encode(getattr(obj, obj.type))
+        encoded[defined_field_definition.identifier] = cls.do_encode(
+            getattr(obj, obj.type))
 
         return encoded
 
@@ -138,13 +159,16 @@ class ConjureEncoder(json.JSONEncoder):
         elif isinstance(obj, list):
             return list(map(cls.do_encode, obj))
         elif isinstance(obj, dict):
-            return dict(map(lambda x: (cls.do_encode(x[0]), cls.do_encode(x[1])), obj.items()))
+            return dict(map(lambda x:
+                            (cls.do_encode(x[0]), cls.do_encode(x[1])),
+                            obj.items()))
         else:
             return obj
 
     def default(self, obj):
         # type: (Any) -> Any
         return self.do_encode(obj)
+
 
 class ConjureDecoder(object):
     '''Decodes json into a conjure object'''
@@ -155,18 +179,21 @@ class ConjureDecoder(object):
 
         Args:
             obj: the json object to decode
-            conjure_type: a class object which is the bean type we're decoding into
+            conjure_type: a class object which is the bean type
+                we're decoding into
         Returns:
             A instance of a bean of type conjure_type.
         '''
 
-        deserialized = {} # type: Dict[str, Any]
-        for arg_name, conjure_field_definition in conjure_type._fields().items():
+        deserialized = {}  # type: Dict[str, Any]
+        for arg_name, conjure_field_definition in \
+                conjure_type._fields().items():
             field_identifier = conjure_field_definition.identifier
 
             if field_identifier not in obj:
                 if not conjure_field_definition.optional:
-                    raise Exception('field {0} not found in object {1}'.format(field_identifier, obj))
+                    raise Exception('field {0} not found in object {1}'.format(
+                        field_identifier, obj))
                 else:
                     deserialized[arg_name] = None
             else:
@@ -181,19 +208,21 @@ class ConjureDecoder(object):
 
         Args:
             obj: the json object to decode
-            conjure_type: a class object which is the union type we're decoding into
+            conjure_type: a class object which is the union type
+                we're decoding into
         Returns:
             An instance of type conjure_type.
         '''
 
-        type_of_union = obj['type'] # type: str
+        type_of_union = obj['type']  # type: str
         conjure_field_definition = conjure_type._options()[type_of_union]
 
-        deserialized = {} # type: Dict[str, Any]
+        deserialized = {}  # type: Dict[str, Any]
 
         if type_of_union not in obj:
             if not conjure_field_definition.optional:
-                raise Exception('field {0} not found in object {1}'.format(type_of_union, obj))
+                raise Exception('field {0} not found in object {1}'.format(
+                    type_of_union, obj))
             else:
                 deserialized[type_of_union] = None
         else:
@@ -208,7 +237,8 @@ class ConjureDecoder(object):
 
         Args:
             obj: the json object to decode
-            conjure_type: a class object which is the enum type we're decoding into.
+            conjure_type: a class object which is the enum type
+                we're decoding into.
         Returns:
             An instance of enum of type conjure_type.
         '''
@@ -218,15 +248,20 @@ class ConjureDecoder(object):
             return conjure_type['UNKNOWN']
 
     @classmethod
-    def decode_dict(cls, obj, key_type, item_type):
-        # type: (Dict[Any, Any], ConjureTypeType, ConjureTypeType) -> Dict[Any, Any]
+    def decode_dict(cls,
+                    obj,  # type: Dict[Any, Any]
+                    key_type,  # ConjureTypeType
+                    item_type  # ConjureTypeType
+                    ):  # type: (...) -> Dict[Any, Any]
         '''Decodes json into a dictionary, handling conversion of the keys/values
         (the keys/values may themselves require conversion).
 
         Args:
             obj: the json object to decode
-            key_type: a class object which is the conjure type of the keys in this dict
-            item_type: a class object which is the conjure type of the values in this dict
+            key_type: a class object which is the conjure type
+                of the keys in this dict
+            item_type: a class object which is the conjure type
+                of the values in this dict
         Returns:
             A python dictionary, where the keys are instances of type key_type
             and the values are of type value_type.
@@ -234,7 +269,10 @@ class ConjureDecoder(object):
         if not isinstance(obj, dict):
             raise Exception("expected a python dict")
 
-        return dict(map(lambda x : (cls.do_decode(x[0], key_type), cls.do_decode(x[1], item_type)), obj.items()))
+        return dict(map(lambda x:
+                        (cls.do_decode(x[0], key_type),
+                         cls.do_decode(x[1], item_type)),
+                        obj.items()))
 
     @classmethod
     def decode_list(cls, obj, element_type):
@@ -243,9 +281,11 @@ class ConjureDecoder(object):
 
         Args:
             obj: the json object to decode
-            element_type: a class object which is the conjure type of the elements in this list.
+            element_type: a class object which is the conjure type of
+                the elements in this list.
         Returns:
-            A python list where the elements are instances of type element_type.
+            A python list where the elements are instances of type
+                element_type.
         '''
         if not isinstance(obj, list):
             raise Exception("expected a python list")
@@ -261,11 +301,14 @@ class ConjureDecoder(object):
             obj: the json object to decode
             element_type: a class object which is the type we're decoding into.
         '''
-        if inspect.isclass(obj_type) and issubclass(obj_type, ConjureBeanType): # type: ignore
-            return cls.decode_conjure_bean_type(obj, obj_type) # type: ignore
-        elif inspect.isclass(obj_type) and issubclass(obj_type, ConjureUnionType): # type: ignore
+        if inspect.isclass(obj_type) and \
+                issubclass(obj_type, ConjureBeanType):  # type: ignore
+            return cls.decode_conjure_bean_type(obj, obj_type)  # type: ignore
+        elif inspect.isclass(obj_type) and \
+                issubclass(obj_type, ConjureUnionType):  # type: ignore
             return cls.decode_conjure_union_type(obj, obj_type)
-        elif inspect.isclass(obj_type) and issubclass(obj_type, ConjureEnumType): # type: ignore
+        elif inspect.isclass(obj_type) and \
+                issubclass(obj_type, ConjureEnumType):  # type: ignore
             return cls.decode_conjure_enum_type(obj, obj_type)
         elif isinstance(obj_type, DictType):
             return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
