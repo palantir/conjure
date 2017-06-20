@@ -19,7 +19,7 @@ buildscript {
 
 plugins {
     id 'com.palantir.git-version' version '0.5.2'
-    id 'org.inferred.processors' version '1.2.3'
+    id 'org.inferred.processors' version '1.2.12'
 }
 
 apply plugin: 'java'
