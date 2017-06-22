@@ -5,8 +5,7 @@
 package com.palantir.conjure.gen.typescript.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import org.junit.Test;
@@ -14,25 +13,11 @@ import org.junit.Test;
 public final class GenerationUtilsTests {
 
     @Test
-    public void relativePathsTest() {
-        assertEquals("./b", GenerationUtils.getRelativePath("a", "b"));
-        assertEquals("./b", GenerationUtils.getRelativePath("x/a", "x/b"));
-        assertEquals("./x/b", GenerationUtils.getRelativePath("y/a", "y/x/b"));
-        assertEquals("../b", GenerationUtils.getRelativePath("x/a", "b"));
-        assertEquals("../../b", GenerationUtils.getRelativePath("x/y/a", "b"));
-        assertEquals("../y/b", GenerationUtils.getRelativePath("x/a", "y/b"));
-    }
-
-    @Test
-    public void packageToFolderPathTest() {
-        assertEquals("c", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c")));
-        assertEquals("c/d", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c.d")));
-        assertEquals("c/d/e", GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b.c.d.e")));
-        try {
-            GenerationUtils.packageToFolderPath(ConjurePackage.of("a1.b"));
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage()).contains("at least 3");
-        }
+    public void packageToScopeandModuleTest() {
+        assertThat(GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b.c"))).isEqualTo("@b/c");
+        assertThat(GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b.c.d"))).isEqualTo("@b/c-d");
+        assertThatThrownBy(() -> GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("packages should have at least 3 segments");
     }
 }

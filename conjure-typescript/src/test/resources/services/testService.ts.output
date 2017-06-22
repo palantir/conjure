@@ -1,6 +1,6 @@
 import { ICreateDatasetRequest } from "./createDatasetRequest";
-import { IBackingFileSystem } from "./datasets/backingFileSystem";
-import { IDataset } from "./datasets/dataset";
+import { IBackingFileSystem } from "@palantir/foundry-catalog-api-datasets";
+import { IDataset } from "@palantir/foundry-catalog-api-datasets";
 
 export interface ITestService {
     createDataset(

@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript.services;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -38,6 +39,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
 
     private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
-        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
+        String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
                 AssignStatement.builder()
                         .lhs("this.bridge")
@@ -166,22 +168,26 @@ public final class ClassServiceGenerator implements ServiceGenerator {
     }
 
     @Override
-    public Set<ExportStatement> generateExports(ConjureDefinition conjureDefinition) {
-        return conjureDefinition.services()
+    public Map<ConjurePackage, Collection<ExportStatement>> generateExports(ConjureDefinition conjureDefinition) {
+        Map<ConjurePackage, Set<Map.Entry<TypeName, ServiceDefinition>>> definitionsByPackage =
+                conjureDefinition.services().entrySet().stream()
+                .collect(Collectors.groupingBy(entry -> entry.getValue().conjurePackage(), Collectors.toSet()));
+        return definitionsByPackage
                 .entrySet()
                 .stream()
-                .map(e -> generateExport(e.getKey(), e.getValue()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> generateExports(entry.getValue())));
     }
 
-    private ExportStatement generateExport(TypeName typeName, ServiceDefinition serviceDef) {
-        ConjurePackage packageLocation = serviceDef.conjurePackage();
-        String parentFolderPath = GenerationUtils.packageToFolderPath(packageLocation);
-        return GenerationUtils.createExportStatementRelativeToRoot(
-                typeName.name(), parentFolderPath, getFilename(typeName));
+    private static Collection<ExportStatement> generateExports(
+            Set<Map.Entry<TypeName, ServiceDefinition>> definitions) {
+        return Collections2.transform(definitions, typeAndDefinition -> generateExport(typeAndDefinition.getKey()));
     }
 
-    private String getFilename(TypeName typeName) {
+    private static ExportStatement generateExport(TypeName typeName) {
+        return GenerationUtils.createExportStatementRelativeToRoot(typeName.name(), getFilename(typeName));
+    }
+
+    private static String getFilename(TypeName typeName) {
         return typeName.name() + "Impl";
     }
 }

@@ -9,6 +9,7 @@ com.palantir.ri:* = 1.0.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 1.2.0
 com.squareup:javapoet = 1.9.0
+com.squareup.okhttp3:okhttp = 3.5.0
 commons-io:commons-io = 2.5
 junit:junit = 4.12
 org.apache.commons:commons-lang3 = 3.6

@@ -706,7 +706,31 @@ Common strategies for specifying versions include:
 ### TypeScript Publication
 The TypeScript Publication plugin enables publishing typescript artifacts from projects using Conjure.
 
-When run, an npm package is published to the specified scope and package, defaulting to the `@elements` scope and the project name as the package name.
+When run, a NPM package is published for each Conjure package defined in your project. The scope corresponds to the
+second part of the Conjure package, with the later parts being joined to form the NPM package name. For example, the
+following Conjure definition would produce `@palantir/foundry-catalog-api`, with generated code corresponding to
+`ExampleEnumeration`, and `@palantir/foundry-catalog-api-datasets`, with generated code corresponding to
+`BackingFileSystem`.
+
+```yaml
+definitions:
+  default-package: com.palantir.foundry.catalog.api
+
+  objects:
+    BackingFileSystem:
+      package: com.palantir.foundry.catalog.api.datasets
+      fields:
+        fileSystemId:
+          type: string
+          docs: The name by which this file system is identified.
+        baseUri: string
+        configuration: map<string, string>
+
+    ExampleEnumeration:
+      values:
+        - A
+        - B
+```
 
 To add the plugin, depend on it in your root project build.gradle:
 
@@ -722,13 +746,6 @@ Apply the plugin on projects containing generated TypeScript:
 
 ```gradle
 apply plugin: 'com.palantir.typescript-publish'
-```
-
-To configure the scope and package names:
-
-```gradle
-publishTypeScript.packageName = 'my-package'
-publishTypeScript.scopeName = 'my-scope'
 ```
 
 To publish, run the `publishTypeScript` task.

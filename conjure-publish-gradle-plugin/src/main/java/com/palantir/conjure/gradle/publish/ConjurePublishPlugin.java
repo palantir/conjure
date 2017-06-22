@@ -11,44 +11,29 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.api.plugins.JavaPlugin;
 
 public class ConjurePublishPlugin implements Plugin<Project> {
+
     @Override
     public final void apply(Project project) {
-        project.getPluginManager().apply(JavaPlugin.class);
-
-        File workingDirectory = getTypescriptWorkingDirectory(project.getBuildDir());
-        File compileTypeScriptOutput = new File(workingDirectory, "compileTypeScriptOutput");
-        File bundleJavaScriptOutput = new File(workingDirectory, "bundleJavaScriptOutput");
+        File compileTypeScriptOutput = new File(project.getBuildDir(), "compileTypeScriptOutput");
+        File generatePackageJsonOutput = new File(project.getBuildDir(), "generatePackageJsonOutput");
 
         CompileTypeScriptJavaScriptTask compileTypescriptJavascriptTask = project.getTasks()
                 .create("compileTypeScriptJavaScript", CompileTypeScriptJavaScriptTask.class);
         compileTypescriptJavascriptTask.setInputDirectory(project.file("src"));
         compileTypescriptJavascriptTask.setOutputDirectory(compileTypeScriptOutput);
 
-        BundleJavascriptTask bundleJavascriptTask = project.getTasks()
-                .create("bundleJavaScript", BundleJavascriptTask.class);
-        bundleJavascriptTask.setInputDirectory(compileTypeScriptOutput);
-        bundleJavascriptTask.setOutputDirectory(bundleJavaScriptOutput);
+        GeneratePackageJsonTask generatePackageJsonTask = project.getTasks()
+                .create("generatePackageJson", GeneratePackageJsonTask.class);
+        generatePackageJsonTask.setInputDirectory(compileTypeScriptOutput);
+        generatePackageJsonTask.setOutputDirectory(generatePackageJsonOutput);
+        generatePackageJsonTask.dependsOn(compileTypescriptJavascriptTask);
 
-        PublishBundledJavascriptTask publishBundledJavascriptTask = project.getTasks()
-                .create("publishBundledJavaScript", PublishBundledJavascriptTask.class);
-        publishBundledJavascriptTask.setInputDirectory(bundleJavaScriptOutput);
-
-        project.getExtensions().create("publishTypeScript", ConjurePublishPluginExtension.class, project);
-
-        Task publishConjureTask = project.getTasks().create("publishTypeScript");
-
-        bundleJavascriptTask.dependsOn(compileTypescriptJavascriptTask);
-        publishBundledJavascriptTask.dependsOn(bundleJavascriptTask);
-
-        publishConjureTask.dependsOn(publishBundledJavascriptTask);
-    }
-
-    public static File getTypescriptWorkingDirectory(File buildDirectory) {
-        return new File(buildDirectory, "conjurePublish/typescriptClient");
+        PublishTypeScriptTask publishTypeScriptTask = project.getTasks()
+                .create("publishTypeScript", PublishTypeScriptTask.class);
+        publishTypeScriptTask.setInputDirectory(generatePackageJsonOutput);
+        publishTypeScriptTask.dependsOn(generatePackageJsonTask);
     }
 
     public static String readResource(String path) {
@@ -67,10 +52,6 @@ public class ConjurePublishPlugin implements Plugin<Project> {
         }
     }
 
-    public static void copyFromResource(String resource, File tsConfigFile) {
-        makeFile(tsConfigFile, readResource(resource));
-    }
-
     public static void copyDirectory(File source, File dest) {
         try {
             FileUtils.copyDirectory(source, dest);
@@ -79,11 +60,4 @@ public class ConjurePublishPlugin implements Plugin<Project> {
         }
     }
 
-    public static void copyFile(File source, File dest) {
-        try {
-            FileUtils.copyFile(source, dest);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

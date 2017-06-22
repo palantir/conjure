@@ -9,7 +9,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.gen.typescript.ConjureTypescriptClientGenerator;
+import com.palantir.conjure.gen.typescript.ConjureTypeScriptClientGenerator;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
 import java.io.File;
@@ -57,7 +57,7 @@ public class CompileConjureTypeScriptTask extends SourceTask {
     }
 
     private void compileFiles(Collection<File> files) {
-        ConjureTypescriptClientGenerator generator = new ConjureTypescriptClientGenerator(
+        ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
                 serviceGenerator, typeGenerator);
 
         List<ConjureDefinition> conjureDefinitions = files.stream().map(Conjure::parse).collect(Collectors.toList());

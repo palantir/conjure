@@ -4,15 +4,14 @@
 
 package com.palantir.conjure.gen.typescript.utils;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
@@ -21,96 +20,68 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public final class GenerationUtils {
 
-    private static final Pattern PACKAGE_BASE = Pattern.compile("^[^.]+\\.[^.]+\\.");
-    private static final Pattern PACKAGE = Pattern.compile(PACKAGE_BASE.pattern() + "[^.]+.*");
-
     private GenerationUtils() {}
 
-    public static String packageToFolderPath(ConjurePackage packageName) {
-        Preconditions.checkArgument(PACKAGE.matcher(packageName.name()).matches(),
-                "packages should have at least 3 segments");
-        return PACKAGE_BASE.matcher(packageName.name()).replaceAll("").replace(".", "/");
-    }
+    /**
+     * Strips the first part of the package, converts the second part to the scope, and converts all remaining parts to
+     * the module name by converting '.' to '-'.
+     * <p>
+     * For example, a package of "com.palantir.foundry.api" would produce "@palantir/foundry-api".
+     */
+    public static String packageToScopeAndModule(ConjurePackage packageName) {
+        String[] parts = packageName.name().split("\\.");
+        Preconditions.checkArgument(parts.length > 2, "packages should have at least 3 segments");
 
-    @VisibleForTesting
-    static String getRelativePath(String srcPath, String destPath) {
-        String[] srcSegments = srcPath.split("/");
-        String[] destSegments = destPath.split("/");
-        int sharedPrefixLength = 0;
-        for (; sharedPrefixLength < Math.min(srcSegments.length, destSegments.length); sharedPrefixLength++) {
-            if (!srcSegments[sharedPrefixLength].equals(destSegments[sharedPrefixLength])) {
-                break;
-            }
-        }
-        int levelsUp = (srcSegments.length - 1) - sharedPrefixLength;
-        StringBuilder result = new StringBuilder();
-        if (levelsUp == 0) {
-            result.append("./");
-        } else {
-            for (int j = levelsUp; j > 0; j--) {
-                result.append("../");
-            }
-        }
-        for (int i = sharedPrefixLength; i < destSegments.length; i++) {
-            result.append(destSegments[i]);
-            if (i != destSegments.length - 1) {
-                result.append("/");
-            }
-        }
-        return result.toString();
-    }
+        String scope = parts[1];
+        List<String> moduleParts = Lists.newArrayList(parts).subList(2, parts.length);
+        String module = Joiner.on('-').join(moduleParts);
 
-    public static ImportStatement createImportStatement(TypescriptSimpleType typescriptType, String sourcePath,
-            String destPath) {
-        return createImportStatement(ImmutableSet.of(typescriptType), sourcePath, destPath);
-    }
-
-    public static ImportStatement createImportStatement(Set<TypescriptSimpleType> typescriptType, String sourcePath,
-            String destPath) {
-        return ImportStatement.builder().filepathToImport(getRelativePath(sourcePath, destPath)).addAllNamesToImport(
-                typescriptType.stream().map(type -> type.name()).collect(Collectors.toList())).build();
-
+        return String.format("@%s/%s", scope, module);
     }
 
     public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
             TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
-        String folderLocation = GenerationUtils.packageToFolderPath(sourcePackage);
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
                 .filter(referenceType -> !referenceType.type().equals(sourceName))
                 .filter(referenceType -> !mapper.getTypescriptType(referenceType).isPrimitive())
-                .map(referenceType -> {
-                    Optional<ConjurePackage> maybeDestName = mapper.getContainingPackage(referenceType);
-                    return maybeDestName.map(destName -> {
-                        String destFolder = GenerationUtils.packageToFolderPath(destName);
-                        return GenerationUtils.createImportStatement(mapper.getTypescriptType(referenceType),
-                                getTypescriptFilePath(folderLocation, sourceName.name()),
-                                getTypescriptFilePath(destFolder, referenceType.type().name()));
-                    });
-                })
+                .map(referenceType -> generateImportStatement(referenceType, sourceName, sourcePackage, mapper))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    public static ExportStatement createExportStatementRelativeToRoot(
-            String exportName, String parentFolderPath, String sourceName) {
-        String tsFilePath = getTypescriptFilePath(parentFolderPath, sourceName);
-        List<String> segments = ImmutableList.copyOf(tsFilePath.split("/"));
-        String filepathToExport = "./" + Joiner.on("/").join(segments);
+    private static Optional<ImportStatement> generateImportStatement(
+            ReferenceType referenceType, TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
+        Optional<ConjurePackage> maybeDestPackage = mapper.getContainingPackage(referenceType);
+        return maybeDestPackage.map(destPackage -> {
+            TypescriptSimpleType typeScriptType = mapper.getTypescriptType(referenceType);
+            if (Objects.equals(sourcePackage, destPackage)) {
+                return ImportStatement.builder()
+                        .addNamesToImport(typeScriptType.name())
+                        .filepathToImport(getTypescriptFilePath(referenceType.type().name()))
+                        .build();
+            }
+            return ImportStatement.builder()
+                    .addNamesToImport(typeScriptType.name())
+                    .filepathToImport(packageToScopeAndModule(destPackage))
+                    .build();
+        });
+    }
 
+    public static ExportStatement createExportStatementRelativeToRoot(String exportName, String sourceName) {
+        String tsFilePath = getTypescriptFilePath(sourceName);
         return ExportStatement.builder()
                 .addNamesToExport(exportName)
-                .filepathToExport(filepathToExport)
+                .filepathToExport(tsFilePath)
                 .build();
     }
 
@@ -118,7 +89,7 @@ public final class GenerationUtils {
         return Files.asCharSource(file, StandardCharsets.UTF_8).read();
     }
 
-    public static String getTypescriptFilePath(String parentFolder, String name) {
-        return parentFolder + "/" + StringUtils.uncapitalize(name);
+    public static String getTypescriptFilePath(String name) {
+        return "./" + StringUtils.uncapitalize(name);
     }
 }

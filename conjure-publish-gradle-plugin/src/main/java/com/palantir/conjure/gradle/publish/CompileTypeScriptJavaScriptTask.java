@@ -37,26 +37,21 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
     @TaskAction
     public final void compileFiles() {
-        File workingDirectory = ConjurePublishPlugin.getTypescriptWorkingDirectory(getProject().getBuildDir());
         // install typescript compiler
         getProject().exec(execSpec -> {
             execSpec.commandLine("npm",
                     "install",
                     "--prefix",
-                    ConjurePublishPlugin.getTypescriptWorkingDirectory(
-                            getProject().getBuildDir()).getAbsolutePath(),
+                    getProject().getBuildDir().getAbsolutePath(),
                     "typescript@2.1.4");
         });
-        File tscExecutable = new File(workingDirectory, "node_modules/typescript/bin/tsc");
+        File tscExecutable = new File(getProject().getBuildDir(), "node_modules/typescript/bin/tsc");
 
         // Construct a directory that we'll use to compile the typescript
-        File typescriptWorkingDirectory =
-                new File(ConjurePublishPlugin.getTypescriptWorkingDirectory(getProject().getBuildDir()),
-                        "typescriptWorkingDirectory");
+        File typescriptWorkingDirectory = new File(getProject().getBuildDir(), "typeScriptWorkingDirectory");
 
         // Write tsconfig.json
         File tsConfigFile = new File(typescriptWorkingDirectory, "tsconfig.json");
-        ConjurePublishPlugin.copyFromResource("tsconfig.json", tsConfigFile);
         ConjurePublishPlugin.makeFile(tsConfigFile, ConjurePublishPlugin.readResource("tsconfig.json"));
 
         // Write e6-shim
@@ -74,8 +69,7 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
         // Compile typescript
         getProject().exec(execSpec -> {
-            execSpec.commandLine(tscExecutable.getAbsolutePath(),
-                    "--rootDir", ".");
+            execSpec.commandLine(tscExecutable.getAbsolutePath(), "--rootDir", ".");
             execSpec.setWorkingDir(typescriptWorkingDirectory);
         });
 

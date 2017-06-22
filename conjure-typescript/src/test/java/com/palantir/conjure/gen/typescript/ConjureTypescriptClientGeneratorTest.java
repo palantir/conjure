@@ -28,12 +28,12 @@ public final class ConjureTypescriptClientGeneratorTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private File src;
-    private ConjureTypescriptClientGenerator generator;
+    private ConjureTypeScriptClientGenerator generator;
 
     @Before
     public void before() throws IOException {
         src = folder.newFolder("src");
-        generator = new ConjureTypescriptClientGenerator(
+        generator = new ConjureTypeScriptClientGenerator(
                 new DefaultServiceGenerator(),
                 new DefaultTypeGenerator());
     }
@@ -42,7 +42,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     public void nativeTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/native-types.conjure"));
         generator.emit(ImmutableList.of(conjure), src);
-        String xfile = "package/foo.ts";
+        String xfile = "@palantir/package/foo.ts";
         assertThat(compiledFileContent(src, xfile))
                 .contains("interface IFoo");
         assertThat(compiledFileContent(src, xfile))
@@ -61,9 +61,9 @@ public final class ConjureTypescriptClientGeneratorTest {
     public void referenceTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/reference-types.conjure"));
         generator.emit(ImmutableList.of(conjure), src);
-        String fooFile = "package1/foo.ts";
-        String barFile = "package1/folder/bar.ts";
-        String boomFile = "package2/folder/boom.ts";
+        String fooFile = "@palantir/package1/foo.ts";
+        String barFile = "@palantir/package1-folder/bar.ts";
+        String boomFile = "@palantir/package2-folder/boom.ts";
 
         // Assert all files are generated
         assertThat(compiledFileContent(src, fooFile))
@@ -75,9 +75,9 @@ public final class ConjureTypescriptClientGeneratorTest {
 
         // Assert expected references to Bar/Boom, and EnumObject from Foo
         assertThat(compiledFileContent(src, fooFile))
-                .contains("import { IBar } from \"./folder/bar\"");
+                .contains("import { IBar } from \"@palantir/package1-folder\"");
         assertThat(compiledFileContent(src, fooFile))
-                .contains("import { IBoom } from \"../package2/folder/boom\"");
+                .contains("import { IBoom } from \"@palantir/package2-folder\"");
         assertThat(compiledFileContent(src, fooFile))
                 .contains("import { EnumObject } from \"./enumObject\"");
     }
@@ -87,17 +87,14 @@ public final class ConjureTypescriptClientGeneratorTest {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services/test-service.yml"));
         generator.emit(ImmutableList.of(conjure), src);
 
-        assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
-                new File("src/test/resources/services/test-service-index.ts").toPath()), StandardCharsets.UTF_8));
-    }
+        assertThat(compiledFileContent(src, "@palantir/foundry-catalog-api/index.ts")).isEqualTo(
+                "export { ICreateDatasetRequest } from \"./createDatasetRequest\";\n"
+                + "export { ITestService } from \"./testService\";\n"
+                + "export { TestService } from \"./testServiceImpl\";\n");
 
-    @Test
-    public void indexFileTest_duplicate() throws IOException {
-        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services-types-duplicates.yml"));
-        generator.emit(ImmutableList.of(conjure), src);
-
-        assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
-                new File("src/test/resources/services-types-duplicates-index.ts").toPath()), StandardCharsets.UTF_8));
+        assertThat(compiledFileContent(src, "@palantir/foundry-catalog-api-datasets/index.ts")).isEqualTo(
+                "export { IBackingFileSystem } from \"./backingFileSystem\";\n"
+                + "export { IDataset } from \"./dataset\";\n");
     }
 
     @Test
@@ -107,8 +104,10 @@ public final class ConjureTypescriptClientGeneratorTest {
         List<ConjureDefinition> definitions = ImmutableList.of(conjure1, conjure2);
         generator.emit(definitions, src);
 
-        assertThat(compiledFileContent(src, "index.ts")).isEqualTo(new String(Files.readAllBytes(
-                new File("src/test/resources/multiple-conjure-files-index.ts").toPath()), StandardCharsets.UTF_8));
+        assertThat(compiledFileContent(src, "@palantir/test-api-objects/index.ts")).isEqualTo(
+                new String(Files.readAllBytes(
+                        new File("src/test/resources/multiple-conjure-files-index.ts").toPath()),
+                        StandardCharsets.UTF_8));
     }
 
     @Test
@@ -117,15 +116,15 @@ public final class ConjureTypescriptClientGeneratorTest {
         generator.emit(ImmutableList.of(conjure), src);
 
         // Generated files contain imports
-        assertThat(compiledFileContent(src, "with/imports/complexObjectWithImports.ts"))
-                .contains("import { IStringExample } from \"../../test/api/stringExample\"")
+        assertThat(compiledFileContent(src, "@api/with-imports/complexObjectWithImports.ts"))
+                .contains("import { IStringExample } from \"@palantir/test-api\"")
                 .doesNotContain("import { string }");
-        assertThat(compiledFileContent(src, "with/imports/testService.ts"))
-                .contains("import { IBackingFileSystem } from \"../../foundry/catalog/api/datasets/backingFileSystem\"")
-                .contains("import { IStringExample } from \"../../test/api/stringExample\"");
+        assertThat(compiledFileContent(src, "@api/with-imports/testService.ts"))
+                .contains("import { IBackingFileSystem } from \"@palantir/foundry-catalog-api-datasets\"")
+                .contains("import { IStringExample } from \"@palantir/test-api\"");
 
         // Imported files are not generated
-        assertThat(compiledFile(src, "foundry/catalog/api/datasets/backingFileSystem.ts")).doesNotExist();
+        assertThat(compiledFile(src, "@palantir/foundry-catalog-api-datasets/backingFileSystem.ts")).doesNotExist();
         assertThat(compiledFile(src, "test/api/stringExample.ts")).doesNotExist();
     }
 

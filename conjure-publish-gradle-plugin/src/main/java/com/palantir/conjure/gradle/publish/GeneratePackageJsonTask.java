@@ -14,7 +14,7 @@ import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
-public class BundleJavascriptTask extends ConventionTask {
+public class GeneratePackageJsonTask extends ConventionTask {
 
     private File inputDirectory;
     private File outputDirectory;
@@ -42,23 +42,28 @@ public class BundleJavascriptTask extends ConventionTask {
         // Copy src
         ConjurePublishPlugin.copyDirectory(new File(getInputDirectory(), "src"), getOutputDirectory());
 
-        // Add package.json
+        // Add package.json for each package
         Handlebars handlebars = new Handlebars();
         try {
             Template template = handlebars.compileInline(ConjurePublishPlugin.readResource("package.json.hbs"));
-            ConjurePublishPluginExtension extension = getProject().getExtensions()
-                    .getByType(ConjurePublishPluginExtension.class);
-
-            String packageJsonText = template.apply(
-                    ImmutableMap.of(
-                            "scopeName", extension.getScopeName(),
-                            "packageName", extension.getPackageName(),
-                            "version", getProject().getVersion()
-                    )
-            );
-            ConjurePublishPlugin.makeFile(new File(getOutputDirectory(), "package.json"), packageJsonText);
+            for (File scopeDir : getOutputDirectory().listFiles()) {
+                for (File packageDir : scopeDir.listFiles()) {
+                    createPackageJson(template, packageDir, scopeDir.getName(), packageDir.getName());
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private void createPackageJson(Template template, File outputDir, String scopeName, String packageName)
+            throws IOException {
+        String packageJsonText = template.apply(
+                ImmutableMap.of(
+                        "scopeName", scopeName,
+                        "packageName", packageName,
+                        "version", getProject().getVersion()));
+        ConjurePublishPlugin.makeFile(new File(outputDir, "package.json"), packageJsonText);
+    }
+
 }
