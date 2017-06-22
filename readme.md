@@ -34,7 +34,7 @@ Contents:
    - [Endpoints](#endpoints)
  - [Gradle Plugin](#gradle-plugin)
    - [Compilation](#conjure-compilation)
-   - [TypeScript Publishing](#typescript-publishing)
+   - [TypeScript Publication](#typescript-publication)
  - [Feature Requests](#feature-requests)
 
 Why?
