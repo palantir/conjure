@@ -18,3 +18,8 @@ requirements:
     - python
     - requests
     - typing
+
+test:
+  imports:
+    - conjure
+    - httpremoting
