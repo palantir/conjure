@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,4 +63,21 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
                     readFromResource("/test/api/" + file.getFileName() + ".retrofit_completable_future"));
         }
     }
+
+    @Test
+    public void testConjureImports() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        File src = folder.newFolder("src");
+        Retrofit2ServiceGenerator generator = new Retrofit2ServiceGenerator(ImmutableSet.of());
+        generator.emit(conjure, src);
+
+        // Generated files contain imports
+        assertThat(compiledFileContent(src, "test/api/with/imports/TestService.java"))
+                .contains("import test.api.StringExample;");
+    }
+
+    private static String compiledFileContent(File srcDir, String clazz) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(srcDir.getPath(), clazz)), StandardCharsets.UTF_8);
+    }
+
 }

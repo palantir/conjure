@@ -8,6 +8,7 @@ package com.palantir.conjure.gen.java;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
+import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -66,10 +67,10 @@ public final class ConjureYmlParsingTest {
             ConjureDefinition conjure = Conjure.parse(file);
             File src = folder.newFolder("src");
             Settings settings = Settings.standard();
-            ConjureJavaServiceAndTypeGenerator generator = new ConjureJavaServiceAndTypeGenerator(
-                    new JerseyServiceGenerator(),
-                    new BeanGenerator(settings));
-            generator.emit(conjure, src);
+            ServiceGenerator serviceGenerator = new JerseyServiceGenerator();
+            serviceGenerator.emit(conjure, src);
+            BeanGenerator beanGenerator = new BeanGenerator(settings);
+            beanGenerator.emit(conjure, src);
         } catch (RuntimeException e) {
             exceptionThrown = true;
             if (valid) {

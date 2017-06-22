@@ -22,13 +22,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public final class BeanJavaTypeGeneratorTests {
+public final class BeanGeneratorTests {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testBeanJavaTypeGenerator_allExamples() throws IOException {
+    public void testBeanGenerator_allExamples() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         List<Path> files = new BeanGenerator(
                 Settings.builder().ignoreUnknownProperties(true).build(),
@@ -39,7 +39,7 @@ public final class BeanJavaTypeGeneratorTests {
     }
 
     @Test
-    public void testEnumJavaGenerator_withNoUnknown() throws IOException {
+    public void testEnumGenerator_withNoUnknown() throws IOException {
         File conjureFile = writeToTempFile(
                 "types:\n"
                         + "  definitions:\n"
@@ -56,6 +56,24 @@ public final class BeanJavaTypeGeneratorTests {
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files);
+    }
+
+    @Test
+    public void testConjureImports() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        File src = folder.newFolder("src");
+        Settings settings = Settings.standard();
+        BeanGenerator generator = new BeanGenerator(settings);
+        generator.emit(conjure, src);
+
+        // Generated files contain imports
+        assertThat(compiledFileContent(src, "test/api/with/imports/ComplexObjectWithImports.java"))
+                .contains("import test.api.StringExample;");
+
+        // Imported files are not generated.
+        assertThat(new File(src, "com/palantir/foundry/catalog/api/datasets/BackingFileSystem.java"))
+                .doesNotExist();
+        assertThat(new File(src, "test/api/StringExample.java")).doesNotExist();
     }
 
     private void assertThatFilesAreTheSame(List<Path> files) throws IOException {
@@ -79,5 +97,9 @@ public final class BeanJavaTypeGeneratorTests {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String compiledFileContent(File srcDir, String clazz) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(srcDir.getPath(), clazz)), StandardCharsets.UTF_8);
     }
 }
