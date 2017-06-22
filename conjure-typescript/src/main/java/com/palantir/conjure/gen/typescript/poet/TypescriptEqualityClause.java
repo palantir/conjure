@@ -9,13 +9,21 @@ import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
 @Value.Immutable
-public interface TypescriptEqualityClause extends TypescriptEqualityStatement {
-
-    String clause();
+public interface TypescriptEqualityClause extends TypescriptExpression {
+    TypescriptExpression lhs();
+    TypescriptExpression rhs();
+    @Value.Default
+    default boolean useTripleEquals() {
+        return true;
+    }
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        writer.write(clause());
+        writer.write("(");
+        lhs().emit(writer);
+        writer.write(useTripleEquals() ? " === " : " == ");
+        rhs().emit(writer);
+        writer.write(")");
     }
 
     static Builder builder() {

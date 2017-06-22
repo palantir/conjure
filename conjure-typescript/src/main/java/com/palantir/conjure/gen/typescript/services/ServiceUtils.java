@@ -16,7 +16,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
-import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
@@ -53,7 +53,7 @@ public final class ServiceUtils {
         return TypescriptFunctionSignature.builder()
                 .name(name)
                 .parameters(generateParameters(value.argsWithAutoDefined().orElse(ImmutableMap.of()), typeMapper))
-                .returnType(TypescriptType.builder().name("Promise<" + innerReturnType + ">").build())
+                .returnType(TypescriptSimpleType.builder().name("Promise<" + innerReturnType + ">").build())
                 .build();
     }
 

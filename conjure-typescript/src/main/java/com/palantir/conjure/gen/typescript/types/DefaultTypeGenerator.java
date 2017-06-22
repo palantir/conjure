@@ -6,10 +6,11 @@ package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.TypesDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
@@ -18,11 +19,9 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
-import com.palantir.conjure.gen.typescript.poet.EqualityStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
@@ -36,11 +35,14 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptFunction;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionBody;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
+import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptTypeAlias;
+import com.palantir.conjure.gen.typescript.poet.TypescriptTypeGuardType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
+import com.palantir.conjure.gen.typescript.poet.TypescriptUnionType;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import com.palantir.parsec.ParseException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -169,66 +171,89 @@ public final class DefaultTypeGenerator implements TypeGenerator {
     private TypescriptFile generateUnionTypeFile(TypeName typeName, UnionTypeDefinition baseTypeDef,
             ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
         List<ConjureType> referencedTypes = Lists.newArrayList();
-        SortedSet<TypescriptTypeSignature> propertySignatures = new TreeSet<TypescriptTypeSignature>();
-        propertySignatures.add(TypescriptTypeSignature.builder()
-                .name("type")
-                .typescriptType(mapper.getTypescriptType(PrimitiveType.STRING))
-                .build());
-        SortedSet<TypescriptFunction> methods =
-                new TreeSet<TypescriptFunction>(Comparator.comparing(TypescriptFunction::functionSignature));
-        ReturnStatement baseReturn = ReturnStatement.builder().expression(RawExpression.of("undefined")).build();
-        String interfaceName = "I" + typeName.name();
-        TypescriptType unionType = TypescriptType.builder().name(interfaceName).build();
+        List<TypescriptInterface> subInterfaces = Lists.newArrayList();
+        List<TypescriptFunction> typeGuards = Lists.newArrayList();
+        Map<String, TypescriptExpression> typeGuardProps = Maps.newHashMap();
+        String mainName = "I" + typeName.name();
+        TypescriptType mainType = TypescriptSimpleType.builder().name(mainName).build();
+
         baseTypeDef.union().forEach((memberName, memberType) -> {
+            String capitalizedMemberName = StringUtils.capitalize(memberName);
+            String interfaceName = String.format("%s_%s", mainName, capitalizedMemberName);
+            String typeGuardName = String.format("is%s", capitalizedMemberName);
+            TypescriptSimpleType interfaceType = TypescriptSimpleType.builder().name(interfaceName).build();
+            StringExpression quotedMemberName = StringExpression.of(memberName);
             ConjureType conjureTypeOfMemberType = getConjureType(memberType.type());
             referencedTypes.add(conjureTypeOfMemberType);
-            propertySignatures.add(
-                    TypescriptTypeSignature.builder()
-                            .name(StringExpression.of(memberName).emitToString())
-                            .typescriptType(mapper.getTypescriptType(conjureTypeOfMemberType))
-                            .isOptional(true)
-                            .build());
-            TypescriptFunctionSignature functionHeader =
-                    TypescriptFunctionSignature.builder()
-                            .addParameters(
-                                    TypescriptTypeSignature.builder().name("obj").typescriptType(unionType).build())
-                            .name(StringUtils.uncapitalize(memberName))
-                            .build();
-            TypescriptEqualityClause typescriptEqualityClause = TypescriptEqualityClause.builder()
-                    .clause("obj.type === " + StringExpression.of(memberName).emitToString())
-                    .build();
-            EqualityStatement equalityStatement = EqualityStatement.builder()
-                    .typescriptEqualityStatement(typescriptEqualityClause)
-                    .equalityBody(ReturnStatement.builder()
-                            .expression(
-                                    RawExpression.of(
-                                            "obj[" + StringExpression.of(memberName).emitToString() + "]"))
+
+            // build interface
+            SortedSet<TypescriptTypeSignature> propertySignatures = Sets.newTreeSet();
+            propertySignatures.add(TypescriptTypeSignature.builder()
+                    .name("type")
+                    .typescriptType(TypescriptSimpleType.builder().name(quotedMemberName.emitToString()).build())
+                    .build());
+            propertySignatures.add(TypescriptTypeSignature.builder()
+                    .name(StringExpression.of(memberName).emitToString())
+                    .typescriptType(mapper.getTypescriptType(conjureTypeOfMemberType))
+                    .build());
+            subInterfaces.add(TypescriptInterface.builder()
+                    .name(interfaceName)
+                    .propertySignatures(propertySignatures)
+                    .build());
+
+            // build type guard function
+            TypescriptFunctionSignature functionSignature = TypescriptFunctionSignature.builder()
+                    .addParameters(TypescriptTypeSignature.builder()
+                            .name("obj")
+                            .typescriptType(mainType)
+                            .build())
+                    .name(typeGuardName)
+                    .returnType(TypescriptTypeGuardType.builder()
+                            .variableName("obj")
+                            .predicateType(interfaceType)
                             .build())
                     .build();
-            TypescriptFunction helperFunction = TypescriptFunction.builder()
-                    .functionSignature(functionHeader)
-                    .functionBody(TypescriptFunctionBody.builder()
-                            .addStatements(equalityStatement)
-                            .addStatements(baseReturn).build())
-                    .isStatic(true)
+            TypescriptFunctionBody functionBody = TypescriptFunctionBody.builder()
+                    .addStatements(ReturnStatement.builder()
+                            .expression(TypescriptEqualityClause.builder()
+                                    .lhs(RawExpression.of("obj.type"))
+                                    .rhs(quotedMemberName).build())
+                            .build())
                     .build();
-            methods.add(helperFunction);
+
+            typeGuards.add(TypescriptFunction.builder()
+                    .functionSignature(functionSignature)
+                    .functionBody(functionBody)
+                    .isMethod(false)
+                    .build());
+            typeGuardProps.put(typeGuardName, RawExpression.of(typeGuardName));
+
         });
-        propertySignatures.add(TypescriptTypeSignature.builder()
-                .name("[key: string]")
-                .typescriptType(mapper.getTypescriptType(AnyType.of()))
-                .build());
-        TypescriptInterface thisInterface = TypescriptInterface.builder()
-                .name(interfaceName)
-                .propertySignatures(propertySignatures)
-                .build();
+
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
                 typeName, packageLocation, mapper);
+
+        TypescriptUnionType unionType = TypescriptUnionType.builder()
+                .types(subInterfaces.stream().map(
+                        i -> TypescriptSimpleType.builder().name(i.name()).build()).collect(Collectors.toList()))
+                .build();
+        TypescriptTypeAlias mainTypeAlias = TypescriptTypeAlias.builder()
+                .name(mainName)
+                .type(unionType)
+                .build();
+
+        AssignStatement typeGuardObj = AssignStatement.builder()
+                .lhs("export const " + mainName)
+                .rhs(JsonExpression.builder().putAllKeyValues(typeGuardProps).build())
+                .build();
+
         return TypescriptFile.builder()
                 .name(typeName.name())
                 .imports(importStatements)
-                .addEmittables(thisInterface)
-                .addAllEmittables(methods)
+                .addAllEmittables(subInterfaces)
+                .addEmittables(mainTypeAlias)
+                .addAllEmittables(typeGuards)
+                .addEmittables(typeGuardObj)
                 .parentFolderPath(parentFolderPath)
                 .build();
     }

@@ -14,14 +14,14 @@ public interface TypescriptFunction extends Emittable {
     TypescriptFunctionSignature functionSignature();
 
     @Value.Default
-    default boolean isStatic() {
-        return false;
+    default boolean isMethod() {
+        return true;
     }
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        if (isStatic()) {
-            writer.writeIndented("export function ");
+        if (!isMethod()) {
+            writer.writeIndented("function ");
         } else {
             writer.writeIndented("public ");
         }

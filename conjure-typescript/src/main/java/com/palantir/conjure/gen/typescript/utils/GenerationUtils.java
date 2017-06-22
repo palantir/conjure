@@ -15,7 +15,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
-import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import java.io.File;
 import java.io.IOException;
@@ -68,12 +68,12 @@ public final class GenerationUtils {
         return result.toString();
     }
 
-    public static ImportStatement createImportStatement(TypescriptType typescriptType, String sourcePath,
+    public static ImportStatement createImportStatement(TypescriptSimpleType typescriptType, String sourcePath,
             String destPath) {
         return createImportStatement(ImmutableSet.of(typescriptType), sourcePath, destPath);
     }
 
-    public static ImportStatement createImportStatement(Set<TypescriptType> typescriptType, String sourcePath,
+    public static ImportStatement createImportStatement(Set<TypescriptSimpleType> typescriptType, String sourcePath,
             String destPath) {
         return ImportStatement.builder().filepathToImport(getRelativePath(sourcePath, destPath)).addAllNamesToImport(
                 typescriptType.stream().map(type -> type.name()).collect(Collectors.toList())).build();

@@ -34,7 +34,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunction;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionBody;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
-import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
@@ -67,7 +67,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         .rhs(RawExpression.of("bridge"))
                         .build())
                 .build();
-        TypescriptType bridgeType = TypescriptType.builder().name("IHttpApiBridge").build();
+        TypescriptSimpleType bridgeType = TypescriptSimpleType.builder().name("IHttpApiBridge").build();
         TypescriptConstructor constructor = TypescriptConstructor.builder()
                 .addParameters(TypescriptTypeSignature.builder().name("bridge").typescriptType(bridgeType).build())
                 .functionBody(constructorBody).build();

@@ -1,42 +1,45 @@
 import { IStringExample } from "./stringExample";
 
-export interface IUnionTypeExample {
-    [key: string]: any;
-    type: string;
-    "map"?: { [key: string]: string };
-    "number"?: number;
-    "set"?: string[];
-    "stringExample"?: IStringExample;
+export interface IUnionTypeExample_StringExample {
+    "stringExample": IStringExample;
+    type: "stringExample";
 }
-export function map(
+export interface IUnionTypeExample_Set {
+    "set": string[];
+    type: "set";
+}
+export interface IUnionTypeExample_Number {
+    "number": number;
+    type: "number";
+}
+export interface IUnionTypeExample_Map {
+    "map": { [key: string]: string };
+    type: "map";
+}
+export type IUnionTypeExample = (IUnionTypeExample_StringExample | IUnionTypeExample_Set | IUnionTypeExample_Number | IUnionTypeExample_Map);
+function isStringExample(
     obj: IUnionTypeExample
-) {
-    if (obj.type === "map") {
-        return obj["map"];
-    }
-    return undefined;
+): obj is IUnionTypeExample_StringExample {
+    return (obj.type === "stringExample");
 }
-export function number(
+function isSet(
     obj: IUnionTypeExample
-) {
-    if (obj.type === "number") {
-        return obj["number"];
-    }
-    return undefined;
+): obj is IUnionTypeExample_Set {
+    return (obj.type === "set");
 }
-export function set(
+function isNumber(
     obj: IUnionTypeExample
-) {
-    if (obj.type === "set") {
-        return obj["set"];
-    }
-    return undefined;
+): obj is IUnionTypeExample_Number {
+    return (obj.type === "number");
 }
-export function stringExample(
+function isMap(
     obj: IUnionTypeExample
-) {
-    if (obj.type === "stringExample") {
-        return obj["stringExample"];
-    }
-    return undefined;
+): obj is IUnionTypeExample_Map {
+    return (obj.type === "map");
 }
+export const IUnionTypeExample = {
+    isMap: isMap,
+    isNumber: isNumber,
+    isSet: isSet,
+    isStringExample: isStringExample,
+};

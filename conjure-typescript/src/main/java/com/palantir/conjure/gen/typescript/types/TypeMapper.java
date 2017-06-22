@@ -34,7 +34,7 @@ import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.ImportedTypes;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
-import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
@@ -49,8 +49,8 @@ public final class TypeMapper {
         this.defaultPackage = defaultPackage;
     }
 
-    public TypescriptType getTypescriptType(ConjureType conjureType) {
-        return TypescriptType.builder().name(getTypeNameFromConjureType(conjureType)).build();
+    public TypescriptSimpleType getTypescriptType(ConjureType conjureType) {
+        return TypescriptSimpleType.builder().name(getTypeNameFromConjureType(conjureType)).build();
     }
 
     public Set<ReferenceType> getReferencedConjureNames(ConjureType conjureType) {
