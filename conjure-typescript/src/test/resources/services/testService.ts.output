@@ -13,6 +13,10 @@ export interface ITestService {
         datasetRid: string
     ): Promise<IDataset>;
     getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;
+    paginateSomething(
+        pageSize: number,
+        pageToken?: string
+    ): Promise<void>;
     uploadRawData(
         input: any
     ): Promise<void>;

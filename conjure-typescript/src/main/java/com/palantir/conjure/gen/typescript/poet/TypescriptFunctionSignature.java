@@ -5,8 +5,10 @@
 package com.palantir.conjure.gen.typescript.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -26,12 +28,18 @@ public interface TypescriptFunctionSignature extends Comparable<TypescriptFuncti
     default void emit(TypescriptPoetWriter writer) {
         writer.write(name());
         writer.write("(");
-        if (parameters().size() > 0) {
+
+        List<TypescriptTypeSignature> parametersOptionalAtEnd = parameters().stream()
+                // this sort is stable
+                .sorted(Comparator.comparing(TypescriptTypeSignature::isOptional))
+                .collect(Collectors.toList());
+
+        if (parametersOptionalAtEnd.size() > 0) {
             writer.writeLine();
             writer.increaseIndent();
             writer.writeIndented();
-            parameters().get(0).emit(writer);
-            parameters().subList(1, parameters().size()).forEach(parameter -> {
+            parametersOptionalAtEnd.get(0).emit(writer);
+            parametersOptionalAtEnd.subList(1, parametersOptionalAtEnd.size()).forEach(parameter -> {
                 writer.writeLine(",");
                 writer.writeIndented();
                 parameter.emit(writer);

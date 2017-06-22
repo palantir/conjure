@@ -92,6 +92,29 @@ export class TestService {
         });
     }
 
+    public paginateSomething(
+        pageSize: number,
+        pageToken?: string
+    ): Promise<void> {
+        return this.bridge.callEndpoint<void>({
+            data: undefined,
+            endpointName: "paginateSomething",
+            endpointPath: "/catalog/datasets/some-page",
+            method: "GET",
+            pathArguments: [
+            ],
+            queryArguments: {
+                pageSize: pageSize,
+                pageToken: pageToken,
+            },
+            requestMediaType: "application/json",
+            requiredHeaders: [
+                "Authorization",
+            ],
+            responseMediaType: "application/json",
+        });
+    }
+
     public uploadRawData(
         input: any
     ): Promise<void> {

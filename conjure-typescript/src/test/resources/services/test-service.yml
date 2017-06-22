@@ -78,3 +78,13 @@ services:
           input:
             type: binary
             param-type: body
+
+      paginateSomething:
+        http: GET /datasets/some-page
+        args:
+          pageToken:
+            type: optional<string>
+            param-type: query
+          pageSize:
+            type: integer
+            param-type: query
