@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -41,7 +42,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void nativeTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/native-types.conjure"));
-        generator.emit(ImmutableList.of(conjure), src);
+        generator.emit(ImmutableList.of(conjure), "0.0.0", src);
         String xfile = "@palantir/package/foo.ts";
         assertThat(compiledFileContent(src, xfile))
                 .contains("interface IFoo");
@@ -60,7 +61,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void referenceTypesTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/reference-types.conjure"));
-        generator.emit(ImmutableList.of(conjure), src);
+        generator.emit(ImmutableList.of(conjure), "0.0.0", src);
         String fooFile = "@palantir/package1/foo.ts";
         String barFile = "@palantir/package1-folder/bar.ts";
         String boomFile = "@palantir/package2-folder/boom.ts";
@@ -85,7 +86,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void indexFileTest() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/services/test-service.yml"));
-        generator.emit(ImmutableList.of(conjure), src);
+        generator.emit(ImmutableList.of(conjure), "0.0.0", src);
 
         assertThat(compiledFileContent(src, "@palantir/foundry-catalog-api/index.ts")).isEqualTo(
                 "export { ICreateDatasetRequest } from \"./createDatasetRequest\";\n"
@@ -102,7 +103,7 @@ public final class ConjureTypescriptClientGeneratorTest {
         ConjureDefinition conjure1 = Conjure.parse(new File("src/test/resources/multiple-conjure-files-1.yml"));
         ConjureDefinition conjure2 = Conjure.parse(new File("src/test/resources/multiple-conjure-files-2.yml"));
         List<ConjureDefinition> definitions = ImmutableList.of(conjure1, conjure2);
-        generator.emit(definitions, src);
+        generator.emit(definitions, "0.0.0", src);
 
         assertThat(compiledFileContent(src, "@palantir/test-api-objects/index.ts")).isEqualTo(
                 new String(Files.readAllBytes(
@@ -113,7 +114,7 @@ public final class ConjureTypescriptClientGeneratorTest {
     @Test
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
-        generator.emit(ImmutableList.of(conjure), src);
+        generator.emit(ImmutableList.of(conjure), "0.0.0", src);
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "@api/with-imports/complexObjectWithImports.ts"))
@@ -124,15 +125,48 @@ public final class ConjureTypescriptClientGeneratorTest {
                 .contains("import { IStringExample } from \"@palantir/test-api\"");
 
         // Imported files are not generated
-        assertThat(compiledFile(src, "@palantir/foundry-catalog-api-datasets/backingFileSystem.ts")).doesNotExist();
-        assertThat(compiledFile(src, "test/api/stringExample.ts")).doesNotExist();
+        assertThat(new File(src, "@palantir/foundry-catalog-api-datasets/backingFileSystem.ts")).doesNotExist();
+        assertThat(new File(src, "test/api/stringExample.ts")).doesNotExist();
+    }
+
+    @Test
+    public void testPackageJson() throws IOException {
+        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        generator.emit(ImmutableList.of(conjure), "0.0.0", src);
+
+        // first package
+        File packageJsonFile = new File(src, "@api/with-imports/package.json");
+        assertThat(packageJsonFile).exists();
+        ObjectMapper mapper = new ObjectMapper();
+        assertThat(mapper.readValue(packageJsonFile, PackageJson.class)).isEqualTo(
+                PackageJson.builder()
+                        .author("Palantir Technologies, Inc.")
+                        .putPeerDependencies(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB,
+                                ConjureTypeScriptClientGenerator.CONJURE_FE_LIB_VERSION)
+                        .version("0.0.0")
+                        .description("Conjure definitions for @api/with-imports")
+                        .name("@api/with-imports")
+                        .putDependencies("@palantir/test-api", "^0.0.0")
+                        .putDependencies("@palantir/foundry-catalog-api-datasets", "^0.0.0")
+                        .build());
+
+        // second package
+        packageJsonFile = new File(src, "@api/with-imports-package-override/package.json");
+        assertThat(packageJsonFile).exists();
+        assertThat(mapper.readValue(packageJsonFile, PackageJson.class)).isEqualTo(
+                PackageJson.builder()
+                        .author("Palantir Technologies, Inc.")
+                        .putPeerDependencies(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB,
+                                ConjureTypeScriptClientGenerator.CONJURE_FE_LIB_VERSION)
+                        .version("0.0.0")
+                        .description("Conjure definitions for @api/with-imports-package-override")
+                        .name("@api/with-imports-package-override")
+                        .putDependencies("@palantir/test-api", "^0.0.0")
+                        .build());
     }
 
     private static String compiledFileContent(File srcDir, String clazz) throws IOException {
-        return GenerationUtils.getCharSource(compiledFile(srcDir, clazz));
+        return GenerationUtils.getCharSource(new File(srcDir, clazz));
     }
 
-    private static File compiledFile(File srcDir, String clazz) throws IOException {
-        return new File(srcDir, clazz);
-    }
 }

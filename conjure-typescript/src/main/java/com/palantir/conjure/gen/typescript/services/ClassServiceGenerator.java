@@ -19,6 +19,7 @@ import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.gen.typescript.ConjureTypeScriptClientGenerator;
 import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
@@ -98,7 +99,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
                 .addImports(ImportStatement.builder()
                         .addNamesToImport("IHttpApiBridge")
-                        .filepathToImport("@elements/conjure-fe-lib")
+                        .filepathToImport(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB)
                         .build())
                 .name(getFilename(typeName))
                 .parentFolderPath(parentFolderPath)

@@ -8,8 +8,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -25,15 +23,5 @@ public interface TypeGenerator {
      * resolve or deconflict as appropriate.
      */
     Map<ConjurePackage, Collection<ExportStatement>> generateExports(TypesDefinition types);
-
-    default void emit(TypesDefinition types, File outputDir) {
-        generate(types).forEach(file -> {
-            try {
-                file.writeTo(outputDir);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
 
 }

@@ -40,23 +40,6 @@ class ConjurePublishPluginTest extends GradleTestSpec {
         file('build/compileTypeScriptOutput/src/@palantir/api-foo/testServiceFooImpl.js').text.contains('var TestServiceFoo = ')
     }
 
-    def 'generatePackageJson generates package.json'() {
-        when:
-        def result = run('generatePackageJson')
-
-        then:
-        result.task(':compileTypeScriptJavaScript').outcome == TaskOutcome.SUCCESS
-        result.task(':generatePackageJson').outcome == TaskOutcome.SUCCESS
-
-        // first package
-        file('build/generatePackageJsonOutput/@palantir/api/testServiceAImpl.js').text.contains('var TestServiceA = ')
-        file('build/generatePackageJsonOutput/@palantir/api/package.json').text.contains('"name": "@palantir/api"');
-
-        // second package
-        file('build/generatePackageJsonOutput/@palantir/api-foo/testServiceFooImpl.js').text.contains('var TestServiceFoo = ')
-        file('build/generatePackageJsonOutput/@palantir/api-foo/package.json').text.contains('"name": "@palantir/api-foo"');
-    }
-
     def readResource(String name) {
         return Resources.asCharSource(Resources.getResource(name), Charset.defaultCharset()).read()
     }

@@ -64,7 +64,9 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
         ConjurePublishPlugin.makeFile(conjureFeLibTypings,
                 ConjurePublishPlugin.readResource("conjure-fe-lib_index.d.ts"));
 
-        // Copy source
+        // Copy all generated TS (including dependencies) into node_modules
+        ConjurePublishPlugin.copyDirectory(getInputDirectory(), new File(typescriptWorkingDirectory, "node_modules"));
+        // Copy source for compilation
         ConjurePublishPlugin.copyDirectory(getInputDirectory(), new File(typescriptWorkingDirectory, "src"));
 
         // Compile typescript

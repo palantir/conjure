@@ -17,23 +17,16 @@ public class ConjurePublishPlugin implements Plugin<Project> {
     @Override
     public final void apply(Project project) {
         File compileTypeScriptOutput = new File(project.getBuildDir(), "compileTypeScriptOutput");
-        File generatePackageJsonOutput = new File(project.getBuildDir(), "generatePackageJsonOutput");
 
         CompileTypeScriptJavaScriptTask compileTypescriptJavascriptTask = project.getTasks()
                 .create("compileTypeScriptJavaScript", CompileTypeScriptJavaScriptTask.class);
         compileTypescriptJavascriptTask.setInputDirectory(project.file("src"));
         compileTypescriptJavascriptTask.setOutputDirectory(compileTypeScriptOutput);
 
-        GeneratePackageJsonTask generatePackageJsonTask = project.getTasks()
-                .create("generatePackageJson", GeneratePackageJsonTask.class);
-        generatePackageJsonTask.setInputDirectory(compileTypeScriptOutput);
-        generatePackageJsonTask.setOutputDirectory(generatePackageJsonOutput);
-        generatePackageJsonTask.dependsOn(compileTypescriptJavascriptTask);
-
         PublishTypeScriptTask publishTypeScriptTask = project.getTasks()
                 .create("publishTypeScript", PublishTypeScriptTask.class);
-        publishTypeScriptTask.setInputDirectory(generatePackageJsonOutput);
-        publishTypeScriptTask.dependsOn(generatePackageJsonTask);
+        publishTypeScriptTask.setInputDirectory(compileTypeScriptOutput);
+        publishTypeScriptTask.dependsOn(compileTypescriptJavascriptTask);
 
         project.afterEvaluate(p -> project.getTasks().maybeCreate("publish").dependsOn(publishTypeScriptTask));
     }

@@ -10,6 +10,12 @@ types:
           string: string
           imported: importedTypes.StringExample
           aliased: importedTypes.AliasExample
+      ComplexObjectWithImportsPackageOverride:
+        package: test.api.with.imports.package.override
+        fields:
+          string: string
+          imported: importedTypes.StringExample
+          aliased: importedTypes.AliasExample
 
 services:
   TestService:

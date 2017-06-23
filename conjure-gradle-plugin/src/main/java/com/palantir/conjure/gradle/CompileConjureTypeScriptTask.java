@@ -53,7 +53,7 @@ public class CompileConjureTypeScriptTask extends SourceTask {
 
         compileFiles(getSource().getFiles());
         // write a gitignore to prevent the generated files ending up in source control
-        Files.write("*.ts\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+        Files.write("*.ts\npackage.json\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
 
     private void compileFiles(Collection<File> files) {
@@ -61,7 +61,7 @@ public class CompileConjureTypeScriptTask extends SourceTask {
                 serviceGenerator, typeGenerator);
 
         List<ConjureDefinition> conjureDefinitions = files.stream().map(Conjure::parse).collect(Collectors.toList());
-        generator.emit(conjureDefinitions, outputDirectory);
+        generator.emit(conjureDefinitions, getProject().getVersion().toString(), outputDirectory);
     }
 
 }

@@ -46,9 +46,11 @@ public class PublishTypeScriptTask extends ConventionTask {
         OkHttpClient client = new OkHttpClient.Builder().build();
         for (File scopeDir : publishWorkingDirectory.listFiles()) {
             String artifactoryCreds = getArtifactoryCreds(client, scopeDir.getName());
-            // Publish each package
-            for (File packageDir : scopeDir.listFiles()) {
-                createNpmrcFileAndPublish(packageDir, artifactoryCreds);
+            if (scopeDir.isDirectory()) {
+                // Publish each package
+                for (File packageDir : scopeDir.listFiles()) {
+                    createNpmrcFileAndPublish(packageDir, artifactoryCreds);
+                }
             }
         }
 
