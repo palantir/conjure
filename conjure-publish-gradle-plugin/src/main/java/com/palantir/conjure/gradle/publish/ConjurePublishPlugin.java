@@ -34,6 +34,8 @@ public class ConjurePublishPlugin implements Plugin<Project> {
                 .create("publishTypeScript", PublishTypeScriptTask.class);
         publishTypeScriptTask.setInputDirectory(generatePackageJsonOutput);
         publishTypeScriptTask.dependsOn(generatePackageJsonTask);
+
+        project.afterEvaluate(p -> project.getTasks().maybeCreate("publish").dependsOn(publishTypeScriptTask));
     }
 
     public static String readResource(String path) {
