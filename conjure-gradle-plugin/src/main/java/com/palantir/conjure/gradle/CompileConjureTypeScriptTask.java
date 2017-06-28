@@ -28,6 +28,9 @@ public class CompileConjureTypeScriptTask extends SourceTask {
     @OutputDirectory
     private File outputDirectory;
 
+    @OutputDirectory
+    private File nodeModulesOutputDirectory;
+
     @Input
     private ServiceGenerator serviceGenerator;
 
@@ -36,6 +39,10 @@ public class CompileConjureTypeScriptTask extends SourceTask {
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    public final void setNodeModulesOutputDirectory(File nodeModulesOutputDirectory) {
+        this.nodeModulesOutputDirectory = nodeModulesOutputDirectory;
     }
 
     public final void setServiceGenerator(ServiceGenerator serviceGenerator) {
@@ -50,18 +57,23 @@ public class CompileConjureTypeScriptTask extends SourceTask {
     public final void compileFiles() throws IOException {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
+        checkState(nodeModulesOutputDirectory.exists() || nodeModulesOutputDirectory.mkdirs(),
+                "Unable to make directory tree %s", nodeModulesOutputDirectory);
 
-        compileFiles(getSource().getFiles());
+        compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()), outputDirectory);
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.ts\npackage.json\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+
+        // make all generated code available for later compilation
+        compileFiles(getSource().getFiles(), nodeModulesOutputDirectory);
     }
 
-    private void compileFiles(Collection<File> files) {
+    private void compileFiles(Collection<File> files, File outputDir) {
         ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
                 serviceGenerator, typeGenerator);
 
         List<ConjureDefinition> conjureDefinitions = files.stream().map(Conjure::parse).collect(Collectors.toList());
-        generator.emit(conjureDefinitions, getProject().getVersion().toString(), outputDirectory);
+        generator.emit(conjureDefinitions, getProject().getVersion().toString(), outputDir);
     }
 
 }

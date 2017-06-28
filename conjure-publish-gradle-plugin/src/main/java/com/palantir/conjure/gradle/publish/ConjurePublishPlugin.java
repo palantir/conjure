@@ -17,16 +17,24 @@ public class ConjurePublishPlugin implements Plugin<Project> {
     @Override
     public final void apply(Project project) {
         File compileTypeScriptOutput = new File(project.getBuildDir(), "compileTypeScriptOutput");
+        File generateNpmrcOutput = new File(project.getBuildDir(), "generateNpmrcOutput");
 
         CompileTypeScriptJavaScriptTask compileTypescriptJavascriptTask = project.getTasks()
                 .create("compileTypeScriptJavaScript", CompileTypeScriptJavaScriptTask.class);
         compileTypescriptJavascriptTask.setInputDirectory(project.file("src"));
+        compileTypescriptJavascriptTask.setNodeModulesInputDirectory(new File(project.getBuildDir(), "node_modules"));
         compileTypescriptJavascriptTask.setOutputDirectory(compileTypeScriptOutput);
+
+        GenerateNpmrcTask generateNpmrcTask = project.getTasks().create("generateNpmrc", GenerateNpmrcTask.class);
+        generateNpmrcTask.setInputDirectory(project.file("src"));
+        generateNpmrcTask.setOutputDirectory(generateNpmrcOutput);
 
         PublishTypeScriptTask publishTypeScriptTask = project.getTasks()
                 .create("publishTypeScript", PublishTypeScriptTask.class);
-        publishTypeScriptTask.setInputDirectory(compileTypeScriptOutput);
+        publishTypeScriptTask.setJavaScriptInputDirectory(compileTypeScriptOutput);
+        publishTypeScriptTask.setNpmrcInputDirectory(generateNpmrcOutput);
         publishTypeScriptTask.dependsOn(compileTypescriptJavascriptTask);
+        publishTypeScriptTask.dependsOn(generateNpmrcTask);
 
         project.afterEvaluate(p -> project.getTasks().maybeCreate("publish").dependsOn(publishTypeScriptTask));
     }

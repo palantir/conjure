@@ -1,4 +1,4 @@
-import { IStringExample } from "./stringExample";
+import { IStringExample } from "@palantir/api";
 
 export interface ITestServiceFoo {
     get(

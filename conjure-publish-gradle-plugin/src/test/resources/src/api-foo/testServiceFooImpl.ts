@@ -1,5 +1,5 @@
-import { IStringExample } from "./stringExample";
 import { IHttpApiBridge } from "@elements/conjure-fe-lib";
+import { IStringExample } from "@palantir/api";
 
 export class TestServiceFoo {
     private bridge: IHttpApiBridge;

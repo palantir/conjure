@@ -5,9 +5,11 @@ apply from: "${rootDir}/gradle/publish-libs.gradle"
 
 dependencies {
     compile project(':conjure-typescript')
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'commons-io:commons-io:2.5'
 
     testCompile gradleTestKit()
     testCompile 'com.netflix.nebula:nebula-test:4.0.0'  // for better temporary folder junit rule
+    testCompile 'com.squareup.okhttp3:mockwebserver'
+    testCompile 'junit:junit'
 }

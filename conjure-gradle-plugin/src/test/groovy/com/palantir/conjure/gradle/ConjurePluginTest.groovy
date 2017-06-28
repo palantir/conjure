@@ -104,11 +104,19 @@ class ConjurePluginTest extends GradleTestSpec {
         result.task(':api:compileConjureRetrofit').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureTypeScript').outcome == TaskOutcome.SUCCESS
 
+        // java
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
-
         file('api/api-objects/src/generated/java/.gitignore').exists()
         file('api/api-objects/src/generated/java/.gitignore').text.contains('*.java')
+
+        // typescript
+        file('api/api-typescript/src/@test/api/stringExample.ts').exists()
+        file('api/api-typescript/src/@test/api/package.json').exists()
+        file('api/api-typescript/src/@test/api/index.ts').exists()
+        file('api/api-typescript/src/.gitignore').exists()
+        file('api/api-typescript/src/.gitignore').text.contains('*.ts')
+        file('api/api-typescript/src/.gitignore').text.contains('package.json')
     }
 
     def 'pythonTask generates code when enabled'() {
@@ -227,9 +235,6 @@ class ConjurePluginTest extends GradleTestSpec {
         conjure {
             conjureImports files('external-import.yml')
         }
-
-        // TODO(melliot): TypeScript does not support imports
-        tasks.getByName('compileConjureTypeScript').enabled = false
         """
         createFile('api/src/main/conjure/conjure.yml') << """
         types:
@@ -237,13 +242,13 @@ class ConjurePluginTest extends GradleTestSpec {
             externalImport: external-imports/external-import.yml
             internalImport: internal-import.yml
           definitions:
-            default-package: test.a.api
+            default-package: test.api.default
             objects:
 
         services:
           TestServiceFoo:
             name: Test Service Foo
-            package: test.x.api
+            package: test.api.service
 
             endpoints:
               post:
@@ -255,7 +260,7 @@ class ConjurePluginTest extends GradleTestSpec {
         createFile('api/src/main/conjure/internal-import.yml') << """
         types:
           definitions:
-            default-package: test.a.api
+            default-package: test.api.internal
             objects:
               InternalImport:
                 fields:
@@ -264,7 +269,7 @@ class ConjurePluginTest extends GradleTestSpec {
         createFile('api/external-import.yml') << """
         types:
           definitions:
-            default-package: test.b.api
+            default-package: test.api.external
             objects:
               ExternalImport:
                 fields:
@@ -284,10 +289,27 @@ class ConjurePluginTest extends GradleTestSpec {
         file('api/build/conjure/internal-import.yml').exists()
         file('api/build/conjure/conjure.yml').exists()
 
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains(
-                "import test.a.api.InternalImport;")
-        file('api/api-jersey/src/generated/java/test/x/api/TestServiceFoo.java').text.contains(
-                "import test.b.api.ExternalImport;")
+        // java
+        file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+                'import test.api.internal.InternalImport;')
+        file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+                'import test.api.external.ExternalImport;')
+        file('api/api-objects/src/generated/java/test/api/external/ExternalImport.java').exists() == false
+
+        // python
+        file('api/api-python/python/service/__init__.py').text.contains(
+                'from internal import InternalImport')
+        file('api/api-python/python/service/__init__.py').text.contains(
+                'from external import ExternalImport')
+        file('api/api-python/python/external').exists() == false
+
+        // typescript
+        file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
+                'import { IInternalImport } from "@api/internal"');
+        file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
+                'import { IExternalImport } from "@api/external"');
+        file('api/api-typescript/src/@api/external').exists() == false
+        file('api/api-typescript/build/node_modules/@api/external').exists()
     }
 
     def 'omitting a project from settings is sufficient to disable'() {

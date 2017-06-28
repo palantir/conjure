@@ -61,7 +61,7 @@ public class CompileConjurePythonTask extends SourceTask {
 
         PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
 
-        compileFiles(beanGenerator, getSource().getFiles());
+        compileFiles(beanGenerator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.py\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }

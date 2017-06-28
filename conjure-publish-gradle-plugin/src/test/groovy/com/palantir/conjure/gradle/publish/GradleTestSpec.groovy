@@ -5,6 +5,7 @@
 package com.palantir.conjure.gradle.publish
 
 import com.energizedwork.spock.extensions.TempDirectory
+import com.google.common.collect.Lists;
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.testkit.runner.GradleRunner
@@ -19,9 +20,11 @@ class GradleTestSpec extends Specification {
     }
 
     protected run(String... tasks) {
+        List<String> taskList = Lists.newArrayList(tasks);
+        taskList.add("--stacktrace");
         return GradleRunner.create()
                 .withProjectDir(testDir)
-                .withArguments(tasks)
+                .withArguments(taskList)
                 .withPluginClasspath()
                 .withDebug(true)
                 .build()

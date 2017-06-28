@@ -6,6 +6,7 @@ package com.palantir.conjure.gradle.publish;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.internal.ConventionTask;
 import org.gradle.api.tasks.InputDirectory;
@@ -14,29 +15,37 @@ import org.gradle.api.tasks.TaskAction;
 
 public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
+    @InputDirectory
     private File inputDirectory;
+
+    @InputDirectory
+    private File nodeModulesInputDirectory;
+
+    @OutputDirectory
     private File outputDirectory;
 
     public final void setInputDirectory(File inputDirectory) {
         this.inputDirectory = inputDirectory;
     }
 
+    public final void setNodeModulesInputDirectory(File nodeModulesInputDirectory) {
+        this.nodeModulesInputDirectory = nodeModulesInputDirectory;
+    }
+
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
-    @InputDirectory
-    public final File getInputDirectory() {
-        return inputDirectory;
-    }
-
-    @OutputDirectory
-    public final File getOutputDirectory() {
-        return outputDirectory;
-    }
-
     @TaskAction
     public final void compileFiles() {
+        // Construct a directory that we'll use to compile the typescript
+        File typescriptWorkingDirectory = new File(getProject().getBuildDir(), "typeScriptWorkingDirectory");
+        ConjurePublishPlugin.copyDirectory(inputDirectory, new File(typescriptWorkingDirectory, "src"));
+        if (nodeModulesInputDirectory.exists()) {
+            ConjurePublishPlugin.copyDirectory(nodeModulesInputDirectory,
+                    new File(typescriptWorkingDirectory, "node_modules"));
+        }
+
         // install typescript compiler
         getProject().exec(execSpec -> {
             execSpec.commandLine("npm",
@@ -46,9 +55,6 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
                     "typescript@2.1.4");
         });
         File tscExecutable = new File(getProject().getBuildDir(), "node_modules/typescript/bin/tsc");
-
-        // Construct a directory that we'll use to compile the typescript
-        File typescriptWorkingDirectory = new File(getProject().getBuildDir(), "typeScriptWorkingDirectory");
 
         // Write tsconfig.json
         File tsConfigFile = new File(typescriptWorkingDirectory, "tsconfig.json");
@@ -64,11 +70,6 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
         ConjurePublishPlugin.makeFile(conjureFeLibTypings,
                 ConjurePublishPlugin.readResource("conjure-fe-lib_index.d.ts"));
 
-        // Copy all generated TS (including dependencies) into node_modules
-        ConjurePublishPlugin.copyDirectory(getInputDirectory(), new File(typescriptWorkingDirectory, "node_modules"));
-        // Copy source for compilation
-        ConjurePublishPlugin.copyDirectory(getInputDirectory(), new File(typescriptWorkingDirectory, "src"));
-
         // Compile typescript
         getProject().exec(execSpec -> {
             execSpec.commandLine(tscExecutable.getAbsolutePath(), "--rootDir", ".");
@@ -77,12 +78,32 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
         // Copy build to output directory
         try {
-            if (!getOutputDirectory().exists()) {
-                FileUtils.forceMkdir(getOutputDirectory());
+            if (!outputDirectory.exists()) {
+                FileUtils.forceMkdir(outputDirectory);
             }
-            ConjurePublishPlugin.copyDirectory(new File(typescriptWorkingDirectory, "build"), getOutputDirectory());
+            ConjurePublishPlugin.copyDirectory(new File(typescriptWorkingDirectory, "build/src"), outputDirectory);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        // recopy package.json b/c tsc drops it
+        for (File scopeDir : inputDirectory.listFiles()) {
+            if (scopeDir.isDirectory()) {
+                for (File packageDir : scopeDir.listFiles()) {
+                    File packageJson = new File(packageDir, "package.json");
+                    if (packageJson.exists()) {
+                        try {
+                            FileUtils.copyFile(packageJson,
+                                    Paths.get(outputDirectory.getAbsolutePath(),
+                                            scopeDir.getName(),
+                                            packageDir.getName(),
+                                            "package.json").toFile());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
         }
     }
 }

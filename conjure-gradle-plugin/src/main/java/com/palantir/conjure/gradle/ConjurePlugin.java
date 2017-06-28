@@ -13,6 +13,7 @@ import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.File;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -30,6 +31,9 @@ import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 public class ConjurePlugin implements Plugin<Project> {
+
+    private static final String EXTERNAL_IMPORTS_DIRNAME = "external-imports";
+
     private final SourceDirectorySetFactory sourceDirectorySetFactory;
 
     @Inject
@@ -52,7 +56,7 @@ public class ConjurePlugin implements Plugin<Project> {
         File buildDir = new File(project.getBuildDir(), "conjure");
         Task processConjureImports = project.getTasks().create("processConjureImports", DefaultTask.class);
         processConjureImports.doLast(task ->
-                project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, "external-imports")))
+                project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, EXTERNAL_IMPORTS_DIRNAME)))
                         .from(extension.getConjureImports())));
 
         // Copy conjure sources into build directory
@@ -164,6 +168,7 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.setSource(copyConjureSourcesTask);
                             task.dependsOn(processConjureImports);
                             task.setOutputDirectory(subproj.file("src"));
+                            task.setNodeModulesOutputDirectory(new File(subproj.getBuildDir(), "node_modules"));
                             task.setServiceGenerator(new DefaultServiceGenerator());
                             task.setTypeGenerator(new DefaultTypeGenerator());
                             conjureTask.dependsOn(task);
@@ -195,6 +200,12 @@ public class ConjurePlugin implements Plugin<Project> {
                         });
             });
         }
+    }
+
+    static Set<File> excludeExternalImports(Set<File> files) {
+        return files.stream()
+                .filter(f -> !Objects.equals(f.getParentFile().getName(), EXTERNAL_IMPORTS_DIRNAME))
+                .collect(Collectors.toSet());
     }
 
     private void addGeneratedToMainSourceSet(Project subproj) {

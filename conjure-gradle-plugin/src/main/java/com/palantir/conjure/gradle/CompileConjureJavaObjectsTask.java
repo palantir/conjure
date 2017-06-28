@@ -56,7 +56,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
                 .build();
 
         TypeGenerator generator = new BeanGenerator(settings, experimentalFeatures.get());
-        compileFiles(generator, getSource().getFiles());
+        compileFiles(generator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
 
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.java\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
