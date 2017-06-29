@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gradle.publish;
 
-import groovy.lang.MissingPropertyException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -64,7 +63,7 @@ public class GenerateNpmrcTask extends ConventionTask {
     private String getArtifactoryCreds(OkHttpClient client, String scope) {
         String artifactoryUsername = System.getenv("ARTIFACTORY_USERNAME");
         String artifactoryPassword = System.getenv("ARTIFACTORY_PASSWORD");
-        String userPass = artifactoryUsername + ":" + artifactoryPassword;
+        String userPass = String.format("%s:%s", artifactoryUsername, artifactoryPassword);
         String base64UserPass = Base64.getEncoder().encodeToString(userPass.getBytes(StandardCharsets.UTF_8));
         String trimmedScope = scope.startsWith("@") ? scope.substring(1) : scope;
         String npmRegistryUriWithScope = String.format("%s/auth/%s", getNpmRegistryUri(), trimmedScope);
@@ -81,11 +80,9 @@ public class GenerateNpmrcTask extends ConventionTask {
     }
 
     private String getNpmRegistryUri() {
-        try {
-            return getProject().property("npmRegistryUri").toString();
-        } catch (MissingPropertyException e) {
-            return "https://artifactory.palantir.build/artifactory/api/npm/all-npm";
-        }
+        return getProject().hasProperty("npmRegistryUri")
+                ? getProject().property("npmRegistryUri").toString()
+                : "https://artifactory.palantir.build/artifactory/api/npm/all-npm";
     }
 
     private void createNpmrcFile(String scopeDirName, String packageDirName, String artifactoryCreds) {
