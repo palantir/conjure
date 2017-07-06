@@ -34,3 +34,6 @@ deployment:
       - git clean -xfd
       - ./gradlew -i artifactoryPublish condaPublish exartisi
 
+notify:
+  webhooks:
+    - url: https://parana.palantir.build/hook
