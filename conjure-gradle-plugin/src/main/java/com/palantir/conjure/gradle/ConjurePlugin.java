@@ -215,7 +215,7 @@ public class ConjurePlugin implements Plugin<Project> {
 
     private void applyDependencyForIdeTasks(Project project, Task conjureTask) {
         project.getPlugins().withType(IdeaPlugin.class, plugin -> {
-            Task task = project.getTasks().findByName("idea");
+            Task task = project.getTasks().findByName("ideaModule");
             if (task != null) {
                 task.dependsOn(conjureTask);
             }
@@ -224,7 +224,7 @@ public class ConjurePlugin implements Plugin<Project> {
             plugin.getModel().getModule().getGeneratedSourceDirs().add(project.file("src/generated/java"));
         });
         project.getPlugins().withType(EclipsePlugin.class, plugin -> {
-            Task task = project.getTasks().findByName("eclipse");
+            Task task = project.getTasks().findByName("eclipseClasspath");
             if (task != null) {
                 task.dependsOn(conjureTask);
             }
