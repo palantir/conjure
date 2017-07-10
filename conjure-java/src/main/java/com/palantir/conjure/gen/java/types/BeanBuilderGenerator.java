@@ -261,6 +261,7 @@ public final class BeanBuilderGenerator {
                 case BOOLEAN:
                     return CodeBlocks.statement("this.$1N = $2T.of($1N)",
                             field.name, asRawType(typeMapper.getClassName(type)));
+                case SAFELONG:
                 case STRING:
                 default:
                     // not special

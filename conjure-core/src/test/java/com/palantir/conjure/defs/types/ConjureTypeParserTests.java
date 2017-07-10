@@ -49,6 +49,12 @@ public final class ConjureTypeParserTests {
     }
 
     @Test
+    public void testParser_safelongType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("safelong"))
+                .isEqualTo(PrimitiveType.SAFELONG);
+    }
+
+    @Test
     public void testParser_refType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("Foo"))
                 .isEqualTo(LocalReferenceType.of(TypeName.of("Foo")));

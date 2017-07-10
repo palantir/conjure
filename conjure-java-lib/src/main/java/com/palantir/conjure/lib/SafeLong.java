@@ -31,6 +31,10 @@ public abstract class SafeLong {
                 MIN_SAFE_VALUE, MAX_SAFE_VALUE);
     }
 
+    public static SafeLong valueOf(String value) {
+        return SafeLong.of(Long.parseLong(value));
+    }
+
     @JsonCreator
     public static SafeLong of(long value) {
         return ImmutableSafeLong.of(value);

@@ -8,7 +8,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -65,11 +64,6 @@ public final class JerseyMethodTypeClassNameVisitor implements ClassNameVisitor 
 
     @Override
     public TypeName visit(SetType type) {
-        return delegate.visit(type);
-    }
-
-    @Override
-    public TypeName visit(SafeLongType type) {
         return delegate.visit(type);
     }
 

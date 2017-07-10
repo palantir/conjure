@@ -56,11 +56,14 @@ types:
         alias: integer
       BooleanAliasExample:
         alias: boolean
+      SafeLongAliasExample:
+        alias: safelong
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>
           bool: optional<boolean>
           integer: optional<integer>
+          safelong: optional<safelong>
       ManyFieldExample:
         fields:
           string: string

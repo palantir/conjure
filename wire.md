@@ -12,6 +12,7 @@ The JSON format `json(o)` for a Conjure object `o` can be recursively defined as
 - If `o` is a primitive Conjure type, then `json(o)` is the corresponding primitive JSON type:
   - Conjure `string` → JSON `string`
   - Conjure `integer` → JSON `number`
+  - Conjure `safelong` → JSON `number`
   - Conjure `double` → JSON `number`
   - Conjure `boolean` → JSON `boolean`.
 - If `o` is a Conjure `object`, then `json(o)` is a JSON `object` whose keys and values are obtained from `o`'s keys and
@@ -27,8 +28,6 @@ The JSON format `json(o)` for a Conjure object `o` can be recursively defined as
 - If `o` is a Conjure `alias` object `alias[v]`, then `json(o) = json(v)`
 - If `o` is a Conjure `optional` object `optional[v]`, then `json(o)` is JSON `null` if `v` is absent, and `json(v)`
   otherwise
-- If `o` is a Conjure `safelong`, then `json(o)` is a JSON `number` representing `o`; for example,
-  `json(safelong[10]) = 10`
 - If `o` is a Conjure `binary` object `binary[d]`, then `json(o)` is the Base64-encoded JSON `string` representation
   of the binary data `d`
 - If `o` is a Conjure `datetime`, then `json(o)` is the ISO-8601-formatted JSON `string` representation of the date

@@ -94,6 +94,8 @@ Base types in the system are:
  * `integer` (32-bit signed whole numbers)
  * `double` (64-bit floating point numbers)
  * `boolean` `(true|false)`
+ * `safelong` (a wrapper around a long type which enforces the value is safely representable as an integer in javascript,
+   between `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`)
 
 ### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language
@@ -110,9 +112,6 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
    The empty string and the empty map/object are valid non-null values.
  * `binary`: a sequence of bytes. When present as a return value for a service
    method, encodes an output stream.
- * `safelong`: a wrapper around a long type which enforces the value is safely
-   representable as an integer in javascript (in javascript, between
-   `Number.MIN_SAFE_INTEGER and Number.MAX_SAFE_INTEGER`).
  * `datetime`: a date/time capable of precisely representing an instant in
    human readable time, encoded as a string using ISO-8601 with required offset
    and optional zone id. Second-precision is required, formats may include up to

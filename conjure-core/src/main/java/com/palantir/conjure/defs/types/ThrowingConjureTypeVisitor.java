@@ -7,7 +7,6 @@ package com.palantir.conjure.defs.types;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -59,11 +58,6 @@ public interface ThrowingConjureTypeVisitor<T> extends ConjureTypeVisitor<T> {
 
     @Override
     default T visit(BinaryType type) {
-        throw createException(type);
-    }
-
-    @Override
-    default T visit(SafeLongType type) {
         throw createException(type);
     }
 

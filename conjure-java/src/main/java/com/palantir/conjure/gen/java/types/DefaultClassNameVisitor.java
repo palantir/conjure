@@ -11,7 +11,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -74,6 +73,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                     return ClassName.get(OptionalInt.class);
                 case BOOLEAN:
                     // no OptionalBoolean type
+                case SAFELONG:
                 case STRING:
                 default:
                     // treat normally
@@ -99,6 +99,8 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                 return TypeName.INT;
             case BOOLEAN:
                 return TypeName.BOOLEAN;
+            case SAFELONG:
+                return ClassName.get(SafeLong.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }
@@ -135,11 +137,6 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     @Override
     public TypeName visit(BinaryType type) {
         return ClassName.get(ByteBuffer.class);
-    }
-
-    @Override
-    public TypeName visit(SafeLongType type) {
-        return ClassName.get(SafeLong.class);
     }
 
     @Override

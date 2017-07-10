@@ -12,7 +12,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -64,6 +63,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             case DOUBLE:
                 return "float";
             case INTEGER:
+            case SAFELONG:
                 return "int";
             default:
                 throw new IllegalArgumentException("unknown type: " + type);
@@ -97,11 +97,6 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
     @Override
     public String visit(BinaryType type) {
         return "Any";
-    }
-
-    @Override
-    public String visit(SafeLongType type) {
-        return "int";
     }
 
     @Override

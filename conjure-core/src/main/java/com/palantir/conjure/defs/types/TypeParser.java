@@ -7,7 +7,6 @@ package com.palantir.conjure.defs.types;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -42,7 +41,6 @@ public enum TypeParser implements Parser<ConjureType> {
                 OptionalTypeParser.INSTANCE,
                 TypeFromString.of("any", AnyType.of()),
                 TypeFromString.of("binary", BinaryType.of()),
-                TypeFromString.of("safelong", SafeLongType.of()),
                 TypeFromString.of("datetime", DateTimeType.of()),
                 ForeignReferenceTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);

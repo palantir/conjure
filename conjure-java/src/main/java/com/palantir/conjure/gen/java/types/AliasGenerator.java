@@ -104,6 +104,9 @@ public final class AliasGenerator {
             case BOOLEAN:
                 return CodeBlock.builder()
                         .addStatement("return new $T($T.parseBoolean(value))", thisClass, aliasType.box()).build();
+            case SAFELONG:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.valueOf(value))", thisClass, aliasType).build();
             default:
                 throw new IllegalStateException("Unknown primitive type: " + primitiveType);
         }

@@ -16,7 +16,6 @@ import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.builtin.SafeLongType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -132,11 +131,6 @@ public final class TypeMapper {
         }
 
         @Override
-        public Void visit(SafeLongType type) {
-            return null;
-        }
-
-        @Override
         public Void visit(DateTimeType type) {
             return null;
         }
@@ -200,6 +194,7 @@ public final class TypeMapper {
             switch (type) {
                 case DOUBLE:
                 case INTEGER:
+                case SAFELONG:
                     return "number";
                 case STRING:
                     return "string";
@@ -244,11 +239,6 @@ public final class TypeMapper {
         @Override
         public String visit(BinaryType type) {
             return "any";
-        }
-
-        @Override
-        public String visit(SafeLongType type) {
-            return "number";
         }
 
         @Override
