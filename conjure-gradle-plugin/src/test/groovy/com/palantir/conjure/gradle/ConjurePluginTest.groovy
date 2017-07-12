@@ -274,6 +274,14 @@ class ConjurePluginTest extends GradleTestSpec {
               ExternalImport:
                 fields:
                   stringField: string
+        services:
+          ExternalService:
+            name: External Service
+            package: test.api.external
+            endpoints:
+              post:
+                http: POST /post
+                returns: ExternalImport
         """
 
         when:
@@ -284,6 +292,7 @@ class ConjurePluginTest extends GradleTestSpec {
         result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
         result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
+        result.task(':api:compileConjureRetrofit').outcome == TaskOutcome.SUCCESS
 
         file('api/build/conjure/external-imports/external-import.yml').exists()
         file('api/build/conjure/internal-import.yml').exists()
@@ -294,7 +303,13 @@ class ConjurePluginTest extends GradleTestSpec {
                 'import test.api.internal.InternalImport;')
         file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.external.ExternalImport;')
+        file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+                'import test.api.internal.InternalImport;')
+        file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+                'import test.api.external.ExternalImport;')
         file('api/api-objects/src/generated/java/test/api/external/ExternalImport.java').exists() == false
+        file('api/api-jersey/src/generated/java/test/api/external/ExternalService.java').exists() == false
+        file('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java').exists() == false
 
         // python
         file('api/api-python/python/service/__init__.py').text.contains(

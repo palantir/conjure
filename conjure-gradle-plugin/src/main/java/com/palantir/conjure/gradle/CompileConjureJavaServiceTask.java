@@ -42,7 +42,7 @@ public class CompileConjureJavaServiceTask extends SourceTask {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
 
-        compileFiles(getSource().getFiles());
+        compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()));
         // write a gitignore to prevent the generated files ending up in source control
         Files.write("*.java\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
     }
