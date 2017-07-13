@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 public final class ConjureTypeScriptClientGenerator {
 
-    public static final String CONJURE_FE_LIB = "@elements/conjure-fe-lib";
-    public static final String CONJURE_FE_LIB_VERSION = "^0.6.0";
+    public static final String CONJURE_FE_LIB = "@foundry/conjure-fe-lib";
+    public static final String CONJURE_FE_LIB_VERSION = "^1.0.1";
 
     private static final ObjectMapper prettyPrintingMapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
@@ -132,7 +132,7 @@ public final class ConjureTypeScriptClientGenerator {
                 .collect(Collectors.toSet());
         return imports.stream()
                 .map(ImportStatement::filepathToImport)
-                // remove relative imports and @elements/conjure-fe-lib which is a peer dependency
+                // remove relative imports and @foundry/conjure-fe-lib which is a peer dependency
                 .filter(path -> !path.startsWith("./") && !path.equals(CONJURE_FE_LIB))
                 .collect(Collectors.toSet());
     }

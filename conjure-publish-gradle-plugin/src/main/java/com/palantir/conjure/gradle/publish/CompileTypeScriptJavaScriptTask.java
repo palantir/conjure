@@ -66,7 +66,7 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
 
         // Write conjure fe lib typings
         File conjureFeLibTypings = new File(typescriptWorkingDirectory,
-                "node_modules/@elements/conjure-fe-lib/index.d.ts");
+                "node_modules/@foundry/conjure-fe-lib/index.d.ts");
         ConjurePublishPlugin.makeFile(conjureFeLibTypings,
                 ConjurePublishPlugin.readResource("conjure-fe-lib_index.d.ts"));
 

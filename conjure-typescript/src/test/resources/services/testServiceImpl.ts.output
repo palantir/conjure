@@ -1,5 +1,5 @@
 import { ICreateDatasetRequest } from "./createDatasetRequest";
-import { IHttpApiBridge } from "@elements/conjure-fe-lib";
+import { IHttpApiBridge } from "@foundry/conjure-fe-lib";
 import { IBackingFileSystem } from "@palantir/foundry-catalog-api-datasets";
 import { IDataset } from "@palantir/foundry-catalog-api-datasets";
 

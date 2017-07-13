@@ -1,5 +1,5 @@
+import { IHttpApiBridge } from "@foundry/conjure-fe-lib";
 import { IStringExample } from "./stringExample";
-import { IHttpApiBridge } from "@elements/conjure-fe-lib";
 
 export class TestServiceA {
     private bridge: IHttpApiBridge;
