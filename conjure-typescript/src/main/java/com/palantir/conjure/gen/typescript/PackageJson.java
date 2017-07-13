@@ -28,6 +28,8 @@ public interface PackageJson {
 
     Map<String, String> dependencies();
 
+    Map<String, String> devDependencies();
+
     static Builder builder() {
         return new Builder();
     }

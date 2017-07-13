@@ -83,6 +83,7 @@ public final class ConjureTypeScriptClientGenerator {
                     .description("Conjure definitions for " + scopeAndModule)
                     .name(scopeAndModule)
                     .dependencies(dependencies)
+                    .putDevDependencies(CONJURE_FE_LIB, CONJURE_FE_LIB_VERSION)
                     .build();
             File packageJsonFile = Paths.get(outputDir.getAbsolutePath(), scopeAndModule, "package.json").toFile();
             try {

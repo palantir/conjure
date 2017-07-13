@@ -148,6 +148,8 @@ public final class ConjureTypescriptClientGeneratorTest {
                         .name("@api/with-imports")
                         .putDependencies("@palantir/test-api", "^0.0.0")
                         .putDependencies("@palantir/foundry-catalog-api-datasets", "^0.0.0")
+                        .putDevDependencies(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB,
+                                ConjureTypeScriptClientGenerator.CONJURE_FE_LIB_VERSION)
                         .build());
 
         // second package
@@ -162,6 +164,8 @@ public final class ConjureTypescriptClientGeneratorTest {
                         .description("Conjure definitions for @api/with-imports-package-override")
                         .name("@api/with-imports-package-override")
                         .putDependencies("@palantir/test-api", "^0.0.0")
+                        .putDevDependencies(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB,
+                                ConjureTypeScriptClientGenerator.CONJURE_FE_LIB_VERSION)
                         .build());
     }
 
