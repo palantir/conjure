@@ -6,13 +6,12 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
+        classpath 'com.netflix.nebula:nebula-dependency-recommender:4.2.1'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.14.0'
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'gradle.plugin.com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.2.0'
         classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.8.0'
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.9'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.0'
     }
 }
@@ -40,6 +39,7 @@ allprojects {
     apply plugin: 'nebula.dependency-recommender'
 
     dependencyRecommendations {
+        strategy OverrideTransitives
         propertiesFile file: project.rootProject.file('versions.props')
         def subprojectVersions = project.file('versions.props')
         if (subprojectVersions.exists()) {
@@ -61,7 +61,7 @@ subprojects {
     apply plugin: 'com.palantir.baseline-eclipse'
     apply plugin: 'com.palantir.baseline-idea'
     apply plugin: 'com.palantir.exartisi-deprecation'
-    apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'com.palantir.baseline-error-prone'
     apply plugin: 'org.inferred.processors'
     apply plugin: 'maven-publish'
 

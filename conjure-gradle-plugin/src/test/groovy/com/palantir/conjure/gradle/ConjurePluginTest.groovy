@@ -172,20 +172,7 @@ class ConjurePluginTest extends GradleTestSpec {
 
     def 'check publication'() {
         given:
-        file('api/build.gradle').text = """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-
-        subprojects {
-            apply plugin: 'nebula.maven-base-publish'
-            apply plugin: 'nebula.maven-resolved-dependencies'
-            apply plugin: 'nebula.javadoc-jar'
-            apply plugin: 'nebula.source-jar'
-        }
-        """
-
-        file('server/build.gradle') << """
+        file('build.gradle') << """
         buildscript {
             repositories {
                 maven {
@@ -196,6 +183,18 @@ class ConjurePluginTest extends GradleTestSpec {
                 classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
             }
         }
+        """
+
+        file('api/build.gradle') << """
+        subprojects {
+            apply plugin: 'nebula.maven-base-publish'
+            apply plugin: 'nebula.maven-resolved-dependencies'
+            apply plugin: 'nebula.javadoc-jar'
+            apply plugin: 'nebula.source-jar'
+        }
+        """
+
+        file('server/build.gradle') << """
         apply plugin: 'java'
         apply plugin: 'nebula.maven-base-publish'
         apply plugin: 'nebula.maven-resolved-dependencies'

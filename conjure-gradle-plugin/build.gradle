@@ -8,9 +8,6 @@ dependencies {
     compile project(':conjure-python')
     compile project(':conjure-typescript')
 
-    compile 'com.netflix.nebula:nebula-dependency-recommender:3.1.0'
-    compile 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
-
     testCompile gradleTestKit()
     testCompile 'com.netflix.nebula:nebula-test:4.0.0'  // for better temporary folder junit rule
 }

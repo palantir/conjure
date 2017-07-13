@@ -75,9 +75,8 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                     .collect(Collectors.toList());
 
             Preconditions.checkState(bodyParams.size() <= 1,
-                    "Endpoint cannot have multiple body parameters: " + bodyParams.stream().map(
-                            e -> e.getKey()).collect(
-                            Collectors.toList()));
+                    "Endpoint cannot have multiple body parameters: %s",
+                    bodyParams.stream().map(e -> e.getKey()).collect(Collectors.toList()));
         }
     }
 
@@ -113,11 +112,11 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
 
             Set<ParameterName> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
             Preconditions.checkState(extraParams.isEmpty(),
-                    "Path parameters defined in endpoint but not present in path template: " + extraParams);
+                    "Path parameters defined in endpoint but not present in path template: %s", extraParams);
 
             Set<ParameterName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
-                    "Path parameters defined path template but not present in endpoint: " + missingParams);
+                    "Path parameters defined path template but not present in endpoint: %s", missingParams);
         }
     }
 
