@@ -39,8 +39,8 @@ Contents:
 
 Why?
 ----
-The rationale for maintaining Conjure rather than picking an existing IDL (e.g., Swagger) for Elements (and other)
-products is as follows. For the first handful of Elements projects (in particular, Gatekeeper, Compass, Foundry), we
+The rationale for maintaining Conjure rather than picking an existing IDL (e.g., Swagger) for Foundry (and other)
+products is as follows. For the first handful of Foundry projects (in particular, Gatekeeper, Compass, Foundry), we
 picked JAX-RS as the API contract between servers (Jersey) and clients (Feign) since it offered the best compromise
 between usability (simple Java proxies, straight-forward server implementations), dependency management (separation
 between API definitions and their implementations), and interoperability (JSON as the lingua franca for both
@@ -51,7 +51,7 @@ languages or even cURL). The idiosyncratic specifics of our interpretation of JA
 Given what we have since learned about the disadvantages of JAX-RS and the advantages of alternative RPC mechanisms
 (e.g., gRPC), one may be inclined to consider this a historic mistake, at least for backend RPC; on the other hand, it
 has allowed us to make swift progress on frontends and it has opened the door for simple service composition, in
-particular for non-Elements and non-Java projects such as Foundry Mobile. Either way, it is the status quo. Since major
+particular for non-Foundry and non-Java projects such as Foundry Mobile. Either way, it is the status quo. Since major
 API breaks are currently a deal-breaker, we are effectively presented with two choices: either continue to specify APIs
 in a Java-centric way via JAX-RS, or retrofit an IDL to our particular interpretation of the JAX-RS wire format. Conjure
 is an experiment towards the latter choice and has the following advantages:
@@ -66,6 +66,14 @@ is an experiment towards the latter choice and has the following advantages:
 
 Of course there are downsides. To mention just two, you cannot Google for Conjure problems, and someone has to maintain
 Conjure and keep up with feature requests and bug fixes.
+
+#### Scope
+
+The primary purpose of Conjure is to define cross-service APIs and its design decisions and feature development follow
+this goal. In API design, stability and simplicity often trump feature-richness and expressive power; this informs the
+limited scope and feature set of Conjure.  It is perfectly acceptable to use Conjure for other purposes (including
+internal data structures, serializing to disk or DB, etc.), but those uses do not drive design decisions and feature
+development.
 
 Types
 -----
