@@ -1,0 +1,72 @@
+test-case-name: "service endpoint argument tests"
+negative:
+  multipleAutoArgsThatResolveToBody:
+    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path
+              # invalid: cannot have multiple arguments with param-type "auto" that resolve to "body"
+              args:
+                arg: string
+                arg2: string
+  multipleBodyParams:
+    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path
+              # invalid: cannot have multiple arguments with param-type "body"
+              args:
+                arg:
+                  type: string
+                  param-type: body
+                arg2:
+                  type: string
+                  param-type: body
+  bodyAndAutoParam:
+    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path
+              # invalid: cannot have multiple arguments with param-type "body"
+              args:
+                arg: string
+                arg2:
+                  type: string
+                  param-type: body
+  bodyParamAndPathParam:
+    expected-error: 'Endpoint cannot be a GET and contain a body'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg}
+              args:
+                # invalid: endpoint cannot have both a path and body parameter
+                arg: string
+                arg2: string

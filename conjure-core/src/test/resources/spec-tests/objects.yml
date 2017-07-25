@@ -1,0 +1,44 @@
+test-case-name: "objects"
+positive:
+  emptyOK:
+    conjure:
+      types:
+        # valid: "definitions" and "conjure-imports' properties are optional
+  recursiveOK:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            SelfRecursiveObject:
+                fields:
+                  # valid: recursive definition OK if reference is in a container type
+                  selfOptional: optional<SelfRecursiveObject>
+                  selfMap: map<string, SelfRecursiveObject>
+                  selfSet: set<SelfRecursiveObject>
+negative:
+  recursiveNotAllowed:
+    expected-error: 'Illegal recursive data type: SelfRecursiveObject -> SelfRecursiveObject'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            SelfRecursiveObject:
+                fields:
+                  # invalid: recursive definition not allowed
+                  self: SelfRecursiveObject
+  cycleNotAllowed:
+    expected-error: 'Illegal recursive data type: Other -> One -> Other'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            # invalid: cyclic definition not allowed
+            One:
+                fields:
+                  other: Other
+            Other:
+                fields:
+                  other: One

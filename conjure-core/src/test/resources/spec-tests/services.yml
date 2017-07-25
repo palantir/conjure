@@ -1,0 +1,9 @@
+test-case-name: "services"
+positive:
+  emptyTypesOK:
+    conjure:
+      # valid: top-level "types" property is optional
+      services:
+        TestService:
+          name: Test Service
+          package: test.a

@@ -1,0 +1,131 @@
+test-case-name: "service endpoint argument tests"
+positive:
+  pathParams:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # valid: "arg" and "aRg" should be separate path parameter variables
+                path: /path/{arg}/{aRg}
+              args:
+                arg: string
+                aRg: string
+  pathParamRegexp:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # valid: arg template can contain regular expression after ':'
+                path: /path/{arg:.+}
+              args:
+                arg: string
+negative:
+  keyAndParamIdClash:
+    expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg}
+              args:
+                # invalid: cannot have multiple arguments with the same name and param-id if it will cause a collision
+                arg: string
+                uniquename:
+                  param-id: arg
+                  type: string
+  paramIdsClash:
+    expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg}/{arg}
+              args:
+                # invalid: cannot have multiple arguments with the same param-id if it will cause a collision
+                argName:
+                  param-id: arg
+                  type: string
+                uniqueName:
+                  param-id: arg
+                  type: string
+  pathTemplateParamMissing:
+    expected-error: "Path parameters defined path template but not present in endpoint: [arg]"
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # invalid: "arg" must be defined as a parameter
+                path: /path/{arg}
+  pathTemplateParamNestedBraces:
+    expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # invalid: braces cannot be nested
+                path: /path/{{arg}}/trailer
+              args:
+                arg: string
+  pathParamUnbalancedBraces:
+    expected-error: 'Segment {{arg} of path /path/{{arg}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # invalid: braces must be balanced
+                path: /path/{{arg}/trailer
+              args:
+                arg: string
+  pathParamDefinedButNotInTemplate:
+    expected-error: 'Path parameters defined in endpoint but not present in path template: [arg]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path
+              args:
+                # invalid: cannot have a path param that does not occur in the path template
+                arg:
+                  param-id: arg
+                  param-type: path
+                  type: string

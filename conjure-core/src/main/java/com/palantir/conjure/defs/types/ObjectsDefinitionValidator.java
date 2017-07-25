@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefinition> {
-    NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator());
+    NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
+    PACKAGE_DEFINED(new PackageDefinedValidator());
 
     private final ConjureValidator<ObjectsDefinition> validator;
 
@@ -72,4 +73,20 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         }
     }
 
+    private static final class PackageDefinedValidator implements ConjureValidator<ObjectsDefinition> {
+        @Override
+        public void validate(ObjectsDefinition definition) {
+            if (definition.defaultConjurePackage().isPresent()
+                    && definition.defaultConjurePackage().get().name().length() > 0) {
+                // default package is defined -- nothing to do
+                return;
+            }
+
+            definition.objects().entrySet().stream().forEach(entry -> {
+                if (!entry.getValue().conjurePackage().isPresent()) {
+                    throw new IllegalStateException("No package is defined for object " + entry.getKey().name());
+                }
+            });
+        }
+    }
 }

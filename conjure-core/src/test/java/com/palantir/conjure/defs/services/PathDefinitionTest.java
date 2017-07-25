@@ -18,15 +18,29 @@ public final class PathDefinitionTest {
                 .hasMessage("Conjure paths must be absolute, i.e., start with '/': abc");
     }
 
+    private static final class PathSegmentTestCase {
+        private final String path;
+        private final String invalidSegment;
+
+        private PathSegmentTestCase(String path, String invalidSegment) {
+            this.path = path;
+            this.invalidSegment = invalidSegment;
+        }
+    }
+
     @Test
     public void testPathSegmentsMustObeySyntax() throws Exception {
-        for (String path : new String[] {"/123", "/abc/$%^", "/abc/{123}"}) {
-            assertThatThrownBy(() -> path(path))
+        for (PathSegmentTestCase currCase : new PathSegmentTestCase[]{
+                new PathSegmentTestCase("/123", "123"),
+                new PathSegmentTestCase("/abc/$%^", "$%^"),
+                new PathSegmentTestCase("/abc/{123}", "{123}"),
+        }) {
+            assertThatThrownBy(() -> path(currCase.path))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Path segments must match segment patterns "
+                    .hasMessage(String.format("Segment %s of path %s did not match required segment patterns "
                             + "^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns "
                             + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or "
-                            + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$: " + path);
+                            + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$", currCase.invalidSegment, currCase.path));
         }
     }
 

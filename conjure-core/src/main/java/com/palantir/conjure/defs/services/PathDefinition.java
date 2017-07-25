@@ -39,8 +39,9 @@ public abstract class PathDefinition {
                     SEGMENT_PATTERN.matcher(segment).matches()
                             || PARAM_SEGMENT_PATTERN.matcher(segment).matches()
                             || PARAM_REGEX_SEGMENT_PATTERN.matcher(segment).matches(),
-                    "Path segments must match segment patterns %s or parameter name patterns %s or %s: %s",
-                    SEGMENT_PATTERN, PARAM_SEGMENT_PATTERN, PARAM_REGEX_SEGMENT_PATTERN, path());
+                    "Segment %s of path %s did not match required segment patterns %s or parameter name "
+                            + "patterns %s or %s",
+                    segment, path(), SEGMENT_PATTERN, PARAM_SEGMENT_PATTERN, PARAM_REGEX_SEGMENT_PATTERN);
         }
     }
 
