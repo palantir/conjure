@@ -16,7 +16,7 @@ task condaPublish {
         def modulePath = "${project.buildDir}/conda-dist/noarch/conjure-python-lib-${modifiedVersion}-py_0.tar.bz2"
         exec {
             // TODO(bduffield): use snapshot repo for snapshots
-            commandLine "curl", "-k", "--upload-file", modulePath,
+            commandLine "curl", "-k", "-u", "${System.env.ARTIFACTORY_USERNAME}:${System.env.ARTIFACTORY_PASSWORD}", "--upload-file", modulePath,
                 "https://publish.artifactory.palantir.build/artifactory/internal-conda-release/noarch/"
         }
     }
