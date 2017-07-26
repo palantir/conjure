@@ -5,9 +5,7 @@
 package com.palantir.conjure.defs.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -18,6 +16,8 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ObjectsDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.builtin.AnyType;
+import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
@@ -28,6 +28,7 @@ import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
@@ -143,16 +144,15 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    public void testParseAlias_notAPrimitiveType() throws IOException {
-        try {
-            mapper.readValue("alias: bummer", BaseObjectTypeDefinition.class);
-            fail();
-        } catch (JsonMappingException e) {
-            // TODO(melliot): improve error reporting
-            assertThat(e.getMessage()).startsWith(
-                    "Can not construct instance of com.palantir.conjure.defs.types.primitive.PrimitiveType, "
-                            + "problem: TypeNames must be a primitive type [unknown, string, ");
-        }
+    public void testParseAlias_validMapType() throws IOException {
+        assertThat(mapper.readValue("alias: map<string, any>", BaseObjectTypeDefinition.class))
+                .isEqualTo(AliasTypeDefinition.builder().alias(MapType.of(PrimitiveType.STRING, AnyType.of())).build());
+    }
+
+    @Test
+    public void testParseAlias_validReference() throws IOException {
+        assertThat(mapper.readValue("alias: Foo", BaseObjectTypeDefinition.class))
+                .isEqualTo(AliasTypeDefinition.builder().alias(LocalReferenceType.of(TypeName.of("Foo"))).build());
     }
 
     @Test

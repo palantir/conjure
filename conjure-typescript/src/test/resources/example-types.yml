@@ -38,6 +38,10 @@ types:
           items: map<string, any>
       AliasExample:
         alias: string
+      MapAliasExample:
+        alias: map<string, any>
+      ReferenceAliasExample:
+        alias: AnyExample
       ManyFieldExample:
         fields:
           string: string
@@ -47,7 +51,10 @@ types:
           items: list<string>
           set: set<string>
           map: map<string, string>
+          mapAlias: MapAliasExample
           alias: AliasExample
+          reference: AnyExample
+          referenceAlias: ReferenceAliasExample
           kebab-case: string
       UnionTypeExample:
         union:

@@ -408,7 +408,7 @@ values:
 ```
 
 #### Alias Definitions
-As a convenience, Conjure offers the ability to alias primitive types so that
+As a convenience, Conjure offers the ability to alias types so that
 stronger types may be carried throughout generated code, though not all generators
 support this feature, and will fallback to replacing the aliased type with its
 concrete type.
@@ -417,7 +417,7 @@ Each alias type appears in the definitions block and may include an optional
 docs block and a mandatory alias type:
 
 ```yaml
-alias: <primitive type>
+alias: <type>
 docs: optional docs
 ```
 

@@ -249,7 +249,7 @@ public final class TypeMapper {
         private String extractTypescriptName(TypeName conjureTypeName, BaseObjectTypeDefinition defType) {
             if (defType instanceof AliasTypeDefinition) {
                 // in typescript we collapse alias types to concrete types
-                return visit(((AliasTypeDefinition) defType).alias());
+                return ((AliasTypeDefinition) defType).alias().visit(this);
             } else if (defType instanceof EnumTypeDefinition) {
                 return conjureTypeName.name();
             } else {

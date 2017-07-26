@@ -58,6 +58,10 @@ types:
         alias: boolean
       SafeLongAliasExample:
         alias: safelong
+      MapAliasExample:
+        alias: map<string, any>
+      ReferenceAliasExample:
+        alias: AnyExample
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>

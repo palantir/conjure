@@ -1,3 +1,5 @@
+import { IAnyExample } from "./anyExample";
+
 export interface IManyFieldExample {
     alias: string;
     doubleValue: number;
@@ -5,6 +7,9 @@ export interface IManyFieldExample {
     items: string[];
     kebabCase: string;
     map: { [key: string]: string };
+    mapAlias: { [key: string]: any };
+    reference: IAnyExample;
+    referenceAlias: IAnyExample;
     set: string[];
     string: string;
     optionalItem?: string;

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.ConjureType;
 import java.io.IOException;
 import org.immutables.value.Value;
 
@@ -18,7 +18,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
 
-    PrimitiveType alias();
+    ConjureType alias();
 
     static Builder builder() {
         return new Builder();
