@@ -22,6 +22,7 @@ import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonEnum;
 import com.palantir.conjure.gen.python.poet.PythonEnum.PythonEnumValue;
+import com.palantir.conjure.gen.python.poet.PythonIdentifierSanitizer;
 import com.palantir.conjure.gen.python.poet.PythonImport;
 import com.palantir.conjure.gen.python.poet.PythonUnionTypeDefinition;
 import com.palantir.parsec.ParseException;
@@ -73,7 +74,8 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                     try {
                         ConjureType conjureType = ConjureType.fromString(unionMember.type());
                         return PythonField.builder()
-                            .attributeName(entry.getKey())
+                            .attributeName(PythonIdentifierSanitizer.sanitize(
+                                    FieldName.of(entry.getKey())))
                             .docs(unionMember.docs())
                             .jsonIdentifier(entry.getKey())
                             .myPyType(myPyMapper.getTypeName(conjureType))
@@ -142,7 +144,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                         .entrySet()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
+                                .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))
                                 .jsonIdentifier(entry.getKey().name())
                                 .docs(entry.getValue().docs())
                                 .pythonType(mapper.getTypeName(entry.getValue().type()))

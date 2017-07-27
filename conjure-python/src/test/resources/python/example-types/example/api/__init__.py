@@ -372,7 +372,7 @@ class ManyFieldExample(ConjureBeanType):
 class UnionTypeExample(ConjureUnionType):
     '''A type which can either be a StringExample, a set of strings, or an integer.'''
 
-    _stringExample = None # type: StringExample
+    _string_example = None # type: StringExample
     _set = None # type: List[str]
     _number = None # type: int
 
@@ -380,17 +380,17 @@ class UnionTypeExample(ConjureUnionType):
     def _options(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'stringExample': ConjureFieldDefinition('stringExample', StringExample),
+            'string_example': ConjureFieldDefinition('stringExample', StringExample),
             'set': ConjureFieldDefinition('set', ListType(str)),
             'number': ConjureFieldDefinition('number', int)
         }
 
-    def __init__(self, stringExample=None, set=None, number=None):
-        if (stringExample is not None) + (set is not None) + (number is not None) != 1:
+    def __init__(self, string_example=None, set=None, number=None):
+        if (string_example is not None) + (set is not None) + (number is not None) != 1:
             raise ValueError('a union must contain a single member')
 
-        if stringExample is not None:
-            self._stringExample = stringExample
+        if string_example is not None:
+            self._string_example = string_example
             self._type = 'stringExample'
         if set is not None:
             self._set = set
@@ -400,10 +400,10 @@ class UnionTypeExample(ConjureUnionType):
             self._type = 'number'
 
     @property
-    def stringExample(self):
+    def string_example(self):
         # type: () -> StringExample
         '''Docs for when UnionTypeExample is of type StringExample.'''
-        return self._stringExample
+        return self._string_example
 
     @property
     def set(self):
@@ -414,6 +414,60 @@ class UnionTypeExample(ConjureUnionType):
     def number(self):
         # type: () -> int
         return self._number
+
+class UnionTypeKeywordFields(ConjureUnionType):
+
+    __return = None # type: str
+    __if = None # type: int
+    __and = None # type: float
+    __lambda = None # type: UnionTypeExample
+
+    @classmethod
+    def _options(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            '_return': ConjureFieldDefinition('return', str),
+            '_if': ConjureFieldDefinition('if', int),
+            '_and': ConjureFieldDefinition('and', float),
+            '_lambda': ConjureFieldDefinition('lambda', UnionTypeExample)
+        }
+
+    def __init__(self, _return=None, _if=None, _and=None, _lambda=None):
+        if (_return is not None) + (_if is not None) + (_and is not None) + (_lambda is not None) != 1:
+            raise ValueError('a union must contain a single member')
+
+        if _return is not None:
+            self.__return = _return
+            self._type = 'return'
+        if _if is not None:
+            self.__if = _if
+            self._type = 'if'
+        if _and is not None:
+            self.__and = _and
+            self._type = 'and'
+        if _lambda is not None:
+            self.__lambda = _lambda
+            self._type = 'lambda'
+
+    @property
+    def _return(self):
+        # type: () -> str
+        return self.__return
+
+    @property
+    def _if(self):
+        # type: () -> int
+        return self.__if
+
+    @property
+    def _and(self):
+        # type: () -> float
+        return self.__and
+
+    @property
+    def _lambda(self):
+        # type: () -> UnionTypeExample
+        return self.__lambda
 
 class EmptyObjectExample(ConjureBeanType):
 

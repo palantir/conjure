@@ -76,5 +76,11 @@ types:
             docs: Docs for when UnionTypeExample is of type StringExample.
           set: set<string>
           number: integer
+      UnionTypeKeywordFields:
+        union:
+          return: string
+          if: integer
+          and: double
+          lambda: UnionTypeExample
       EmptyObjectExample:
         fields: {}

@@ -104,7 +104,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
             poetWriter.writeIndentedLine("if %s is not None:", option.attributeName());
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine("self._%s = %s", option.attributeName(), option.attributeName());
-            poetWriter.writeIndentedLine("self._type = '%s'", option.attributeName());
+            poetWriter.writeIndentedLine("self._type = '%s'", option.jsonIdentifier());
             poetWriter.decreaseIndent();
         });
         poetWriter.decreaseIndent();
