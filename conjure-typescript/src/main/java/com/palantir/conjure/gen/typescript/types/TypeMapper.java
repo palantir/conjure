@@ -197,6 +197,7 @@ public final class TypeMapper {
                 case SAFELONG:
                     return "number";
                 case STRING:
+                case RID:
                     return "string";
                 case BOOLEAN:
                     return "boolean";

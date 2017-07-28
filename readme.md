@@ -99,11 +99,12 @@ user-defined types (e.g. imports and object definitions) use pascal case.
 ### Primitives
 Base types in the system are:
  * `string`
- * `integer` (32-bit signed whole numbers)
- * `double` (64-bit floating point numbers)
- * `boolean` `(true|false)`
- * `safelong` (a wrapper around a long type which enforces the value is safely representable as an integer in javascript,
-   between `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`)
+ * `integer`: 32-bit signed whole numbers
+ * `double`: 64-bit floating point numbers
+ * `boolean`: `(true|false)`
+ * `safelong`: a wrapper around a long type which enforces the value is safely representable as an integer in javascript,
+   between `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`
+ * `rid`: a [Resource Identifier](https://github.com/palantir/resource-identifier)
 
 ### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language

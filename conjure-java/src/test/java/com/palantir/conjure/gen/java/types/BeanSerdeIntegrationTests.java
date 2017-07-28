@@ -15,6 +15,7 @@ import org.junit.rules.ExpectedException;
 import test.api.BooleanExample;
 import test.api.ListExample;
 import test.api.MapExample;
+import test.api.RidExample;
 import test.api.SafeLongExample;
 import test.api.SetExample;
 
@@ -43,6 +44,11 @@ public final class BeanSerdeIntegrationTests {
     @Test
     public void testSafeLongExampleSerde() throws Exception {
         testSerde("{\"safeLongValue\": 9007199254740991}", SafeLongExample.class);
+    }
+
+    @Test
+    public void testRidExampleSerde() throws Exception {
+        testSerde("{\"ridValue\": \"ri.foundry.main.dataset.0\"}", RidExample.class);
     }
 
     @Test

@@ -11,6 +11,9 @@ types:
       SafeLongExample:
         fields:
           safeLongValue: safelong
+      RidExample:
+        fields:
+          ridValue: rid
       DateTimeExample:
         fields:
           datetime: datetime
@@ -58,6 +61,8 @@ types:
         alias: boolean
       SafeLongAliasExample:
         alias: safelong
+      RidAliasExample:
+        alias: rid
       MapAliasExample:
         alias: map<string, any>
       ReferenceAliasExample:
@@ -68,6 +73,7 @@ types:
           bool: optional<boolean>
           integer: optional<integer>
           safelong: optional<safelong>
+          rid: optional<rid>
       ManyFieldExample:
         fields:
           string: string

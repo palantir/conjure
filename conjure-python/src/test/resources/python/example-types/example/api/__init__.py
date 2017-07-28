@@ -66,6 +66,26 @@ class SafeLongExample(ConjureBeanType):
         # type: () -> int
         return self._safe_long_value
 
+class RidExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'rid_value': ConjureFieldDefinition('ridValue', str)
+        }
+
+    _rid_value = None # type: str
+
+    def __init__(self, rid_value):
+        # type: (str) -> None
+        self._rid_value = rid_value
+
+    @property
+    def rid_value(self):
+        # type: () -> str
+        return self._rid_value
+
 class DoubleExample(ConjureBeanType):
 
     @classmethod
@@ -265,18 +285,24 @@ class PrimitiveOptionalsExample(ConjureBeanType):
         return {
             'num': ConjureFieldDefinition('num', float),
             'bool': ConjureFieldDefinition('bool', bool),
-            'integer': ConjureFieldDefinition('integer', int)
+            'integer': ConjureFieldDefinition('integer', int),
+            'safelong': ConjureFieldDefinition('safelong', int),
+            'rid': ConjureFieldDefinition('rid', str)
         }
 
     _num = None # type: float
     _bool = None # type: bool
     _integer = None # type: int
+    _safelong = None # type: int
+    _rid = None # type: str
 
-    def __init__(self, num, bool, integer):
-        # type: (float, bool, int) -> None
+    def __init__(self, num, bool, integer, safelong, rid):
+        # type: (float, bool, int, int, str) -> None
         self._num = num
         self._bool = bool
         self._integer = integer
+        self._safelong = safelong
+        self._rid = rid
 
     @property
     def num(self):
@@ -292,6 +318,16 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     def integer(self):
         # type: () -> int
         return self._integer
+
+    @property
+    def safelong(self):
+        # type: () -> int
+        return self._safelong
+
+    @property
+    def rid(self):
+        # type: () -> str
+        return self._rid
 
 class ManyFieldExample(ConjureBeanType):
 

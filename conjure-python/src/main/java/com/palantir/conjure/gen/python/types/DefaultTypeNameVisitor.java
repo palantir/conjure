@@ -54,6 +54,7 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
     public String visit(PrimitiveType type) {
         switch (type) {
             case STRING:
+            case RID:
                 return "str";
             case BOOLEAN:
                 return "bool";

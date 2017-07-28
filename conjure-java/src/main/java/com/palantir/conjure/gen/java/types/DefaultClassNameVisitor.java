@@ -22,6 +22,7 @@ import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.ri.ResourceIdentifier;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -75,6 +76,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                     // no OptionalBoolean type
                 case SAFELONG:
                 case STRING:
+                case RID:
                 default:
                     // treat normally
             }
@@ -101,6 +103,8 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                 return TypeName.BOOLEAN;
             case SAFELONG:
                 return ClassName.get(SafeLong.class);
+            case RID:
+                return ClassName.get(ResourceIdentifier.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }

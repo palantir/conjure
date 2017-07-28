@@ -263,6 +263,7 @@ public final class BeanBuilderGenerator {
                             field.name, asRawType(typeMapper.getClassName(type)));
                 case SAFELONG:
                 case STRING:
+                case RID:
                 default:
                     // not special
             }

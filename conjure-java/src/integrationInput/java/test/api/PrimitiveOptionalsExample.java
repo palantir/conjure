@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.ri.ResourceIdentifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,16 +25,20 @@ public final class PrimitiveOptionalsExample {
 
     private final Optional<SafeLong> safelong;
 
+    private final Optional<ResourceIdentifier> rid;
+
     private PrimitiveOptionalsExample(
             OptionalDouble num,
             Optional<Boolean> bool,
             OptionalInt integer,
-            Optional<SafeLong> safelong) {
-        validateFields(num, bool, integer, safelong);
+            Optional<SafeLong> safelong,
+            Optional<ResourceIdentifier> rid) {
+        validateFields(num, bool, integer, safelong, rid);
         this.num = num;
         this.bool = bool;
         this.integer = integer;
         this.safelong = safelong;
+        this.rid = rid;
     }
 
     @JsonProperty("num")
@@ -56,6 +61,11 @@ public final class PrimitiveOptionalsExample {
         return this.safelong;
     }
 
+    @JsonProperty("rid")
+    public Optional<ResourceIdentifier> getRid() {
+        return this.rid;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -67,12 +77,13 @@ public final class PrimitiveOptionalsExample {
         return this.num.equals(other.num)
                 && this.bool.equals(other.bool)
                 && this.integer.equals(other.integer)
-                && this.safelong.equals(other.safelong);
+                && this.safelong.equals(other.safelong)
+                && this.rid.equals(other.rid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(num, bool, integer, safelong);
+        return Objects.hash(num, bool, integer, safelong, rid);
     }
 
     @Override
@@ -94,6 +105,10 @@ public final class PrimitiveOptionalsExample {
                 .append("safelong")
                 .append(": ")
                 .append(safelong)
+                .append(", ")
+                .append("rid")
+                .append(": ")
+                .append(rid)
                 .append("}")
                 .toString();
     }
@@ -102,12 +117,14 @@ public final class PrimitiveOptionalsExample {
             OptionalDouble num,
             Optional<Boolean> bool,
             OptionalInt integer,
-            Optional<SafeLong> safelong) {
+            Optional<SafeLong> safelong,
+            Optional<ResourceIdentifier> rid) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");
         missingFields = addFieldIfMissing(missingFields, bool, "bool");
         missingFields = addFieldIfMissing(missingFields, integer, "integer");
         missingFields = addFieldIfMissing(missingFields, safelong, "safelong");
+        missingFields = addFieldIfMissing(missingFields, rid, "rid");
         if (missingFields != null) {
             throw new IllegalStateException(
                     "Some required fields have not been set: " + missingFields);
@@ -119,7 +136,7 @@ public final class PrimitiveOptionalsExample {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(4);
+                missingFields = new ArrayList<>(5);
             }
             missingFields.add(fieldName);
         }
@@ -140,6 +157,8 @@ public final class PrimitiveOptionalsExample {
 
         private Optional<SafeLong> safelong = Optional.empty();
 
+        private Optional<ResourceIdentifier> rid = Optional.empty();
+
         private Builder() {}
 
         public Builder from(PrimitiveOptionalsExample other) {
@@ -147,6 +166,7 @@ public final class PrimitiveOptionalsExample {
             bool(other.getBool());
             integer(other.getInteger());
             safelong(other.getSafelong());
+            rid(other.getRid());
             return this;
         }
 
@@ -195,8 +215,19 @@ public final class PrimitiveOptionalsExample {
             return this;
         }
 
+        @JsonSetter("rid")
+        public Builder rid(Optional<ResourceIdentifier> rid) {
+            this.rid = Objects.requireNonNull(rid, "rid cannot be null");
+            return this;
+        }
+
+        public Builder rid(ResourceIdentifier rid) {
+            this.rid = Optional.of(Objects.requireNonNull(rid, "rid cannot be null"));
+            return this;
+        }
+
         public PrimitiveOptionalsExample build() {
-            return new PrimitiveOptionalsExample(num, bool, integer, safelong);
+            return new PrimitiveOptionalsExample(num, bool, integer, safelong, rid);
         }
     }
 }

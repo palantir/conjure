@@ -11,6 +11,12 @@ types:
       DoubleExample:
         fields:
           doubleValue: double
+      SafeLongExample:
+        fields:
+          safeLongValue: safelong
+      RidExample:
+        fields:
+          ridValue: rid
       OptionalExample:
         fields:
           item: optional<string>
