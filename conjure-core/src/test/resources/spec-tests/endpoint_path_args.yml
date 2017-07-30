@@ -48,6 +48,21 @@ negative:
                 uniquename:
                   param-id: arg
                   type: string
+  samePathParamMultipleTimes:
+    expected-error: 'Path parameter arg appears more than once in path /path/{arg}/{arg}'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # invalid: cannot have multiple path segments that use the same path parameter
+                path: /path/{arg}/{arg}
+              args:
+                arg: string
   paramIdsClash:
     expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
     conjure:
@@ -59,7 +74,7 @@ negative:
             testEndpoint:
               http:
                 method: GET
-                path: /path/{arg}/{arg}
+                path: /path/{arg}
               args:
                 # invalid: cannot have multiple arguments with the same param-id if it will cause a collision
                 argName:

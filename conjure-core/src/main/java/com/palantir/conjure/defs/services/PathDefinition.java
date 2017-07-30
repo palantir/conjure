@@ -9,7 +9,10 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
+import org.glassfish.jersey.uri.UriTemplate;
 import org.immutables.value.Value;
 
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
@@ -43,6 +46,14 @@ public abstract class PathDefinition {
                             + "patterns %s or %s",
                     segment, path(), SEGMENT_PATTERN, PARAM_SEGMENT_PATTERN, PARAM_REGEX_SEGMENT_PATTERN);
         }
+
+        // verify that path template variables are unique
+        Set<String> templateVars = new HashSet<>();
+        new UriTemplate(path().toString()).getTemplateVariables().stream().forEach(var -> {
+            Preconditions.checkState(!templateVars.contains(var),
+                    "Path parameter %s appears more than once in path %s", var, path());
+            templateVars.add(var);
+        });
     }
 
     /**
