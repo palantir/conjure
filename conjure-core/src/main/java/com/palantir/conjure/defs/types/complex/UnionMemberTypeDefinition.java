@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition.UnionMemberTypeDeserializer;
+import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -19,7 +21,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionMemberTypeDefinition {
 
-    String type();
+    ConjureType type();
 
     Optional<String> docs();
 
@@ -36,7 +38,11 @@ public interface UnionMemberTypeDefinition {
                 throws IOException {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
-                return builder().type(candidate).build();
+                try {
+                    return builder().type(ConjureType.fromString(candidate)).build();
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             return ImmutableUnionMemberTypeDefinition.fromJson(

@@ -25,7 +25,6 @@ import com.palantir.conjure.gen.python.poet.PythonEnum.PythonEnumValue;
 import com.palantir.conjure.gen.python.poet.PythonIdentifierSanitizer;
 import com.palantir.conjure.gen.python.poet.PythonImport;
 import com.palantir.conjure.gen.python.poet.PythonUnionTypeDefinition;
-import com.palantir.parsec.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -71,19 +70,15 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .stream()
                 .map(entry -> {
                     UnionMemberTypeDefinition unionMember = entry.getValue();
-                    try {
-                        ConjureType conjureType = ConjureType.fromString(unionMember.type());
-                        return PythonField.builder()
-                            .attributeName(PythonIdentifierSanitizer.sanitize(
-                                    FieldName.of(entry.getKey())))
-                            .docs(unionMember.docs())
-                            .jsonIdentifier(entry.getKey())
-                            .myPyType(myPyMapper.getTypeName(conjureType))
-                            .pythonType(mapper.getTypeName(conjureType))
-                            .build();
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
+                    ConjureType conjureType = unionMember.type();
+                    return PythonField.builder()
+                        .attributeName(PythonIdentifierSanitizer.sanitize(
+                                FieldName.of(entry.getKey())))
+                        .docs(unionMember.docs())
+                        .jsonIdentifier(entry.getKey())
+                        .myPyType(myPyMapper.getTypeName(conjureType))
+                        .pythonType(mapper.getTypeName(conjureType))
+                        .build();
                 })
                 .collect(Collectors.toList());
 

@@ -62,7 +62,7 @@ public final class UnionGenerator {
         Map<String, TypeName> memberTypes = typeDef.union().entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> typeMapper.getClassName(toConjureType(entry.getValue().type()))));
+                        entry -> typeMapper.getClassName(entry.getValue().type())));
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
@@ -124,7 +124,7 @@ public final class UnionGenerator {
         return memberTypeDefs.entrySet().stream().map(entry -> {
             String memberName = entry.getKey();
             UnionMemberTypeDefinition memberTypeDef = entry.getValue();
-            TypeName memberType = typeMapper.getClassName(toConjureType(memberTypeDef.type()));
+            TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
             MethodSpec.Builder builder = MethodSpec.methodBuilder("of")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -241,8 +241,7 @@ public final class UnionGenerator {
             TypeMapper typeMapper, ClassName baseClass, Map<String, UnionMemberTypeDefinition> memberTypeDefs) {
         return memberTypeDefs.entrySet().stream().map(entry -> {
             String memberName = entry.getKey();
-            String memberString = entry.getValue().type();
-            TypeName memberType = typeMapper.getClassName(toConjureType(memberString));
+            TypeName memberType = typeMapper.getClassName(entry.getValue().type());
             ClassName wrapperClass = peerWrapperClass(baseClass, memberName);
 
             AnnotationSpec jsonPropertyAnnotation = AnnotationSpec.builder(JsonProperty.class)

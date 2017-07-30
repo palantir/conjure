@@ -195,7 +195,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             String typeGuardName = String.format("is%s", capitalizedMemberName);
             TypescriptSimpleType interfaceType = TypescriptSimpleType.builder().name(interfaceName).build();
             StringExpression quotedMemberName = StringExpression.of(memberName);
-            ConjureType conjureTypeOfMemberType = getConjureType(memberType.type());
+            ConjureType conjureTypeOfMemberType = memberType.type();
             referencedTypes.add(conjureTypeOfMemberType);
 
             // build interface
