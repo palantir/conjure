@@ -40,6 +40,13 @@ public interface ServiceDefinition {
 
     Map<String, EndpointDefinition> endpoints();
 
+    @Value.Check
+    default void check() {
+        for (ServiceDefinitionValidator validator : ServiceDefinitionValidator.values()) {
+            validator.validate(this);
+        }
+    }
+
     static Builder builder() {
         return new Builder();
     }

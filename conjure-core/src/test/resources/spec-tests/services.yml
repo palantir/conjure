@@ -1,9 +1,40 @@
 test-case-name: "services"
 positive:
-  emptyTypesOK:
+  emptyServicesOK:
     conjure:
-      # valid: top-level "types" property is optional
+      services:
+          # valid: empty services OK
+  samePathOKWithUniqueMethods:
+    conjure:
       services:
         TestService:
           name: Test Service
           package: test.a
+          endpoints:
+            # valid: multiple endpoints can have the same path if method is unique
+            testEndpoint:
+              http:
+                method: GET
+                path: /myEndpoint
+            otherTestEndpoint:
+              http:
+                method: DELETE
+                path: /myEndpoint
+negative:
+  endpointPathMethodMustBeUnique:
+    expected-error: 'Endpoint "GET /myEndpoint" is defined by multiple endpoints: [testEndpoint, otherTestEndpoint]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            # valid: cannot have multiple endpoints with the same method and path
+            testEndpoint:
+              http:
+                method: GET
+                path: /myEndpoint
+            otherTestEndpoint:
+              http:
+                method: GET
+                path: /myEndpoint
