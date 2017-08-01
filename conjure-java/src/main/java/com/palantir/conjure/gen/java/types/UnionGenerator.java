@@ -14,13 +14,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
-import com.palantir.parsec.ParseException;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -89,15 +87,6 @@ public final class UnionGenerator {
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
-    }
-
-    // TODO(rfink): This should go away once we implement ConjureType#name
-    private static ConjureType toConjureType(String string) {
-        try {
-            return ConjureType.fromString(string);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static MethodSpec generateConstructor(ClassName baseClass) {

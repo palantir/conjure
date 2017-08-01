@@ -42,7 +42,6 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptTypeGuardType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptUnionType;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
-import com.palantir.parsec.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -268,14 +267,6 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .addEmittables(typeGuardObj)
                 .parentFolderPath(parentFolderPath)
                 .build();
-    }
-
-    private ConjureType getConjureType(String type) {
-        try {
-            return ConjureType.fromString(type);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
