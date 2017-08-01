@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,14 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
                                     ((ReferenceType) currField.getValue().type()).type()
                             );
                         }
+                    }
+                } else if (currEntry.getValue() instanceof AliasTypeDefinition) {
+                    AliasTypeDefinition aliasDef = (AliasTypeDefinition) currEntry.getValue();
+                    if (aliasDef.alias() instanceof ReferenceType) {
+                        typeToRefFields.put(
+                                currEntry.getKey(),
+                                ((ReferenceType) aliasDef.alias()).type()
+                        );
                     }
                 }
             }

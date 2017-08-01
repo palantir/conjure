@@ -1,0 +1,119 @@
+test-case-name: "types"
+positive:
+  primitives:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            StringExample:
+              fields:
+                string: string
+            IntegerExample:
+              fields:
+                integer: integer
+            DoubleExample:
+              fields:
+                double: double
+            BooleanExample:
+              fields:
+                boolean: boolean
+            SafeLongExample:
+              fields:
+                safelong: safelong
+            RidExample:
+              fields:
+                rid: rid
+  builtins:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            AnyExample:
+              fields:
+                any: any
+            MapExample:
+              fields:
+                map: map<string, string>
+            ListExample:
+              fields:
+                list: list<string>
+            SetExample:
+              fields:
+                set: set<string>
+            OptionalExample:
+              fields:
+                optional: optional<string>
+            BinaryExample:
+              fields:
+                binary: binary
+            DateTimeExample:
+              fields:
+                datetime: datetime
+  enums:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            EnumExample:
+              values:
+                - ONE
+                - TWO
+  aliases:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            BaseType:
+              fields:
+                name: string
+            PrimitiveAliasExample:
+              alias: string
+            BuiltinAliasExample:
+              alias: map<string, rid>
+            ObjectAliasExample:
+              alias: BaseType
+            AliasAliasExample:
+              alias: ObjectAliasExample
+  unions:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            UnionTypeExample:
+              union:
+                stringExample:
+                  type: StringExample
+                  docs: Docs for when UnionTypeExample is of type StringExample.
+                set: set<string>
+                thisFieldIsAnInteger: integer
+            UnionTypeMultipleFieldsSameTypeExample:
+              union:
+                stringOne: string
+                stringTwo: string
+negative:
+  selfAliasTypeNotAllowed:
+    expected-error: 'Illegal recursive data type: SelfAlias -> SelfAlias'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            SelfAlias:
+              alias: SelfAlias
+  aliasCycleNotAllowed:
+    expected-error: 'Illegal recursive data type: CycleType -> SelfAlias -> CycleType'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            CycleType:
+              fields:
+                name: SelfAlias
+            SelfAlias:
+              alias: CycleType

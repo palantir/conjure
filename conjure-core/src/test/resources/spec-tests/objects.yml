@@ -42,3 +42,16 @@ negative:
             Other:
                 fields:
                   other: One
+  cycleViaAliasNotAllowed:
+    expected-error: 'Illegal recursive data type: Other -> One -> Other'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            # invalid: cyclic definition not allowed
+            One:
+              fields:
+                other: Other
+            Other:
+              alias: One
