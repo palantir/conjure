@@ -32,25 +32,31 @@ public final class UnionTypeExample {
     }
 
     /** Docs for when UnionTypeExample is of type StringExample. */
-    public static UnionTypeExample of(StringExample value) {
+    public static UnionTypeExample stringExample(StringExample value) {
         return new UnionTypeExample(new StringExampleWrapper(value));
     }
 
-    public static UnionTypeExample of(Set<String> value) {
+    public static UnionTypeExample set(Set<String> value) {
         return new UnionTypeExample(new SetWrapper(value));
     }
 
-    public static UnionTypeExample of(int value) {
+    public static UnionTypeExample thisFieldIsAnInteger(int value) {
         return new UnionTypeExample(new ThisFieldIsAnIntegerWrapper(value));
     }
 
+    public static UnionTypeExample alsoAnInteger(int value) {
+        return new UnionTypeExample(new AlsoAnIntegerWrapper(value));
+    }
+
     public <T> T accept(Visitor<T> visitor) {
-        if (value instanceof SetWrapper) {
-            return visitor.visit(((SetWrapper) value).value);
+        if (value instanceof AlsoAnIntegerWrapper) {
+            return visitor.visitAlsoAnInteger(((AlsoAnIntegerWrapper) value).value);
+        } else if (value instanceof SetWrapper) {
+            return visitor.visitSet(((SetWrapper) value).value);
         } else if (value instanceof ThisFieldIsAnIntegerWrapper) {
-            return visitor.visit(((ThisFieldIsAnIntegerWrapper) value).value);
+            return visitor.visitThisFieldIsAnInteger(((ThisFieldIsAnIntegerWrapper) value).value);
         } else if (value instanceof StringExampleWrapper) {
-            return visitor.visit(((StringExampleWrapper) value).value);
+            return visitor.visitStringExample(((StringExampleWrapper) value).value);
         } else if (value instanceof UnknownWrapper) {
             return visitor.visitUnknown(((UnknownWrapper) value).getType());
         }
@@ -62,6 +68,9 @@ public final class UnionTypeExample {
     public boolean equals(Object other) {
         return this == other
                 || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
+                || (other instanceof Integer
+                        && value instanceof AlsoAnIntegerWrapper
+                        && Objects.equals(((AlsoAnIntegerWrapper) value).value, other))
                 || (other instanceof Set
                         && value instanceof SetWrapper
                         && Objects.equals(((SetWrapper) value).value, other))
@@ -94,11 +103,13 @@ public final class UnionTypeExample {
     }
 
     public interface Visitor<T> {
-        T visit(Set<String> value);
+        T visitAlsoAnInteger(int value);
 
-        T visit(int value);
+        T visitSet(Set<String> value);
 
-        T visit(StringExample value);
+        T visitThisFieldIsAnInteger(int value);
+
+        T visitStringExample(StringExample value);
 
         T visitUnknown(String unknownType);
     }
@@ -110,6 +121,7 @@ public final class UnionTypeExample {
         defaultImpl = UnknownWrapper.class
     )
     @JsonSubTypes({
+        @JsonSubTypes.Type(AlsoAnIntegerWrapper.class),
         @JsonSubTypes.Type(SetWrapper.class),
         @JsonSubTypes.Type(ThisFieldIsAnIntegerWrapper.class),
         @JsonSubTypes.Type(StringExampleWrapper.class)
@@ -235,6 +247,49 @@ public final class UnionTypeExample {
         @Override
         public String toString() {
             return new StringBuilder("ThisFieldIsAnIntegerWrapper")
+                    .append("{")
+                    .append("value")
+                    .append(": ")
+                    .append(value)
+                    .append("}")
+                    .toString();
+        }
+    }
+
+    @JsonTypeName("alsoAnInteger")
+    private static class AlsoAnIntegerWrapper implements Base {
+        private final int value;
+
+        @JsonCreator
+        private AlsoAnIntegerWrapper(@JsonProperty("alsoAnInteger") int value) {
+            Objects.requireNonNull(value);
+            this.value = value;
+        }
+
+        @JsonProperty("alsoAnInteger")
+        private int getValue() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other
+                    || (other instanceof AlsoAnIntegerWrapper
+                            && equalTo((AlsoAnIntegerWrapper) other));
+        }
+
+        private boolean equalTo(AlsoAnIntegerWrapper other) {
+            return this.value == other.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
+        public String toString() {
+            return new StringBuilder("AlsoAnIntegerWrapper")
                     .append("{")
                     .append("value")
                     .append(": ")

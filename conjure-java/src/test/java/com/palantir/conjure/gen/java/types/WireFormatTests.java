@@ -161,9 +161,9 @@ public final class WireFormatTests {
     @Test
     public void testUnionType() throws Exception {
         StringExample stringExample = StringExample.of("foo");
-        UnionTypeExample unionTypeStringExample = UnionTypeExample.of(stringExample);
-        UnionTypeExample unionTypeSet = UnionTypeExample.of(ImmutableSet.of("item"));
-        UnionTypeExample unionTypeInt = UnionTypeExample.of(5);
+        UnionTypeExample unionTypeStringExample = UnionTypeExample.stringExample(stringExample);
+        UnionTypeExample unionTypeSet = UnionTypeExample.set(ImmutableSet.of("item"));
+        UnionTypeExample unionTypeInt = UnionTypeExample.thisFieldIsAnInteger(5);
         String serializedUnionTypeStringExample = "{\"type\":\"stringExample\",\"stringExample\":{\"string\":\"foo\"}}";
         String serializedUnionTypeSet = "{\"type\":\"set\",\"set\":[\"item\"]}";
         String serializedUnionTypeInt = "{\"type\":\"thisFieldIsAnInteger\",\"thisFieldIsAnInteger\":5}";
@@ -277,27 +277,30 @@ public final class WireFormatTests {
     }
 
     private static class TestVisitor implements UnionTypeExample.Visitor<Integer> {
-
         @Override
-        public Integer visit(StringExample stringExampleValue) {
+        public Integer visitStringExample(StringExample stringExampleValue) {
             return stringExampleValue.getString().length();
         }
 
         @Override
-        public Integer visit(Set<String> setStringValue) {
+        public Integer visitSet(Set<String> setStringValue) {
             return setStringValue.size();
         }
 
         @Override
-        public Integer visit(int integerValue) {
-            return integerValue;
+        public Integer visitAlsoAnInteger(int value) {
+            return value;
+        }
+
+        @Override
+        public Integer visitThisFieldIsAnInteger(int value) {
+            return value;
         }
 
         @Override
         public Integer visitUnknown(String unknownType) {
             return 0;
         }
-
     }
 
 }

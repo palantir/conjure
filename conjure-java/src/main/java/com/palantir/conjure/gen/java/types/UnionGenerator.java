@@ -115,7 +115,8 @@ public final class UnionGenerator {
             UnionMemberTypeDefinition memberTypeDef = entry.getValue();
             TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
-            MethodSpec.Builder builder = MethodSpec.methodBuilder("of")
+            // memberName is guarded to be a valid Java identifier, so this is safe
+            MethodSpec.Builder builder = MethodSpec.methodBuilder(memberName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(memberType, variableName)
                     .addStatement("return new $T(new $T($L))",
@@ -148,7 +149,8 @@ public final class UnionGenerator {
                 codeBuilder.nextControlFlow("else $L", ifStatement);
             }
             codeBuilder.addStatement(
-                    "return $1N.$2L((($3T) $4L).$4L)", visitor, VISIT_METHOD_NAME, wrapperClass, VALUE_FIELD_NAME);
+                    "return $1N.$2L((($3T) $4L).$4L)", visitor, VISIT_METHOD_NAME + StringUtils.capitalize(memberName),
+                    wrapperClass, VALUE_FIELD_NAME);
         }
         ClassName unknownWrapperClass = visitorClass.peerClass(UNKNOWN_WRAPPER_CLASS_NAME);
         codeBuilder.nextControlFlow("else if ($L instanceof $T)", VALUE_FIELD_NAME, unknownWrapperClass);
@@ -194,7 +196,7 @@ public final class UnionGenerator {
     private static List<MethodSpec> generateMemberVisitMethods(Map<String, TypeName> memberTypes) {
         return memberTypes.entrySet().stream().map(entry -> {
             String variableName = variableName();
-            return MethodSpec.methodBuilder(VISIT_METHOD_NAME)
+            return MethodSpec.methodBuilder(VISIT_METHOD_NAME + StringUtils.capitalize(entry.getKey()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(entry.getValue(), variableName)
                     .returns(TYPE_VARIABLE)
