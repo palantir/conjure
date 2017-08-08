@@ -32,6 +32,24 @@ export class TestService {
         });
     }
 
+    public emptyDocs(): Promise<void> {
+        return this.bridge.callEndpoint<void>({
+            data: undefined,
+            endpointName: "emptyDocs",
+            endpointPath: "/catalog/documentation",
+            method: "GET",
+            pathArguments: [
+            ],
+            queryArguments: {
+            },
+            requestMediaType: "application/json",
+            requiredHeaders: [
+                "Authorization",
+            ],
+            responseMediaType: "application/json",
+        });
+    }
+
     public getBranches(
         datasetRid: string
     ): Promise<string[]> {

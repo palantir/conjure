@@ -6,17 +6,25 @@ export interface ITestService {
     createDataset(
         request: ICreateDatasetRequest
     ): Promise<IDataset>;
+
+    emptyDocs(): Promise<void>;
+
     getBranches(
         datasetRid: string
     ): Promise<string[]>;
+
     getDataset(
         datasetRid: string
     ): Promise<IDataset>;
+
+    /** Returns a mapping from file system id to backing file system configuration. */
     getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;
+
     paginateSomething(
         pageSize: number,
         pageToken?: string
     ): Promise<void>;
+
     uploadRawData(
         input: any
     ): Promise<void>;

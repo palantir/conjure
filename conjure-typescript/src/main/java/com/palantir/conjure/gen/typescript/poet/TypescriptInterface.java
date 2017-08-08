@@ -21,7 +21,7 @@ public interface TypescriptInterface extends Emittable {
     }
 
     @Value.Default
-    default SortedSet<TypescriptFunctionSignature> methodSignatures() {
+    default SortedSet<TypescriptInterfaceFunctionSignature> methodSignatures() {
         return Sets.newTreeSet();
     }
 
@@ -37,11 +37,18 @@ public interface TypescriptInterface extends Emittable {
         if (!propertySignatures().isEmpty() && !methodSignatures().isEmpty()) {
             writer.writeLine();
         }
-        methodSignatures().forEach(method -> {
-            writer.writeIndented();
-            method.emit(writer);
-            writer.writeLine(";");
-        });
+
+        if (!methodSignatures().isEmpty()) {
+            TypescriptInterfaceFunctionSignature finalSignature = methodSignatures().last();
+            methodSignatures().forEach(method -> {
+                writer.writeIndented();
+                method.emit(writer);
+                writer.writeLine(";");
+                if (!method.equals(finalSignature)) {
+                    writer.writeLine();
+                }
+            });
+        }
         writer.decreaseIndent().writeIndentedLine("}");
     }
 

@@ -11,8 +11,8 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
-import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
+import com.palantir.conjure.gen.typescript.poet.TypescriptInterfaceFunctionSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.util.Collection;
@@ -37,9 +37,12 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
     private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
         ConjurePackage packageLocation = serviceDef.conjurePackage();
         String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
-        Set<TypescriptFunctionSignature> methodSignatures = serviceDef.endpoints().entrySet()
+        Set<TypescriptInterfaceFunctionSignature> methodSignatures = serviceDef.endpoints().entrySet()
                 .stream()
-                .map(e -> ServiceUtils.generateFunctionSignature(e.getKey(), e.getValue(), typeMapper))
+                .map(e -> TypescriptInterfaceFunctionSignature.builder()
+                        .docs(e.getValue().docs())
+                        .signature(ServiceUtils.generateFunctionSignature(e.getKey(), e.getValue(), typeMapper))
+                        .build())
                 .collect(Collectors.toSet());
         TypescriptInterface serviceInterface = TypescriptInterface.builder()
                 .name(getInterfaceName(typeName))
