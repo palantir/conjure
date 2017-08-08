@@ -701,7 +701,7 @@ Common strategies for specifying versions include:
 
    ```gradle
    subprojects {
-       configurations.compile {
+       configurations.all {
            resolutionStrategy {
                force 'com.palantir.conjure:conjure-java-lib:0.31.0'
                force 'com.squareup.retrofit2:retrofit:2.2.0'
