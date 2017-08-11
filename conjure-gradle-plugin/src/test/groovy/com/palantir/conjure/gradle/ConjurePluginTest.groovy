@@ -405,6 +405,25 @@ class ConjurePluginTest extends GradleTestSpec {
         result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
     }
 
+    def 'works with afterEvaluate'() {
+        file('build.gradle') << '''
+            allprojects {
+                afterEvaluate { p ->
+                    if (p.tasks.findByPath('check') == null) {
+                        p.tasks.create('check')
+                    }
+                }
+            }
+        '''
+
+        when:
+        // doesn't matter what task is run, just need to trigger project evaluation
+        def result = run(':tasks')
+
+        then:
+        result.task(':tasks').outcome == TaskOutcome.SUCCESS
+    }
+
     def readResource(String name) {
         Resources.asCharSource(Resources.getResource(name), Charset.defaultCharset()).read()
     }

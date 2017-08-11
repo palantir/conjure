@@ -45,7 +45,6 @@ public class ConjurePlugin implements Plugin<Project> {
     @SuppressWarnings("checkstyle:methodlength")
     public final void apply(Project project) {
         ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class);
-        project.evaluationDependsOnChildren();
 
         // Conjure code source set
         SourceDirectorySet conjureSourceSet = sourceDirectorySetFactory.create("conjure");
