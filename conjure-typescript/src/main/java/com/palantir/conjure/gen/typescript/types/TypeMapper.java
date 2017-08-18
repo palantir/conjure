@@ -25,7 +25,6 @@ import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
@@ -210,7 +209,7 @@ public final class TypeMapper {
         public String visit(LocalReferenceType type) {
             BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
             if (defType != null) {
-                return extractTypescriptName(type.type(), defType);
+                return extractTypescriptName(type, defType);
             } else {
                 ExternalTypeDefinition depType = types.imports().get(type.type());
                 checkNotNull(depType, "Unable to resolve type %s", type.type());
@@ -224,7 +223,7 @@ public final class TypeMapper {
             if (importedTypes != null) {
                 BaseObjectTypeDefinition defType = importedTypes.importedTypes().objects().get(type.type());
                 checkNotNull(defType, "Unable to resolve imported conjure type %s", type.type());
-                return extractTypescriptName(type.type(), defType);
+                return extractTypescriptName(type, defType);
             } else {
                 ExternalTypeDefinition depType = types.imports().get(type.type());
                 checkNotNull(depType, "Unable to resolve type %s", type.type());
@@ -247,17 +246,32 @@ public final class TypeMapper {
             return "string";
         }
 
-        private String extractTypescriptName(TypeName conjureTypeName, BaseObjectTypeDefinition defType) {
+        private String extractTypescriptName(ReferenceType referenceType, BaseObjectTypeDefinition defType) {
             if (defType instanceof AliasTypeDefinition) {
                 // in typescript we collapse alias types to concrete types
-                return ((AliasTypeDefinition) defType).alias().visit(this);
+                return getAliasedType(referenceType, (AliasTypeDefinition) defType).visit(this);
             } else if (defType instanceof EnumTypeDefinition) {
-                return conjureTypeName.name();
+                return referenceType.type().name();
             } else {
                 // Interfaces are prepended with "I"
-                return "I" + conjureTypeName.name();
+                return "I" + referenceType.type().name();
             }
         }
 
+        // If the original ReferenceType is a ForeignReferenceType and the aliased type is a LocalReferenceType,
+        // then the LocalReferenceType has to be converted to a ForeignReferenceType for resolution to work
+        private ConjureType getAliasedType(ReferenceType referenceType, AliasTypeDefinition aliasTypeDefinition) {
+            ConjureType aliasedType = aliasTypeDefinition.alias();
+            if (referenceType instanceof ForeignReferenceType
+                    && aliasedType instanceof LocalReferenceType
+                    && !(aliasedType instanceof PrimitiveType)) {
+
+                LocalReferenceType localAliasedType = (LocalReferenceType) aliasedType;
+                return ForeignReferenceType.of(
+                        ((ForeignReferenceType) referenceType).namespace(),
+                        localAliasedType.type());
+            }
+            return aliasedType;
+        }
     }
 }

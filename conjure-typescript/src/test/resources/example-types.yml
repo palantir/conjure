@@ -44,6 +44,8 @@ types:
           items: map<string, any>
       AliasExample:
         alias: string
+      ComplexAliasExample:
+        alias: StringExample
       MapAliasExample:
         alias: map<string, any>
       ReferenceAliasExample:
