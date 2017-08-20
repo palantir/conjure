@@ -15,7 +15,7 @@ positive:
               args:
                 arg: string
                 aRg: string
-  pathParamRegexp:
+  pathParamTrailingDotRegexp:
     conjure:
       services:
         TestService:
@@ -25,11 +25,88 @@ positive:
             testEndpoint:
               http:
                 method: GET
-                # valid: arg template can contain regular expression after ':'
+                # valid: arg template for trailing path parameter can contain regular expression '.+'
                 path: /path/{arg:.+}
               args:
                 arg: string
+  pathParamTrailingStarRegexp:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # valid: arg template for trailing path parameter can contain regular expression '.*'
+                path: /path/{arg:.*}
+              args:
+                arg: string
+  pathParamInlineRegexp:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                # valid: arg template for path parameter can contain regular expression '.+' even if it is not the last parameter
+                path: /path/{arg:.+}/resolve
+              args:
+                arg: string
+  pathWithPossibleConflictOK:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg:.+}
+              args:
+                arg: string
+            otherEndpoint:
+              http:
+                method: GET
+                # valid: although all requests that match this endpoint will also be matched by "testEndpoint",
+                #        matching will be performed based on longest matching literal prefix and is legal.
+                path: /path/another/{arg:.+}
+              args:
+                arg: string
 negative:
+  inlineRegexpCannotBeStar:
+    expected-error: 'Path parameter {arg} in path /path/{arg:.*}/foo specifies regular expression .*, but this regular expression is only permitted if the path parameter is the last segment'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg:.*}/foo
+              args:
+                arg: string
+  regexpMustBeMatchAll:
+    expected-error: 'Segment {arg:[0-9]+} of path /path/{arg:[0-9]+} did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg:[0-9]+}
+              args:
+                arg: string
   keyAndParamIdClash:
     expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
     conjure:
@@ -63,6 +140,27 @@ negative:
                 path: /path/{arg}/{arg}
               args:
                 arg: string
+  multiplePathArgsInSamePosition:
+    expected-error: 'Endpoint "GET /path/{arg}/resolve" is defined by multiple endpoints: [testEndpointA, testEndpointB]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpointA:
+              http:
+                method: GET
+                path: /path/{arg}/resolve
+              args:
+                arg: string
+            testEndpointB:
+              http:
+                method: GET
+                # invalid: cannot have multiple endpoints that differ only in path parameter
+                path: /path/{other:.+}/resolve
+              args:
+                other: string
   paramIdsClash:
     expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
     conjure:
@@ -97,7 +195,7 @@ negative:
                 # invalid: "arg" must be defined as a parameter
                 path: /path/{arg}
   pathTemplateParamNestedBraces:
-    expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$'
+    expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
       services:
         TestService:
@@ -112,7 +210,7 @@ negative:
               args:
                 arg: string
   pathParamUnbalancedBraces:
-    expected-error: 'Segment {{arg} of path /path/{{arg}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*:.*}$'
+    expected-error: 'Segment {{arg} of path /path/{{arg}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
       services:
         TestService:

@@ -9,6 +9,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.ConjureValidator;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefinition> {
     UNIQUE_PATH_METHODS(new UniquePathMethodsValidator());
@@ -24,12 +25,18 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         validator.validate(definition);
     }
 
+    private static final Pattern PATHVAR_PATTERN = Pattern.compile(Pattern.quote("{") + ".+" + Pattern.quote("}"));
+
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
         @Override
         public void validate(ServiceDefinition definition) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
             definition.endpoints().entrySet().stream().forEach(entry -> {
                 String methodPath = entry.getValue().http().method() + " " + entry.getValue().http().path().toString();
+                // normalize all path parameter variables and regular expressions because all path args are treated
+                // as identical for comparisons (paths cannot differ only in the name/regular expression of a path
+                // variable)
+                methodPath = PATHVAR_PATTERN.matcher(methodPath).replaceAll("{arg}");
                 pathToEndpoints.put(methodPath, entry.getKey());
             });
 

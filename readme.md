@@ -495,8 +495,7 @@ Service identifiers are typically Pascal case.
 ### Endpoints
 Endpoint definitions describe a method, its arguments and return type for
 this service.
- * `http`: the request line for a particular endpoint, either in shorthand
-   form:
+ * `http`: the request line for a particular endpoint, either in shorthand form:
 
    ```yaml
    http: GET /some/path/{someArg}
@@ -510,11 +509,39 @@ this service.
      path: /some/path/{someArg}
    ```
 
-   where arguments are encapsulated with braces, and must match any path
-   arguments found in the later `args` section.
-
-   HTTP methods need to be supported by the server, presently the server
-   implementations allow for `GET`, `POST`, `PUT` and `DELETE`.
+     * `method` must be one of  `GET`, `POST`, `PUT` or `DELETE`
+     * `path` is a path segment that must begin with a slash (`/`) and must not end in a slash
+     * A path segment can be specified to be a path parameter argument by encapsulating the segment in curly braces (`{}`)
+     * A particular `method` + `path` combination can only be defined once per service. All path parameters are
+       considered equivalent for the purposes of determining uniqueness -- for example, `GET /branch/{arg}/resolve` and
+       `GET /branch/{id:.+}/resolve` are considered equivalent and thus cannot both be defined for a particular service.
+     * All path parameters that occur in the path must match a path argument specified in the `args` section
+     * Path parameters must be unique: the same parameter cannot occur multiple times in the same path
+     * Path parameter names have the same restrictions as field names
+     * Path parameter names are case-sensitive (`arg` and `aRg` are considered separate parameters)
+     * The type for a path parameter must be a primitive type or an alias type that resolves to a primitive type
+     * `:.+` can be appended to the variable name of a path parameter to specify that a non-greedy match should be
+       performed for the parameter. Unlike other path parameters, specifying this will allow the parameter to match the
+       slash (`/`) character.
+       * For example, if the value of `path` is `/branch/{branchPath:.+}/resolve`, then the request paths
+         `/branch/foo/resolve` and `/branch/foo/bar/resolve/resolve` would both match the path, and the value of the
+         `branchPath` path parameter would be `foo` and `foo/bar/resolve`, respectively. A request of `/branch/resolve`
+         would not match.
+     * If the path parameter is the final segment of a path, then `:.*` can also be appended to the variable name to
+       specify that the trailing parameter may be empty. For example, if the value of `path` is
+       `/branch/{branchPath:.*}`, then `/branch/foo` and `branch/` would both match the path, and the value of the
+       `branchPath` parameter would be `foo` and `` (empty), respectively.
+     * `:.+` and `:.*` are the only regular expressions that are supported, and `:.*` is only supported for trailing
+        path parameters (path parameters that are the final segments of a path)
+     * For server implementations: if a request can be matched to multiple paths (due to the presence of two paths that
+       share the same prefix segments and then differ in a path parameter segment versus a literal path segment), then
+       the registered path that has the longest literal prefix match should be used to handle the request
+       * For example, if `/path/dataset/{arg}` and `/path/{arg}/fetch` are both registered as paths and
+         `/path/dataset/fetch` is issued as a request, the server should handle it as `/path/dataset/{arg}` with
+         `{arg}` = "fetch" (rather than as `/path/{arg}/fetch` with `{arg}` = "dataset") because `/path/dataset` is the
+         longest literal prefix match.
+       * As a fallback, we stipulate that the behavior of path matching should match the behavior that would be
+         exhibited by a JAX-RS server handling the equivalent path expressions and inputs.
  * `auth`: an optional auth requirement to override `default-auth`,
    and with identical options to `default-auth`. To override the default and
    remove auth from an endpoint, use `none`.
