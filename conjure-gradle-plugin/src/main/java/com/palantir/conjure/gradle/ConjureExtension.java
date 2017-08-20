@@ -6,22 +6,31 @@ package com.palantir.conjure.gradle;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
+import org.gradle.api.Project;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.file.collections.SimpleFileCollection;
 
 public class ConjureExtension {
-    private FileCollection conjureImports = new SimpleFileCollection();
+
+    private final Project project;
+
+    private ConfigurableFileCollection conjureImports;
     private Set<String> experimentalFeatures = Sets.newHashSet();
 
+    public ConjureExtension(Project project) {
+        this.project = project;
+        conjureImports = project.files();
+    }
+
     public final void setConjureImports(FileCollection files) {
-        conjureImports = files;
+        conjureImports = project.files(files);
     }
 
     public final void conjureImports(FileCollection files) {
-        conjureImports = files;
+        conjureImports.from(files);
     }
 
-    public final FileCollection getConjureImports() {
+    public final ConfigurableFileCollection getConjureImports() {
         return conjureImports;
     }
 
