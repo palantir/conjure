@@ -25,7 +25,8 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         validator.validate(definition);
     }
 
-    private static final Pattern PATHVAR_PATTERN = Pattern.compile(Pattern.quote("{") + ".+" + Pattern.quote("}"));
+    // The ? is for reluctant matching, i.e. matching as few characters as possible.
+    private static final Pattern PATHVAR_PATTERN = Pattern.compile(Pattern.quote("{") + ".+?" + Pattern.quote("}"));
 
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
         @Override

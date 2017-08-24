@@ -78,6 +78,28 @@ positive:
                 path: /path/another/{arg:.+}
               args:
                 arg: string
+  multiplePathsWithTwoArgsAndSamePrefix:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http:
+                method: GET
+                path: /path/{arg1}/test/{arg2}
+              args:
+                arg1: string
+                arg2: string
+            otherEndpoint:
+              http:
+                method: GET
+                # valid: this has a distinct path segment
+                path: /path/{arg1}/other/{arg2}
+              args:
+                arg1: string
+                arg2: string
 negative:
   inlineRegexpCannotBeStar:
     expected-error: 'Path parameter {arg} in path /path/{arg:.*}/foo specifies regular expression .*, but this regular expression is only permitted if the path parameter is the last segment'
@@ -161,6 +183,29 @@ negative:
                 path: /path/{other:.+}/resolve
               args:
                 other: string
+  multipleTwoPathArgsInSamePosition:
+    expected-error: 'Endpoint "GET /path/{arg}/resolve/{arg}" is defined by multiple endpoints: [testEndpointA, testEndpointB]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpointA:
+              http:
+                method: GET
+                path: /path/{arg}/resolve/{arg2}
+              args:
+                arg: string
+                arg2: string
+            testEndpointB:
+              http:
+                method: GET
+                # invalid: cannot have multiple endpoints that differ only in path parameter
+                path: /path/{other}/resolve/{other2:.+}
+              args:
+                other: string
+                other2: string
   paramIdsClash:
     expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
     conjure:
