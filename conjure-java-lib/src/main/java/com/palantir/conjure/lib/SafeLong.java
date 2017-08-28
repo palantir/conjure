@@ -4,8 +4,6 @@
 
 package com.palantir.conjure.lib;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.immutables.value.Value;
@@ -26,9 +24,11 @@ public abstract class SafeLong {
 
     @Value.Check
     protected final void check() {
-        checkState(MIN_SAFE_VALUE <= longValue() && longValue() <= MAX_SAFE_VALUE,
-                "number must be safely representable in javascript i.e. lie between %s and %s",
-                MIN_SAFE_VALUE, MAX_SAFE_VALUE);
+        if (!(MIN_SAFE_VALUE <= longValue() && longValue() <= MAX_SAFE_VALUE)) {
+            throw new IllegalStateException(String.format(
+                    "number must be safely representable in javascript i.e. lie between %s and %s",
+                    MIN_SAFE_VALUE, MAX_SAFE_VALUE));
+        }
     }
 
     public static SafeLong valueOf(String value) {
