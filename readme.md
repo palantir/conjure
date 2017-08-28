@@ -242,14 +242,20 @@ Java style naming convention: `com.example.name`.
 
 This manifests in the generated languages as follows:
 
-* Java - the Conjure package name is the Java package name
-* TypeScript - the folder containing the object is the Conjure package
-name with the first two segments removed (this is done for brevity).
-For example: `com.example.folder1.folder2 -> folder1/folder2`
+* Java - the Java package is the Conjure package name
+* TypeScript - the TypeScript package is the Conjure package name with the first two segments removed (this is done for
+  brevity). For example: `com.example.folder1.folder2 -> folder1-folder2`. The second part of the package is used as the
+NPM publishing scope: `@example` in this case. See [Typescript Publication](#typescript-publication) for more details.
+* Python - the Python package is the Conjure package name with the first two segments removed. For example:
+  `com.example.folder1.folder2 -> folder1.folder2`.
 
 Packages are not used for namespacing purposes within a Conjure file -- all
 type names must be unique within a Conjure file, even across different types
 (e.g. an object definition and an enum definition).
+
+Package names should not be reused across projects. Reusing package names
+can cause publishing errors because multiple generated packages will have
+the same name.
 
 ### Defined Types
 Defined types consist of objects completely specified within the context of a
