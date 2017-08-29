@@ -1,4 +1,4 @@
-apply from: "${rootDir}/gradle/publish-libs.gradle"
+apply plugin: 'com.palantir.publish-jar'
 
 sourceSets {
     integrationInput
