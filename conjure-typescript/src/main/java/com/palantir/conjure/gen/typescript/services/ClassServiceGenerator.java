@@ -160,7 +160,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                                 .map(RawExpression::of)
                                 .collect(Collectors.toList()), RawExpression.of("undefined")))
                 .build();
-        String genericParam = value.returns().map(val -> typeMapper.getTypescriptType(val).name()).orElse("void");
+        String genericParam = ServiceUtils.generateFunctionSignatureReturnType(value, typeMapper);
         FunctionCallExpression call = FunctionCallExpression.builder().name(
                 "this.bridge.callEndpoint<" + genericParam + ">").addArguments(
                 JsonExpression.builder().keyValues(keyValues).build()).build();

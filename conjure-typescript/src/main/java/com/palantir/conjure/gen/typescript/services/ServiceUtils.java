@@ -46,10 +46,19 @@ public final class ServiceUtils {
         return GenerationUtils.generateImportStatements(usedTypes, name, packageLocation, typeMapper);
     }
 
+    public static String generateFunctionSignatureReturnType(EndpointDefinition value, TypeMapper typeMapper) {
+        return value.returns().map(conjureType -> {
+            String typeName = typeMapper.getTypescriptType(conjureType).name();
+            if (conjureType instanceof OptionalType) {
+                return typeName + " | undefined";
+            }
+            return typeName;
+        }).orElse("void");
+    }
+
     public static TypescriptFunctionSignature generateFunctionSignature(String name, EndpointDefinition value,
             TypeMapper typeMapper) {
-        String innerReturnType = value.returns().map(
-                type -> typeMapper.getTypescriptType(value.returns().get()).name()).orElse("void");
+        String innerReturnType = generateFunctionSignatureReturnType(value, typeMapper);
         return TypescriptFunctionSignature.builder()
                 .name(name)
                 .parameters(generateParameters(value.argsWithAutoDefined().orElse(ImmutableMap.of()), typeMapper))

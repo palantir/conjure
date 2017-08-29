@@ -15,7 +15,7 @@ export interface ITestService {
 
     getDataset(
         datasetRid: string
-    ): Promise<IDataset>;
+    ): Promise<IDataset | undefined>;
 
     /** Returns a mapping from file system id to backing file system configuration. */
     getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;

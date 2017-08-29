@@ -73,8 +73,8 @@ export class TestService {
 
     public getDataset(
         datasetRid: string
-    ): Promise<IDataset> {
-        return this.bridge.callEndpoint<IDataset>({
+    ): Promise<IDataset | undefined> {
+        return this.bridge.callEndpoint<IDataset | undefined>({
             data: undefined,
             endpointName: "getDataset",
             endpointPath: "/catalog/datasets/{datasetRid}",
