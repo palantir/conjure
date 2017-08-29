@@ -73,7 +73,8 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
         // Compile typescript
         getProject().exec(execSpec -> {
             execSpec.commandLine(tscExecutable.getAbsolutePath(), "--rootDir", ".");
-            execSpec.setWorkingDir(typescriptWorkingDirectory);
+            // Cast to Object to maintain compatibility with Gradle 3.x
+            execSpec.setWorkingDir((Object) typescriptWorkingDirectory);
         });
 
         // Copy build to output directory

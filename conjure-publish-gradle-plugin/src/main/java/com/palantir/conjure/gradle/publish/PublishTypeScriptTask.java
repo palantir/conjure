@@ -58,7 +58,8 @@ public class PublishTypeScriptTask extends ConventionTask {
                     }
 
                     getProject().exec(execSpec -> {
-                        execSpec.setWorkingDir(packageDir);
+                        // Cast to Object to maintain compatibility with Gradle 3.x
+                        execSpec.setWorkingDir((Object) packageDir);
                         execSpec.commandLine("npm", "publish", "./");
                     });
                 }
