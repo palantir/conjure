@@ -7,21 +7,20 @@ package com.palantir.conjure.gradle.publish
 import com.google.common.io.Resources
 import java.nio.charset.Charset
 import javax.ws.rs.core.HttpHeaders
+import nebula.test.IntegrationSpec
+import nebula.test.functional.ExecutionResult
 import okhttp3.mockwebserver.MockWebServer
+import org.gradle.api.tasks.Exec
 import org.gradle.testkit.runner.TaskOutcome
 
-class ConjurePublishPluginTest extends GradleTestSpec {
+class ConjurePublishPluginTest extends IntegrationSpec {
 
     private MockWebServer server = new MockWebServer();
 
     def setup() {
         server.start(8888);
 
-        file('build.gradle') << """
-        plugins {
-            id 'com.palantir.typescript-publish'
-        }
-        """
+        buildFile << "apply plugin: 'com.palantir.typescript-publish'"
 
         // @palantir/api package
         file('src/@palantir/api/package.json').text = readResource('src/api/package.json')
@@ -46,30 +45,27 @@ class ConjurePublishPluginTest extends GradleTestSpec {
     }
 
     def cleanup() {
-        server.shutdown();
+        server.shutdown()
     }
 
     def 'compileTypeScriptJavaScript compiles all typescript files'() {
         when:
-        def result = run('compileTypeScriptJavaScript')
+        runTasksSuccessfully('compileTypeScriptJavaScript')
 
         then:
-        result.task(':compileTypeScriptJavaScript').outcome == TaskOutcome.SUCCESS
-        file('build/compileTypeScriptOutput/@palantir/api/package.json').exists()
+        fileExists('build/compileTypeScriptOutput/@palantir/api/package.json')
         file('build/compileTypeScriptOutput/@palantir/api/testServiceAImpl.js').text.contains('var TestServiceA = ')
         file('build/compileTypeScriptOutput/@palantir/api-foo/testServiceFooImpl.js').text.contains('var TestServiceFoo = ')
     }
 
     def 'generateNpmrc creates .npmrc file'() {
         given:
-        MockArtifactory.enqueueNpmrcBody(server, readResource('.npmrc'));
+        MockArtifactory.enqueueNpmrcBody(server, readResource('.npmrc'))
 
         when:
-        def result = run('generateNpmrc', '-PnpmRegistryUri=http://localhost:8888')
+        runTasksSuccessfully('generateNpmrc', '-PnpmRegistryUri=http://localhost:8888')
 
         then:
-        result.task(':generateNpmrc').outcome == TaskOutcome.SUCCESS
-
         // verify that scope is trimmed and auth header is set
         def request = server.takeRequest();
         request.getPath() == '/auth/palantir'
@@ -91,12 +87,12 @@ class ConjurePublishPluginTest extends GradleTestSpec {
         MockArtifactory.enqueueNoopPublish(server)
 
         when:
-        def result = run('publishTypeScript', '-PnpmRegistryUri=http://localhost:8888')
+        ExecutionResult result = runTasksSuccessfully('publishTypeScript', '-PnpmRegistryUri=http://localhost:8888')
 
         then:
-        result.task(':compileTypeScriptJavaScript').outcome == TaskOutcome.SUCCESS
-        result.task(':generateNpmrc').outcome == TaskOutcome.SUCCESS
-        result.task(':publishTypeScript').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':compileTypeScriptJavaScript')
+        result.wasExecuted(':generateNpmrc')
+        result.wasExecuted(':publishTypeScript')
     }
 
     def 'publish depends on publishTypeScript'() {
@@ -105,10 +101,10 @@ class ConjurePublishPluginTest extends GradleTestSpec {
         MockArtifactory.enqueueNoopPublish(server)
 
         when:
-        def result = run('publish', '-PnpmRegistryUri=http://localhost:8888')
+        ExecutionResult result = runTasksSuccessfully('publish', '-PnpmRegistryUri=http://localhost:8888')
 
         then:
-        result.task(':publishTypeScript').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':publishTypeScript')
     }
 
     def readResource(String name) {

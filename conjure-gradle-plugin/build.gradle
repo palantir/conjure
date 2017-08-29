@@ -9,7 +9,7 @@ dependencies {
     compile project(':conjure-typescript')
 
     testCompile gradleTestKit()
-    testCompile 'com.netflix.nebula:nebula-test:4.0.0'  // for better temporary folder junit rule
+    testCompile 'com.netflix.nebula:nebula-test:6.1.2'
 }
 
 println sourceSets.getClass()

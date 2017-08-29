@@ -6,23 +6,20 @@ package com.palantir.conjure.gradle.publish
 
 import com.google.common.io.Resources
 import java.nio.charset.Charset
+import nebula.test.IntegrationSpec
+import nebula.test.functional.ExecutionResult
 import nebula.test.multiproject.MultiProjectIntegrationHelper
 import okhttp3.mockwebserver.MockWebServer
 import org.gradle.testkit.runner.TaskOutcome
 
-class ConjurePublishPluginSubprojectTest extends GradleTestSpec {
+class ConjurePublishPluginSubprojectTest extends IntegrationSpec {
 
     private MockWebServer server = new MockWebServer();
 
     def setup() {
         server.start(8888);
 
-        def helper = new MultiProjectIntegrationHelper(directory(''), file('settings.gradle'));
-        helper.addSubproject('subproject', """
-        plugins {
-            id 'com.palantir.typescript-publish'
-        }
-        """)
+        addSubproject('subproject', "apply plugin: 'com.palantir.typescript-publish'")
 
         file('subproject/src/@palantir/api/package.json').text = readResource('src/api/package.json')
         file('subproject/src/@palantir/api/index.ts').text = readResource('src/api/index.ts')
@@ -32,7 +29,7 @@ class ConjurePublishPluginSubprojectTest extends GradleTestSpec {
     }
 
     def cleanup() {
-        server.shutdown();
+        server.shutdown()
     }
 
     def 'publish depends on publishTypeScript'() {
@@ -41,10 +38,10 @@ class ConjurePublishPluginSubprojectTest extends GradleTestSpec {
         MockArtifactory.enqueueNoopPublish(server)
 
         when:
-        def result = run('publish', '-PnpmRegistryUri=http://localhost:8888')
+        ExecutionResult result = runTasksSuccessfully('publish', '-PnpmRegistryUri=http://localhost:8888')
 
         then:
-        result.task(':subproject:publishTypeScript').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':subproject:publishTypeScript')
     }
 
     def readResource(String name) {

@@ -6,12 +6,14 @@ package com.palantir.conjure.gradle
 
 import com.google.common.io.Resources
 import java.nio.charset.Charset
+import nebula.test.functional.ExecutionResult
+import nebula.test.IntegrationSpec
 import org.gradle.testkit.runner.TaskOutcome
 
-class ConjurePluginTest extends GradleTestSpec {
+class ConjurePluginTest extends IntegrationSpec {
 
     def setup() {
-        createFile('settings.gradle') << """
+        createFile('settings.gradle') << '''
         include 'api'
         include 'api:api-objects'
         include 'api:api-jersey'
@@ -19,9 +21,9 @@ class ConjurePluginTest extends GradleTestSpec {
         include 'api:api-typescript'
         include 'api:api-python'
         include 'server'
-        """
+        '''.stripIndent()
 
-        createFile('build.gradle') << """
+        createFile('build.gradle') << '''
         buildscript {
             repositories {
                 maven {
@@ -54,23 +56,19 @@ class ConjurePluginTest extends GradleTestSpec {
                 }
             }
         }
-        """
+        '''.stripIndent()
 
-        createFile('api/build.gradle') << """
-        plugins {
-            id 'com.palantir.conjure'
-        }
-        """
+        createFile('api/build.gradle') << "apply plugin: 'com.palantir.conjure'"
 
-        createFile('versions.props') << """
+        createFile('versions.props') << '''
         com.fasterxml.jackson.*:* = 2.6.7
         com.google.guava:guava = 18.0
         com.palantir.conjure:conjure-java-lib = 0.25.0
         com.squareup.retrofit2:retrofit = 2.1.0
         javax.ws.rs:javax.ws.rs-api = 2.0.1
-        """
+        '''.stripIndent()
 
-        createFile('api/src/main/conjure/api.yml') << """
+        createFile('api/src/main/conjure/api.yml') << '''
         types:
           definitions:
             default-package: test.test.api
@@ -89,90 +87,86 @@ class ConjurePluginTest extends GradleTestSpec {
                 args:
                   object: StringExample
                 returns: StringExample
-        """
+        '''.stripIndent()
     }
 
     def 'compileConjure generates code in subprojects'() {
         when:
-        def result = run(':api:compileConjure')
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
         then:
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureRetrofit').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureTypeScript').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':api:compileConjure')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureObjects')
+        result.wasExecuted(':api:compileConjureJersey')
+        result.wasExecuted(':api:compileConjureRetrofit')
+        result.wasExecuted(':api:compileConjureTypeScript')
 
         // java
-        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
+        fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
-        file('api/api-objects/src/generated/java/.gitignore').exists()
+        fileExists('api/api-objects/src/generated/java/.gitignore')
         file('api/api-objects/src/generated/java/.gitignore').text.contains('*.java')
 
         // typescript
-        file('api/api-typescript/src/@test/api/stringExample.ts').exists()
-        file('api/api-typescript/src/@test/api/package.json').exists()
-        file('api/api-typescript/src/@test/api/index.ts').exists()
-        file('api/api-typescript/src/.gitignore').exists()
+        fileExists('api/api-typescript/src/@test/api/stringExample.ts')
+        fileExists('api/api-typescript/src/@test/api/package.json')
+        fileExists('api/api-typescript/src/@test/api/index.ts')
+        fileExists('api/api-typescript/src/.gitignore')
         file('api/api-typescript/src/.gitignore').text.contains('*.ts')
         file('api/api-typescript/src/.gitignore').text.contains('package.json')
     }
 
     def 'pythonTask generates code when enabled'() {
-        given:
-        file('api/build.gradle').text = """
-        plugins {
-            id 'com.palantir.conjure'
-        }
+        file('api/build.gradle').text = '''
+        apply plugin: 'com.palantir.conjure'
 
         conjure {
             conjureImports files('external-import.yml')
         }
 
         tasks.getByName('compileConjurePython').enabled = true
-        """
+        '''.stripIndent()
 
         when:
-        def result = run(':api:compileConjure')
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
         then:
-        result.task(':api:compileConjurePython').outcome == TaskOutcome.SUCCESS
-        file('api/api-python/python/api/__init__.py').exists()
+        result.wasExecuted(':api:compileConjurePython')
+        fileExists('api/api-python/python/api/__init__.py')
     }
 
     def 'check code compiles'() {
         when:
-        def result = run('check')
+        ExecutionResult result = runTasksSuccessfully('check')
 
         then:
-        result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':api:api-jersey:compileJava')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureJersey')
+        result.wasExecuted(':api:compileConjureObjects')
 
-        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
-        file('api/api-objects/src/generated/java/.gitignore').exists()
+        fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
+        fileExists('api/api-objects/src/generated/java/.gitignore')
     }
 
 
     def 'check code compiles when run in parallel with multiple build targets'() {
         when:
-        def result = run('--parallel', 'check', 'tasks')
+        ExecutionResult result = runTasksSuccessfully('--parallel', 'check', 'tasks')
 
         then:
-        result.task(':api:api-objects:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':api:api-objects:compileJava')
+        result.wasExecuted(':api:api-jersey:compileJava')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureJersey')
 
-        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
-        file('api/api-objects/src/generated/java/.gitignore').exists()
+        fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
+        fileExists('api/api-objects/src/generated/java/.gitignore')
     }
 
     def 'check publication'() {
-        given:
-        file('build.gradle') << """
+        file('build.gradle') << '''
         buildscript {
             repositories {
                 maven {
@@ -183,18 +177,18 @@ class ConjurePluginTest extends GradleTestSpec {
                 classpath 'com.netflix.nebula:nebula-publishing-plugin:4.4.4'
             }
         }
-        """
+        '''.stripIndent()
 
-        file('api/build.gradle') << """
+        file('api/build.gradle') << '''
         subprojects {
             apply plugin: 'nebula.maven-base-publish'
             apply plugin: 'nebula.maven-resolved-dependencies'
             apply plugin: 'nebula.javadoc-jar'
             apply plugin: 'nebula.source-jar'
         }
-        """
+        '''.stripIndent()
 
-        file('server/build.gradle') << """
+        file('server/build.gradle') << '''
         apply plugin: 'java'
         apply plugin: 'nebula.maven-base-publish'
         apply plugin: 'nebula.maven-resolved-dependencies'
@@ -205,15 +199,15 @@ class ConjurePluginTest extends GradleTestSpec {
             compile project(':api:api-jersey')
             compile project(':api:api-retrofit') // safe to include both this and jersey, if necessary
         }
-        """
+        '''.stripIndent()
 
         when:
-        def result = run('--parallel', 'publishToMavenLocal')
+        ExecutionResult result = runTasksSuccessfully('--parallel', 'publishToMavenLocal')
 
         then:
-        result.task(':api:api-jersey:compileJava').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':api:api-jersey:compileJava')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureJersey')
 
         new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/').exists()
         new File(System.getProperty('user.home') +
@@ -225,17 +219,15 @@ class ConjurePluginTest extends GradleTestSpec {
     }
 
     def 'copies conjure imports into build directory and provides imports to conjure compiler'() {
-        given:
-        file('api/build.gradle').text = """
-        plugins {
-            id 'com.palantir.conjure'
-        }
+        file('api/build.gradle').text = '''
+        apply plugin: 'com.palantir.conjure'
 
         conjure {
             conjureImports files('external-import.yml')
         }
-        """
-        createFile('api/src/main/conjure/conjure.yml') << """
+        '''.stripIndent()
+
+        createFile('api/src/main/conjure/conjure.yml') << '''
         types:
           conjure-imports:
             externalImport: external-imports/external-import.yml
@@ -255,8 +247,9 @@ class ConjurePluginTest extends GradleTestSpec {
                 args:
                   object: externalImport.ExternalImport
                 returns: internalImport.InternalImport
-        """
-        createFile('api/src/main/conjure/internal-import.yml') << """
+        '''.stripIndent()
+
+        createFile('api/src/main/conjure/internal-import.yml') << '''
         types:
           definitions:
             default-package: test.api.internal
@@ -264,8 +257,9 @@ class ConjurePluginTest extends GradleTestSpec {
               InternalImport:
                 fields:
                   stringField: string
-        """
-        createFile('api/external-import.yml') << """
+        '''.stripIndent()
+
+        createFile('api/external-import.yml') << '''
         types:
           definitions:
             default-package: test.api.external
@@ -281,21 +275,21 @@ class ConjurePluginTest extends GradleTestSpec {
               post:
                 http: POST /post
                 returns: ExternalImport
-        """
+        '''.stripIndent()
 
         when:
-        def result = run(':api:compileConjure')
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
         then:
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureRetrofit').outcome == TaskOutcome.SUCCESS
+        result.wasExecuted(':api:compileConjure')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureJersey')
+        result.wasExecuted(':api:compileConjureObjects')
+        result.wasExecuted(':api:compileConjureRetrofit')
 
-        file('api/build/conjure/external-imports/external-import.yml').exists()
-        file('api/build/conjure/internal-import.yml').exists()
-        file('api/build/conjure/conjure.yml').exists()
+        fileExists('api/build/conjure/external-imports/external-import.yml')
+        fileExists('api/build/conjure/internal-import.yml')
+        fileExists('api/build/conjure/conjure.yml')
 
         // java
         file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
@@ -306,63 +300,62 @@ class ConjurePluginTest extends GradleTestSpec {
                 'import test.api.internal.InternalImport;')
         file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.external.ExternalImport;')
-        file('api/api-objects/src/generated/java/test/api/external/ExternalImport.java').exists() == false
-        file('api/api-jersey/src/generated/java/test/api/external/ExternalService.java').exists() == false
-        file('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java').exists() == false
+        !fileExists('api/api-objects/src/generated/java/test/api/external/ExternalImport.java')
+        !fileExists('api/api-jersey/src/generated/java/test/api/external/ExternalService.java')
+        !fileExists('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java')
 
         // python
         file('api/api-python/python/service/__init__.py').text.contains(
                 'from internal import InternalImport')
         file('api/api-python/python/service/__init__.py').text.contains(
                 'from external import ExternalImport')
-        file('api/api-python/python/external').exists() == false
+        !fileExists('api/api-python/python/external')
 
         // typescript
         file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
-                'import { IInternalImport } from "@api/internal"');
+                'import { IInternalImport } from "@api/internal"')
         file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
-                'import { IExternalImport } from "@api/external"');
-        file('api/api-typescript/src/@api/external').exists() == false
-        file('api/api-typescript/build/node_modules/@api/external').exists()
+                'import { IExternalImport } from "@api/external"')
+        !fileExists('api/api-typescript/src/@api/external')
+        fileExists('api/api-typescript/build/node_modules/@api/external')
     }
 
     def 'omitting a project from settings is sufficient to disable'() {
         given:
-        file('settings.gradle').text = """
+        file('settings.gradle').text = '''
         include 'api'
         include 'api:api-objects'
-        """
+        '''.stripIndent()
 
         when:
-        def result = run(':api:compileConjure')
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
         then:
-        result.task(':api:compileConjure').outcome == TaskOutcome.SUCCESS
-        result.task(':api:processConjureImports').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
-        result.task(':api:compileConjureJersey') == null
+        result.wasExecuted(':api:compileConjure')
+        result.wasExecuted(':api:processConjureImports')
+        result.wasExecuted(':api:compileConjureObjects')
+        !result.wasExecuted(':api:compileConjureJersey')
 
-        file('api/api-objects/src/generated/java/test/test/api/StringExample.java').exists()
+        fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
     }
 
     def 'including only the jersey project throws because objects project is missing'() {
         given:
-        file('settings.gradle').text = """
+        file('settings.gradle').text = '''
         include 'api'
         include 'api:api-jersey'
-        """
+        '''.stripIndent()
 
         when:
-        def result = fail(':api:compileConjure')
+        ExecutionResult result = runTasksWithFailure(':api:compileConjure')
 
         then:
-        result.task(':api:compileConjureJersey') == null
+        !result.wasExecuted(':api:compileConjureJersey')
     }
 
     def 'experimental features are disabled by default'() {
-        given:
-        createFile('api/src/main/conjure/union.yml') << """
+        createFile('api/src/main/conjure/union.yml') << '''
         types:
           definitions:
             default-package: test.a.api
@@ -370,20 +363,18 @@ class ConjurePluginTest extends GradleTestSpec {
               UnionTypeExample:
                 union:
                   number: integer
-        """
+        '''.stripIndent()
 
         when:
-        def result = fail(':api:compileConjureObjects')
+        ExecutionResult result = runTasksWithFailure(':api:compileConjureObjects')
 
         then:
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.FAILED
-        result.output.contains(
+        result.standardError.contains(
                 "Error: UnionTypes is an experimental feature of conjure-java that has not been enabled.")
     }
 
     def 'can enable experimental features'() {
-        given:
-        createFile('api/src/main/conjure/union.yml') << """
+        createFile('api/src/main/conjure/union.yml') << '''
         types:
           definitions:
             default-package: test.a.api
@@ -391,18 +382,19 @@ class ConjurePluginTest extends GradleTestSpec {
               UnionTypeExample:
                 union:
                   number: integer
-        """
-        file('api/build.gradle') << """
+        '''.stripIndent()
+
+        file('api/build.gradle') << '''
         conjure {
             experimentalFeature "UnionTypes"
         }
-        """
+        '''.stripIndent()
 
         when:
-        def result = run(':api:compileConjureObjects')
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjureObjects')
 
         then:
-        result.task(':api:compileConjureObjects').outcome == TaskOutcome.SUCCESS
+        result.success
     }
 
     def 'works with afterEvaluate'() {
@@ -414,17 +406,14 @@ class ConjurePluginTest extends GradleTestSpec {
                     }
                 }
             }
-        '''
+        '''.stripIndent()
 
         when:
         // doesn't matter what task is run, just need to trigger project evaluation
-        def result = run(':tasks')
+        ExecutionResult result = runTasksSuccessfully(':tasks')
 
         then:
-        result.task(':tasks').outcome == TaskOutcome.SUCCESS
+        result.success
     }
 
-    def readResource(String name) {
-        Resources.asCharSource(Resources.getResource(name), Charset.defaultCharset()).read()
-    }
 }
