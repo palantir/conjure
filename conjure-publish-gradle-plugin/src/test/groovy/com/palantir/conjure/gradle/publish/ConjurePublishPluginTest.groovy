@@ -12,6 +12,7 @@ import nebula.test.functional.ExecutionResult
 import okhttp3.mockwebserver.MockWebServer
 import org.gradle.api.tasks.Exec
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Unroll
 
 class ConjurePublishPluginTest extends IntegrationSpec {
 
@@ -105,6 +106,21 @@ class ConjurePublishPluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':publishTypeScript')
+    }
+
+    @Unroll
+    def 'runs on version of gradle: #version'() {
+        when:
+        gradleVersion = version
+        MockArtifactory.enqueueNpmrcBody(server, readResource('.npmrc'))
+        MockArtifactory.enqueueNoopPublish(server)
+        ExecutionResult result = runTasksSuccessfully('publish', '-PnpmRegistryUri=http://localhost:8888')
+
+        then:
+        result.success
+
+        where:
+        version << ['4.1', '4.0', '3.5', '3.4']
     }
 
     def readResource(String name) {

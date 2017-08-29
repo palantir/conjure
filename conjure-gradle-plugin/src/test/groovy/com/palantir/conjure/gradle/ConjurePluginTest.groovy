@@ -9,6 +9,7 @@ import java.nio.charset.Charset
 import nebula.test.functional.ExecutionResult
 import nebula.test.IntegrationSpec
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Unroll
 
 class ConjurePluginTest extends IntegrationSpec {
 
@@ -414,6 +415,19 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.success
+    }
+
+    @Unroll
+    def 'runs on version of gradle: #version'() {
+        when:
+        gradleVersion = version
+        ExecutionResult result = runTasksSuccessfully('compileConjure')
+
+        then:
+        result.success
+
+        where:
+        version << ['4.1', '4.0', '3.5', '3.4']
     }
 
 }
