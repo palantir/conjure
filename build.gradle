@@ -10,7 +10,7 @@ buildscript {
         classpath 'com.palantir.baseline:gradle-baseline-java:0.16.0'
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
-        classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.1.10'
+        classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
         classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.8.0'
     }
 }
