@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.netflix.nebula:nebula-dependency-recommender:4.5.0'
+        classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.16.0'
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
