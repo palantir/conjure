@@ -8,7 +8,7 @@ dependencies {
     compile project(':conjure-typescript')
 
     testCompile gradleTestKit()
-    testCompile 'com.netflix.nebula:nebula-test:6.1.2'
+    testCompile 'com.netflix.nebula:nebula-test'
 }
 
 println sourceSets.getClass()

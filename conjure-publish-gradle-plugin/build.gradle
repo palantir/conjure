@@ -4,11 +4,11 @@ apply plugin: 'java-gradle-plugin'
 
 dependencies {
     compile project(':conjure-typescript')
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
-    compile 'commons-io:commons-io:2.5'
+    compile 'com.squareup.okhttp3:okhttp'
+    compile 'commons-io:commons-io'
 
     testCompile gradleTestKit()
-    testCompile 'com.netflix.nebula:nebula-test:6.1.2'
+    testCompile 'com.netflix.nebula:nebula-test'
     testCompile 'com.squareup.okhttp3:mockwebserver'
     testCompile 'junit:junit'
 }
