@@ -14,6 +14,9 @@ types:
       RidExample:
         fields:
           ridValue: rid
+      BearerTokenExample:
+        fields:
+          bearerTokenValue: bearertoken
       DateTimeExample:
         fields:
           datetime: datetime
@@ -63,6 +66,8 @@ types:
         alias: safelong
       RidAliasExample:
         alias: rid
+      BearerTokenAliasExample:
+        alias: bearertoken
       MapAliasExample:
         alias: map<string, any>
       ReferenceAliasExample:
@@ -74,6 +79,7 @@ types:
           integer: optional<integer>
           safelong: optional<safelong>
           rid: optional<rid>
+          bearertoken: optional<bearertoken>
       ManyFieldExample:
         fields:
           string: string

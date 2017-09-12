@@ -105,6 +105,7 @@ Base types in the system are:
  * `safelong`: a wrapper around a long type which enforces the value is safely representable as an integer in javascript,
    between `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`
  * `rid`: a [Resource Identifier](https://github.com/palantir/resource-identifier)
+ * `bearertoken`: a [BearerToken](https://github.com/palantir/auth-tokens/#bearertoken)
 
 ### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language

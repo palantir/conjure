@@ -61,7 +61,8 @@ public final class ConjureTypescriptTypeTest {
                         exportStatement("IUnionReferenceExample", "unionReferenceExample"),
                         exportStatement("IEmptyObjectExample", "emptyObjectExample"),
                         exportStatement("ISafeLongExample", "safeLongExample"),
-                        exportStatement("IRidExample", "ridExample"))));
+                        exportStatement("IRidExample", "ridExample"),
+                        exportStatement("IBearerTokenExample", "bearerTokenExample"))));
     }
 
     private ExportStatement exportStatement(String typeName, String filename) {

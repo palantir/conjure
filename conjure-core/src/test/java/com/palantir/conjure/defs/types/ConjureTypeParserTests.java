@@ -61,6 +61,12 @@ public final class ConjureTypeParserTests {
     }
 
     @Test
+    public void testParser_bearertokenType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("bearertoken"))
+                .isEqualTo(PrimitiveType.BEARERTOKEN);
+    }
+
+    @Test
     public void testParser_refType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("Foo"))
                 .isEqualTo(LocalReferenceType.of(TypeName.of("Foo")));

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.lib.SafeLong;
 import com.palantir.ri.ResourceIdentifier;
+import com.palantir.tokens.auth.BearerToken;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,18 +28,22 @@ public final class PrimitiveOptionalsExample {
 
     private final Optional<ResourceIdentifier> rid;
 
+    private final Optional<BearerToken> bearertoken;
+
     private PrimitiveOptionalsExample(
             OptionalDouble num,
             Optional<Boolean> bool,
             OptionalInt integer,
             Optional<SafeLong> safelong,
-            Optional<ResourceIdentifier> rid) {
-        validateFields(num, bool, integer, safelong, rid);
+            Optional<ResourceIdentifier> rid,
+            Optional<BearerToken> bearertoken) {
+        validateFields(num, bool, integer, safelong, rid, bearertoken);
         this.num = num;
         this.bool = bool;
         this.integer = integer;
         this.safelong = safelong;
         this.rid = rid;
+        this.bearertoken = bearertoken;
     }
 
     @JsonProperty("num")
@@ -66,6 +71,11 @@ public final class PrimitiveOptionalsExample {
         return this.rid;
     }
 
+    @JsonProperty("bearertoken")
+    public Optional<BearerToken> getBearertoken() {
+        return this.bearertoken;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -78,12 +88,13 @@ public final class PrimitiveOptionalsExample {
                 && this.bool.equals(other.bool)
                 && this.integer.equals(other.integer)
                 && this.safelong.equals(other.safelong)
-                && this.rid.equals(other.rid);
+                && this.rid.equals(other.rid)
+                && this.bearertoken.equals(other.bearertoken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(num, bool, integer, safelong, rid);
+        return Objects.hash(num, bool, integer, safelong, rid, bearertoken);
     }
 
     @Override
@@ -109,6 +120,10 @@ public final class PrimitiveOptionalsExample {
                 .append("rid")
                 .append(": ")
                 .append(rid)
+                .append(", ")
+                .append("bearertoken")
+                .append(": ")
+                .append(bearertoken)
                 .append("}")
                 .toString();
     }
@@ -118,13 +133,15 @@ public final class PrimitiveOptionalsExample {
             Optional<Boolean> bool,
             OptionalInt integer,
             Optional<SafeLong> safelong,
-            Optional<ResourceIdentifier> rid) {
+            Optional<ResourceIdentifier> rid,
+            Optional<BearerToken> bearertoken) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");
         missingFields = addFieldIfMissing(missingFields, bool, "bool");
         missingFields = addFieldIfMissing(missingFields, integer, "integer");
         missingFields = addFieldIfMissing(missingFields, safelong, "safelong");
         missingFields = addFieldIfMissing(missingFields, rid, "rid");
+        missingFields = addFieldIfMissing(missingFields, bearertoken, "bearertoken");
         if (missingFields != null) {
             throw new IllegalStateException(
                     "Some required fields have not been set: " + missingFields);
@@ -136,7 +153,7 @@ public final class PrimitiveOptionalsExample {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(5);
+                missingFields = new ArrayList<>(6);
             }
             missingFields.add(fieldName);
         }
@@ -159,6 +176,8 @@ public final class PrimitiveOptionalsExample {
 
         private Optional<ResourceIdentifier> rid = Optional.empty();
 
+        private Optional<BearerToken> bearertoken = Optional.empty();
+
         private Builder() {}
 
         public Builder from(PrimitiveOptionalsExample other) {
@@ -167,6 +186,7 @@ public final class PrimitiveOptionalsExample {
             integer(other.getInteger());
             safelong(other.getSafelong());
             rid(other.getRid());
+            bearertoken(other.getBearertoken());
             return this;
         }
 
@@ -226,8 +246,20 @@ public final class PrimitiveOptionalsExample {
             return this;
         }
 
+        @JsonSetter("bearertoken")
+        public Builder bearertoken(Optional<BearerToken> bearertoken) {
+            this.bearertoken = Objects.requireNonNull(bearertoken, "bearertoken cannot be null");
+            return this;
+        }
+
+        public Builder bearertoken(BearerToken bearertoken) {
+            this.bearertoken =
+                    Optional.of(Objects.requireNonNull(bearertoken, "bearertoken cannot be null"));
+            return this;
+        }
+
         public PrimitiveOptionalsExample build() {
-            return new PrimitiveOptionalsExample(num, bool, integer, safelong, rid);
+            return new PrimitiveOptionalsExample(num, bool, integer, safelong, rid, bearertoken);
         }
     }
 }

@@ -12,6 +12,7 @@ The JSON format `json(o)` for a Conjure object `o` can be recursively defined as
 - If `o` is a primitive Conjure type, then `json(o)` is the corresponding primitive JSON type:
   - Conjure `string` → JSON `string`
   - Conjure `rid` → JSON `string`
+  - Conjure `bearertoken` → JSON `string`
   - Conjure `integer` → JSON `number`
   - Conjure `safelong` → JSON `number`
   - Conjure `double` → JSON `number`

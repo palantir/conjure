@@ -17,6 +17,9 @@ types:
       RidExample:
         fields:
           ridValue: rid
+      BearerTokenExample:
+        fields:
+          bearerTokenValue: bearertoken
       OptionalExample:
         fields:
           item: optional<string>

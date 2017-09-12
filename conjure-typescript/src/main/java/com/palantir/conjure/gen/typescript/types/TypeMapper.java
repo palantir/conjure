@@ -197,6 +197,7 @@ public final class TypeMapper {
                     return "number";
                 case STRING:
                 case RID:
+                case BEARERTOKEN:
                     return "string";
                 case BOOLEAN:
                     return "boolean";

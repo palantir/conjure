@@ -12,6 +12,7 @@ import com.palantir.remoting2.ext.jackson.ObjectMappers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import test.api.BearerTokenExample;
 import test.api.BooleanExample;
 import test.api.ListExample;
 import test.api.MapExample;
@@ -49,6 +50,11 @@ public final class BeanSerdeIntegrationTests {
     @Test
     public void testRidExampleSerde() throws Exception {
         testSerde("{\"ridValue\": \"ri.foundry.main.dataset.0\"}", RidExample.class);
+    }
+
+    @Test
+    public void testBearerTokenExampleSerde() throws Exception {
+        testSerde("{\"bearerTokenValue\": \"anything\"}", BearerTokenExample.class);
     }
 
     @Test

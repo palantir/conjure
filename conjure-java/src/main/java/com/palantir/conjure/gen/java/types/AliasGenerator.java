@@ -125,6 +125,7 @@ public final class AliasGenerator {
                         .addStatement("return new $T($T.parseBoolean(value))", thisClass, aliasTypeName.box()).build();
             case SAFELONG:
             case RID:
+            case BEARERTOKEN:
                 return CodeBlock.builder()
                         .addStatement("return new $T($T.valueOf(value))", thisClass, aliasTypeName).build();
             default:

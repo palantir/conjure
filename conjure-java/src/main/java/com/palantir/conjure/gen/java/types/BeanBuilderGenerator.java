@@ -264,6 +264,7 @@ public final class BeanBuilderGenerator {
                 case SAFELONG:
                 case STRING:
                 case RID:
+                case BEARERTOKEN:
                 default:
                     // not special
             }

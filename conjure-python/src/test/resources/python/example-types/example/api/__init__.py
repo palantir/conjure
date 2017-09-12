@@ -86,6 +86,26 @@ class RidExample(ConjureBeanType):
         # type: () -> str
         return self._rid_value
 
+class BearerTokenExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'bearer_token_value': ConjureFieldDefinition('bearerTokenValue', str)
+        }
+
+    _bearer_token_value = None # type: str
+
+    def __init__(self, bearer_token_value):
+        # type: (str) -> None
+        self._bearer_token_value = bearer_token_value
+
+    @property
+    def bearer_token_value(self):
+        # type: () -> str
+        return self._bearer_token_value
+
 class DoubleExample(ConjureBeanType):
 
     @classmethod
@@ -287,7 +307,8 @@ class PrimitiveOptionalsExample(ConjureBeanType):
             'bool': ConjureFieldDefinition('bool', bool),
             'integer': ConjureFieldDefinition('integer', int),
             'safelong': ConjureFieldDefinition('safelong', int),
-            'rid': ConjureFieldDefinition('rid', str)
+            'rid': ConjureFieldDefinition('rid', str),
+            'bearertoken': ConjureFieldDefinition('bearertoken', str)
         }
 
     _num = None # type: float
@@ -295,14 +316,16 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     _integer = None # type: int
     _safelong = None # type: int
     _rid = None # type: str
+    _bearertoken = None # type: str
 
-    def __init__(self, num, bool, integer, safelong, rid):
-        # type: (float, bool, int, int, str) -> None
+    def __init__(self, num, bool, integer, safelong, rid, bearertoken):
+        # type: (float, bool, int, int, str, str) -> None
         self._num = num
         self._bool = bool
         self._integer = integer
         self._safelong = safelong
         self._rid = rid
+        self._bearertoken = bearertoken
 
     @property
     def num(self):
@@ -328,6 +351,11 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     def rid(self):
         # type: () -> str
         return self._rid
+
+    @property
+    def bearertoken(self):
+        # type: () -> str
+        return self._bearertoken
 
 class ManyFieldExample(ConjureBeanType):
 

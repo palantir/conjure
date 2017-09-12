@@ -14,6 +14,9 @@ types:
       RidExample:
         fields:
           ridValue: rid
+      BearerTokenExample:
+        fields:
+          bearerTokenValue: bearertoken
       DoubleExample:
         fields:
           doubleValue: double
@@ -62,6 +65,7 @@ types:
           integer: optional<integer>
           safelong: optional<safelong>
           rid: optional<rid>
+          bearertoken: optional<bearertoken>
       ManyFieldExample:
         fields:
           string: string

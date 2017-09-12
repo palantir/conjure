@@ -23,7 +23,8 @@ public enum PrimitiveType implements LocalReferenceType {
     DOUBLE(TypeName.of("double")),
     BOOLEAN(TypeName.of("boolean")),
     SAFELONG(TypeName.of("safelong")),
-    RID(TypeName.of("rid"));
+    RID(TypeName.of("rid")),
+    BEARERTOKEN(TypeName.of("bearertoken"));
 
     private static final Map<TypeName, PrimitiveType> types =
             EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(PrimitiveType::type, t -> t));

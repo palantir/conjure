@@ -58,6 +58,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
         switch (type) {
             case STRING:
             case RID:
+            case BEARERTOKEN:
                 return "str";
             case BOOLEAN:
                 return "bool";
