@@ -18,7 +18,7 @@ dependencies:
 
 test:
   override:
-    - ./gradlew --parallel build
+    - ./gradlew --parallel --stacktrace build
 
 deployment:
   snapshots:
@@ -26,13 +26,13 @@ deployment:
     owner: foundry
     commands:
       - git clean -xfd
-      - ./gradlew -i publish condaPublish exartisi
+      - ./gradlew -i --stacktrace --continue publish condaPublish exartisi
   releases:
     tag: /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/
     owner: foundry
     commands:
       - git clean -xfd
-      - ./gradlew -i publish condaPublish exartisi
+      - ./gradlew -i --stacktrace --continue publish condaPublish exartisi
 
 notify:
   webhooks:
