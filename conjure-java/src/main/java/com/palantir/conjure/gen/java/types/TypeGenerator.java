@@ -5,32 +5,50 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ObjectsDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public interface TypeGenerator {
 
     default Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypesDefinition types = conjureDefinition.types();
-        return types.definitions().objects().entrySet().stream().map(
-                type -> generateType(
+        ObjectsDefinition objectsDefinition = types.definitions();
+        Set<JavaFile> files = Sets.newLinkedHashSet();
+
+        // Generate java files for object definitions
+        objectsDefinition.objects().entrySet().stream().map(
+                type -> generateObjectType(
                         types,
-                        types.definitions().defaultConjurePackage(),
+                        objectsDefinition.defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .forEach(files::add);
+
+        // Generate java files for error definitions
+        if (objectsDefinition.errors().size() > 0) {
+            ConjurePackage errorsPackage = objectsDefinition.defaultConjurePackage()
+                    .orElseThrow(() ->
+                            new IllegalStateException("Default package must be set when there are error definitions."));
+            files.addAll(generateErrorTypes(types,
+                    errorsPackage,
+                    objectsDefinition.errors()));
+        }
+
+        return files;
     }
 
     /**
@@ -46,9 +64,14 @@ public interface TypeGenerator {
         return emittedPaths;
     }
 
-    JavaFile generateType(
+    JavaFile generateObjectType(
             TypesDefinition allTypes,
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
             BaseObjectTypeDefinition typeDef);
+
+    Set<JavaFile> generateErrorTypes(
+            TypesDefinition allTypes,
+            ConjurePackage errorsPackage,
+            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef);
 }

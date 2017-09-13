@@ -24,6 +24,8 @@ import org.junit.rules.TemporaryFolder;
 
 public final class BeanGeneratorTests {
 
+    private static final String REFERENCE_FILES_FOLDER = "src/integrationInput/java/test/api/";
+
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
@@ -35,7 +37,7 @@ public final class BeanGeneratorTests {
                 ImmutableSet.of(ExperimentalFeatures.UnionTypes))
                 .emit(def, folder.getRoot());
 
-        assertThatFilesAreTheSame(files);
+        assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);
     }
 
     @Test
@@ -55,7 +57,7 @@ public final class BeanGeneratorTests {
         List<Path> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
                 .emit(def, folder.getRoot());
 
-        assertThatFilesAreTheSame(files);
+        assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);
     }
 
     @Test
@@ -76,9 +78,18 @@ public final class BeanGeneratorTests {
         assertThat(new File(src, "test/api/StringExample.java")).doesNotExist();
     }
 
-    private void assertThatFilesAreTheSame(List<Path> files) throws IOException {
+    @Test
+    public void testConjureErrors() throws IOException {
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-errors.yml"));
+        List<Path> files = new BeanGenerator(Settings.standard())
+                .emit(def, folder.getRoot());
+
+        assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER + "/errors/");
+    }
+
+    private void assertThatFilesAreTheSame(List<Path> files, String referenceFilesFolder) throws IOException {
         for (Path file : files) {
-            Path expectedFile = Paths.get("src/integrationInput/java/test/api/", file.getFileName().toString());
+            Path expectedFile = Paths.get(referenceFilesFolder, file.getFileName().toString());
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
                 // help make shrink-wrapping output sane
                 Files.createDirectories(expectedFile.getParent());

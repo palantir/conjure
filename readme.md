@@ -261,9 +261,10 @@ the same name.
 ### Defined Types
 Defined types consist of objects completely specified within the context of a
 Conjure file (possibly referencing other type aliases, primitive types,
-and built-ins). These types are *Object Definitions*, *Enum Definitions* or
-*Alias Definitions*. These types of objects consist of, minimally, a type
-alias, an optional package name and optional documentation.
+and built-ins). These types are *Object Definitions*, *Enum Definitions*,
+*Alias Definitions*, or *Error Definitions*. These types of objects consist of,
+minimally, a type alias, an optional package name and optional documentation,
+except for error types, which will be described in its own section below.
 
 Conjure renderers will use the type alias as the object name, and will emit
 the object definition in the defined package or fall-back to the
@@ -429,10 +430,33 @@ alias: <type>
 docs: optional docs
 ```
 
+#### Error Definitions
+Conjure offers first-class support for HTTP Remoting 3 [ServiceException](https://github.com/palantir/http-remoting#error-propagation)
+by providing the ability to define error types. An error definition consists of a type
+alias, a namespace, an error code, which should be one of 
+[the codes defined in HTTP Remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors/src/main/java/com/palantir/remoting/api/errors/ErrorType.java#L38),
+optional documentation, and optional lists of safe and unsafe arguments. It lives in a different
+block from other object definitions, called `errors`.
+
+For each error definition, Conjure will generate an error type object and a factory method
+for creating `ServiceException`s associated with that error type. They will both be put in
+a class named `[YourNamespace]Errors`, along with the generated objects and factory methods 
+for other error definitions with the same namespace. Instead of having each error definition 
+define its own package, the default package name is used for all error definitions.
+
+The type alias and namespace should be in `UpperCamelCase`, whereas error code should be 
+in `UPPER_UNDERSCORE_CASE`.
+
+Error definition could optionally have two argument lists, `safe-args` and `unsafe-args`. 
+Each takes a list of fields, defined in the same syntax as fields in object definitions. 
+The difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
+Safe arguments come first in the generated factory methods.
+
 #### Examples
 See also:
  * [Example Type Definitions](conjure-java/src/test/resources/example-types.yml)
- * [Example Generated Java Code](conjure-java/src/test/resources/test/api)
+ * [Example Error Definitions](conjure-java/src/test/resources/example-errors.yml)
+ * [Example Generated Java Code](conjure-java/src/integrationInput/java/test/api)
  * [Example Generated TypeScript Code](conjure-typescript/src/test/resources/types)
 
 ```yaml
@@ -471,6 +495,16 @@ definitions:
     ExampleAlias:
       # alias types have an alias block instead of values or fields
       alias: string
+
+  errors:
+    ExampleError:
+      namespace: Conjure
+      code: INTERNAL
+      docs: Optional Docs
+      safe-args:
+        safeArgument: string
+      unsafe-args:
+        unsafeArgument: any
 ```
 
 Services

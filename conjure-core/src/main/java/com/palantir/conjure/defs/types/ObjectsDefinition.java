@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
@@ -25,6 +26,8 @@ public interface ObjectsDefinition {
 
     // TODO(rfink): Rename to "types" [backcompat break], https://github.palantir.build/foundry/conjure/issues/351
     Map<TypeName, BaseObjectTypeDefinition> objects();
+
+    Map<TypeName, ErrorTypeDefinition> errors();
 
     static Builder builder() {
         return new Builder();

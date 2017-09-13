@@ -19,6 +19,7 @@ import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
@@ -74,7 +75,7 @@ public final class BeanGenerator implements TypeGenerator {
     }
 
     @Override
-    public JavaFile generateType(
+    public JavaFile generateObjectType(
             TypesDefinition types,
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
@@ -96,6 +97,15 @@ public final class BeanGenerator implements TypeGenerator {
                     typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
+    }
+
+    @Override
+    public Set<JavaFile> generateErrorTypes(
+            TypesDefinition allTypes,
+            ConjurePackage errorsPackage,
+            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
+        TypeMapper typeMapper = new TypeMapper(allTypes);
+        return ErrorGenerator.generateErrorTypes(typeMapper, errorsPackage, errorTypeNameToDef);
     }
 
     private JavaFile generateBeanType(
