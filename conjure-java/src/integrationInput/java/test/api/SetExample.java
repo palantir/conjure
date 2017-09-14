@@ -61,7 +61,7 @@ public final class SetExample {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         if (missingFields != null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
         }
     }

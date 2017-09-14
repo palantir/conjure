@@ -268,7 +268,7 @@ public final class BeanGenerator implements TypeGenerator {
         builder
                 .beginControlFlow("if (missingFields != null)")
                 .addStatement("throw new $T(\"Some required fields have not been set: \" + missingFields)",
-                        IllegalStateException.class)
+                        IllegalArgumentException.class)
                 .endControlFlow();
         return builder.build();
     }

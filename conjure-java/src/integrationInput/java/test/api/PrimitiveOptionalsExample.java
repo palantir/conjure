@@ -143,7 +143,7 @@ public final class PrimitiveOptionalsExample {
         missingFields = addFieldIfMissing(missingFields, rid, "rid");
         missingFields = addFieldIfMissing(missingFields, bearertoken, "bearertoken");
         if (missingFields != null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
         }
     }

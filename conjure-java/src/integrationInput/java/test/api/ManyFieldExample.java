@@ -171,7 +171,7 @@ public final class ManyFieldExample {
         missingFields = addFieldIfMissing(missingFields, map, "map");
         missingFields = addFieldIfMissing(missingFields, alias, "alias");
         if (missingFields != null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
         }
     }

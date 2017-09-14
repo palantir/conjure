@@ -72,7 +72,7 @@ public final class ListExample {
         missingFields = addFieldIfMissing(missingFields, items, "items");
         missingFields = addFieldIfMissing(missingFields, primitiveItems, "primitiveItems");
         if (missingFields != null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
         }
     }

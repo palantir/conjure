@@ -58,7 +58,7 @@ public final class RidExample {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, ridValue, "ridValue");
         if (missingFields != null) {
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
         }
     }
