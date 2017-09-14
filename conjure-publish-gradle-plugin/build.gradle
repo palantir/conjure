@@ -12,3 +12,7 @@ dependencies {
     testCompile 'com.squareup.okhttp3:mockwebserver'
     testCompile 'junit:junit'
 }
+
+gradlePlugin {
+    automatedPublishing = false
+}

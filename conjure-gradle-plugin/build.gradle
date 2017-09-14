@@ -11,4 +11,6 @@ dependencies {
     testCompile 'com.netflix.nebula:nebula-test'
 }
 
-println sourceSets.getClass()
+gradlePlugin {
+    automatedPublishing = false
+}
