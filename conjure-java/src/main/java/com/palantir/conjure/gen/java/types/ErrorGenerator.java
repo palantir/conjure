@@ -119,7 +119,7 @@ public final class ErrorGenerator {
         Class<?> clazz = isSafe ? SafeArg.class : UnsafeArg.class;
         methodBuilder.addCode(",\n    $T.of($S, $L)", clazz, argName, argName);
         argDefinition.docs().ifPresent(docs ->
-                methodBuilder.addJavadoc("@$L: $L", argName, StringUtils.appendIfMissing(docs, "\n")));
+                methodBuilder.addJavadoc("@param $L $L", argName, StringUtils.appendIfMissing(docs, "\n")));
     }
 
     private static ClassName errorTypesClassName(ConjurePackage conjurePackage, ErrorNamespace namespace) {

@@ -18,21 +18,21 @@ public final class ConjureErrors {
 
     private ConjureErrors() {}
 
-    public static ServiceException invalidTypeDefinition(String typeName, Object typeDef) {
-        return new ServiceException(
-                INVALID_TYPE_DEFINITION,
-                SafeArg.of("typeName", typeName),
-                UnsafeArg.of("typeDef", typeDef));
-    }
-
     /**
-     * @serviceName: Name of the invalid service definition.
-     * @serviceDef: Details of the invalid service definition.
+     * @param serviceName Name of the invalid service definition.
+     * @param serviceDef Details of the invalid service definition.
      */
     public static ServiceException invalidServiceDefinition(String serviceName, Object serviceDef) {
         return new ServiceException(
                 INVALID_SERVICE_DEFINITION,
                 SafeArg.of("serviceName", serviceName),
                 UnsafeArg.of("serviceDef", serviceDef));
+    }
+
+    public static ServiceException invalidTypeDefinition(String typeName, Object typeDef) {
+        return new ServiceException(
+                INVALID_TYPE_DEFINITION,
+                SafeArg.of("typeName", typeName),
+                UnsafeArg.of("typeDef", typeDef));
     }
 }
