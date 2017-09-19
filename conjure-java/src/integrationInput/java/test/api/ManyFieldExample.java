@@ -49,9 +49,9 @@ public final class ManyFieldExample {
         this.integer = integer;
         this.doubleValue = doubleValue;
         this.optionalItem = optionalItem;
-        this.items = Collections.unmodifiableList(new ArrayList<>(items));
-        this.set = Collections.unmodifiableSet(new LinkedHashSet<>(set));
-        this.map = Collections.unmodifiableMap(new LinkedHashMap<>(map));
+        this.items = Collections.unmodifiableList(items);
+        this.set = Collections.unmodifiableSet(set);
+        this.map = Collections.unmodifiableMap(map);
         this.alias = alias;
     }
 

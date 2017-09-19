@@ -20,7 +20,7 @@ public final class SetExample {
 
     private SetExample(Set<String> items) {
         validateFields(items);
-        this.items = Collections.unmodifiableSet(new LinkedHashSet<>(items));
+        this.items = Collections.unmodifiableSet(items);
     }
 
     @JsonProperty("items")

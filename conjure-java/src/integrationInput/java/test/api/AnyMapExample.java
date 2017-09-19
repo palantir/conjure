@@ -19,7 +19,7 @@ public final class AnyMapExample {
 
     private AnyMapExample(Map<String, Object> items) {
         validateFields(items);
-        this.items = Collections.unmodifiableMap(new LinkedHashMap<>(items));
+        this.items = Collections.unmodifiableMap(items);
     }
 
     @JsonProperty("items")

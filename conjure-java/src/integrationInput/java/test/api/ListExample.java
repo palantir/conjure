@@ -20,8 +20,8 @@ public final class ListExample {
 
     private ListExample(List<String> items, List<Integer> primitiveItems) {
         validateFields(items, primitiveItems);
-        this.items = Collections.unmodifiableList(new ArrayList<>(items));
-        this.primitiveItems = Collections.unmodifiableList(new ArrayList<>(primitiveItems));
+        this.items = Collections.unmodifiableList(items);
+        this.primitiveItems = Collections.unmodifiableList(primitiveItems);
     }
 
     @JsonProperty("items")
