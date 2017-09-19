@@ -184,7 +184,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         List<ConjureType> referencedTypes = Lists.newArrayList();
         List<TypescriptInterface> subInterfaces = Lists.newArrayList();
         List<TypescriptFunction> typeGuards = Lists.newArrayList();
-        Map<String, TypescriptExpression> typeGuardProps = Maps.newHashMap();
+        List<TypescriptFunction> factories = Lists.newArrayList();
+        Map<String, TypescriptExpression> helperFunctionProps = Maps.newHashMap();
         String mainName = "I" + typeName.name();
         TypescriptType mainType = TypescriptSimpleType.builder().name(mainName).build();
 
@@ -195,7 +196,9 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             TypescriptSimpleType interfaceType = TypescriptSimpleType.builder().name(interfaceName).build();
             StringExpression quotedMemberName = StringExpression.of(memberName);
             ConjureType conjureTypeOfMemberType = memberType.type();
+            TypescriptSimpleType typescriptMemberType = mapper.getTypescriptType(conjureTypeOfMemberType);
             referencedTypes.add(conjureTypeOfMemberType);
+
 
             // build interface
             SortedSet<TypescriptTypeSignature> propertySignatures = Sets.newTreeSet();
@@ -205,7 +208,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .build());
             propertySignatures.add(TypescriptTypeSignature.builder()
                     .name(StringExpression.of(memberName).emitToString())
-                    .typescriptType(mapper.getTypescriptType(conjureTypeOfMemberType))
+                    .typescriptType(typescriptMemberType)
                     .build());
             subInterfaces.add(TypescriptInterface.builder()
                     .name(interfaceName)
@@ -237,8 +240,31 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .functionBody(functionBody)
                     .isMethod(false)
                     .build());
-            typeGuardProps.put(typeGuardName, RawExpression.of(typeGuardName));
+            helperFunctionProps.put(typeGuardName, RawExpression.of(typeGuardName));
 
+            // build factory function
+            TypescriptFunctionSignature factorySignature = TypescriptFunctionSignature.builder()
+                    .addParameters(TypescriptTypeSignature.builder()
+                            .name(memberName)
+                            .typescriptType(typescriptMemberType)
+                            .build())
+                    .name(memberName)
+                    .returnType(interfaceType)
+                    .build();
+            TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
+                    .addStatements(ReturnStatement.builder()
+                            .expression(JsonExpression.builder()
+                                    .putKeyValues("type", StringExpression.of(memberName))
+                                    .putKeyValues(memberName, RawExpression.of(memberName))
+                                    .build())
+                            .build())
+                    .build();
+            factories.add(TypescriptFunction.builder()
+                    .functionSignature(factorySignature)
+                    .functionBody(factoryBody)
+                    .isMethod(false)
+                    .build());
+            helperFunctionProps.put(memberName, RawExpression.of(memberName));
         });
 
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
@@ -255,7 +281,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
         AssignStatement typeGuardObj = AssignStatement.builder()
                 .lhs("export const " + mainName)
-                .rhs(JsonExpression.builder().putAllKeyValues(typeGuardProps).build())
+                .rhs(JsonExpression.builder().putAllKeyValues(helperFunctionProps).build())
                 .build();
 
         return TypescriptFile.builder()
@@ -264,6 +290,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .addAllEmittables(subInterfaces)
                 .addEmittables(mainTypeAlias)
                 .addAllEmittables(typeGuards)
+                .addAllEmittables(factories)
                 .addEmittables(typeGuardObj)
                 .parentFolderPath(parentFolderPath)
                 .build();
