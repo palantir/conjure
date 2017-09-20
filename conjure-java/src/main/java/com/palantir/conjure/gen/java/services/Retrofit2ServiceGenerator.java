@@ -237,6 +237,8 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 return ClassName.get("retrofit2.http", "DELETE");
             case "GET":
                 return ClassName.get("retrofit2.http", "GET");
+            case "HEAD":
+                return ClassName.get("retrofit2.http", "HEAD");
             case "PUT":
                 return ClassName.get("retrofit2.http", "PUT");
             case "POST":

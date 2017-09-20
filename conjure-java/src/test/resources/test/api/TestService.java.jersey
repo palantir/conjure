@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,7 +42,7 @@ public interface TestService {
     Dataset createDataset(
             @HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
 
-    @GET
+    @HEAD
     @Path("/datasets/{datasetRid}")
     Optional<Dataset> getDataset(
             @HeaderParam("Authorization") AuthHeader authHeader,

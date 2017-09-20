@@ -62,7 +62,7 @@ services:
         returns: Dataset
 
       getDataset:
-        http: GET /datasets/{datasetRid}
+        http: HEAD /datasets/{datasetRid}
         args:
           datasetRid:
             type: ResourceIdentifier

@@ -21,6 +21,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.HEAD;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -38,7 +39,7 @@ public interface TestService {
     CompletableFuture<Dataset> createDataset(
             @Header("Authorization") AuthHeader authHeader, @Body CreateDatasetRequest request);
 
-    @GET("/catalog/datasets/{datasetRid}")
+    @HEAD("/catalog/datasets/{datasetRid}")
     CompletableFuture<Optional<Dataset>> getDataset(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
