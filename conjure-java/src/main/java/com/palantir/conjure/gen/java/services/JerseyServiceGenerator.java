@@ -214,8 +214,6 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 return ClassName.get("javax.ws.rs", "DELETE");
             case "GET":
                 return ClassName.get("javax.ws.rs", "GET");
-            case "HEAD":
-                return ClassName.get("javax.ws.rs", "HEAD");
             case "PUT":
                 return ClassName.get("javax.ws.rs", "PUT");
             case "POST":
