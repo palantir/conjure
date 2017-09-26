@@ -24,6 +24,9 @@ positive:
             RidExample:
               fields:
                 rid: rid
+            BearerToken:
+              fields:
+                bearertoken: bearertoken
   builtins:
     conjure:
       types:
