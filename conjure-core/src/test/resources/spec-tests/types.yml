@@ -95,6 +95,20 @@ positive:
               union:
                 stringOne: string
                 stringTwo: string
+  errors:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            InvalidTypeDefinition:
+              namespace: Conjure
+              code: INVALID_ARGUMENT
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any
 negative:
   selfAliasTypeNotAllowed:
     expected-error: 'Illegal recursive data type: SelfAlias -> SelfAlias'
@@ -117,3 +131,18 @@ negative:
                 name: SelfAlias
             SelfAlias:
               alias: CycleType
+  errorsCodeMustBeSpecificValue:
+    expected-error: 'Invalid error code badCode.'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            InvalidTypeDefinition:
+              namespace: Conjure
+              code: badCode
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any
