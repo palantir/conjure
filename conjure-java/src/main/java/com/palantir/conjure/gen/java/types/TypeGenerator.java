@@ -40,11 +40,8 @@ public interface TypeGenerator {
 
         // Generate java files for error definitions
         if (objectsDefinition.errors().size() > 0) {
-            ConjurePackage errorsPackage = objectsDefinition.defaultConjurePackage()
-                    .orElseThrow(() ->
-                            new IllegalStateException("Default package must be set when there are error definitions."));
             files.addAll(generateErrorTypes(types,
-                    errorsPackage,
+                    objectsDefinition.defaultConjurePackage(),
                     objectsDefinition.errors()));
         }
 
@@ -72,6 +69,6 @@ public interface TypeGenerator {
 
     Set<JavaFile> generateErrorTypes(
             TypesDefinition allTypes,
-            ConjurePackage errorsPackage,
+            Optional<ConjurePackage> defaultPackage,
             Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef);
 }

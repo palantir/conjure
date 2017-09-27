@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition.BaseObjectTypeDefinitionDeserializer;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -39,6 +40,8 @@ public interface BaseObjectTypeDefinition {
                 return AliasTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("union") != null) {
                 return UnionTypeDefinition.fromJson(parser, tree);
+            } else if (tree.get("namespace") != null) {
+                return ErrorTypeDefinition.fromJson(parser, tree);
             } else {
                 throw new IllegalArgumentException(
                         "Unrecognized definition, objects must have either fields, values or an alias defined.");

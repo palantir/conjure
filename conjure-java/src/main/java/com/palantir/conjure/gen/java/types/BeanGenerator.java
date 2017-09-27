@@ -100,10 +100,10 @@ public final class BeanGenerator implements TypeGenerator {
     @Override
     public Set<JavaFile> generateErrorTypes(
             TypesDefinition allTypes,
-            ConjurePackage errorsPackage,
+            Optional<ConjurePackage> defaultPackage,
             Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
         TypeMapper typeMapper = new TypeMapper(allTypes);
-        return ErrorGenerator.generateErrorTypes(typeMapper, errorsPackage, errorTypeNameToDef);
+        return ErrorGenerator.generateErrorTypes(typeMapper, defaultPackage, errorTypeNameToDef);
     }
 
     private JavaFile generateBeanType(

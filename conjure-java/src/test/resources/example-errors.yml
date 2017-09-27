@@ -26,3 +26,8 @@ types:
         namespace: ConjureJava
         docs: Failed to compile Conjure definition to Java code.
         code: INTERNAL
+      DifferentPackage:
+        package: test.api.errors.other
+        namespace: Conjure
+        docs: Different package.
+        code: INTERNAL

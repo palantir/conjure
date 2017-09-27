@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -23,6 +24,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -34,27 +36,38 @@ public final class ErrorGenerator {
 
     public static Set<JavaFile> generateErrorTypes(
             TypeMapper typeMapper,
-            ConjurePackage conjurePackage,
+            Optional<ConjurePackage> defaultPackage,
             Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
 
-        return splitErrorDefsByNamespace(errorTypeNameToDef)
+        return splitErrorDefsByNamespace(errorTypeNameToDef, defaultPackage)
                 .entrySet()
                 .stream()
-                .map(entry -> generateErrorTypesForNamespace(
-                        typeMapper, conjurePackage, entry.getKey(), entry.getValue()))
-                .collect(Collectors.toSet());
+                .flatMap(entry ->
+                        entry.getValue()
+                                .entrySet()
+                                .stream()
+                                .map(innerEntry -> generateErrorTypesForNamespace(
+                                        typeMapper, ConjurePackage.of(entry.getKey()), innerEntry.getKey(),
+                                        innerEntry.getValue()))
+                ).collect(Collectors.toSet());
     }
 
-    private static Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>> splitErrorDefsByNamespace(
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
+    private static Map<String, Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>>> splitErrorDefsByNamespace(
+            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef, Optional<ConjurePackage> defaultPackage) {
 
-        Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>> namespacedErrorDefs = Maps.newHashMap();
+        Map<String, Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>>> pkgToNamespacedErrorDefs =
+                Maps.newHashMap();
         errorTypeNameToDef.entrySet().stream().forEach(entry -> {
+            ConjurePackage errorPkg = ConjurePackages.getPackage(entry.getValue().conjurePackage(), defaultPackage);
+            pkgToNamespacedErrorDefs.computeIfAbsent(errorPkg.name(), key -> Maps.newHashMap());
+
+            Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>> namespacedErrorDefs = pkgToNamespacedErrorDefs.get(
+                    errorPkg.name());
             ErrorNamespace namespace = entry.getValue().namespace();
             namespacedErrorDefs.computeIfAbsent(namespace, key -> Maps.newHashMap());
             namespacedErrorDefs.get(namespace).put(entry.getKey(), entry.getValue());
         });
-        return namespacedErrorDefs;
+        return pkgToNamespacedErrorDefs;
     }
 
     private static JavaFile generateErrorTypesForNamespace(

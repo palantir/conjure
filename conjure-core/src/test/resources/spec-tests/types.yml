@@ -112,6 +112,15 @@ positive:
                 typeName: string
               unsafe-args:
                 typeDef: any
+            CustomDefinition:
+              package: test.api.other.errors
+              namespace: Conjure
+              code: INVALID_ARGUMENT
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any
 negative:
   selfAliasTypeNotAllowed:
     expected-error: 'Illegal recursive data type: SelfAlias -> SelfAlias'

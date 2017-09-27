@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder;
 
 public final class BeanGeneratorTests {
 
-    private static final String REFERENCE_FILES_FOLDER = "src/integrationInput/java/test/api/";
+    private static final String REFERENCE_FILES_FOLDER = "src/integrationInput/java";
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -84,12 +84,13 @@ public final class BeanGeneratorTests {
         List<Path> files = new BeanGenerator(Settings.standard())
                 .emit(def, folder.getRoot());
 
-        assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER + "/errors/");
+        assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);
     }
 
     private void assertThatFilesAreTheSame(List<Path> files, String referenceFilesFolder) throws IOException {
         for (Path file : files) {
-            Path expectedFile = Paths.get(referenceFilesFolder, file.getFileName().toString());
+            Path relativized = folder.getRoot().toPath().relativize(file);
+            Path expectedFile = Paths.get(referenceFilesFolder, relativized.toString());
             if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
                 // help make shrink-wrapping output sane
                 Files.createDirectories(expectedFile.getParent());
