@@ -21,7 +21,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public abstract class ErrorNamespace {
 
-    private static final Pattern UPPER_CAMEL_CASE = Pattern.compile("(([A-Z][a-z]+)+)");
+    private static final Pattern UPPER_CAMEL_CASE = Pattern.compile("(([A-Z][a-z0-9]+)+)");
 
     @JsonValue
     public abstract String name();
