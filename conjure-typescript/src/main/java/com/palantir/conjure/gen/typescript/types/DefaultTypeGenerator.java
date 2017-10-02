@@ -17,7 +17,6 @@ import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
-import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
@@ -30,6 +29,7 @@ import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
 import com.palantir.conjure.gen.typescript.poet.StringExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptEqualityClause;
 import com.palantir.conjure.gen.typescript.poet.TypescriptExpression;
+import com.palantir.conjure.gen.typescript.poet.TypescriptFieldSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunction;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionBody;
@@ -134,11 +134,11 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     private static TypescriptFile generateObjectFile(TypeName typeName, ObjectTypeDefinition typeDef,
             ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
-        Set<TypescriptTypeSignature> propertySignatures = typeDef.fields().entrySet()
+        Set<TypescriptFieldSignature> propertySignatures = typeDef.fields().entrySet()
                 .stream()
-                .map(e -> TypescriptTypeSignature.builder()
+                .map(e -> TypescriptFieldSignature.builder()
                         .isOptional(e.getValue().type() instanceof OptionalType)
-                        .name(e.getKey().toCase(FieldName.Case.LOWER_CAMEL_CASE).name())
+                        .name(e.getKey().name())
                         .typescriptType(mapper.getTypescriptType(e.getValue().type()))
                         .build())
                 .collect(Collectors.toSet());
@@ -201,13 +201,13 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
 
             // build interface
-            SortedSet<TypescriptTypeSignature> propertySignatures = Sets.newTreeSet();
-            propertySignatures.add(TypescriptTypeSignature.builder()
+            SortedSet<TypescriptFieldSignature> propertySignatures = Sets.newTreeSet();
+            propertySignatures.add(TypescriptFieldSignature.builder()
                     .name("type")
                     .typescriptType(TypescriptSimpleType.builder().name(quotedMemberName.emitToString()).build())
                     .build());
-            propertySignatures.add(TypescriptTypeSignature.builder()
-                    .name(StringExpression.of(memberName).emitToString())
+            propertySignatures.add(TypescriptFieldSignature.builder()
+                    .name(memberName)
                     .typescriptType(typescriptMemberType)
                     .build());
             subInterfaces.add(TypescriptInterface.builder()

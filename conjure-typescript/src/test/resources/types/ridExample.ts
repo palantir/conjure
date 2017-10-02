@@ -1,3 +1,3 @@
 export interface IRidExample {
-    ridValue: string;
+    'ridValue': string;
 }

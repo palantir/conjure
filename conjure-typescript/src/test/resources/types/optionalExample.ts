@@ -1,3 +1,3 @@
 export interface IOptionalExample {
-    item?: string;
+    'item'?: string;
 }

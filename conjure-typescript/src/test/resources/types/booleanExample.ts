@@ -1,3 +1,3 @@
 export interface IBooleanExample {
-    coin: boolean;
+    'coin': boolean;
 }

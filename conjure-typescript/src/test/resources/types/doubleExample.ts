@@ -1,3 +1,3 @@
 export interface IDoubleExample {
-    doubleValue: number;
+    'doubleValue': number;
 }

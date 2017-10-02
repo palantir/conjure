@@ -1,3 +1,3 @@
 export interface IStringExample {
-    string: string;
+    'string': string;
 }

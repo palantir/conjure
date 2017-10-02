@@ -1,3 +1,3 @@
 export interface IAnyMapExample {
-    items: { [key: string]: any };
+    'items': { [key: string]: any };
 }

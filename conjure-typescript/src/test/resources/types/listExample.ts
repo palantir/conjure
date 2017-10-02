@@ -1,3 +1,3 @@
 export interface IListExample {
-    items: string[];
+    'items': string[];
 }

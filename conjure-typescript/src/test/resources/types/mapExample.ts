@@ -1,3 +1,3 @@
 export interface IMapExample {
-    items: { [key: string]: string };
+    'items': { [key: string]: string };
 }

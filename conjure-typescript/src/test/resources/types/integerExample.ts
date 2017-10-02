@@ -1,3 +1,3 @@
 export interface IIntegerExample {
-    integer: number;
+    'integer': number;
 }

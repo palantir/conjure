@@ -13,7 +13,7 @@ import org.junit.Test;
 public final class GenerationUtilsTests {
 
     @Test
-    public void packageToScopeandModuleTest() {
+    public void packageToScopeAndModuleTest() {
         assertThat(GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b.c"))).isEqualTo("@b/c");
         assertThat(GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b.c.d"))).isEqualTo("@b/c-d");
         assertThatThrownBy(() -> GenerationUtils.packageToScopeAndModule(ConjurePackage.of("a1.b")))

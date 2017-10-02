@@ -47,15 +47,15 @@ public final class ConjureTypescriptClientGeneratorTest {
         assertThat(compiledFileContent(src, xfile))
                 .contains("interface IFoo");
         assertThat(compiledFileContent(src, xfile))
-                .contains("fdouble: number");
+                .contains("'fdouble': number");
         assertThat(compiledFileContent(src, xfile))
-                .contains("finteger: number");
+                .contains("'finteger': number");
         assertThat(compiledFileContent(src, xfile))
-                .contains("fmap: { [key: string]: string }");
+                .contains("'fmap': { [key: string]: string }");
         assertThat(compiledFileContent(src, xfile))
-                .contains("fstring: string");
+                .contains("'fstring': string");
         assertThat(compiledFileContent(src, xfile))
-                .contains("foptional?: string");
+                .contains("'foptional'?: string");
     }
 
     @Test

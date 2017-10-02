@@ -1,20 +1,20 @@
 import { IStringExample } from "./stringExample";
 
 export interface IUnionTypeExample_StringExample {
-    "stringExample": IStringExample;
-    type: "stringExample";
+    'stringExample': IStringExample;
+    'type': "stringExample";
 }
 export interface IUnionTypeExample_Set {
-    "set": string[];
-    type: "set";
+    'set': string[];
+    'type': "set";
 }
 export interface IUnionTypeExample_Number {
-    "number": number;
-    type: "number";
+    'number': number;
+    'type': "number";
 }
 export interface IUnionTypeExample_Map {
-    "map": { [key: string]: string };
-    type: "map";
+    'map': { [key: string]: string };
+    'type': "map";
 }
 export type IUnionTypeExample = (IUnionTypeExample_StringExample | IUnionTypeExample_Set | IUnionTypeExample_Number | IUnionTypeExample_Map);
 function isStringExample(

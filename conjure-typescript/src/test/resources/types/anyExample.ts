@@ -1,3 +1,3 @@
 export interface IAnyExample {
-    any: any;
+    'any': any;
 }

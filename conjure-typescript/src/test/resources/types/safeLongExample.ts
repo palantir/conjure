@@ -1,3 +1,3 @@
 export interface ISafeLongExample {
-    safeLongValue: number;
+    'safeLongValue': number;
 }

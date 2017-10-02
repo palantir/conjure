@@ -1,3 +1,3 @@
 export interface IBearerTokenExample {
-    bearerTokenValue: string;
+    'bearerTokenValue': string;
 }

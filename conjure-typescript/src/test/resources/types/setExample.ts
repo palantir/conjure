@@ -1,3 +1,3 @@
 export interface ISetExample {
-    items: string[];
+    'items': string[];
 }

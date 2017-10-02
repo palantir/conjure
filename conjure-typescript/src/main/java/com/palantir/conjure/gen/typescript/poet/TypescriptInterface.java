@@ -16,7 +16,7 @@ public interface TypescriptInterface extends Emittable {
     String name();
 
     @Value.Default
-    default SortedSet<TypescriptTypeSignature> propertySignatures() {
+    default SortedSet<TypescriptFieldSignature> propertySignatures() {
         return Sets.newTreeSet();
     }
 
