@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -115,8 +116,9 @@ public final class UnionGenerator {
             UnionMemberTypeDefinition memberTypeDef = entry.getValue();
             TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
-            // memberName is guarded to be a valid Java identifier, so this is safe
-            MethodSpec.Builder builder = MethodSpec.methodBuilder(memberName)
+            // memberName is guarded to be a valid Java identifier and not to end in an underscore, so this is safe
+            String factoryMethodName = SourceVersion.isName(memberName) ? memberName : memberName + "_";
+            MethodSpec.Builder builder = MethodSpec.methodBuilder(factoryMethodName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(memberType, variableName)
                     .addStatement("return new $T(new $T($L))",

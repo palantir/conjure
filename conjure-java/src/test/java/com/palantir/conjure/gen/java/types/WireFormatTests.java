@@ -301,6 +301,22 @@ public final class WireFormatTests {
         public Integer visitUnknown(String unknownType) {
             return 0;
         }
+
+        @Override
+        public Integer visitNew(int value) {
+            return value;
+        }
+
+        @Override
+        public Integer visitInterface(int value) {
+            return value;
+        }
+
+        @Override
+        public Integer visitIf(int value) {
+            return value;
+        }
+
     }
 
 }

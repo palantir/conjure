@@ -99,5 +99,8 @@ types:
           set: set<string>
           thisFieldIsAnInteger: integer
           alsoAnInteger: integer
+          if: integer # some 'bad' member names!
+          new: integer
+          interface: integer
       EmptyObjectExample:
         fields: {}

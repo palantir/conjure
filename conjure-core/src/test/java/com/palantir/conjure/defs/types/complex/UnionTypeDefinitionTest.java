@@ -33,4 +33,11 @@ public final class UnionTypeDefinitionTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Union member key must be a valid Java identifier: %s", key));
     }
+
+    @Test
+    public void testUnionMemberKeyMustNotHaveTrailingUnderscore() throws Exception {
+        assertThatThrownBy(UnionTypeDefinition.builder().putUnion("foo_", MEMBER)::build)
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Union member key must not end with an underscore: foo_");
+    }
 }

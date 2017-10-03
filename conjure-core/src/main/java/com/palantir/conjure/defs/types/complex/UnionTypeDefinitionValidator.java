@@ -8,7 +8,9 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureValidator;
 
 public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDefinition> {
-    KEY_SYNTAX(new KeySyntaxValidator());
+    KEY_SYNTAX(new KeySyntaxValidator()),
+    NO_TRAILING_UNDERSCORE(new NoTrailingUnderscoreValidator());
+
 
     private final ConjureValidator<UnionTypeDefinition> validator;
 
@@ -19,6 +21,18 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
     @Override
     public void validate(UnionTypeDefinition definition) {
         validator.validate(definition);
+    }
+
+    private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionTypeDefinition> {
+
+        @Override
+        public void validate(UnionTypeDefinition definition) {
+            definition.union().keySet().forEach(key -> {
+                Preconditions.checkArgument(!key.endsWith("_"),
+                        "Union member key must not end with an underscore: %s", key);
+            });
+        }
+
     }
 
     private static final class KeySyntaxValidator implements ConjureValidator<UnionTypeDefinition> {
