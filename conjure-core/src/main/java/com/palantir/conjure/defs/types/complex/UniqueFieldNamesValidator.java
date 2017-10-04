@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Verifies that field names are unique modulo normalization to {@link FieldName.Case#CAMEL_CASE_PATTERN
- * camel case}.
+ * Verifies that field names are unique modulo normalization to
+ * {@link FieldName.Case#LOWER_CAMEL_CASE lower camel case}.
  */
 public final class UniqueFieldNamesValidator implements ConjureValidator<Set<FieldName>> {
 
