@@ -73,6 +73,9 @@ types:
           set: set<string>
           number: integer
           map: map<string, string>
+          return: integer
+          if: integer
+          any: integer
       UnionReferenceExample:
         fields:
           unionField: UnionTypeExample

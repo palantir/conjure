@@ -35,6 +35,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptFunction;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionBody;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
+import com.palantir.conjure.gen.typescript.poet.TypescriptKeywords;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeAlias;
@@ -243,19 +244,20 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             helperFunctionProps.put(typeGuardName, RawExpression.of(typeGuardName));
 
             // build factory function
+            String sanitizedMemberName = TypescriptKeywords.isKeyword(memberName) ? memberName + "_" : memberName;
             TypescriptFunctionSignature factorySignature = TypescriptFunctionSignature.builder()
                     .addParameters(TypescriptTypeSignature.builder()
-                            .name(memberName)
+                            .name(sanitizedMemberName)
                             .typescriptType(typescriptMemberType)
                             .build())
-                    .name(memberName)
+                    .name(sanitizedMemberName)
                     .returnType(interfaceType)
                     .build();
             TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
                     .addStatements(ReturnStatement.builder()
                             .expression(JsonExpression.builder()
                                     .putKeyValues("type", StringExpression.of(memberName))
-                                    .putKeyValues(memberName, RawExpression.of(memberName))
+                                    .putKeyValues(memberName, RawExpression.of(sanitizedMemberName))
                                     .build())
                             .build())
                     .build();
@@ -264,7 +266,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .functionBody(factoryBody)
                     .isMethod(false)
                     .build());
-            helperFunctionProps.put(memberName, RawExpression.of(memberName));
+            helperFunctionProps.put(memberName, RawExpression.of(sanitizedMemberName));
         });
 
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
