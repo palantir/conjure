@@ -50,7 +50,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
 
     @Override
     public String visit(OptionalType type) {
-        return type.itemType().visit(this);
+        return "Optional[" + type.itemType().visit(this) + "]";
     }
 
     @Override

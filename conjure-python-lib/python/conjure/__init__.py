@@ -32,6 +32,14 @@ class DictType(ConjureType):
         self.value_type = value_type
 
 
+class OptionalType(ConjureType):
+    item_type = None  # type: Type[DecodableType]
+
+    def __init__(self, item_type):
+        # type: (Type[DecodableType]) -> None
+        self.item_type = item_type
+
+
 class BinaryType(ConjureType):
     pass
 
@@ -293,6 +301,23 @@ class ConjureDecoder(object):
         return list(map(lambda x: cls.do_decode(x, element_type), obj))
 
     @classmethod
+    def decode_optional(cls, obj, object_type):
+        # type: (Optional[Any], ConjureTypeType) -> Optional[Any]
+        '''Decodes json into an element, returning None if the provided object is None.
+
+        Args:
+            obj: the json object to decode
+            object_type: a class object which is the conjure type of
+                the object if present.
+        Returns:
+            The decoded obj or None if no obj is provided.
+        '''
+        if obj is None:
+            return None
+
+        return cls.do_decode(obj, object_type)
+
+    @classmethod
     def do_decode(cls, obj, obj_type):
         # type: (Any, ConjureTypeType) -> Any
         '''Decodes json into the specified type
@@ -314,6 +339,8 @@ class ConjureDecoder(object):
             return cls.decode_dict(obj, obj_type.key_type, obj_type.value_type)
         elif isinstance(obj_type, ListType):
             return cls.decode_list(obj, obj_type.item_type)
+        elif isinstance(obj_type, OptionalType):
+            return cls.decode_optional(obj, obj_type.item_type)
         else:
             return obj
 

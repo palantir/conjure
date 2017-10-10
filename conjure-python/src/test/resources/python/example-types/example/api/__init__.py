@@ -152,18 +152,18 @@ class OptionalExample(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'item': ConjureFieldDefinition('item', str)
+            'item': ConjureFieldDefinition('item', OptionalType(str))
         }
 
-    _item = None # type: str
+    _item = None # type: Optional[str]
 
     def __init__(self, item):
-        # type: (str) -> None
+        # type: (Optional[str]) -> None
         self._item = item
 
     @property
     def item(self):
-        # type: () -> str
+        # type: () -> Optional[str]
         return self._item
 
 class ListExample(ConjureBeanType):
@@ -303,23 +303,23 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'num': ConjureFieldDefinition('num', float),
-            'bool': ConjureFieldDefinition('bool', bool),
-            'integer': ConjureFieldDefinition('integer', int),
-            'safelong': ConjureFieldDefinition('safelong', int),
-            'rid': ConjureFieldDefinition('rid', str),
-            'bearertoken': ConjureFieldDefinition('bearertoken', str)
+            'num': ConjureFieldDefinition('num', OptionalType(float)),
+            'bool': ConjureFieldDefinition('bool', OptionalType(bool)),
+            'integer': ConjureFieldDefinition('integer', OptionalType(int)),
+            'safelong': ConjureFieldDefinition('safelong', OptionalType(int)),
+            'rid': ConjureFieldDefinition('rid', OptionalType(str)),
+            'bearertoken': ConjureFieldDefinition('bearertoken', OptionalType(str))
         }
 
-    _num = None # type: float
-    _bool = None # type: bool
-    _integer = None # type: int
-    _safelong = None # type: int
-    _rid = None # type: str
-    _bearertoken = None # type: str
+    _num = None # type: Optional[float]
+    _bool = None # type: Optional[bool]
+    _integer = None # type: Optional[int]
+    _safelong = None # type: Optional[int]
+    _rid = None # type: Optional[str]
+    _bearertoken = None # type: Optional[str]
 
     def __init__(self, num, bool, integer, safelong, rid, bearertoken):
-        # type: (float, bool, int, int, str, str) -> None
+        # type: (Optional[float], Optional[bool], Optional[int], Optional[int], Optional[str], Optional[str]) -> None
         self._num = num
         self._bool = bool
         self._integer = integer
@@ -329,32 +329,32 @@ class PrimitiveOptionalsExample(ConjureBeanType):
 
     @property
     def num(self):
-        # type: () -> float
+        # type: () -> Optional[float]
         return self._num
 
     @property
     def bool(self):
-        # type: () -> bool
+        # type: () -> Optional[bool]
         return self._bool
 
     @property
     def integer(self):
-        # type: () -> int
+        # type: () -> Optional[int]
         return self._integer
 
     @property
     def safelong(self):
-        # type: () -> int
+        # type: () -> Optional[int]
         return self._safelong
 
     @property
     def rid(self):
-        # type: () -> str
+        # type: () -> Optional[str]
         return self._rid
 
     @property
     def bearertoken(self):
-        # type: () -> str
+        # type: () -> Optional[str]
         return self._bearertoken
 
 class ManyFieldExample(ConjureBeanType):
@@ -367,7 +367,7 @@ class ManyFieldExample(ConjureBeanType):
             'integer': ConjureFieldDefinition('integer', int),
             'integer_example': ConjureFieldDefinition('integerExample', IntegerExample),
             'double_value': ConjureFieldDefinition('doubleValue', float),
-            'optional_item': ConjureFieldDefinition('optionalItem', str),
+            'optional_item': ConjureFieldDefinition('optionalItem', OptionalType(str)),
             'items': ConjureFieldDefinition('items', ListType(str)),
             'set': ConjureFieldDefinition('set', ListType(str)),
             'map': ConjureFieldDefinition('map', DictType(str, str))
@@ -377,13 +377,13 @@ class ManyFieldExample(ConjureBeanType):
     _integer = None # type: int
     _integer_example = None # type: IntegerExample
     _double_value = None # type: float
-    _optional_item = None # type: str
+    _optional_item = None # type: Optional[str]
     _items = None # type: List[str]
     _set = None # type: List[str]
     _map = None # type: Dict[str, str]
 
     def __init__(self, string, integer, integer_example, double_value, optional_item, items, set, map):
-        # type: (str, int, IntegerExample, float, str, List[str], List[str], Dict[str, str]) -> None
+        # type: (str, int, IntegerExample, float, Optional[str], List[str], List[str], Dict[str, str]) -> None
         self._string = string
         self._integer = integer
         self._integer_example = integer_example
@@ -415,7 +415,7 @@ class ManyFieldExample(ConjureBeanType):
 
     @property
     def optional_item(self):
-        # type: () -> str
+        # type: () -> Optional[str]
         return self._optional_item
 
     @property

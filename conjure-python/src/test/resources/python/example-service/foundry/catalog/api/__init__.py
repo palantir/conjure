@@ -133,7 +133,7 @@ class TestService(Service):
         return _decoder.decode(_response.json(), Dataset)
 
     def getDataset(self, authHeader, datasetRid):
-        # type: (str, str) -> Dataset
+        # type: (str, str) -> Optional[Dataset]
 
         _headers = {
             'Accept': 'application/json',
@@ -163,7 +163,7 @@ class TestService(Service):
         _response.raise_for_status()
 
         _decoder = ConjureDecoder()
-        return _decoder.decode(_response.json(), Dataset)
+        return _decoder.decode(_response.json(), OptionalType(Dataset))
 
     def getRawData(self, authHeader, datasetRid):
         # type: (str, str) -> Any
@@ -201,7 +201,7 @@ class TestService(Service):
         return _raw
 
     def maybeGetRawData(self, authHeader, datasetRid):
-        # type: (str, str) -> Any
+        # type: (str, str) -> Optional[Any]
 
         _headers = {
             'Accept': 'application/json',
@@ -231,7 +231,7 @@ class TestService(Service):
         _response.raise_for_status()
 
         _decoder = ConjureDecoder()
-        return _decoder.decode(_response.json(), BinaryType())
+        return _decoder.decode(_response.json(), OptionalType(BinaryType()))
 
     def getBranches(self, authHeader, datasetRid):
         # type: (str, str) -> List[str]
@@ -300,7 +300,7 @@ class TestService(Service):
         return _decoder.decode(_response.json(), ListType(str))
 
     def resolveBranch(self, authHeader, datasetRid, branch):
-        # type: (str, str, str) -> str
+        # type: (str, str, str) -> Optional[str]
 
         _headers = {
             'Accept': 'application/json',
@@ -331,10 +331,10 @@ class TestService(Service):
         _response.raise_for_status()
 
         _decoder = ConjureDecoder()
-        return _decoder.decode(_response.json(), str)
+        return _decoder.decode(_response.json(), OptionalType(str))
 
     def testParam(self, authHeader, datasetRid):
-        # type: (str, str) -> str
+        # type: (str, str) -> Optional[str]
 
         _headers = {
             'Accept': 'application/json',
@@ -364,7 +364,7 @@ class TestService(Service):
         _response.raise_for_status()
 
         _decoder = ConjureDecoder()
-        return _decoder.decode(_response.json(), str)
+        return _decoder.decode(_response.json(), OptionalType(str))
 
     def testBoolean(self, authHeader):
         # type: (str) -> bool

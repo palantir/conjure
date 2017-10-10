@@ -46,8 +46,7 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
 
     @Override
     public String visit(OptionalType type) {
-        // TODO (bduffield): optionals for real
-        return type.itemType().visit(this);
+        return "OptionalType(" + type.itemType().visit(this) + ")";
     }
 
     @Override
