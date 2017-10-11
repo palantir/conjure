@@ -556,9 +556,10 @@ this service.
      * A particular `method` + `path` combination can only be defined once per service. All path parameters are
        considered equivalent for the purposes of determining uniqueness -- for example, `GET /branch/{arg}/resolve` and
        `GET /branch/{id:.+}/resolve` are considered equivalent and thus cannot both be defined for a particular service.
+     * Non-header parameter names must be lowerCamelCase. Header parameter names must be Upper-Kebab-Case (valid header 
+       names include `Cache-Control` or `Content-MD5`).
      * All path parameters that occur in the path must match a path argument specified in the `args` section
      * Path parameters must be unique: the same parameter cannot occur multiple times in the same path
-     * Path parameter names have the same restrictions as field names
      * Path parameter names are case-sensitive (`arg` and `aRg` are considered separate parameters)
      * The type for a path parameter must be a primitive type or an alias type that resolves to a primitive type
      * `:.+` can be appended to the variable name of a path parameter to specify that a non-greedy match should be
