@@ -24,10 +24,10 @@ import com.palantir.conjure.gen.typescript.poet.ArrayExpression;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.FunctionCallExpression;
-import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
 import com.palantir.conjure.gen.typescript.poet.RawExpression;
 import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
+import com.palantir.conjure.gen.typescript.poet.StandardImportStatement;
 import com.palantir.conjure.gen.typescript.poet.StringExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptClass;
 import com.palantir.conjure.gen.typescript.poet.TypescriptConstructor;
@@ -97,7 +97,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
         return TypescriptFile.builder()
                 .addEmittables(typescriptClass)
                 .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
-                .addImports(ImportStatement.builder()
+                .addImports(StandardImportStatement.builder()
                         .addNamesToImport("IHttpApiBridge")
                         .filepathToImport(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB)
                         .build())

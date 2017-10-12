@@ -14,6 +14,8 @@ import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
+import com.palantir.conjure.gen.typescript.poet.StandardImportStatement;
+import com.palantir.conjure.gen.typescript.poet.StarImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import java.io.File;
@@ -22,7 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 
 public final class GenerationUtils {
@@ -48,33 +52,65 @@ public final class GenerationUtils {
 
     public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
             TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
-        return conjureTypes.stream()
-                .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
-                .distinct()
-                .filter(referenceType -> !referenceType.type().equals(sourceName))
-                .filter(referenceType -> !mapper.getTypescriptType(referenceType).isPrimitive())
-                .map(referenceType -> generateImportStatement(referenceType, sourceName, sourcePackage, mapper))
+        return getReferenceTypeStream(conjureTypes, sourceName, mapper)
+                .map(referenceType -> generateImportStatement(referenceType, sourcePackage, mapper))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
     private static Optional<ImportStatement> generateImportStatement(
-            ReferenceType referenceType, TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
+            ReferenceType referenceType, ConjurePackage sourcePackage, TypeMapper mapper) {
         Optional<ConjurePackage> maybeDestPackage = mapper.getContainingPackage(referenceType);
         return maybeDestPackage.map(destPackage -> {
             TypescriptSimpleType typeScriptType = mapper.getTypescriptType(referenceType);
             if (Objects.equals(sourcePackage, destPackage)) {
-                return ImportStatement.builder()
+                return StandardImportStatement.builder()
                         .addNamesToImport(typeScriptType.name())
                         .filepathToImport(getTypescriptFilePath(referenceType.type().name()))
                         .build();
             }
-            return ImportStatement.builder()
+            return StandardImportStatement.builder()
                     .addNamesToImport(typeScriptType.name())
                     .filepathToImport(packageToScopeAndModule(destPackage))
                     .build();
         });
+    }
+
+    public static List<ImportStatement> generateStarImportStatements(List<ConjureType> conjureTypes,
+            Function<TypescriptSimpleType, String> getVariableName, TypeName sourceName, ConjurePackage sourcePackage,
+            TypeMapper mapper) {
+        return getReferenceTypeStream(conjureTypes, sourceName, mapper)
+                .map(referenceType -> generateStarImportStatement(
+                        referenceType, getVariableName, sourcePackage, mapper))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private static Optional<StarImportStatement> generateStarImportStatement(
+            ReferenceType referenceType, Function<TypescriptSimpleType, String> getVariableName,
+            ConjurePackage sourcePackage, TypeMapper mapper) {
+        Optional<ConjurePackage> maybeDestPackage = mapper.getContainingPackage(referenceType);
+        return maybeDestPackage.map(destPackage -> {
+            TypescriptSimpleType typeScriptType = mapper.getTypescriptType(referenceType);
+            String filepath = Objects.equals(sourcePackage, destPackage)
+                    ? getTypescriptFilePath(referenceType.type().name())
+                    : packageToScopeAndModule(destPackage);
+            return StarImportStatement.builder()
+                    .variableName(getVariableName.apply(typeScriptType))
+                    .filepathToImport(filepath)
+                    .build();
+        });
+    }
+
+    private static Stream<ReferenceType> getReferenceTypeStream(List<ConjureType> conjureTypes,
+            TypeName sourceName, TypeMapper mapper) {
+        return conjureTypes.stream()
+                .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
+                .distinct()
+                .filter(referenceType -> !referenceType.type().equals(sourceName))
+                .filter(referenceType -> !mapper.getTypescriptType(referenceType).isPrimitive());
     }
 
     public static ExportStatement createExportStatementRelativeToRoot(String exportName, String sourceName) {

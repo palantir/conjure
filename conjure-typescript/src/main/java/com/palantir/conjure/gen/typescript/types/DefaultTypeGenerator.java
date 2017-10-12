@@ -271,6 +271,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
                 typeName, packageLocation, mapper);
+        List<ImportStatement> starImportStatements = GenerationUtils.generateStarImportStatements(referencedTypes,
+                this::getUnusedVariableName, typeName, packageLocation, mapper);
 
         TypescriptUnionType unionType = TypescriptUnionType.builder()
                 .types(subInterfaces.stream().map(
@@ -288,7 +290,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
         return TypescriptFile.builder()
                 .name(typeName.name())
-                .imports(importStatements)
+                .addAllImports(importStatements)
+                .addAllImports(starImportStatements)
                 .addAllEmittables(subInterfaces)
                 .addEmittables(mainTypeAlias)
                 .addAllEmittables(typeGuards)
@@ -298,4 +301,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .build();
     }
 
+    private String getUnusedVariableName(TypescriptSimpleType typeName) {
+        return "_" + typeName.name();
+    }
 }

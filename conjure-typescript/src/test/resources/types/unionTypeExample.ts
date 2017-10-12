@@ -1,4 +1,5 @@
 import { IStringExample } from "./stringExample";
+import * as _IStringExample from "./stringExample";
 
 export interface IUnionTypeExample_StringExample {
     'stringExample': IStringExample;
