@@ -1,1 +1,1 @@
-Copyright ${today.year} Palantir Technologies, Inc. All rights reserved.
+(c) Copyright ${today.year} Palantir Technologies Inc. All rights reserved.

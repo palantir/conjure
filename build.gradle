@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.0.0'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.16.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.17.0'
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
         classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
@@ -94,6 +94,6 @@ subprojects {
 }
 
 dependencies {
-    baseline group: 'com.palantir.baseline', name: 'gradle-baseline-java-config', ext: 'zip'
+    baseline 'com.palantir.baseline:gradle-baseline-java-config:0.17.0@zip'
 }
 
