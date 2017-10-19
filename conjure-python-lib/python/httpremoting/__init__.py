@@ -3,6 +3,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 import requests
+import random
 
 
 class SslConfiguration:
@@ -35,7 +36,7 @@ class Service:
     def _uri(self):
         # type: () -> str
         '''returns a random uri'''
-        return self._uris[0]
+        return random.choice(self._uris)
 
 
 T = TypeVar('T')
