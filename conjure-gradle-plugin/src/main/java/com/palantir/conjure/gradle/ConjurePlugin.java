@@ -27,12 +27,14 @@ import org.gradle.api.internal.file.SourceDirectorySetFactory;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.Delete;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 public class ConjurePlugin implements Plugin<Project> {
 
     private static final String EXTERNAL_IMPORTS_DIRNAME = "external-imports";
+    private static final String JAVA_GENERATED_SOURCE_DIRNAME = "src/generated/java";
 
     private final SourceDirectorySetFactory sourceDirectorySetFactory;
 
@@ -62,6 +64,14 @@ public class ConjurePlugin implements Plugin<Project> {
         Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);
         copyConjureSourcesTask.into(project.file(buildDir)).from(conjureSourceSet);
 
+        Delete cleanCopiedConjureSources = project.getTasks().create("cleanCopiedConjureSources", Delete.class);
+        cleanCopiedConjureSources.delete(buildDir);
+
+        copyConjureSourcesTask.dependsOn(cleanCopiedConjureSources);
+
+        final Task cleanTask = project.getTasks().maybeCreate("clean", Delete.class);
+        cleanTask.dependsOn(cleanCopiedConjureSources);
+
         // Set up conjure compile task
         Task conjureTask = project.getTasks().create("compileConjure", DefaultTask.class);
         applyDependencyForIdeTasks(project, conjureTask);
@@ -84,16 +94,20 @@ public class ConjurePlugin implements Plugin<Project> {
                 subproj.getPluginManager().apply(JavaPlugin.class);
 
                 addGeneratedToMainSourceSet(subproj);
-                project.getTasks().create("compileConjureObjects",
+                project.getTasks().create(
+                        "compileConjureObjects",
                         CompileConjureJavaObjectsTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
-                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
+                            task.setOutputDirectory(outputDir);
                             task.setExperimentalFeatures(experimentalFeaturesSupplier);
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
+                            task.dependsOn(
+                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureObjects", outputDir));
                         });
 
                 subproj.getDependencies().add("compile", "com.palantir.conjure:conjure-java-lib");
@@ -112,17 +126,21 @@ public class ConjurePlugin implements Plugin<Project> {
 
                 addGeneratedToMainSourceSet(subproj);
 
-                project.getTasks().create("compileConjureRetrofit",
+                project.getTasks().create(
+                        "compileConjureRetrofit",
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
-                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
+                            task.setOutputDirectory(outputDir);
                             task.setServiceGenerator(
                                     () -> new Retrofit2ServiceGenerator(experimentalFeaturesSupplier.get()));
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
+                            task.dependsOn(
+                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureRetrofit", outputDir));
                         });
 
                 subproj.getDependencies().add("compile", objectsProject);
@@ -140,16 +158,20 @@ public class ConjurePlugin implements Plugin<Project> {
 
                 addGeneratedToMainSourceSet(subproj);
 
-                project.getTasks().create("compileConjureJersey",
+                project.getTasks().create(
+                        "compileConjureJersey",
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
                             task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
-                            task.setOutputDirectory(subproj.file("src/generated/java"));
+                            File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
+                            task.setOutputDirectory(outputDir);
                             task.setServiceGenerator(JerseyServiceGenerator::new);
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
+                            task.dependsOn(
+                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureJersey", outputDir));
                         });
 
                 subproj.getDependencies().add("compile", objectsProject);
@@ -207,20 +229,20 @@ public class ConjurePlugin implements Plugin<Project> {
                 .collect(Collectors.toSet());
     }
 
-    private void addGeneratedToMainSourceSet(Project subproj) {
+    private static void addGeneratedToMainSourceSet(Project subproj) {
         JavaPluginConvention javaPlugin = subproj.getConvention().findPlugin(JavaPluginConvention.class);
-        javaPlugin.getSourceSets().getByName("main").getJava().srcDir(subproj.files("src/generated/java"));
+        javaPlugin.getSourceSets().getByName("main").getJava().srcDir(subproj.files(JAVA_GENERATED_SOURCE_DIRNAME));
     }
 
-    private void applyDependencyForIdeTasks(Project project, Task conjureTask) {
+    private static void applyDependencyForIdeTasks(Project project, Task conjureTask) {
         project.getPlugins().withType(IdeaPlugin.class, plugin -> {
             Task task = project.getTasks().findByName("ideaModule");
             if (task != null) {
                 task.dependsOn(conjureTask);
             }
 
-            plugin.getModel().getModule().getSourceDirs().add(project.file("src/generated/java"));
-            plugin.getModel().getModule().getGeneratedSourceDirs().add(project.file("src/generated/java"));
+            plugin.getModel().getModule().getSourceDirs().add(project.file(JAVA_GENERATED_SOURCE_DIRNAME));
+            plugin.getModel().getModule().getGeneratedSourceDirs().add(project.file(JAVA_GENERATED_SOURCE_DIRNAME));
         });
         project.getPlugins().withType(EclipsePlugin.class, plugin -> {
             Task task = project.getTasks().findByName("eclipseClasspath");
@@ -228,5 +250,12 @@ public class ConjurePlugin implements Plugin<Project> {
                 task.dependsOn(conjureTask);
             }
         });
+    }
+
+    private static Task createCleanConjureTaskForJavaProject(Project project, String taskName, File outputDir) {
+        Delete cleanConjureTask = project.getTasks().create(taskName, Delete.class);
+        cleanConjureTask.delete(outputDir);
+        project.getTasks().findByName("clean").dependsOn(cleanConjureTask);
+        return cleanConjureTask;
     }
 }

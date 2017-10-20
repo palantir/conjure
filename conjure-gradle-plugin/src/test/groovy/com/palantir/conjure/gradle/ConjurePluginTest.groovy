@@ -151,7 +151,6 @@ class ConjurePluginTest extends IntegrationSpec {
         fileExists('api/api-objects/src/generated/java/.gitignore')
     }
 
-
     def 'check code compiles when run in parallel with multiple build targets'() {
         when:
         ExecutionResult result = runTasksSuccessfully('--parallel', 'check', 'tasks')
@@ -164,6 +163,62 @@ class ConjurePluginTest extends IntegrationSpec {
 
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
         fileExists('api/api-objects/src/generated/java/.gitignore')
+    }
+
+    def 'clean cleans up src/generated/java'() {
+        when:
+        runTasksSuccessfully('compileJava')
+        ExecutionResult result = runTasksSuccessfully('clean')
+
+        then:
+        result.wasExecuted(':api:api-jersey:cleanConjureJersey')
+        result.wasExecuted(':api:api-objects:cleanConjureObjects')
+        result.wasExecuted(':api:api-retrofit:cleanConjureRetrofit')
+
+        !fileExists('api/api-jersey/src/generated/java')
+        !fileExists('api/api-objects/src/generated/java')
+        !fileExists('api/api-retrofit/src/generated/java')
+    }
+
+    def 'compileConjure creates build/conjure for root project'() {
+        when:
+        runTasksSuccessfully('compileConjure')
+
+        then:
+        fileExists('api/build/conjure')
+    }
+
+    def 'clean cleans up build/conjure for root project'() {
+        when:
+        runTasksSuccessfully('compileConjure')
+        ExecutionResult result = runTasksSuccessfully('clean')
+
+        then:
+        result.wasExecuted(':api:cleanCopiedConjureSources')
+
+        !fileExists('api/build/conjure')
+    }
+
+    def 'copyConjureSources runs cleanCopiedConjureSources'() {
+        when:
+        ExecutionResult result = runTasksSuccessfully(':api:copyConjureSources')
+
+        then:
+        result.wasExecuted(':api:cleanCopiedConjureSources')
+    }
+
+    def 'cleanCopiedConjureSources task is registered correctly as a dependency if the clean task exists already'() {
+        file('build.gradle') << '''
+            task clean(type: Delete) {
+                // do nothing
+            }
+        '''.stripIndent()
+
+        when:
+        ExecutionResult result = runTasksSuccessfully('clean')
+
+        then:
+        result.wasExecuted(':api:cleanCopiedConjureSources')
     }
 
     def 'check publication'() {
