@@ -19,7 +19,7 @@
         <property name="lineSeparator" value="lf"/>
     </module>
     <module name="RegexpHeader">
-        <property name="header" value="^/\*$\n^ \* Copyright \d{4} Palantir Technologies, Inc\. All rights reserved\.$"/>
+        <property name="header" value="^/\*$\n^ \* \(c\) Copyright \d{4} Palantir Technologies Inc\. All rights reserved\.$"/>
         <property name="fileExtensions" value=".java,.ts"/>
     </module>
     <module name="RegexpMultiline"> <!-- Development Practices: Writing good unit tests -->
