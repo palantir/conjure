@@ -1,5 +1,4 @@
-from typing import List, Set, Dict, Tuple, Text, Optional, Type, Any, Union
-from functools import wraps
+from typing import List, Dict, Optional, Type, Any, Union
 import inspect
 import json
 from enum import Enum
@@ -45,7 +44,11 @@ class BinaryType(ConjureType):
 
 
 class ConjureEnumType(ConjureType, Enum):
-    pass
+
+    # override __format__ of ConjureEnumType to prevent issue with default
+    # Enum behaviour due to lack of __format__ method on ConjureType
+    def __format__(self, format_spec):
+        return self.__str__()
 
 
 class ConjureBeanType(ConjureType):
