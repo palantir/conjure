@@ -11,6 +11,7 @@ buildscript {
         classpath 'com.palantir.baseline:gradle-baseline-java:0.17.1'
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
+        classpath 'com.palantir.gradle.changelog:gradle-changelog:2.3.0'
         classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
         classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.8.0'
     }
@@ -37,6 +38,7 @@ allprojects {
     }
     apply plugin: 'com.palantir.configuration-resolver'
     apply plugin: 'com.palantir.exartisi-dependencies'
+    apply plugin: 'com.palantir.changelog'
     apply plugin: 'nebula.dependency-recommender'
 
     dependencyRecommendations {
@@ -96,4 +98,3 @@ subprojects {
 dependencies {
     baseline 'com.palantir.baseline:gradle-baseline-java-config:0.17.1@zip'
 }
-
