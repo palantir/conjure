@@ -4,10 +4,12 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import java.io.File;
 import org.junit.Rule;
@@ -24,8 +26,11 @@ public class UnionGeneratorTest {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         BeanGenerator generator = new BeanGenerator(Settings.standard());
 
-        assertThatThrownBy(() -> generator.emit(def, folder.getRoot()))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Error: UnionTypes is an experimental feature of conjure-java that has not been enabled.");
+        try {
+            generator.emit(def, folder.getRoot());
+            failBecauseExceptionWasNotThrown(ExperimentalFeatureDisabledException.class);
+        } catch (ExperimentalFeatureDisabledException e) {
+            assertThat(e.getFeature()).isEqualTo(ExperimentalFeatures.UnionTypes);
+        }
     }
 }

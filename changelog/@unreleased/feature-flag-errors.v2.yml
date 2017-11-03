@@ -1,0 +1,5 @@
+type: break
+break:
+  description: >
+    Error types are disabled by default. They can be switched on using the
+    `conjure { experimentalFeature 'ErrorTypes' }` feature flag.

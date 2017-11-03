@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.types.BeanGenerator;
+import com.palantir.conjure.gen.java.types.ExperimentalFeatureDisabledException;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +69,13 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
 
     private void compileFile(TypeGenerator generator, Path path) {
         ConjureDefinition conjure = Conjure.parse(path.toFile());
-        generator.emit(conjure, outputDirectory);
+        try {
+            generator.emit(conjure, outputDirectory);
+        } catch (ExperimentalFeatureDisabledException e) {
+            String helpfulMessage = String.format("'%s' is an experimental feature. "
+                            + "Add `conjure { experimentalFeature '%s' }` to your build.gradle to enable this.",
+                    e.getFeature(), e.getFeature());
+            throw new IllegalArgumentException(helpfulMessage, e);
+        }
     }
 }

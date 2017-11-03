@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
@@ -82,9 +81,7 @@ public final class BeanGenerator implements TypeGenerator {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
-            Preconditions.checkState(enabledExperimentalFeatures.contains(ExperimentalFeatures.UnionTypes),
-                    "Error: %s is an experimental feature of conjure-java that has not been enabled.",
-                    ExperimentalFeatures.UnionTypes);
+            requireExperimentalFeature(ExperimentalFeatures.UnionTypes);
             return UnionGenerator.generateUnionType(
                     typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
@@ -102,8 +99,20 @@ public final class BeanGenerator implements TypeGenerator {
             TypesDefinition allTypes,
             Optional<ConjurePackage> defaultPackage,
             Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
+        if (errorTypeNameToDef.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        requireExperimentalFeature(ExperimentalFeatures.ErrorTypes);
+
         TypeMapper typeMapper = new TypeMapper(allTypes);
         return ErrorGenerator.generateErrorTypes(typeMapper, defaultPackage, errorTypeNameToDef);
+    }
+
+    private void requireExperimentalFeature(ExperimentalFeatures feature) {
+        if (!enabledExperimentalFeatures.contains(feature)) {
+            throw new ExperimentalFeatureDisabledException(feature);
+        }
     }
 
     private JavaFile generateBeanType(

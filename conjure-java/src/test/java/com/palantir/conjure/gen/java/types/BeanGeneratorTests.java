@@ -81,7 +81,7 @@ public final class BeanGeneratorTests {
     @Test
     public void testConjureErrors() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-errors.yml"));
-        List<Path> files = new BeanGenerator(Settings.standard())
+        List<Path> files = new BeanGenerator(Settings.standard(), ImmutableSet.of(ExperimentalFeatures.ErrorTypes))
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);

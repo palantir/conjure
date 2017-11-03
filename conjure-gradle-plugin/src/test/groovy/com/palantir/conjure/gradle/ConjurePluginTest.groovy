@@ -4,11 +4,8 @@
 
 package com.palantir.conjure.gradle
 
-import com.google.common.io.Resources
-import java.nio.charset.Charset
-import nebula.test.functional.ExecutionResult
 import nebula.test.IntegrationSpec
-import org.gradle.testkit.runner.TaskOutcome
+import nebula.test.functional.ExecutionResult
 import spock.lang.Unroll
 
 class ConjurePluginTest extends IntegrationSpec {
@@ -426,7 +423,7 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.standardError.contains(
-                "Error: UnionTypes is an experimental feature of conjure-java that has not been enabled.")
+                "'UnionTypes' is an experimental feature. Add `conjure { experimentalFeature 'UnionTypes' }` to your build.gradle to enable this.")
     }
 
     def 'can enable experimental features'() {
@@ -443,6 +440,30 @@ class ConjurePluginTest extends IntegrationSpec {
         file('api/build.gradle') << '''
         conjure {
             experimentalFeature "UnionTypes"
+        }
+        '''.stripIndent()
+
+        when:
+        ExecutionResult result = runTasksSuccessfully(':api:compileConjureObjects')
+
+        then:
+        result.success
+    }
+
+    def 'experimental ErrorTypes feature can be enabled'() {
+        createFile('api/src/main/conjure/errors.yml') << '''
+        types:
+          definitions:
+            default-package: test.a.api
+            errors:
+              NotAllowedToChangeDatasetId:
+                namespace: MyErrors
+                code: FAILED_PRECONDITION
+        '''.stripIndent()
+
+        file('api/build.gradle') << '''
+        conjure {
+            experimentalFeature "ErrorTypes"
         }
         '''.stripIndent()
 
