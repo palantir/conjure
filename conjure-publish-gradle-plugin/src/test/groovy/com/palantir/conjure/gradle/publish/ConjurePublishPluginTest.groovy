@@ -120,7 +120,7 @@ class ConjurePublishPluginTest extends IntegrationSpec {
         result.success
 
         where:
-        version << ['4.1', '4.0', '3.5', '3.4']
+        version << ['4.3', '4.2', '4.1', '4.0', '3.5']
     }
 
     def readResource(String name) {
