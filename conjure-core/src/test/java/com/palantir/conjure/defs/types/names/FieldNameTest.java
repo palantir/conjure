@@ -23,6 +23,10 @@ public final class FieldNameTest {
 
         FieldName.of("snake_case");
         FieldName.of("snake1_case123");
+
+        FieldName.of("xCoordinate");
+        FieldName.of("defaultXPosition");
+        FieldName.of("defaultX");
     }
 
     @Test
@@ -37,14 +41,14 @@ public final class FieldNameTest {
                 "snake_123_case",
                 "kebab-123-case",
                 "mixed-kebab_snake-case",
+                "x",
+                "defaultDNSName"
                 }) {
             assertThatThrownBy(() -> FieldName.of(invalid))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("FieldName \"%s\" must follow one of the following patterns: "
-                                    + "[LOWER_CAMEL_CASE[^[a-z][a-z0-9]+([A-Z][a-z0-9]+)*$], "
-                                    + "KEBAB_CASE[^[a-z][a-z0-9]+(-[a-z][a-z0-9]+)*$], "
-                                    + "SNAKE_CASE[^[a-z][a-z0-9]+(_[a-z][a-z0-9]+)*$]]",
-                            invalid);
+                    .hasMessageContaining(String.format(
+                            "FieldName \"%s\" must follow one of the following patterns",
+                            invalid));
         }
     }
 

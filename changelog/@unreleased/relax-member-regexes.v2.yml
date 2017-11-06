@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: >
+    Relaxed regexes for field names to allow some uses of single characters, e.g.
+    `xCoordinate`, `defaultXPosition` and `defaultX`.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/636
