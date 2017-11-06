@@ -16,7 +16,6 @@ import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonFile;
 import com.palantir.conjure.gen.python.poet.PythonPoetWriter;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
-import com.palantir.conjure.gen.python.types.PythonBeanGenerator.ExperimentalFeatures;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ public final class ConjurePythonGeneratorTest {
     public void testGenerateTypes() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-types.yml"));
         ConjurePythonGenerator generator = new ConjurePythonGenerator(
-                new DefaultBeanGenerator(ImmutableSet.of(ExperimentalFeatures.UnionTypes)), new ClientGenerator());
+                new DefaultBeanGenerator(ImmutableSet.of()), new ClientGenerator());
 
         InMemoryPythonFileWriter pythonFileWriter = new InMemoryPythonFileWriter();
         generator.write(conjure, pythonFileWriter);
@@ -119,7 +118,7 @@ public final class ConjurePythonGeneratorTest {
                     file.getName().replaceAll(".yml$", ""));
             Files.createParentDirs(referenceCodeLocation.toFile());
             ConjurePythonGenerator generator = new ConjurePythonGenerator(
-                    new DefaultBeanGenerator(ImmutableSet.of(ExperimentalFeatures.UnionTypes)), new ClientGenerator());
+                    new DefaultBeanGenerator(ImmutableSet.of()), new ClientGenerator());
             generator.write(conjure, new DefaultPythonFileWriter(referenceCodeLocation));
         }
 

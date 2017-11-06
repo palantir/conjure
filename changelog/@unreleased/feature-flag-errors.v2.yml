@@ -1,5 +1,6 @@
-type: break
-break:
+type: manualTask
+manualTask:
   description: >
-    Error types are disabled by default. They can be switched on using the
-    `conjure { experimentalFeature 'ErrorTypes' }` feature flag.
+    Error types are disabled by default.
+  actions:
+  - Add `conjure { experimentalFeature 'ErrorTypes' }` to your build.gradle files if you want to use these.

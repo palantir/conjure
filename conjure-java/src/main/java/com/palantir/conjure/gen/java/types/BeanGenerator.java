@@ -81,7 +81,6 @@ public final class BeanGenerator implements TypeGenerator {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
-            requireExperimentalFeature(ExperimentalFeatures.UnionTypes);
             return UnionGenerator.generateUnionType(
                     typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {

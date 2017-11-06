@@ -407,26 +407,7 @@ class ConjurePluginTest extends IntegrationSpec {
         !result.wasExecuted(':api:compileConjureJersey')
     }
 
-    def 'experimental features are disabled by default'() {
-        createFile('api/src/main/conjure/union.yml') << '''
-        types:
-          definitions:
-            default-package: test.a.api
-            objects:
-              UnionTypeExample:
-                union:
-                  number: integer
-        '''.stripIndent()
-
-        when:
-        ExecutionResult result = runTasksWithFailure(':api:compileConjureObjects')
-
-        then:
-        result.standardError.contains(
-                "'UnionTypes' is an experimental feature. Add `conjure { experimentalFeature 'UnionTypes' }` to your build.gradle to enable this.")
-    }
-
-    def 'can enable experimental features'() {
+    def 'UnionTypes is no longer experimental'() {
         createFile('api/src/main/conjure/union.yml') << '''
         types:
           definitions:
@@ -447,7 +428,7 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksSuccessfully(':api:compileConjureObjects')
 
         then:
-        result.success
+        result.getStandardOutput().contains("'UnionTypes' are no longer considered experimental and are now enabled by default - please remove this from your build.gradle.")
     }
 
     def 'experimental ErrorTypes feature can be enabled'() {

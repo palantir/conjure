@@ -1,0 +1,6 @@
+type: manualTask
+manualTask:
+  description: >
+    `UnionTypes` are no longer considered experimental and are now always enabled.
+  actions:
+  - Remove `experimentalFeature "UnionTypes"` from your build.gradle files.

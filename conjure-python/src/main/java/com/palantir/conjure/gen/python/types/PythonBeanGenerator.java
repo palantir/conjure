@@ -12,9 +12,7 @@ import com.palantir.conjure.gen.python.poet.PythonClass;
 
 public interface PythonBeanGenerator {
 
-    enum ExperimentalFeatures {
-        UnionTypes
-    }
+    enum ExperimentalFeatures {}
 
     PythonClass generateObject(
             TypesDefinition types,

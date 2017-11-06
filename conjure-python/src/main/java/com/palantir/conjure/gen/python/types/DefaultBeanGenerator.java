@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
@@ -48,9 +47,6 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
         } else if (typeDef instanceof EnumTypeDefinition) {
             return generateObject(packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
-            Preconditions.checkState(enabledExperimentalFeatures.contains(ExperimentalFeatures.UnionTypes),
-                    "Error: %s is an experimental feature of conjure-python that has not been enabled.",
-                    ExperimentalFeatures.UnionTypes);
             return generateObject(types, packageNameProcessor, typeName, (UnionTypeDefinition) typeDef);
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
