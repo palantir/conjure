@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: >
+    Java builder methods now include the same descriptive javadoc as fields on the finished object.
+  link: https://github.palantir.build/foundry/conjure/issues/643

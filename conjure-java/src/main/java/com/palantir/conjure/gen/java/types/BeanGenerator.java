@@ -1,35 +1,25 @@
 /*
- * (c) Copyright 2016 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
  */
 
 package com.palantir.conjure.gen.java.types;
-
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
-import com.palantir.conjure.gen.java.ExperimentalFeatures;
-import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -45,16 +35,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.immutables.value.Value;
 
-public final class BeanGenerator implements TypeGenerator {
+public final class BeanGenerator {
 
-    private final Set<ExperimentalFeatures> enabledExperimentalFeatures;
-    private final Settings settings;
+    private BeanGenerator() {}
 
     /** The maximum number of parameters for which a static factory method is generated in addition to the builder. */
     private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
@@ -62,63 +50,12 @@ public final class BeanGenerator implements TypeGenerator {
     /** The name of the singleton instance field generated for empty objects. */
     private static final String SINGLETON_INSTANCE_NAME = "INSTANCE";
 
-    public BeanGenerator(Settings settings) {
-        this(settings, ImmutableSet.of());
-    }
-
-    public BeanGenerator(Settings settings, Set<ExperimentalFeatures> enabledExperimentalFeatures) {
-        this.settings = settings;
-        this.enabledExperimentalFeatures = ImmutableSet.copyOf(enabledExperimentalFeatures);
-    }
-
-    @Override
-    public JavaFile generateObjectType(
-            TypesDefinition types,
-            Optional<ConjurePackage> defaultPackage,
-            TypeName typeName,
-            BaseObjectTypeDefinition typeDef) {
-        TypeMapper typeMapper = new TypeMapper(types);
-        if (typeDef instanceof ObjectTypeDefinition) {
-            return generateBeanType(typeMapper, defaultPackage, typeName, (ObjectTypeDefinition) typeDef);
-        } else if (typeDef instanceof UnionTypeDefinition) {
-            return UnionGenerator.generateUnionType(
-                    typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
-        } else if (typeDef instanceof EnumTypeDefinition) {
-            return EnumGenerator.generateEnumType(
-                    defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues());
-        } else if (typeDef instanceof AliasTypeDefinition) {
-            return AliasGenerator.generateAliasType(
-                    typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef);
-        }
-        throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
-    }
-
-    @Override
-    public Set<JavaFile> generateErrorTypes(
-            TypesDefinition allTypes,
-            Optional<ConjurePackage> defaultPackage,
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
-        if (errorTypeNameToDef.isEmpty()) {
-            return Collections.emptySet();
-        }
-
-        requireExperimentalFeature(ExperimentalFeatures.ErrorTypes);
-
-        TypeMapper typeMapper = new TypeMapper(allTypes);
-        return ErrorGenerator.generateErrorTypes(typeMapper, defaultPackage, errorTypeNameToDef);
-    }
-
-    private void requireExperimentalFeature(ExperimentalFeatures feature) {
-        if (!enabledExperimentalFeatures.contains(feature)) {
-            throw new ExperimentalFeatureDisabledException(feature);
-        }
-    }
-
-    private JavaFile generateBeanType(
+    public static JavaFile generateBeanType(
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
-            ObjectTypeDefinition typeDef) {
+            ObjectTypeDefinition typeDef,
+            boolean ignoreUnknownProperties) {
 
         ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName objectClass = ClassName.get(typePackage.name(), typeName.name());
@@ -168,7 +105,7 @@ public final class BeanGenerator implements TypeGenerator {
                             .addMember("builder", "$T.class", builderClass).build())
                     .addMethod(createBuilder(builderClass))
                     .addType(BeanBuilderGenerator.generate(
-                            typeMapper, objectClass, builderClass, typeDef, settings.ignoreUnknownProperties()));
+                            typeMapper, objectClass, builderClass, typeDef, ignoreUnknownProperties));
         }
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
@@ -335,7 +272,7 @@ public final class BeanGenerator implements TypeGenerator {
                 .build();
     }
 
-    static String generateGetterName(String fieldName) {
+    public static String generateGetterName(String fieldName) {
         return "get" + StringUtils.capitalize(fieldName);
     }
 
@@ -373,5 +310,4 @@ public final class BeanGenerator implements TypeGenerator {
             return fields.stream().map(EnrichedField::poetSpec).collect(Collectors.toList());
         }
     }
-
 }

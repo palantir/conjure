@@ -22,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public final class BeanGeneratorTests {
+public final class ObjectGeneratorTests {
 
     private static final String REFERENCE_FILES_FOLDER = "src/integrationInput/java";
 
@@ -30,9 +30,9 @@ public final class BeanGeneratorTests {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testBeanGenerator_allExamples() throws IOException {
+    public void testObjectGenerator_allExamples() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
-        List<Path> files = new BeanGenerator(
+        List<Path> files = new ObjectGenerator(
                 Settings.builder().ignoreUnknownProperties(true).build(),
                 ImmutableSet.of())
                 .emit(def, folder.getRoot());
@@ -54,7 +54,7 @@ public final class BeanGeneratorTests {
                         + "          - TWO\n");
 
         ConjureDefinition def = Conjure.parse(conjureFile);
-        List<Path> files = new BeanGenerator(Settings.builder().supportUnknownEnumValues(false).build())
+        List<Path> files = new ObjectGenerator(Settings.builder().supportUnknownEnumValues(false).build())
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);
@@ -65,7 +65,7 @@ public final class BeanGeneratorTests {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
-        BeanGenerator generator = new BeanGenerator(settings);
+        ObjectGenerator generator = new ObjectGenerator(settings);
         generator.emit(conjure, src);
 
         // Generated files contain imports
@@ -81,7 +81,7 @@ public final class BeanGeneratorTests {
     @Test
     public void testConjureErrors() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-errors.yml"));
-        List<Path> files = new BeanGenerator(Settings.standard(), ImmutableSet.of(ExperimentalFeatures.ErrorTypes))
+        List<Path> files = new ObjectGenerator(Settings.standard(), ImmutableSet.of(ExperimentalFeatures.ErrorTypes))
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);

@@ -82,6 +82,7 @@ public final class SetExample {
         return new Builder();
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Set<String> items = new LinkedHashSet<>();

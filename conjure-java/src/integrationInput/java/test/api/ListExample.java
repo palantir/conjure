@@ -93,6 +93,7 @@ public final class ListExample {
         return new Builder();
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private List<String> items = new ArrayList<>();

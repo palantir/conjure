@@ -66,7 +66,7 @@ public final class UnionGenerator {
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
-                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class))
+                .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(UnionGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(fields)
                 .addMethod(generateConstructor(baseClass))

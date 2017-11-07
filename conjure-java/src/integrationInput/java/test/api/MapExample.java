@@ -81,6 +81,7 @@ public final class MapExample {
         return new Builder();
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Map<String, String> items = new LinkedHashMap<>();

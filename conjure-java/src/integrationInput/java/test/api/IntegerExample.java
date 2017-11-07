@@ -55,6 +55,7 @@ public final class IntegerExample {
         return new Builder();
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private int integer;

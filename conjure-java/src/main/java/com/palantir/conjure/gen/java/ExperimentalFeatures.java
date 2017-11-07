@@ -5,7 +5,7 @@
 package com.palantir.conjure.gen.java;
 
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
-import com.palantir.conjure.gen.java.types.BeanGenerator;
+import com.palantir.conjure.gen.java.types.ObjectGenerator;
 
 public enum ExperimentalFeatures {
 
@@ -16,7 +16,7 @@ public enum ExperimentalFeatures {
     RetrofitCompletableFutures,
 
     /**
-     * Enables conjure error types in the {@link BeanGenerator}.
+     * Enables conjure error types in the {@link ObjectGenerator}.
      * YML files defining {@code types.definition.errors} will generate
      * static methods to throw remoting-api compatible ServiceExceptions. */
     ErrorTypes

@@ -80,6 +80,7 @@ public final class OptionalExample {
         return new Builder();
     }
 
+    @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Optional<String> item = Optional.empty();

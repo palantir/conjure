@@ -10,8 +10,8 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
-import com.palantir.conjure.gen.java.types.BeanGenerator;
 import com.palantir.conjure.gen.java.types.ExperimentalFeatureDisabledException;
+import com.palantir.conjure.gen.java.types.ObjectGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
                 .supportUnknownEnumValues(true)
                 .build();
 
-        TypeGenerator generator = new BeanGenerator(settings, experimentalFeatures.get());
+        TypeGenerator generator = new ObjectGenerator(settings, experimentalFeatures.get());
         compileFiles(generator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
 
         GitIgnore.writeGitIgnore(outputDirectory, "*.java\n");

@@ -16,7 +16,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 /** A type which can either be a StringExample, a set of strings, or an integer. */
-@Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
+@Generated("com.palantir.conjure.gen.java.types.UnionGenerator")
 public final class UnionTypeExample {
     private final Base value;
 

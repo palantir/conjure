@@ -82,14 +82,30 @@ types:
           bearertoken: optional<bearertoken>
       ManyFieldExample:
         fields:
-          string: string
-          integer: integer
-          doubleValue: double
-          optionalItem: optional<string>
-          items: list<string>
-          set: set<string>
-          map: map<string, string>
-          alias: StringAliasExample
+          string:
+            type: string
+            docs: docs for string field
+          integer:
+            type: integer
+            docs: docs for integer field
+          doubleValue:
+            type: double
+            docs: docs for doubleValue field
+          optionalItem:
+            type: optional<string>
+            docs: docs for optionalItem field
+          items:
+            type: list<string>
+            docs: docs for items field
+          set:
+            type: set<string>
+            docs: docs for set field
+          map:
+            type: map<string, string>
+            docs: docs for map field
+          alias:
+            type: StringAliasExample
+            docs: docs for alias field
       UnionTypeExample:
         docs: A type which can either be a StringExample, a set of strings, or an integer.
         union:
