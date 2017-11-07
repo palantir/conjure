@@ -21,7 +21,6 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -187,7 +186,7 @@ public final class EnumGenerator {
                 .returns(thisClass)
                 .addAnnotation(JsonCreator.class)
                 .addParameter(param)
-                .addStatement("$1T.requireNonNull($2N, \"$2N cannot be null\")", Objects.class, param)
+                .addStatement("$L", Expressions.requireNonNull(param.name, param.name + " cannot be null"))
                 // uppercase param for backwards compatibility
                 .addStatement("String upperCasedValue = $N.toUpperCase($T.ROOT)", param, Locale.class)
                 .addCode(parser.build())

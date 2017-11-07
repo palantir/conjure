@@ -36,7 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -188,28 +187,29 @@ public final class BeanBuilderGenerator {
     private static CodeBlock typeAwareSet(FieldSpec spec, ConjureType type, boolean shouldClearFirst) {
         if (type instanceof ListType || type instanceof SetType) {
             CodeBlock addStatement = CodeBlocks.statement(
-                    "this.$1N.addAll($2T.requireNonNull($1N, \"$1N cannot be null\"))", spec.name, Objects.class);
+                    "this.$1N.addAll($2L)", spec.name,
+                    Expressions.requireNonNull(spec.name, spec.name + " cannot be null"));
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
         } else if (type instanceof MapType) {
             CodeBlock addStatement = CodeBlocks.statement(
-                    "this.$1N.putAll($2T.requireNonNull($1N, \"$1N cannot be null\"))", spec.name, Objects.class);
+                    "this.$1N.putAll($2L)", spec.name,
+                    Expressions.requireNonNull(spec.name, spec.name + " cannot be null"));
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
         } else if (type instanceof BinaryType) {
             return CodeBlock.builder()
-                    .addStatement("$2T.requireNonNull($1N, \"$1N cannot be null\")", spec.name, Objects.class)
+                    .addStatement("$L", Expressions.requireNonNull(spec.name, spec.name + " cannot be null"))
                     .addStatement("this.$1N = $2T.allocate($1N.remaining()).put($1N.duplicate())",
                             spec.name,
                             ByteBuffer.class)
                     .addStatement("this.$1N.rewind()", spec.name)
                     .build();
-        } else if (spec.type.isPrimitive()) {
-            // primitive type non-nullity already enforced
-            return CodeBlocks.statement("this.$1N = $1N", spec.name);
         } else {
-            return CodeBlocks.statement("this.$1N = $2T.requireNonNull($1N, \"$1N cannot be null\")",
-                    spec.name, Objects.class);
+            CodeBlock nullCheckedValue = spec.type.isPrimitive()
+                    ? CodeBlock.of("$N", spec.name) // primitive types can't be null, so no need for requireNonNull!
+                    : Expressions.requireNonNull(spec.name, spec.name + " cannot be null");
+            return CodeBlocks.statement("this.$1L = $2L", spec.name, nullCheckedValue);
         }
     }
 
@@ -268,8 +268,8 @@ public final class BeanBuilderGenerator {
                     // not special
             }
         }
-        return CodeBlocks.statement("this.$1N = $2T.of($3T.requireNonNull($1N, \"$1N cannot be null\"))",
-                field.name, Optional.class, Objects.class);
+        return CodeBlocks.statement("this.$1N = $2T.of($3L)",
+                field.name, Optional.class, Expressions.requireNonNull(field.name, field.name + " cannot be null"));
     }
 
     private MethodSpec createItemSetter(EnrichedField enriched, ConjureType itemType) {

@@ -22,7 +22,6 @@ public final class UnionTypeExample {
 
     @JsonCreator
     private UnionTypeExample(Base value) {
-        Objects.requireNonNull(value);
         this.value = value;
     }
 
@@ -171,7 +170,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private StringExampleWrapper(@JsonProperty("stringExample") StringExample value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "stringExample cannot be null");
             this.value = value;
         }
 
@@ -214,7 +213,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private SetWrapper(@JsonProperty("set") Set<String> value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "set cannot be null");
             this.value = value;
         }
 
@@ -255,7 +254,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private ThisFieldIsAnIntegerWrapper(@JsonProperty("thisFieldIsAnInteger") int value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "thisFieldIsAnInteger cannot be null");
             this.value = value;
         }
 
@@ -298,7 +297,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private AlsoAnIntegerWrapper(@JsonProperty("alsoAnInteger") int value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "alsoAnInteger cannot be null");
             this.value = value;
         }
 
@@ -341,7 +340,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private IfWrapper(@JsonProperty("if") int value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "if cannot be null");
             this.value = value;
         }
 
@@ -382,7 +381,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private NewWrapper(@JsonProperty("new") int value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "new cannot be null");
             this.value = value;
         }
 
@@ -423,7 +422,7 @@ public final class UnionTypeExample {
 
         @JsonCreator
         private InterfaceWrapper(@JsonProperty("interface") int value) {
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(value, "interface cannot be null");
             this.value = value;
         }
 
@@ -476,8 +475,8 @@ public final class UnionTypeExample {
         }
 
         private UnknownWrapper(String type, Map<String, Object> value) {
-            Objects.requireNonNull(type);
-            Objects.requireNonNull(value);
+            Objects.requireNonNull(type, "type cannot be null");
+            Objects.requireNonNull(value, "value cannot be null");
             this.type = type;
             this.value = value;
         }

@@ -97,7 +97,7 @@ public final class UnionGenerator {
                 .addModifiers(Modifier.PRIVATE)
                 .addAnnotation(AnnotationSpec.builder(JsonCreator.class).build())
                 .addParameter(baseClass, VALUE_FIELD_NAME)
-                .addStatement("$L", Expressions.staticMethodCall(Objects.class, "requireNonNull", VALUE_FIELD_NAME))
+                // no null check because this constructor is private and is only called by nice factory methods
                 .addStatement("this.$1L = $1L", VALUE_FIELD_NAME)
                 .build();
     }
@@ -261,8 +261,8 @@ public final class UnionGenerator {
                             .addParameter(ParameterSpec.builder(memberType, VALUE_FIELD_NAME)
                                     .addAnnotation(jsonPropertyAnnotation)
                                     .build())
-                            .addStatement("$L",
-                                    Expressions.staticMethodCall(Objects.class, "requireNonNull", VALUE_FIELD_NAME))
+                            .addStatement("$L", Expressions.requireNonNull(VALUE_FIELD_NAME,
+                                    String.format("%s cannot be null", memberName.name())))
                             .addStatement("this.$1L = $1L", VALUE_FIELD_NAME)
                             .build())
                     .addMethod(MethodSpec.methodBuilder("getValue")
@@ -311,10 +311,9 @@ public final class UnionGenerator {
                         .addModifiers(Modifier.PRIVATE)
                         .addParameter(typeParameter)
                         .addParameter(ParameterSpec.builder(genericMapType, VALUE_FIELD_NAME).build())
-                        .addStatement("$L",
-                                Expressions.staticMethodCall(Objects.class, "requireNonNull", typeParameter))
-                        .addStatement("$L",
-                                Expressions.staticMethodCall(Objects.class, "requireNonNull", VALUE_FIELD_NAME))
+                        .addStatement("$L", Expressions.requireNonNull(typeParameter.name, "type cannot be null"))
+                        .addStatement("$L", Expressions.requireNonNull(VALUE_FIELD_NAME,
+                                String.format("%s cannot be null", VALUE_FIELD_NAME)))
                         .addStatement("this.$1N = $1N", typeParameter)
                         .addStatement("this.$1L = $1L", VALUE_FIELD_NAME)
                         .build())
