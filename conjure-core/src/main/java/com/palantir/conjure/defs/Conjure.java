@@ -76,7 +76,7 @@ public final class Conjure {
                 ObjectsDefinition importedObjects = importedConjure.types().definitions();
                 parsedImports.put(namespace, ImportedTypes.withResolvedImports(importedFile, importedObjects));
             } catch (RuntimeException e) {
-                throw new RuntimeException("Failed to open imported Conjure definition: " + importedFile, e);
+                throw new RuntimeException("Failed to import '" + importedFile + "': " + e.getMessage(), e);
             }
         }
         return parsedImports;

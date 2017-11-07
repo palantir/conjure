@@ -474,6 +474,48 @@ class ConjurePluginTest extends IntegrationSpec {
         result.success
     }
 
+    def 'descriptive error message for bad external-import'() {
+        file('api/build.gradle').text = '''
+        apply plugin: 'com.palantir.conjure'
+
+        conjure {
+            conjureImports files('external-import.yml')
+        }
+        '''.stripIndent()
+
+        createFile('api/src/main/conjure/conjure.yml') << '''
+        types:
+          conjure-imports:
+            externalImport: external-imports/external-import.yml
+          definitions:
+            default-package: test.api.default
+
+        services: {}
+        '''.stripIndent()
+
+        createFile('api/external-import.yml') << '''
+        types:
+          definitions:
+            default-package: test.api.external
+            objects: {}
+        services:
+          ExternalService:
+            name: External Service
+            package: test.api.external
+            endpoints:
+              post:
+                http: POST/brokenhttpline
+        '''.stripIndent()
+
+        when:
+        ExecutionResult result = runTasksWithFailure(':api:compileConjure')
+
+        then:
+        result.getStandardError().contains("Failed to import 'external-imports/external-import.yml': " +
+                "com.fasterxml.jackson.databind.JsonMappingException: " +
+                "Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
+    }
+
     @Unroll
     def 'runs on version of gradle: #version'() {
         when:

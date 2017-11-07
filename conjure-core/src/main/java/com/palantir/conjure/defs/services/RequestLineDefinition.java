@@ -49,7 +49,9 @@ public interface RequestLineDefinition {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 String[] parts = candidate.split(" ", 2);
-                checkArgument(parts.length == 2, "Request line must be of the form: [METHOD] [PATH]");
+                checkArgument(parts.length == 2,
+                        "Request line must be of the form: [METHOD] [PATH], instead was '%s'",
+                        candidate);
                 return of(parts[0], PathDefinition.of(parts[1]));
             }
 
