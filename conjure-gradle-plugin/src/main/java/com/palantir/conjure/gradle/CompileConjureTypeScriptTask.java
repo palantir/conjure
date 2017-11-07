@@ -6,7 +6,6 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.ConjureTypeScriptClientGenerator;
@@ -14,7 +13,6 @@ import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,8 +59,7 @@ public class CompileConjureTypeScriptTask extends SourceTask {
                 "Unable to make directory tree %s", nodeModulesOutputDirectory);
 
         compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()), outputDirectory);
-        // write a gitignore to prevent the generated files ending up in source control
-        Files.write("*.ts\npackage.json\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+        GitIgnore.writeGitIgnore(outputDirectory, "*.ts\npackage.json\n");
 
         // make all generated code available for later compilation
         compileFiles(getSource().getFiles(), nodeModulesOutputDirectory);

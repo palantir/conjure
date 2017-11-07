@@ -6,13 +6,11 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -43,8 +41,7 @@ public class CompileConjureJavaServiceTask extends SourceTask {
                 "Unable to make directory tree %s", outputDirectory);
 
         compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()));
-        // write a gitignore to prevent the generated files ending up in source control
-        Files.write("*.java\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+        GitIgnore.writeGitIgnore(outputDirectory, "*.java\n");
     }
 
     private void compileFiles(Collection<File> files) {

@@ -6,7 +6,6 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.python.ConjurePythonGenerator;
@@ -16,7 +15,6 @@ import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
@@ -62,8 +60,7 @@ public class CompileConjurePythonTask extends SourceTask {
         PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
 
         compileFiles(beanGenerator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
-        // write a gitignore to prevent the generated files ending up in source control
-        Files.write("*.py\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+        GitIgnore.writeGitIgnore(outputDirectory, "*.py\n");
     }
 
     private void compileFiles(PythonBeanGenerator beanGenerator, Collection<File> files) {

@@ -104,7 +104,7 @@ public final class BeanGeneratorTests {
     private File writeToTempFile(String content) {
         try {
             File file = folder.newFile();
-            com.google.common.io.Files.write(content, file, StandardCharsets.UTF_8);
+            Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
             return file;
         } catch (IOException e) {
             throw new RuntimeException(e);

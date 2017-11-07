@@ -6,7 +6,6 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.io.Files;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
@@ -16,7 +15,6 @@ import com.palantir.conjure.gen.java.types.ExperimentalFeatureDisabledException;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
@@ -59,8 +57,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
         TypeGenerator generator = new BeanGenerator(settings, experimentalFeatures.get());
         compileFiles(generator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
 
-        // write a gitignore to prevent the generated files ending up in source control
-        Files.write("*.java\n", new File(outputDirectory, ".gitignore"), StandardCharsets.UTF_8);
+        GitIgnore.writeGitIgnore(outputDirectory, "*.java\n");
     }
 
     private void compileFiles(TypeGenerator generator, Collection<File> files) {

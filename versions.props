@@ -1,7 +1,7 @@
 com.fasterxml.jackson.*:jackson-* = 2.7.4
 com.fasterxml.jackson.datatype:jackson-datatype-jdk7 = 2.6.7
-com.google.googlejavaformat:google-java-format = 1.4
-com.google.guava:guava = 19.0
+com.google.googlejavaformat:google-java-format = 1.5
+com.google.guava:guava = 22.0
 com.netflix.nebula:nebula-test = 6.1.2
 com.palantir.baseline:* = 0.17.1
 com.palantir.remoting3:jackson-support = 3.7.0
@@ -11,7 +11,7 @@ com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 3.0.1
 com.squareup.okhttp3:* = 3.9.0
 com.squareup:javapoet = 1.9.0
-commons-io:commons-io = 2.5
+commons-io:commons-io = 2.6
 junit:junit = 4.12
 org.apache.commons:commons-lang3 = 3.6
 org.assertj:* = 3.8.0
@@ -24,3 +24,4 @@ com.google.errorprone:error_prone_annotations = 2.1.2
 
 # Resolve conflicts
 javax.ws.rs:javax.ws.rs-api = 2.1
+com.google.code.findbugs:jsr305 = 3.0.1
