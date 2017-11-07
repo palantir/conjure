@@ -4,6 +4,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.palantir.ri:resource-identifier'
     compile 'com.palantir.tokens:auth-tokens'
+    compile 'com.palantir.remoting-api:errors'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'

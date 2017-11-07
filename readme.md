@@ -754,6 +754,7 @@ dependencies, which are included automatically in appropriate projects:
  * `com.palantir.conjure:conjure-java-lib`
  * `com.squareup.retrofit2:retrofit`
  * `javax.ws.rs:javax.ws.rs-api`
+ * `com.palantir.remoting-api:errors`
 
 Common strategies for specifying versions include:
 
@@ -767,6 +768,7 @@ Common strategies for specifying versions include:
                force 'com.palantir.conjure:conjure-java-lib:0.31.0'
                force 'com.squareup.retrofit2:retrofit:2.2.0'
                force 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+               force 'com.palantir.remoting-api:errors:1.3.0'
            }
        }
    }

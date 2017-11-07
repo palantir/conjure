@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: >
+    Generated `:foo-api-objects` projects now depend on
+    `com.palantir.remoting-api:errors` so should compile out of the box.
+  links:
+  - https://github.palantir.build/foundry/conjure/issues/634

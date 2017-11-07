@@ -35,9 +35,6 @@ dependencies {
     testCompile 'org.mockito:mockito-core'
 
     integrationInputCompile project(':conjure-java-lib')
-    integrationInputCompile 'com.fasterxml.jackson.core:jackson-databind'
-    integrationInputCompile 'com.google.guava:guava'
-    integrationInputCompile 'com.palantir.remoting-api:errors'
 
     processor 'org.immutables:value'
 }
