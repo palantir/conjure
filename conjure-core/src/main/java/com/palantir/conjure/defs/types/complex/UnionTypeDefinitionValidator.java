@@ -30,7 +30,7 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
         @Override
         public void validate(UnionTypeDefinition definition) {
             definition.union().keySet().forEach(key -> {
-                Preconditions.checkArgument(!key.endsWith("_"),
+                Preconditions.checkArgument(!key.name().endsWith("_"),
                         "Union member key must not end with an underscore: %s", key);
             });
         }
@@ -55,8 +55,8 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
         @Override
         public void validate(UnionTypeDefinition definition) {
             definition.union().keySet().forEach(key -> {
-                        Preconditions.checkArgument(!key.isEmpty(), "Union member key must not be empty");
-                        Preconditions.checkArgument(isValidJavaIdentifier(key),
+                        Preconditions.checkArgument(!key.name().isEmpty(), "Union member key must not be empty");
+                        Preconditions.checkArgument(isValidJavaIdentifier(key.name()),
                                 "Union member key must be a valid Java identifier: %s", key);
                     }
             );

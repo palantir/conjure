@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.names.FieldName;
 import java.io.IOException;
 import java.util.Map;
 import org.immutables.value.Value;
@@ -18,7 +19,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
 
-    Map<String, UnionMemberTypeDefinition> union();
+    Map<FieldName, UnionMemberTypeDefinition> union();
 
     @Value.Check
     default void check() {

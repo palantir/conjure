@@ -51,7 +51,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 
 public final class DefaultTypeGenerator implements TypeGenerator {
 
@@ -191,11 +190,11 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         TypescriptType mainType = TypescriptSimpleType.builder().name(mainName).build();
 
         baseTypeDef.union().forEach((memberName, memberType) -> {
-            String capitalizedMemberName = StringUtils.capitalize(memberName);
+            String capitalizedMemberName = memberName.capitalize();
             String interfaceName = String.format("%s_%s", mainName, capitalizedMemberName);
             String typeGuardName = String.format("is%s", capitalizedMemberName);
             TypescriptSimpleType interfaceType = TypescriptSimpleType.builder().name(interfaceName).build();
-            StringExpression quotedMemberName = StringExpression.of(memberName);
+            StringExpression quotedMemberName = StringExpression.of(memberName.name());
             ConjureType conjureTypeOfMemberType = memberType.type();
             TypescriptSimpleType typescriptMemberType = mapper.getTypescriptType(conjureTypeOfMemberType);
             referencedTypes.add(conjureTypeOfMemberType);
@@ -208,7 +207,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .typescriptType(TypescriptSimpleType.builder().name(quotedMemberName.emitToString()).build())
                     .build());
             propertySignatures.add(TypescriptFieldSignature.builder()
-                    .name(memberName)
+                    .name(memberName.name())
                     .typescriptType(typescriptMemberType)
                     .build());
             subInterfaces.add(TypescriptInterface.builder()
@@ -244,7 +243,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             helperFunctionProps.put(typeGuardName, RawExpression.of(typeGuardName));
 
             // build factory function
-            String sanitizedMemberName = TypescriptKeywords.isKeyword(memberName) ? memberName + "_" : memberName;
+            String sanitizedMemberName =
+                    TypescriptKeywords.isKeyword(memberName.name()) ? memberName.name() + "_" : memberName.name();
             TypescriptFunctionSignature factorySignature = TypescriptFunctionSignature.builder()
                     .addParameters(TypescriptTypeSignature.builder()
                             .name(sanitizedMemberName)
@@ -256,8 +256,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
                     .addStatements(ReturnStatement.builder()
                             .expression(JsonExpression.builder()
-                                    .putKeyValues("type", StringExpression.of(memberName))
-                                    .putKeyValues(memberName, RawExpression.of(sanitizedMemberName))
+                                    .putKeyValues("type", StringExpression.of(memberName.name()))
+                                    .putKeyValues(memberName.name(), RawExpression.of(sanitizedMemberName))
                                     .build())
                             .build())
                     .build();
@@ -266,7 +266,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .functionBody(factoryBody)
                     .isMethod(false)
                     .build());
-            helperFunctionProps.put(memberName, RawExpression.of(sanitizedMemberName));
+            helperFunctionProps.put(memberName.name(), RawExpression.of(sanitizedMemberName));
         });
 
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,

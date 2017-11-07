@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,5 +129,13 @@ public abstract class FieldName {
     /** Converts this {@link FieldName} to a {@link FieldName} with the given case. */
     public final FieldName toCase(Case targetCase) {
         return FieldName.of(nameCase().convertTo(this, targetCase));
+    }
+
+    /**
+     * Converts this {@link FieldName} to an upper camel case string (e.g. myVariant -> MyVariant).
+     * Note that the resultant string is no longer a valid {@link FieldName}.
+     */
+    public final String capitalize() {
+        return StringUtils.capitalize(name());
     }
 }

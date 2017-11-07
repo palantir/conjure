@@ -70,4 +70,15 @@ public final class FieldNameTest {
         assertThat(snakeCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
         assertThat(snakeCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
     }
+
+    @Test
+    public void capitalize_should_turn_camel_case_into_sensible_class_name() throws Exception {
+        assertThat(FieldName.of("myVariant").capitalize()).isEqualTo("MyVariant");
+    }
+
+    @Test
+    public void capitalize_capture_unused_behavior() throws Exception {
+        assertThat(FieldName.of("my-variant").capitalize()).isEqualTo("My-variant");
+        assertThat(FieldName.of("my_variant").capitalize()).isEqualTo("My_variant");
+    }
 }

@@ -61,20 +61,20 @@ public final class UnionTypeExample {
     }
 
     public <T> T accept(Visitor<T> visitor) {
-        if (value instanceof NewWrapper) {
-            return visitor.visitNew(((NewWrapper) value).value);
-        } else if (value instanceof AlsoAnIntegerWrapper) {
-            return visitor.visitAlsoAnInteger(((AlsoAnIntegerWrapper) value).value);
+        if (value instanceof StringExampleWrapper) {
+            return visitor.visitStringExample(((StringExampleWrapper) value).value);
         } else if (value instanceof SetWrapper) {
             return visitor.visitSet(((SetWrapper) value).value);
         } else if (value instanceof ThisFieldIsAnIntegerWrapper) {
             return visitor.visitThisFieldIsAnInteger(((ThisFieldIsAnIntegerWrapper) value).value);
-        } else if (value instanceof StringExampleWrapper) {
-            return visitor.visitStringExample(((StringExampleWrapper) value).value);
-        } else if (value instanceof InterfaceWrapper) {
-            return visitor.visitInterface(((InterfaceWrapper) value).value);
+        } else if (value instanceof AlsoAnIntegerWrapper) {
+            return visitor.visitAlsoAnInteger(((AlsoAnIntegerWrapper) value).value);
         } else if (value instanceof IfWrapper) {
             return visitor.visitIf(((IfWrapper) value).value);
+        } else if (value instanceof NewWrapper) {
+            return visitor.visitNew(((NewWrapper) value).value);
+        } else if (value instanceof InterfaceWrapper) {
+            return visitor.visitInterface(((InterfaceWrapper) value).value);
         } else if (value instanceof UnknownWrapper) {
             return visitor.visitUnknown(((UnknownWrapper) value).getType());
         }
@@ -86,27 +86,27 @@ public final class UnionTypeExample {
     public boolean equals(Object other) {
         return this == other
                 || (other instanceof UnionTypeExample && equalTo((UnionTypeExample) other))
-                || (other instanceof Integer
-                        && value instanceof NewWrapper
-                        && Objects.equals(((NewWrapper) value).value, other))
-                || (other instanceof Integer
-                        && value instanceof AlsoAnIntegerWrapper
-                        && Objects.equals(((AlsoAnIntegerWrapper) value).value, other))
+                || (other instanceof StringExample
+                        && value instanceof StringExampleWrapper
+                        && Objects.equals(((StringExampleWrapper) value).value, other))
                 || (other instanceof Set
                         && value instanceof SetWrapper
                         && Objects.equals(((SetWrapper) value).value, other))
                 || (other instanceof Integer
                         && value instanceof ThisFieldIsAnIntegerWrapper
                         && Objects.equals(((ThisFieldIsAnIntegerWrapper) value).value, other))
-                || (other instanceof StringExample
-                        && value instanceof StringExampleWrapper
-                        && Objects.equals(((StringExampleWrapper) value).value, other))
                 || (other instanceof Integer
-                        && value instanceof InterfaceWrapper
-                        && Objects.equals(((InterfaceWrapper) value).value, other))
+                        && value instanceof AlsoAnIntegerWrapper
+                        && Objects.equals(((AlsoAnIntegerWrapper) value).value, other))
                 || (other instanceof Integer
                         && value instanceof IfWrapper
-                        && Objects.equals(((IfWrapper) value).value, other));
+                        && Objects.equals(((IfWrapper) value).value, other))
+                || (other instanceof Integer
+                        && value instanceof NewWrapper
+                        && Objects.equals(((NewWrapper) value).value, other))
+                || (other instanceof Integer
+                        && value instanceof InterfaceWrapper
+                        && Objects.equals(((InterfaceWrapper) value).value, other));
     }
 
     private boolean equalTo(UnionTypeExample other) {
@@ -130,19 +130,19 @@ public final class UnionTypeExample {
     }
 
     public interface Visitor<T> {
-        T visitNew(int value);
-
-        T visitAlsoAnInteger(int value);
+        T visitStringExample(StringExample value);
 
         T visitSet(Set<String> value);
 
         T visitThisFieldIsAnInteger(int value);
 
-        T visitStringExample(StringExample value);
-
-        T visitInterface(int value);
+        T visitAlsoAnInteger(int value);
 
         T visitIf(int value);
+
+        T visitNew(int value);
+
+        T visitInterface(int value);
 
         T visitUnknown(String unknownType);
     }
@@ -154,13 +154,13 @@ public final class UnionTypeExample {
         defaultImpl = UnknownWrapper.class
     )
     @JsonSubTypes({
-        @JsonSubTypes.Type(NewWrapper.class),
-        @JsonSubTypes.Type(AlsoAnIntegerWrapper.class),
+        @JsonSubTypes.Type(StringExampleWrapper.class),
         @JsonSubTypes.Type(SetWrapper.class),
         @JsonSubTypes.Type(ThisFieldIsAnIntegerWrapper.class),
-        @JsonSubTypes.Type(StringExampleWrapper.class),
-        @JsonSubTypes.Type(InterfaceWrapper.class),
-        @JsonSubTypes.Type(IfWrapper.class)
+        @JsonSubTypes.Type(AlsoAnIntegerWrapper.class),
+        @JsonSubTypes.Type(IfWrapper.class),
+        @JsonSubTypes.Type(NewWrapper.class),
+        @JsonSubTypes.Type(InterfaceWrapper.class)
     })
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Base {}

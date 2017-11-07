@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.defs.types.names.FieldName;
 import org.junit.Test;
 
 public final class UnionTypeDefinitionTest {
@@ -18,26 +19,27 @@ public final class UnionTypeDefinitionTest {
     public void testUnionMemberKeyMustNotBeEmpty() throws Exception {
         assertThatThrownBy(() ->
                 UnionTypeDefinition.builder()
-                        .putUnion("", MEMBER)
+                        .putUnion(FieldName.of(""), MEMBER)
                         .build())
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Union member key must not be empty");
+                .hasMessageStartingWith("FieldName \"\" must follow one of the following patterns");
     }
 
     @Test
     public void testUnionMemberKeyMustNotBeIllegalJavaIdentifier() throws Exception {
         ImmutableList.of("%foo", "foo@").forEach(key -> assertThatThrownBy(() ->
                 UnionTypeDefinition.builder()
-                        .putUnion(key, MEMBER)
+                        .putUnion(FieldName.of(key), MEMBER)
                         .build())
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Union member key must be a valid Java identifier: %s", key));
+                .hasMessageStartingWith(
+                        String.format("FieldName \"%s\" must follow one of the following patterns", key)));
     }
 
     @Test
     public void testUnionMemberKeyMustNotHaveTrailingUnderscore() throws Exception {
-        assertThatThrownBy(UnionTypeDefinition.builder().putUnion("foo_", MEMBER)::build)
+        assertThatThrownBy(() -> UnionTypeDefinition.builder().putUnion(FieldName.of("foo_"), MEMBER).build())
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Union member key must not end with an underscore: foo_");
+            .hasMessageStartingWith("FieldName \"foo_\" must follow one of the following patterns");
     }
 }
