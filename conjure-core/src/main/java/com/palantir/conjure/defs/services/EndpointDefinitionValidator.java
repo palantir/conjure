@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.ws.rs.HttpMethod;
 
+@com.google.errorprone.annotations.Immutable
 public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefinition> {
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
@@ -41,6 +42,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         validator.validate(definition);
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class NonBodyArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
         private static final ImmutableSet<Class<? extends ConjureType>> ILLEGAL_NON_BODY_ARG_TYPES
                 = ImmutableSet.of(BinaryType.class);
@@ -65,6 +67,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class SingleBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
@@ -80,6 +83,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class NoGetBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
@@ -96,6 +100,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
@@ -120,6 +125,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class ParameterNameValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
@@ -133,6 +139,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {

@@ -47,7 +47,7 @@ public enum PrimitiveType implements LocalReferenceType {
 
     @Override
     public <T> T visit(ConjureTypeVisitor<T> visitor) {
-        return visitor.visit(this);
+        return visitor.visitPrimitive(this);
     }
 
     @JsonCreator

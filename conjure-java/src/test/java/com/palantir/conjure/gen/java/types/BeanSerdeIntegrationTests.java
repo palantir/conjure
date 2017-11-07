@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palantir.remoting2.ext.jackson.ObjectMappers;
+import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,7 +25,7 @@ public final class BeanSerdeIntegrationTests {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private static final ObjectMapper mapper = ObjectMappers.guavaJdk7Jdk8();
+    private static final ObjectMapper mapper = ObjectMappers.newServerObjectMapper();
 
     @Test
     public void testSetExampleSerde() throws Exception {

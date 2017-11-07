@@ -19,7 +19,7 @@ public interface ListType extends ConjureType {
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
-        return visitor.visit(this);
+        return visitor.visitList(this);
     }
 
     static ListType of(ConjureType itemType) {

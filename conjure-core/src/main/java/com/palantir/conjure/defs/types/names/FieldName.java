@@ -94,6 +94,7 @@ public abstract class FieldName {
     public abstract String name();
 
     @Value.Check
+    @SuppressWarnings("Slf4jLogsafeArgs")
     protected final void check() {
         Preconditions.checkArgument(
                 Case.LOWER_CAMEL_CASE.pattern.matcher(name()).matches()

@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.ConjureValidator;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+@com.google.errorprone.annotations.Immutable
 public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefinition> {
     UNIQUE_PATH_METHODS(new UniquePathMethodsValidator());
 
@@ -28,6 +29,7 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     // The ? is for reluctant matching, i.e. matching as few characters as possible.
     private static final Pattern PATHVAR_PATTERN = Pattern.compile(Pattern.quote("{") + ".+?" + Pattern.quote("}"));
 
+    @com.google.errorprone.annotations.Immutable
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
         @Override
         public void validate(ServiceDefinition definition) {

@@ -16,6 +16,7 @@ import org.immutables.value.Value;
 /**
  * Represents the name of a conjure {@link ObjectsDefinition#objects() object}.
  */
+@com.google.errorprone.annotations.Immutable
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class TypeName {

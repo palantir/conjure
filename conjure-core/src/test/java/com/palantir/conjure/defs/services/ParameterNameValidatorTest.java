@@ -15,6 +15,7 @@ import org.junit.Test;
 public final class ParameterNameValidatorTest {
 
     @Test
+    @SuppressWarnings("CheckReturnValue")
     public void testValid() {
         for (String parameterName : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234")) {
             EndpointDefinition.Builder endpoint = createEndpoint(parameterName);

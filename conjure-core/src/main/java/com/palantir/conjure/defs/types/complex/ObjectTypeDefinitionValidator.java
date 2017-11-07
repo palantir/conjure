@@ -6,6 +6,7 @@ package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureValidator;
 
+@com.google.errorprone.annotations.Immutable
 public enum ObjectTypeDefinitionValidator implements ConjureValidator<ObjectTypeDefinition> {
     UNIQUE_FIELD_NAMES(definition -> {
         UniqueFieldNamesValidator uniqueFieldNamesValidator = new UniqueFieldNamesValidator(ObjectTypeDefinition.class);

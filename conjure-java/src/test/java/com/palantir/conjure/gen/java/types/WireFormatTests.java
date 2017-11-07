@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import com.palantir.remoting2.ext.jackson.ObjectMappers;
+import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import java.nio.ByteBuffer;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -34,7 +34,7 @@ import test.api.UnionTypeExample;
 
 public final class WireFormatTests {
 
-    private final ObjectMapper mapper = ObjectMappers.guavaJdk7Jdk8();
+    private final ObjectMapper mapper = ObjectMappers.newServerObjectMapper();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

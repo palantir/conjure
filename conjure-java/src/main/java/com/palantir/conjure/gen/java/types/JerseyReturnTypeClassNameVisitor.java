@@ -27,53 +27,53 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
     }
 
     @Override
-    public TypeName visit(AnyType type) {
-        return delegate.visit(type);
+    public TypeName visitAny(AnyType type) {
+        return delegate.visitAny(type);
     }
 
     @Override
-    public TypeName visit(ListType type) {
-        return delegate.visit(type);
+    public TypeName visitList(ListType type) {
+        return delegate.visitList(type);
     }
 
     @Override
-    public TypeName visit(MapType type) {
-        return delegate.visit(type);
+    public TypeName visitMap(MapType type) {
+        return delegate.visitMap(type);
     }
 
     @Override
-    public TypeName visit(OptionalType type) {
-        return delegate.visit(type);
+    public TypeName visitOptional(OptionalType type) {
+        return delegate.visitOptional(type);
     }
 
     @Override
-    public TypeName visit(PrimitiveType type) {
-        return delegate.visit(type);
+    public TypeName visitPrimitive(PrimitiveType type) {
+        return delegate.visitPrimitive(type);
     }
 
     @Override
-    public TypeName visit(LocalReferenceType type) {
-        return delegate.visit(type);
+    public TypeName visitLocalReference(LocalReferenceType type) {
+        return delegate.visitLocalReference(type);
     }
 
     @Override
-    public TypeName visit(ForeignReferenceType type) {
-        return delegate.visit(type);
+    public TypeName visitForeignReference(ForeignReferenceType type) {
+        return delegate.visitForeignReference(type);
     }
 
     @Override
-    public TypeName visit(SetType type) {
-        return delegate.visit(type);
+    public TypeName visitSet(SetType type) {
+        return delegate.visitSet(type);
     }
 
     @Override
-    public TypeName visit(BinaryType type) {
+    public TypeName visitBinary(BinaryType type) {
         return ClassName.get(javax.ws.rs.core.StreamingOutput.class);
     }
 
     @Override
-    public TypeName visit(DateTimeType type) {
-        return delegate.visit(type);
+    public TypeName visitDateTime(DateTimeType type) {
+        return delegate.visitDateTime(type);
     }
 
 }

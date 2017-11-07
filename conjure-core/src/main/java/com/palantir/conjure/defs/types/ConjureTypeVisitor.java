@@ -16,14 +16,14 @@ import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 public interface ConjureTypeVisitor<T> {
-    T visit(AnyType type);
-    T visit(ListType type);
-    T visit(MapType type);
-    T visit(OptionalType type);
-    T visit(PrimitiveType type);
-    T visit(LocalReferenceType type);
-    T visit(ForeignReferenceType type);
-    T visit(SetType type);
-    T visit(BinaryType type);
-    T visit(DateTimeType type);
+    T visitAny(AnyType type);
+    T visitList(ListType type);
+    T visitMap(MapType type);
+    T visitOptional(OptionalType type);
+    T visitPrimitive(PrimitiveType type);
+    T visitLocalReference(LocalReferenceType type);
+    T visitForeignReference(ForeignReferenceType type);
+    T visitSet(SetType type);
+    T visitBinary(BinaryType type);
+    T visitDateTime(DateTimeType type);
 }

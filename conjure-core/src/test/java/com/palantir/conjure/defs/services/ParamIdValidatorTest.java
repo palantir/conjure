@@ -19,6 +19,7 @@ public final class ParamIdValidatorTest {
     private static final ParameterName PARAMETER_NAME = ParameterName.of("arg");
 
     @Test
+    @SuppressWarnings("CheckReturnValue")
     public void testValidNonHeader() {
         for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234")) {
             EndpointDefinition.Builder endpoint = createEndpoint(ArgumentDefinition.ParamType.BODY, paramId);
@@ -28,6 +29,7 @@ public final class ParamIdValidatorTest {
     }
 
     @Test
+    @SuppressWarnings("CheckReturnValue")
     public void testValidHeader() {
         List<String> paramIds = ImmutableList.of(
                 HttpHeaders.AUTHORIZATION,

@@ -17,7 +17,7 @@ public interface BinaryType extends ConjureType {
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
-        return visitor.visit(this);
+        return visitor.visitBinary(this);
     }
 
     static BinaryType of() {

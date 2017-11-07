@@ -15,7 +15,7 @@ public interface DateTimeType extends ConjureType {
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
-        return visitor.visit(this);
+        return visitor.visitDateTime(this);
     }
 
     // marker interface

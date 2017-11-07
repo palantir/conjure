@@ -47,25 +47,25 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(AnyType type) {
+    public TypeName visitAny(AnyType type) {
         return ClassName.get(Object.class);
     }
 
     @Override
-    public TypeName visit(ListType type) {
+    public TypeName visitList(ListType type) {
         TypeName itemType = type.itemType().visit(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
     }
 
     @Override
-    public TypeName visit(MapType type) {
+    public TypeName visitMap(MapType type) {
         return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
                 type.keyType().visit(this).box(),
                 type.valueType().visit(this).box());
     }
 
     @Override
-    public TypeName visit(OptionalType type) {
+    public TypeName visitOptional(OptionalType type) {
         if (type.itemType() instanceof PrimitiveType) {
             // special handling for primitive optionals with Java 8
             switch ((PrimitiveType) type.itemType()) {
@@ -93,7 +93,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(PrimitiveType type) {
+    public TypeName visitPrimitive(PrimitiveType type) {
         switch (type) {
             case STRING:
                 return ClassName.get(String.class);
@@ -115,7 +115,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(LocalReferenceType type) {
+    public TypeName visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
         BaseObjectTypeDefinition baseType = types.definitions().objects().get(type.type());
         if (baseType != null) {
@@ -130,25 +130,25 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
-    public TypeName visit(ForeignReferenceType type) {
+    public TypeName visitForeignReference(ForeignReferenceType type) {
         return ClassName.get(
                 types.getImportsForRefNameSpace(type).getPackageForImportedType(type).name(),
                 type.type().name());
     }
 
     @Override
-    public TypeName visit(SetType type) {
+    public TypeName visitSet(SetType type) {
         TypeName itemType = type.itemType().visit(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
     }
 
     @Override
-    public TypeName visit(BinaryType type) {
+    public TypeName visitBinary(BinaryType type) {
         return ClassName.get(ByteBuffer.class);
     }
 
     @Override
-    public TypeName visit(DateTimeType type) {
+    public TypeName visitDateTime(DateTimeType type) {
         return ClassName.get(ZonedDateTime.class);
     }
 }

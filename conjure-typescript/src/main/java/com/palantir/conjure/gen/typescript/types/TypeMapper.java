@@ -78,59 +78,59 @@ public final class TypeMapper {
         }
 
         @Override
-        public Void visit(AnyType type) {
+        public Void visitAny(AnyType type) {
             return null;
         }
 
         @Override
-        public Void visit(ListType type) {
+        public Void visitList(ListType type) {
             stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(MapType type) {
+        public Void visitMap(MapType type) {
             stack.add(type.keyType());
             stack.add(type.valueType());
             return null;
         }
 
         @Override
-        public Void visit(OptionalType type) {
+        public Void visitOptional(OptionalType type) {
             stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(PrimitiveType type) {
+        public Void visitPrimitive(PrimitiveType type) {
             return null;
         }
 
         @Override
-        public Void visit(LocalReferenceType type) {
+        public Void visitLocalReference(LocalReferenceType type) {
             result.add(type);
             return null;
         }
 
         @Override
-        public Void visit(ForeignReferenceType type) {
+        public Void visitForeignReference(ForeignReferenceType type) {
             result.add(type);
             return null;
         }
 
         @Override
-        public Void visit(SetType type) {
+        public Void visitSet(SetType type) {
             stack.add(type.itemType());
             return null;
         }
 
         @Override
-        public Void visit(BinaryType type) {
+        public Void visitBinary(BinaryType type) {
             return null;
         }
 
         @Override
-        public Void visit(DateTimeType type) {
+        public Void visitDateTime(DateTimeType type) {
             return null;
         }
 
@@ -143,7 +143,7 @@ public final class TypeMapper {
 
     private class ContainingPackageVisitor implements ThrowingConjureTypeVisitor<Optional<ConjurePackage>> {
         @Override
-        public Optional<ConjurePackage> visit(LocalReferenceType type) {
+        public Optional<ConjurePackage> visitLocalReference(LocalReferenceType type) {
             BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
             if (defType != null) {
                 if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
@@ -159,7 +159,7 @@ public final class TypeMapper {
         }
 
         @Override
-        public Optional<ConjurePackage> visit(ForeignReferenceType type) {
+        public Optional<ConjurePackage> visitForeignReference(ForeignReferenceType type) {
             return Optional.of(types.getImportsForRefNameSpace(type).getPackageForImportedType(type));
         }
     }
@@ -167,29 +167,29 @@ public final class TypeMapper {
     private class TypeNameVisitor implements ConjureTypeVisitor<String> {
 
         @Override
-        public String visit(AnyType type) {
+        public String visitAny(AnyType type) {
             return "any";
         }
 
         @Override
-        public String visit(ListType type) {
+        public String visitList(ListType type) {
             return getTypeNameFromConjureType(type.itemType()) + "[]";
         }
 
         @Override
-        public String visit(MapType type) {
+        public String visitMap(MapType type) {
             String keyType = getTypeNameFromConjureType(type.keyType());
             String valueType = getTypeNameFromConjureType(type.valueType());
             return "{ [key: " + keyType + "]: " + valueType + " }";
         }
 
         @Override
-        public String visit(OptionalType type) {
+        public String visitOptional(OptionalType type) {
             return getTypeNameFromConjureType(type.itemType());
         }
 
         @Override
-        public String visit(PrimitiveType type) {
+        public String visitPrimitive(PrimitiveType type) {
             switch (type) {
                 case DOUBLE:
                 case INTEGER:
@@ -207,7 +207,7 @@ public final class TypeMapper {
         }
 
         @Override
-        public String visit(LocalReferenceType type) {
+        public String visitLocalReference(LocalReferenceType type) {
             BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
             if (defType != null) {
                 return extractTypescriptName(type, defType);
@@ -219,7 +219,7 @@ public final class TypeMapper {
         }
 
         @Override
-        public String visit(ForeignReferenceType type) {
+        public String visitForeignReference(ForeignReferenceType type) {
             ImportedTypes importedTypes = types.conjureImports().get(type.namespace());
             if (importedTypes != null) {
                 BaseObjectTypeDefinition defType = importedTypes.importedTypes().objects().get(type.type());
@@ -233,17 +233,17 @@ public final class TypeMapper {
         }
 
         @Override
-        public String visit(SetType type) {
+        public String visitSet(SetType type) {
             return getTypeNameFromConjureType(type.itemType()) + "[]";
         }
 
         @Override
-        public String visit(BinaryType type) {
+        public String visitBinary(BinaryType type) {
             return "any";
         }
 
         @Override
-        public String visit(DateTimeType type) {
+        public String visitDateTime(DateTimeType type) {
             return "string";
         }
 

@@ -34,6 +34,7 @@ public final class EndpointDefinitionTest {
     }
 
     @Test
+    @SuppressWarnings("CheckReturnValue")
     public void testArgumentBodyTypeValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(map(ParameterName.of("testArg"), ArgumentDefinition.builder()

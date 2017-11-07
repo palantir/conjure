@@ -7,6 +7,7 @@ package com.palantir.conjure.defs.types.complex;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureValidator;
 
+@com.google.errorprone.annotations.Immutable
 public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDefinition> {
     KEY_SYNTAX(new KeySyntaxValidator()),
     NO_TRAILING_UNDERSCORE(new NoTrailingUnderscoreValidator());
@@ -23,6 +24,7 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
         validator.validate(definition);
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionTypeDefinition> {
 
         @Override
@@ -35,6 +37,7 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
 
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class KeySyntaxValidator implements ConjureValidator<UnionTypeDefinition> {
 
         private static boolean isValidJavaIdentifier(String key) {

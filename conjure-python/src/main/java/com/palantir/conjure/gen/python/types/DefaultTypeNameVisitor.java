@@ -30,27 +30,27 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
     }
 
     @Override
-    public String visit(AnyType type) {
+    public String visitAny(AnyType type) {
         return "object";
     }
 
     @Override
-    public String visit(ListType type) {
+    public String visitList(ListType type) {
         return "ListType(" + type.itemType().visit(this) + ")";
     }
 
     @Override
-    public String visit(MapType type) {
+    public String visitMap(MapType type) {
         return "DictType(" + type.keyType().visit(this) + ", " + type.valueType().visit(this) + ")";
     }
 
     @Override
-    public String visit(OptionalType type) {
+    public String visitOptional(OptionalType type) {
         return "OptionalType(" + type.itemType().visit(this) + ")";
     }
 
     @Override
-    public String visit(PrimitiveType type) {
+    public String visitPrimitive(PrimitiveType type) {
         switch (type) {
             case STRING:
             case RID:
@@ -69,7 +69,7 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
     }
 
     @Override
-    public String visit(LocalReferenceType type) {
+    public String visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
         BaseObjectTypeDefinition baseType = types.definitions().objects().get(type.type());
         if (baseType != null) {
@@ -77,28 +77,28 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
         } else {
             ExternalTypeDefinition depType = types.imports().get(type.type());
             checkNotNull(depType, "Unable to resolve type %s", type.type());
-            return visit(depType.baseType());
+            return visitPrimitive(depType.baseType());
         }
     }
 
     @Override
-    public String visit(ForeignReferenceType type) {
+    public String visitForeignReference(ForeignReferenceType type) {
         return type.type().name();
     }
 
     @Override
-    public String visit(SetType type) {
+    public String visitSet(SetType type) {
         // TODO (bduffield): real sets
         return ListType.of(type.itemType()).visit(this);
     }
 
     @Override
-    public String visit(BinaryType type) {
+    public String visitBinary(BinaryType type) {
         return "BinaryType()";
     }
 
     @Override
-    public String visit(DateTimeType type) {
+    public String visitDateTime(DateTimeType type) {
         return "str";
     }
 

@@ -23,6 +23,7 @@ public final class EnumValueDefinitionTest {
     }
 
     @Test
+    @SuppressWarnings("CheckReturnValue")
     public void testFormat() {
         EnumValueDefinition.builder().value("FOO").build();
         EnumValueDefinition.builder().value("FOO_BAR").build();

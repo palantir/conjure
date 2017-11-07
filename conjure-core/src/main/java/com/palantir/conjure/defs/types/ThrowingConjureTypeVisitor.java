@@ -17,52 +17,52 @@ import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 public interface ThrowingConjureTypeVisitor<T> extends ConjureTypeVisitor<T> {
     @Override
-    default T visit(AnyType type) {
+    default T visitAny(AnyType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(ListType type) {
+    default T visitList(ListType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(MapType type) {
+    default T visitMap(MapType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(OptionalType type) {
+    default T visitOptional(OptionalType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(PrimitiveType type) {
+    default T visitPrimitive(PrimitiveType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(LocalReferenceType type) {
+    default T visitLocalReference(LocalReferenceType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(ForeignReferenceType type) {
+    default T visitForeignReference(ForeignReferenceType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(SetType type) {
+    default T visitSet(SetType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(BinaryType type) {
+    default T visitBinary(BinaryType type) {
         throw createException(type);
     }
 
     @Override
-    default T visit(DateTimeType type) {
+    default T visitDateTime(DateTimeType type) {
         throw createException(type);
     }
     default UnsupportedOperationException createException(Object type) {

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@com.google.errorprone.annotations.Immutable
 public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefinition> {
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
     PACKAGE_DEFINED(new PackageDefinedValidator());
@@ -34,6 +35,7 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         this.validator.validate(definition);
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class NoRecursiveTypesValidator implements ConjureValidator<ObjectsDefinition> {
         @Override
         public void validate(ObjectsDefinition definition) {
@@ -82,6 +84,7 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class PackageDefinedValidator implements ConjureValidator<ObjectsDefinition> {
         @Override
         public void validate(ObjectsDefinition definition) {

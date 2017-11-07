@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureValidator;
 import java.util.regex.Pattern;
 
+@com.google.errorprone.annotations.Immutable
 public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDefinition> {
     UnknownValueNotUsed(new UnknownValueNotUsedValidator()),
     Format(new FormatValidator());
@@ -23,6 +24,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
         validator.validate(definition);
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class UnknownValueNotUsedValidator implements ConjureValidator<EnumValueDefinition> {
 
         @Override
@@ -33,6 +35,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
         }
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
         private static final Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z][A-Z0-9]*(_[A-Z0-9]+)*");
 

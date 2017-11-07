@@ -15,11 +15,12 @@ import java.util.Set;
  * Verifies that field names are unique modulo normalization to
  * {@link FieldName.Case#LOWER_CAMEL_CASE lower camel case}.
  */
+@com.google.errorprone.annotations.Immutable
 public final class UniqueFieldNamesValidator implements ConjureValidator<Set<FieldName>> {
 
-    private String classSimpleName;
+    private final String classSimpleName;
 
-    public UniqueFieldNamesValidator(Class clazz) {
+    public UniqueFieldNamesValidator(Class<?> clazz) {
         classSimpleName = clazz.getSimpleName();
     }
 

@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureValidator;
 import java.util.Set;
 
+@com.google.errorprone.annotations.Immutable
 public enum EnumTypeDefinitionValidator implements ConjureValidator<EnumTypeDefinition> {
     UniqueEnumValues(new UniqueEnumValuesValidator());
 
@@ -23,6 +24,7 @@ public enum EnumTypeDefinitionValidator implements ConjureValidator<EnumTypeDefi
         validator.validate(definition);
     }
 
+    @com.google.errorprone.annotations.Immutable
     private static final class UniqueEnumValuesValidator implements ConjureValidator<EnumTypeDefinition> {
 
         @Override

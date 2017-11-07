@@ -85,7 +85,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += ['-XepDisableWarningsInGeneratedCode']
+        options.compilerArgs += ['-XepDisableWarningsInGeneratedCode', '-Werror']
     }
 
     configurations.errorprone {
@@ -96,5 +96,5 @@ subprojects {
 }
 
 dependencies {
-    baseline 'com.palantir.baseline:gradle-baseline-java-config:0.17.1@zip'
+    baseline 'com.palantir.baseline:gradle-baseline-java-config@zip'
 }

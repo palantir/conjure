@@ -39,17 +39,17 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     }
 
     @Override
-    public Set<PythonClassName> visit(AnyType type) {
+    public Set<PythonClassName> visitAny(AnyType type) {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<PythonClassName> visit(ListType type) {
+    public Set<PythonClassName> visitList(ListType type) {
         return type.itemType().visit(this);
     }
 
     @Override
-    public Set<PythonClassName> visit(MapType type) {
+    public Set<PythonClassName> visitMap(MapType type) {
         return ImmutableSet.<PythonClassName>builder()
                 .addAll(type.keyType().visit(this))
                 .addAll(type.valueType().visit(this))
@@ -57,17 +57,17 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     }
 
     @Override
-    public Set<PythonClassName> visit(OptionalType type) {
+    public Set<PythonClassName> visitOptional(OptionalType type) {
         return type.itemType().visit(this);
     }
 
     @Override
-    public Set<PythonClassName> visit(PrimitiveType type) {
+    public Set<PythonClassName> visitPrimitive(PrimitiveType type) {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<PythonClassName> visit(LocalReferenceType refType) {
+    public Set<PythonClassName> visitLocalReference(LocalReferenceType refType) {
         BaseObjectTypeDefinition type = types.definitions().objects().get(refType.type());
         if (type != null) {
             ConjurePackage packageName = packageNameProcessor.getPackageName(type.conjurePackage());
@@ -75,12 +75,12 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
         } else {
             ExternalTypeDefinition depType = types.imports().get(refType.type());
             checkNotNull(depType, "Unable to resolve type %s", refType.type());
-            return visit(depType.baseType());
+            return visitPrimitive(depType.baseType());
         }
     }
 
     @Override
-    public Set<PythonClassName> visit(ForeignReferenceType type) {
+    public Set<PythonClassName> visitForeignReference(ForeignReferenceType type) {
         ConjurePackage importPackage = types.getImportsForRefNameSpace(type).getPackageForImportedType(type);
         return ImmutableSet.of(PythonClassName.of(
                 packageNameProcessor.getPackageName(Optional.of(importPackage)),
@@ -88,17 +88,17 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     }
 
     @Override
-    public Set<PythonClassName> visit(SetType type) {
+    public Set<PythonClassName> visitSet(SetType type) {
         return type.itemType().visit(this);
     }
 
     @Override
-    public Set<PythonClassName> visit(BinaryType type) {
+    public Set<PythonClassName> visitBinary(BinaryType type) {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<PythonClassName> visit(DateTimeType type) {
+    public Set<PythonClassName> visitDateTime(DateTimeType type) {
         return ImmutableSet.of();
     }
 

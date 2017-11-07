@@ -22,7 +22,7 @@ import org.immutables.value.Value;
 public interface LocalReferenceType extends ReferenceType {
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
-        return visitor.visit(this);
+        return visitor.visitLocalReference(this);
     }
 
     static LocalReferenceType of(TypeName type) {

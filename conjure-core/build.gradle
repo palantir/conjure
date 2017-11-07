@@ -12,6 +12,7 @@ dependencies {
     compile 'com.palantir.syntactic-paths:syntactic-paths'
     compile 'org.glassfish.jersey.core:jersey-common'
     compile 'org.slf4j:slf4j-api'
+    implementation 'com.google.errorprone:error_prone_annotations'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
