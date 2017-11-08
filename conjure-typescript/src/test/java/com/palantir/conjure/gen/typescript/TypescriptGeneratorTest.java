@@ -13,53 +13,21 @@ import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
 
+@ConjureSubfolderRunner.ParentFolder("src/test/resources")
+@RunWith(ConjureSubfolderRunner.class)
 public final class TypescriptGeneratorTest {
 
-    private final ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
+    private static final ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
             new DefaultServiceGenerator(),
             new DefaultTypeGenerator());
 
-    @Rule public final TestName current = new TestName();
-
     @Test
-    public void types() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    @Test
-    public void services() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    @Test
-    public void errors() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    @Test
-    public void multiple() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    @Test
-    public void imports() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    @Test
-    public void duplicates() throws Exception {
-        assertThatFilesRenderAsExpected("src/test/resources/" + current.getMethodName());
-    }
-
-    private void assertThatFilesRenderAsExpected(String string) throws IOException {
-        Path folder = Paths.get(string);
+    public void assertThatFilesRenderAsExpected(Path folder) throws IOException {
         Path expected = folder.resolve("expected");
         Path actual = folder.resolve("actual");
 
@@ -94,7 +62,7 @@ public final class TypescriptGeneratorTest {
         return definitions;
     }
 
-    private static void assertFoldersEqual(Path expected, Path actual) throws IOException {
+    private void assertFoldersEqual(Path expected, Path actual) throws IOException {
         long count = Files.walk(expected)
                 .filter(path -> path.toFile().isFile())
                 .map(path -> expected.relativize(path))
@@ -103,7 +71,7 @@ public final class TypescriptGeneratorTest {
         System.out.println(count + " files checked");
     }
 
-    private static void clearDirectory(Path directory) throws IOException {
+    private void clearDirectory(Path directory) throws IOException {
         Files.createDirectories(directory);
         Files.walk(directory).filter(path -> path.toFile().isFile()).forEach(path -> path.toFile().delete());
         Files.walk(directory).forEach(path -> path.toFile().delete());
