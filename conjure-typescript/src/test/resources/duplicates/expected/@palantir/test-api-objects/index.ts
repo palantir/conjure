@@ -1,0 +1,1 @@
+export { IDuplicateExample } from "./duplicateExample";

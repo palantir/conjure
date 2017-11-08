@@ -1,0 +1,33 @@
+types:
+  definitions:
+    default-package: com.palantir.product
+    errors:
+      InvalidTypeDefinition:
+        namespace: Conjure
+        code: INVALID_ARGUMENT
+        docs: Invalid Conjure type definition.
+        safe-args:
+          typeName: string
+        unsafe-args:
+          typeDef: any
+      InvalidServiceDefinition:
+        namespace: Conjure
+        code: INVALID_ARGUMENT
+        docs: Invalid Conjure service definition.
+        safe-args:
+          serviceName:
+            type: string
+            docs: Name of the invalid service definition.
+        unsafe-args:
+          serviceDef:
+            type: any
+            docs: Details of the invalid service definition.
+      JavaCompilationFailed:
+        namespace: ConjureJava
+        docs: Failed to compile Conjure definition to Java code.
+        code: INTERNAL
+      DifferentPackage:
+        package: com.palantir.another
+        namespace: Conjure
+        docs: Different package.
+        code: INTERNAL

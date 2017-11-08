@@ -1,0 +1,12 @@
+types:
+  definitions:
+    default-package: com.palantir.test.api
+    objects: {}
+
+services:
+  DuplicateService:
+    name: DuplicateService
+    package: com.palantir.test.api
+    endpoints:
+      copy2:
+        http: GET /copy2

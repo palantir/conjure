@@ -1,0 +1,11 @@
+types:
+  definitions:
+    default-package: com.palantir.test.api
+    objects:
+      StringExample:
+        fields:
+          string: string
+      AliasExample:
+        alias: string
+      ComplexAliasExample:
+        alias: StringExample

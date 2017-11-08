@@ -1,0 +1,16 @@
+{
+  "author" : "Palantir Technologies, Inc.",
+  "peerDependencies" : {
+    "@foundry/conjure-fe-lib" : "^1.0.1"
+  },
+  "version" : "0.0.0",
+  "description" : "Conjure definitions for @palantir/another",
+  "name" : "@palantir/another",
+  "dependencies" : {
+    "@palantir/product" : "^0.0.0",
+    "@palantir/product-datasets" : "^0.0.0"
+  },
+  "devDependencies" : {
+    "@foundry/conjure-fe-lib" : "^1.0.1"
+  }
+}

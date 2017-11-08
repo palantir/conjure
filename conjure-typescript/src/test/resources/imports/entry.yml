@@ -1,0 +1,32 @@
+types:
+  conjure-imports:
+    importedTypes: import-me.yml
+    importedServices: somefolder/import-me-too.yml
+  definitions:
+    default-package: test.api.with.imports
+    objects:
+      ComplexObjectWithImports:
+        fields:
+          string: string
+          imported: importedTypes.StringExample
+          aliased: importedTypes.AliasExample
+          complexAliased: importedTypes.ComplexAliasExample
+      ComplexObjectWithImportsPackageOverride:
+        package: test.api.with.imports.package.override
+        fields:
+          string: string
+          imported: importedTypes.StringExample
+          aliased: importedTypes.AliasExample
+          complexAliased: importedTypes.ComplexAliasExample
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api.with.imports
+    base-path: /catalog
+    endpoints:
+      testEndpoint:
+        http: POST /testEndpoint
+        args:
+          importedString: importedTypes.StringExample
+        returns: importedServices.BackingFileSystem

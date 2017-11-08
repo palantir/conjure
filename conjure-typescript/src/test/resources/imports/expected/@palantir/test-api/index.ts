@@ -1,0 +1,1 @@
+export { IStringExample } from "./stringExample";

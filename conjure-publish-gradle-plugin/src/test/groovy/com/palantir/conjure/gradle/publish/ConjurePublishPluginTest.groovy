@@ -10,8 +10,6 @@ import javax.ws.rs.core.HttpHeaders
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
 import okhttp3.mockwebserver.MockWebServer
-import org.gradle.api.tasks.Exec
-import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Unroll
 
 class ConjurePublishPluginTest extends IntegrationSpec {
