@@ -4,6 +4,8 @@ machine:
     - pyenv global 2.7.10 3.5.0
   java:
     version: oraclejdk8
+  services:
+    - docker
   environment:
     TERM: dumb
   node:
