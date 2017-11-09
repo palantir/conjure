@@ -43,7 +43,7 @@ public final class JerseyServiceGeneratorTests extends TestBase {
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "test/api/with/imports/TestService.java"))
-                .contains("import test.api.StringExample;");
+                .contains("import com.palantir.product.StringExample;");
     }
 
     private void testServiceGeneration(String conjureFile) throws IOException {
@@ -51,7 +51,7 @@ public final class JerseyServiceGeneratorTests extends TestBase {
         List<Path> files = new JerseyServiceGenerator().emit(def, folder.getRoot());
 
         for (Path file : files) {
-            if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
+            if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
                 Path output = Paths.get("src/test/resources/test/api/" + file.getFileName() + ".jersey");
                 Files.delete(output);
                 Files.copy(file, output);

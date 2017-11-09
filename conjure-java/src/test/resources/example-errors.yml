@@ -1,6 +1,6 @@
 types:
   definitions:
-    default-package: test.api.errors
+    default-package: com.palantir.product
     errors:
       InvalidTypeDefinition:
         namespace: Conjure
@@ -27,7 +27,7 @@ types:
         docs: Failed to compile Conjure definition to Java code.
         code: INTERNAL
       DifferentPackage:
-        package: test.api.errors.other
+        package: com.palantir.another
         namespace: Conjure
         docs: Different package.
         code: INTERNAL

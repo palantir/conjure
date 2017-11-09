@@ -1,8 +1,8 @@
-package test.api;
+package com.palantir.another;
 
-import com.palantir.foundry.catalog.api.CreateDatasetRequest;
-import com.palantir.foundry.catalog.api.datasets.BackingFileSystem;
-import com.palantir.foundry.catalog.api.datasets.Dataset;
+import com.palantir.product.CreateDatasetRequest;
+import com.palantir.product.datasets.BackingFileSystem;
+import com.palantir.product.datasets.Dataset;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
 import java.lang.Boolean;

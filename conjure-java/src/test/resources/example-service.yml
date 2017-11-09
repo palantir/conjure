@@ -2,9 +2,9 @@ types:
   imports:
     ResourceIdentifier:
       base-type: string
-      external: 
+      external:
         java: com.palantir.ri.ResourceIdentifier
-    
+
     AuthHeader:
       base-type: string
       external:
@@ -15,25 +15,25 @@ types:
         java: com.palantir.redaction.Safe
 
   definitions:
-    default-package: com.palantir.foundry.catalog.api
-    objects:      
+    default-package: com.palantir.product
+    objects:
       BackingFileSystem:
-        package: com.palantir.foundry.catalog.api.datasets
+        package: com.palantir.product.datasets
         fields:
           fileSystemId:
             type: string
             docs: The name by which this file system is identified.
           baseUri: string
           configuration: map<string, string>
-  
+
       Dataset:
-        package: com.palantir.foundry.catalog.api.datasets
+        package: com.palantir.product.datasets
         fields:
           fileSystemId: string
           rid:
             type: ResourceIdentifier
             docs: Uniquely identifies this dataset.
-          
+
       CreateDatasetRequest:
         fields:
           fileSystemId: string
@@ -42,7 +42,7 @@ types:
 services:
   TestService:
     name: Test Service
-    package: test.api
+    package: com.palantir.another
     default-auth: header
     base-path: /catalog
     docs: |
@@ -54,7 +54,7 @@ services:
         returns: map<string, BackingFileSystem>
         docs: |
           Returns a mapping from file system id to backing file system configuration.
-          
+
       createDataset:
         http: POST /datasets
         args:
@@ -137,7 +137,7 @@ services:
             param-id: datasetRid
             param-type: path
         returns: optional<string>
-        
+
       testBoolean:
         http: GET /boolean
         returns: boolean
@@ -145,7 +145,7 @@ services:
       testDouble:
         http: GET /double
         returns: double
-      
+
       testInteger:
         http: GET /integer
         returns: integer

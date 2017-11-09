@@ -39,7 +39,7 @@ public final class TypescriptGeneratorTest {
     }
 
     private void maybeResetExpectedDirectory(Path expected, List<ConjureDefinition> definitions) throws IOException {
-        if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))
+        if (Boolean.valueOf(System.getProperty("recreate", "false"))
                 || !expected.toFile().isDirectory()) {
             clearDirectory(expected);
             generator.emit(definitions, "0.0.0", expected.toFile());

@@ -70,7 +70,7 @@ public final class ObjectGeneratorTests {
 
         // Generated files contain imports
         assertThat(compiledFileContent(src, "test/api/with/imports/ComplexObjectWithImports.java"))
-                .contains("import test.api.StringExample;");
+                .contains("import com.palantir.product.StringExample;");
 
         // Imported files are not generated.
         assertThat(new File(src, "com/palantir/foundry/catalog/api/datasets/BackingFileSystem.java"))
@@ -91,7 +91,7 @@ public final class ObjectGeneratorTests {
         for (Path file : files) {
             Path relativized = folder.getRoot().toPath().relativize(file);
             Path expectedFile = Paths.get(referenceFilesFolder, relativized.toString());
-            if (Boolean.valueOf(System.getProperty("NOT_SAFE_FOR_CI", "false"))) {
+            if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
                 // help make shrink-wrapping output sane
                 Files.createDirectories(expectedFile.getParent());
                 Files.deleteIfExists(expectedFile);

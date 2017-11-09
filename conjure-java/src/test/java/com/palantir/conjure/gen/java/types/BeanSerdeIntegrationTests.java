@@ -8,17 +8,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palantir.product.BearerTokenExample;
+import com.palantir.product.BooleanExample;
+import com.palantir.product.ListExample;
+import com.palantir.product.MapExample;
+import com.palantir.product.RidExample;
+import com.palantir.product.SafeLongExample;
+import com.palantir.product.SetExample;
 import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import test.api.BearerTokenExample;
-import test.api.BooleanExample;
-import test.api.ListExample;
-import test.api.MapExample;
-import test.api.RidExample;
-import test.api.SafeLongExample;
-import test.api.SetExample;
 
 public final class BeanSerdeIntegrationTests {
 
