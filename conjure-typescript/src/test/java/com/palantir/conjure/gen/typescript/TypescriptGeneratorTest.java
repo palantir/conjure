@@ -15,18 +15,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @ConjureSubfolderRunner.ParentFolder("src/test/resources")
 @RunWith(ConjureSubfolderRunner.class)
 public final class TypescriptGeneratorTest {
 
-    private static final ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
+    private final ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
             new DefaultServiceGenerator(),
             new DefaultTypeGenerator());
 
-    @Test
+    @ConjureSubfolderRunner.Test
     public void assertThatFilesRenderAsExpected(Path folder) throws IOException {
         Path expected = folder.resolve("expected");
         Path actual = folder.resolve("actual");

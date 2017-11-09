@@ -5,20 +5,17 @@
 package com.palantir.conjure.gen.typescript;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.io.ByteStreams;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,42 +23,34 @@ import org.slf4j.LoggerFactory;
  * Spins up the tsc compiler in a docker container to attempt to compile every checked in 'expected' folder referenced
  * by TypescriptGeneratorTest.
  */
+@ConjureSubfolderRunner.ParentFolder(value = "src/test/resources", parallel = true)
+@RunWith(ConjureSubfolderRunner.class)
 @SuppressWarnings("Slf4jLogsafeArgs")
-public class DockerTscTest {
+public final class DockerTscTest {
 
     private static final Logger log = LoggerFactory.getLogger(DockerTscTest.class);
     private static final Path tsconfig = Paths.get(
             "../conjure-publish-gradle-plugin/src/main/resources/tsconfig.json");
     private static final Path feLib = Paths.get(
             "../conjure-publish-gradle-plugin/src/main/resources/conjure-fe-lib_index.d.ts");
+    private static final Supplier<String> dockerTag = Suppliers.memoize(() ->
+            dockerBuild("conjure/tsc", "src/test/resources/Dockerfile"));
 
-    @BeforeClass
-    public static void beforeClass() throws IOException, InterruptedException {
-        log.info("{}", dockerBuild("conjure/tsc", "src/test/resources/Dockerfile"));
-    }
-
-    @Test
-    public void compileAll() throws Exception {
-        File otherResources = new File("src/test/resources");
-        List<File> directories = Arrays.stream(otherResources.listFiles())
-                .filter(File::isDirectory)
-                .collect(Collectors.toList());
-
+    @ConjureSubfolderRunner.Test
+    public void assertThatGeneratedCodeCompilesWithTsc(Path directory) throws Exception {
         SoftAssertions softly = new SoftAssertions();
-        directories.parallelStream().forEach(directory -> {
-            String errors = dockerTsc(directory);
-            softly.assertThat(errors)
-                    .as("tsc for " + directory)
-                    .isEmpty();
-        });
+        String errors = dockerTsc(directory);
+        softly.assertThat(errors)
+                .as("tsc for " + directory)
+                .isEmpty();
         softly.assertAll();
     }
 
-    private String dockerTsc(File directory) {
+    private String dockerTsc(Path directory) {
         log.info("Checking {}", directory);
         Stopwatch started = Stopwatch.createStarted();
 
-        Path inputDirectory = directory.toPath().resolve("expected");
+        Path inputDirectory = directory.resolve("expected");
         if (!inputDirectory.toFile().exists() || inputDirectory.toFile().listFiles().length == 0) {
             log.info("Skipping empty {}", inputDirectory);
             return "";
@@ -79,17 +68,18 @@ public class DockerTscTest {
                 // (different node_modules dir ensures docker mounting doesn't freak out)
                 "-v", mountPath(feLib, "/node_modules/@foundry/conjure-fe-lib/index.d.ts"),
                 "--rm",
-                "conjure/tsc"
+                dockerTag.get()
         };
         String tscOutput = runProcess(command);
         log.info("finished {} {}s", directory, started.elapsed(TimeUnit.SECONDS));
         return tscOutput;
     }
 
-    private static String dockerBuild(String tag, String dockerfile) throws IOException {
-        return runProcess("docker", "build",
+    private static String dockerBuild(String tag, String dockerfile) {
+        log.info("{}", runProcess("docker", "build",
                 Paths.get(dockerfile).getParent().toAbsolutePath().toString(),
-                "--tag", tag);
+                "--tag", tag));
+        return "conjure/tsc";
     }
 
     private static String mountPath(Path hostPath, String dockerPath) {
