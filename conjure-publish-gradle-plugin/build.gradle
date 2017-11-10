@@ -17,3 +17,9 @@ dependencies {
 gradlePlugin {
     automatedPublishing = false
 }
+
+idea {
+    module {
+        testSourceDirs += file("src/test/groovy")
+    }
+}
