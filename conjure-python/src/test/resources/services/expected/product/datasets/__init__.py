@@ -1,4 +1,4 @@
-# this is package foundry.catalog.api.datasets
+# this is package product.datasets
 from conjure import *
 from typing import Dict
 from typing import List

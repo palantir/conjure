@@ -1,69 +1,14 @@
-# this is package foundry.catalog.api
+# this is package another
 from conjure import *
-from foundry.catalog.api.datasets import BackingFileSystem
-from foundry.catalog.api.datasets import Dataset
 from httpremoting import Service
+from product import CreateDatasetRequest
+from product.datasets import BackingFileSystem
+from product.datasets import Dataset
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Set
 from typing import Tuple
-
-class CreateDatasetRequest(ConjureBeanType):
-
-    @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            'file_system_id': ConjureFieldDefinition('fileSystemId', str),
-            'path': ConjureFieldDefinition('path', str)
-        }
-
-    _file_system_id = None # type: str
-    _path = None # type: str
-
-    def __init__(self, file_system_id, path):
-        # type: (str, str) -> None
-        self._file_system_id = file_system_id
-        self._path = path
-
-    @property
-    def file_system_id(self):
-        # type: () -> str
-        return self._file_system_id
-
-    @property
-    def path(self):
-        # type: () -> str
-        return self._path
-
-class ExplicitCreateDatasetRequest(ConjureBeanType):
-
-    @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            'backing_file_system': ConjureFieldDefinition('backingFileSystem', BackingFileSystem),
-            'path': ConjureFieldDefinition('path', str)
-        }
-
-    _backing_file_system = None # type: BackingFileSystem
-    _path = None # type: str
-
-    def __init__(self, backing_file_system, path):
-        # type: (BackingFileSystem, str) -> None
-        self._backing_file_system = backing_file_system
-        self._path = path
-
-    @property
-    def backing_file_system(self):
-        # type: () -> BackingFileSystem
-        return self._backing_file_system
-
-    @property
-    def path(self):
-        # type: () -> str
-        return self._path
 
 class TestService(Service):
     '''A Markdown description of the service.'''
@@ -232,6 +177,37 @@ class TestService(Service):
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(BinaryType()))
+
+    def uploadRawData(self, authHeader, input):
+        # type: (str, Any) -> None
+
+        _headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': authHeader,
+        } # type: Dict[str, Any]
+
+        _params = {
+        } # type: Dict[str, Any]
+
+        _path_params = {
+        } # type: Dict[str, Any]
+
+        _json = ConjureEncoder().default(input) # type: Any
+
+        _path = '/catalog/datasets/upload-raw'
+        _path = _path.format(**_path_params)
+
+        _response = self._requests_session.request( # type: ignore
+            'POST',
+            self._uri + _path,
+            params=_params,
+            headers=_headers,
+            json=_json)
+
+        _response.raise_for_status()
+
+        return
 
     def getBranches(self, authHeader, datasetRid):
         # type: (str, str) -> List[str]

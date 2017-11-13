@@ -1,4 +1,4 @@
-# this is package example.api
+# this is package product
 from conjure import *
 from typing import Dict
 from typing import List
@@ -106,6 +106,26 @@ class BearerTokenExample(ConjureBeanType):
         # type: () -> str
         return self._bearer_token_value
 
+class DateTimeExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'datetime': ConjureFieldDefinition('datetime', str)
+        }
+
+    _datetime = None # type: str
+
+    def __init__(self, datetime):
+        # type: (str) -> None
+        self._datetime = datetime
+
+    @property
+    def datetime(self):
+        # type: () -> str
+        return self._datetime
+
 class DoubleExample(ConjureBeanType):
 
     @classmethod
@@ -172,19 +192,27 @@ class ListExample(ConjureBeanType):
     def _fields(cls):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
-            'items': ConjureFieldDefinition('items', ListType(str))
+            'items': ConjureFieldDefinition('items', ListType(str)),
+            'primitive_items': ConjureFieldDefinition('primitiveItems', ListType(int))
         }
 
     _items = None # type: List[str]
+    _primitive_items = None # type: List[int]
 
-    def __init__(self, items):
-        # type: (List[str]) -> None
+    def __init__(self, items, primitive_items):
+        # type: (List[str], List[int]) -> None
         self._items = items
+        self._primitive_items = primitive_items
 
     @property
     def items(self):
         # type: () -> List[str]
         return self._items
+
+    @property
+    def primitive_items(self):
+        # type: () -> List[int]
+        return self._primitive_items
 
 class SetExample(ConjureBeanType):
 
@@ -365,7 +393,6 @@ class ManyFieldExample(ConjureBeanType):
         return {
             'string': ConjureFieldDefinition('string', str),
             'integer': ConjureFieldDefinition('integer', int),
-            'integer_example': ConjureFieldDefinition('integerExample', IntegerExample),
             'double_value': ConjureFieldDefinition('doubleValue', float),
             'optional_item': ConjureFieldDefinition('optionalItem', OptionalType(str)),
             'items': ConjureFieldDefinition('items', ListType(str)),
@@ -375,18 +402,16 @@ class ManyFieldExample(ConjureBeanType):
 
     _string = None # type: str
     _integer = None # type: int
-    _integer_example = None # type: IntegerExample
     _double_value = None # type: float
     _optional_item = None # type: Optional[str]
     _items = None # type: List[str]
     _set = None # type: List[str]
     _map = None # type: Dict[str, str]
 
-    def __init__(self, string, integer, integer_example, double_value, optional_item, items, set, map):
-        # type: (str, int, IntegerExample, float, Optional[str], List[str], List[str], Dict[str, str]) -> None
+    def __init__(self, string, integer, double_value, optional_item, items, set, map):
+        # type: (str, int, float, Optional[str], List[str], List[str], Dict[str, str]) -> None
         self._string = string
         self._integer = integer
-        self._integer_example = integer_example
         self._double_value = double_value
         self._optional_item = optional_item
         self._items = items
@@ -396,41 +421,43 @@ class ManyFieldExample(ConjureBeanType):
     @property
     def string(self):
         # type: () -> str
+        '''docs for string field'''
         return self._string
 
     @property
     def integer(self):
         # type: () -> int
+        '''docs for integer field'''
         return self._integer
-
-    @property
-    def integer_example(self):
-        # type: () -> IntegerExample
-        return self._integer_example
 
     @property
     def double_value(self):
         # type: () -> float
+        '''docs for doubleValue field'''
         return self._double_value
 
     @property
     def optional_item(self):
         # type: () -> Optional[str]
+        '''docs for optionalItem field'''
         return self._optional_item
 
     @property
     def items(self):
         # type: () -> List[str]
+        '''docs for items field'''
         return self._items
 
     @property
     def set(self):
         # type: () -> List[str]
+        '''docs for set field'''
         return self._set
 
     @property
     def map(self):
         # type: () -> Dict[str, str]
+        '''docs for map field'''
         return self._map
 
 class UnionTypeExample(ConjureUnionType):
@@ -438,7 +465,11 @@ class UnionTypeExample(ConjureUnionType):
 
     _string_example = None # type: StringExample
     _set = None # type: List[str]
-    _number = None # type: int
+    _this_field_is_an_integer = None # type: int
+    _also_an_integer = None # type: int
+    __if = None # type: int
+    _new = None # type: int
+    _interface = None # type: int
 
     @classmethod
     def _options(cls):
@@ -446,11 +477,15 @@ class UnionTypeExample(ConjureUnionType):
         return {
             'string_example': ConjureFieldDefinition('stringExample', StringExample),
             'set': ConjureFieldDefinition('set', ListType(str)),
-            'number': ConjureFieldDefinition('number', int)
+            'this_field_is_an_integer': ConjureFieldDefinition('thisFieldIsAnInteger', int),
+            'also_an_integer': ConjureFieldDefinition('alsoAnInteger', int),
+            '_if': ConjureFieldDefinition('if', int),
+            'new': ConjureFieldDefinition('new', int),
+            'interface': ConjureFieldDefinition('interface', int)
         }
 
-    def __init__(self, string_example=None, set=None, number=None):
-        if (string_example is not None) + (set is not None) + (number is not None) != 1:
+    def __init__(self, string_example=None, set=None, this_field_is_an_integer=None, also_an_integer=None, _if=None, new=None, interface=None):
+        if (string_example is not None) + (set is not None) + (this_field_is_an_integer is not None) + (also_an_integer is not None) + (_if is not None) + (new is not None) + (interface is not None) != 1:
             raise ValueError('a union must contain a single member')
 
         if string_example is not None:
@@ -459,9 +494,21 @@ class UnionTypeExample(ConjureUnionType):
         if set is not None:
             self._set = set
             self._type = 'set'
-        if number is not None:
-            self._number = number
-            self._type = 'number'
+        if this_field_is_an_integer is not None:
+            self._this_field_is_an_integer = this_field_is_an_integer
+            self._type = 'thisFieldIsAnInteger'
+        if also_an_integer is not None:
+            self._also_an_integer = also_an_integer
+            self._type = 'alsoAnInteger'
+        if _if is not None:
+            self.__if = _if
+            self._type = 'if'
+        if new is not None:
+            self._new = new
+            self._type = 'new'
+        if interface is not None:
+            self._interface = interface
+            self._type = 'interface'
 
     @property
     def string_example(self):
@@ -475,48 +522,14 @@ class UnionTypeExample(ConjureUnionType):
         return self._set
 
     @property
-    def number(self):
+    def this_field_is_an_integer(self):
         # type: () -> int
-        return self._number
-
-class UnionTypeKeywordFields(ConjureUnionType):
-
-    __return = None # type: str
-    __if = None # type: int
-    __and = None # type: float
-    __lambda = None # type: UnionTypeExample
-
-    @classmethod
-    def _options(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            '_return': ConjureFieldDefinition('return', str),
-            '_if': ConjureFieldDefinition('if', int),
-            '_and': ConjureFieldDefinition('and', float),
-            '_lambda': ConjureFieldDefinition('lambda', UnionTypeExample)
-        }
-
-    def __init__(self, _return=None, _if=None, _and=None, _lambda=None):
-        if (_return is not None) + (_if is not None) + (_and is not None) + (_lambda is not None) != 1:
-            raise ValueError('a union must contain a single member')
-
-        if _return is not None:
-            self.__return = _return
-            self._type = 'return'
-        if _if is not None:
-            self.__if = _if
-            self._type = 'if'
-        if _and is not None:
-            self.__and = _and
-            self._type = 'and'
-        if _lambda is not None:
-            self.__lambda = _lambda
-            self._type = 'lambda'
+        return self._this_field_is_an_integer
 
     @property
-    def _return(self):
-        # type: () -> str
-        return self.__return
+    def also_an_integer(self):
+        # type: () -> int
+        return self._also_an_integer
 
     @property
     def _if(self):
@@ -524,14 +537,14 @@ class UnionTypeKeywordFields(ConjureUnionType):
         return self.__if
 
     @property
-    def _and(self):
-        # type: () -> float
-        return self.__and
+    def new(self):
+        # type: () -> int
+        return self._new
 
     @property
-    def _lambda(self):
-        # type: () -> UnionTypeExample
-        return self.__lambda
+    def interface(self):
+        # type: () -> int
+        return self._interface
 
 class EmptyObjectExample(ConjureBeanType):
 

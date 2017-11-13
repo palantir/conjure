@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.palantir.conjure.ConjureSubfolderRunner;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;

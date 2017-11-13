@@ -1,6 +1,6 @@
 types:
   definitions:
-    default-package: example.api
+    default-package: com.palantir.product
     objects:
       StringExample:
         fields:
@@ -17,6 +17,9 @@ types:
       BearerTokenExample:
         fields:
           bearerTokenValue: bearertoken
+      DateTimeExample:
+        fields:
+          datetime: datetime
       DoubleExample:
         fields:
           doubleValue: double
@@ -29,6 +32,7 @@ types:
       ListExample:
         fields:
           items: list<string>
+          primitiveItems: list<integer>
       SetExample:
         fields:
           items: set<string>
@@ -58,6 +62,16 @@ types:
       #   alias: integer
       # BooleanAliasExample:
       #   alias: boolean
+      # SafeLongAliasExample:
+      #   alias: safelong
+      # RidAliasExample:
+      #   alias: rid
+      # BearerTokenAliasExample:
+      #   alias: bearertoken
+      # MapAliasExample:
+      #   alias: map<string, any>
+      # ReferenceAliasExample:
+      #   alias: AnyExample
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>
@@ -68,15 +82,30 @@ types:
           bearertoken: optional<bearertoken>
       ManyFieldExample:
         fields:
-          string: string
-          integer: integer
-          integerExample: IntegerExample
-          doubleValue: double
-          optionalItem: optional<string>
-          items: list<string>
-          set: set<string>
-          map: map<string, string>
-          # alias: StringAliasExample
+          string:
+            type: string
+            docs: docs for string field
+          integer:
+            type: integer
+            docs: docs for integer field
+          doubleValue:
+            type: double
+            docs: docs for doubleValue field
+          optionalItem:
+            type: optional<string>
+            docs: docs for optionalItem field
+          items:
+            type: list<string>
+            docs: docs for items field
+          set:
+            type: set<string>
+            docs: docs for set field
+          map:
+            type: map<string, string>
+            docs: docs for map field
+          # alias:
+          #   type: StringAliasExample
+          #   docs: docs for alias field
       UnionTypeExample:
         docs: A type which can either be a StringExample, a set of strings, or an integer.
         union:
@@ -84,12 +113,10 @@ types:
             type: StringExample
             docs: Docs for when UnionTypeExample is of type StringExample.
           set: set<string>
-          number: integer
-      UnionTypeKeywordFields:
-        union:
-          return: string
-          if: integer
-          and: double
-          lambda: UnionTypeExample
+          thisFieldIsAnInteger: integer
+          alsoAnInteger: integer
+          if: integer # some 'bad' member names!
+          new: integer
+          interface: integer
       EmptyObjectExample:
         fields: {}

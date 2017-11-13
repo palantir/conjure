@@ -2,7 +2,7 @@
  * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.gen.typescript;
+package com.palantir.conjure;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -40,7 +40,9 @@ public final class ConjureSubfolderRunner extends ParentRunner<Path> {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     public @interface ParentFolder {
+        /** Parent folder to list. */
         String value();
+        /** Whether tests should be executed indepenently on a CachedThreadPool. */
         boolean parallel() default false;
     }
 

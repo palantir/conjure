@@ -13,6 +13,7 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
+    testCompile project(':conjure-test-common')
 
     processor 'org.immutables:value'
 }

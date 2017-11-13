@@ -9,15 +9,8 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
+    testCompile project(':conjure-test-common')
     testRuntime 'org.slf4j:slf4j-simple'
 
     processor 'org.immutables:value'
-}
-
-task(generateTypescript, dependsOn: jar, type: JavaExec) {
-    main = "com.palantir.conjure.gen.typescript.ConjureTypescriptClientGenerator"
-    classpath = sourceSets.main.runtimeClasspath
-    if (project.hasProperty('javaArgs')) {
-        args(javaArgs.split(','))
-    }
 }

@@ -1,0 +1,4 @@
+dependencies {
+    compile 'junit:junit'
+    implementation 'org.slf4j:slf4j-api'
+}
