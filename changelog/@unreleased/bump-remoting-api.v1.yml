@@ -1,0 +1,4 @@
+type: fix
+fix:
+  description: Bump remoting-api to 1.4.1 to fix `CUSTOM_SERVER` and `CUSTOM_CLIENT` exception types not being usable from gradle.
+  link: https://github.palantir.build/foundry/conjure/pull/686
