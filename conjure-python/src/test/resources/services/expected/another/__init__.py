@@ -45,13 +45,14 @@ class TestService(Service):
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), DictType(str, BackingFileSystem))
 
-    def createDataset(self, authHeader, request):
-        # type: (str, CreateDatasetRequest) -> Dataset
+    def createDataset(self, authHeader, request, testHeaderArg):
+        # type: (str, CreateDatasetRequest, str) -> Dataset
 
         _headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': authHeader,
+            'Test-Header': testHeaderArg,
         } # type: Dict[str, Any]
 
         _params = {
