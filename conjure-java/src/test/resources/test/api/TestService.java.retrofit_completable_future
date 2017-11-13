@@ -36,7 +36,9 @@ public interface TestService {
 
     @POST("/catalog/datasets")
     CompletableFuture<Dataset> createDataset(
-            @Header("Authorization") AuthHeader authHeader, @Body CreateDatasetRequest request);
+            @Header("Authorization") AuthHeader authHeader,
+            @Body CreateDatasetRequest request,
+            @Header("Test-Header") String testHeaderArg);
 
     @GET("/catalog/datasets/{datasetRid}")
     CompletableFuture<Optional<Dataset>> getDataset(

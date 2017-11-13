@@ -39,7 +39,9 @@ public interface TestService {
     @POST
     @Path("/datasets")
     Dataset createDataset(
-            @HeaderParam("Authorization") AuthHeader authHeader, CreateDatasetRequest request);
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            CreateDatasetRequest request,
+            @HeaderParam("Test-Header") String testHeaderArg);
 
     @GET
     @Path("/datasets/{datasetRid}")

@@ -4,7 +4,8 @@ import { IDataset } from "@palantir/product-datasets";
 
 export interface ITestService {
     createDataset(
-        request: ICreateDatasetRequest
+        request: ICreateDatasetRequest,
+        testHeaderArg: string
     ): Promise<IDataset>;
 
     getBranches(

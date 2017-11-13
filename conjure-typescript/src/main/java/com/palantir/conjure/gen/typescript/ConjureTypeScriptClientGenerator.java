@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public final class ConjureTypeScriptClientGenerator {
 
     public static final String CONJURE_FE_LIB = "@foundry/conjure-fe-lib";
-    public static final String CONJURE_FE_LIB_VERSION = "^1.0.1";
+    public static final String CONJURE_FE_LIB_VERSION = "^1.1.1";
 
     private static final ObjectMapper prettyPrintingMapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);

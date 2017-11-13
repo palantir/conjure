@@ -14,6 +14,8 @@ export class MyService {
             data: undefined,
             endpointName: "getFoo",
             endpointPath: "/foo",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
             ],

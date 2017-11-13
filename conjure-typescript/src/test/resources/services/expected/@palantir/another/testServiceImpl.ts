@@ -13,12 +13,16 @@ export class TestService {
     }
 
     public createDataset(
-        request: ICreateDatasetRequest
+        request: ICreateDatasetRequest,
+        testHeaderArg: string
     ): Promise<IDataset> {
         return this.bridge.callEndpoint<IDataset>({
             data: request,
             endpointName: "createDataset",
             endpointPath: "/catalog/datasets",
+            headers: {
+                "Test-Header": testHeaderArg,
+            },
             method: "POST",
             pathArguments: [
             ],
@@ -27,6 +31,7 @@ export class TestService {
             requestMediaType: "application/json",
             requiredHeaders: [
                 "Authorization",
+                "Test-Header",
             ],
             responseMediaType: "application/json",
         });
@@ -39,6 +44,8 @@ export class TestService {
             data: undefined,
             endpointName: "getBranches",
             endpointPath: "/catalog/datasets/{datasetRid}/branches",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -60,6 +67,8 @@ export class TestService {
             data: undefined,
             endpointName: "getBranchesDeprecated",
             endpointPath: "/catalog/datasets/{datasetRid}/branchesDeprecated",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -81,6 +90,8 @@ export class TestService {
             data: undefined,
             endpointName: "getDataset",
             endpointPath: "/catalog/datasets/{datasetRid}",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -100,6 +111,8 @@ export class TestService {
             data: undefined,
             endpointName: "getFileSystems",
             endpointPath: "/catalog/fileSystems",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
             ],
@@ -120,6 +133,8 @@ export class TestService {
             data: undefined,
             endpointName: "getRawData",
             endpointPath: "/catalog/datasets/{datasetRid}/raw",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -141,6 +156,8 @@ export class TestService {
             data: undefined,
             endpointName: "maybeGetRawData",
             endpointPath: "/catalog/datasets/{datasetRid}/raw-maybe",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -163,6 +180,8 @@ export class TestService {
             data: undefined,
             endpointName: "resolveBranch",
             endpointPath: "/catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -183,6 +202,8 @@ export class TestService {
             data: undefined,
             endpointName: "testBoolean",
             endpointPath: "/catalog/boolean",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
             ],
@@ -201,6 +222,8 @@ export class TestService {
             data: undefined,
             endpointName: "testDouble",
             endpointPath: "/catalog/double",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
             ],
@@ -219,6 +242,8 @@ export class TestService {
             data: undefined,
             endpointName: "testInteger",
             endpointPath: "/catalog/integer",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
             ],
@@ -239,6 +264,8 @@ export class TestService {
             data: undefined,
             endpointName: "testParam",
             endpointPath: "/catalog/datasets/{datasetRid}/testParam",
+            headers: {
+            },
             method: "GET",
             pathArguments: [
                 datasetRid,
@@ -260,6 +287,8 @@ export class TestService {
             data: input,
             endpointName: "uploadRawData",
             endpointPath: "/catalog/datasets/upload-raw",
+            headers: {
+            },
             method: "POST",
             pathArguments: [
             ],

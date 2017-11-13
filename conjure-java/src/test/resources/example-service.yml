@@ -59,6 +59,10 @@ services:
         http: POST /datasets
         args:
           request: CreateDatasetRequest
+          testHeaderArg:
+            param-id: Test-Header
+            param-type: header
+            type: string
         returns: Dataset
 
       getDataset:

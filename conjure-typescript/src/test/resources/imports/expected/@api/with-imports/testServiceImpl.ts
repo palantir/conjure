@@ -18,6 +18,8 @@ export class TestService {
             data: importedString,
             endpointName: "testEndpoint",
             endpointPath: "/catalog/testEndpoint",
+            headers: {
+            },
             method: "POST",
             pathArguments: [
             ],

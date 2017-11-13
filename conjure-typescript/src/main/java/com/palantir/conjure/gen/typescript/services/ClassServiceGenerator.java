@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.services;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -25,6 +26,7 @@ import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.FunctionCallExpression;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
+import com.palantir.conjure.gen.typescript.poet.ObjectExpression;
 import com.palantir.conjure.gen.typescript.poet.RawExpression;
 import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
 import com.palantir.conjure.gen.typescript.poet.StandardImportStatement;
@@ -129,36 +131,57 @@ public final class ClassServiceGenerator implements ServiceGenerator {
             requestMediaType = MediaType.APPLICATION_JSON;
         }
 
+        ObjectExpression headers = ObjectExpression.builder().keyValues(
+                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                        .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
+                        .collect(Collectors.toMap(
+                                e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()),
+                                e -> RawExpression.of(e.getKey().name()))))
+                .build();
+
+        ArrayExpression requiredHeaders = ArrayExpression.of(ImmutableList.<TypescriptExpression>builder()
+                .addAll(authDefinition.type() == AuthDefinition.AuthType.HEADER
+                        ? Lists.newArrayList(StringExpression.of("Authorization"))
+                        : Lists.newArrayList())
+                .addAll(value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                        .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
+                        .map(e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()))
+                        .collect(Collectors.toList()))
+                .build());
+
+        ArrayExpression pathArguments = ArrayExpression.of(
+                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                        .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+                        .map(e -> e.getKey().name())
+                        .map(RawExpression::of)
+                        .collect(Collectors.toList()));
+
+        JsonExpression queryArguments = JsonExpression.builder().keyValues(
+                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                        .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
+                        .map(e -> e.getKey().name())
+                        .collect(Collectors.toMap(identifier -> identifier, RawExpression::of)))
+                .build();
+
+        RawExpression data = Iterables.getOnlyElement(
+                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                        .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.BODY)
+                        .map(e -> e.getKey().name())
+                        .map(RawExpression::of)
+                        .collect(Collectors.toList()), RawExpression.of("undefined"));
+
         Map<String, TypescriptExpression> keyValues = ImmutableMap.<String, TypescriptExpression>builder()
                 .put("endpointPath", StringExpression.of(
                         serviceBasePath.resolve(value.http().path()).path().toString()))
                 .put("endpointName", StringExpression.of(name))
+                .put("headers", headers)
                 .put("method", StringExpression.of(value.http().method()))
                 .put("requestMediaType", StringExpression.of(requestMediaType))
                 .put("responseMediaType", StringExpression.of(responseMediaType))
-                .put("requiredHeaders", ArrayExpression.of(
-                        authDefinition.type() == AuthDefinition.AuthType.HEADER
-                                ? Lists.newArrayList(StringExpression.of("Authorization"))
-                                : Lists.newArrayList()))
-                .put("pathArguments", ArrayExpression.of(
-                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
-                                .map(e -> e.getKey().name())
-                                .map(RawExpression::of)
-                                .collect(Collectors.toList())))
-                .put("queryArguments", JsonExpression.builder().keyValues(
-                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
-                                .map(e -> e.getKey().name())
-                                .collect(Collectors.toMap(identifier -> identifier,
-                                        identifier -> RawExpression.of(identifier))))
-                        .build())
-                .put("data", Iterables.getOnlyElement(
-                        value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
-                                .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.BODY)
-                                .map(e -> e.getKey().name())
-                                .map(RawExpression::of)
-                                .collect(Collectors.toList()), RawExpression.of("undefined")))
+                .put("requiredHeaders", requiredHeaders)
+                .put("pathArguments", pathArguments)
+                .put("queryArguments", queryArguments)
+                .put("data", data)
                 .build();
         String genericParam = ServiceUtils.generateFunctionSignatureReturnType(value, typeMapper);
         FunctionCallExpression call = FunctionCallExpression.builder().name(
