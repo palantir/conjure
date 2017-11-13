@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
 
+exec(open('conjure/_version.py').read())
+
 setup(
     name='conjure-python-lib',
+
+    version = __version__,
 
     description='Conjure Python Library',
 

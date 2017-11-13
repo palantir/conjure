@@ -2,6 +2,7 @@ from typing import List, Dict, Optional, Type, Any, Union
 import inspect
 import json
 from enum import Enum
+from ._version import __version__
 
 
 class ConjureType:

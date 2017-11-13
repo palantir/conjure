@@ -1,5 +1,14 @@
 apply from: "${rootDir}/gradle/python-conda.gradle"
 
+task createPythonVersionFile {
+    def modifiedVersion = project.version.replace('-', '_')
+    def file = new File("$projectDir/python/conjure/_version.py")
+    file.createNewFile()
+    file.text = "__version__ = \"$modifiedVersion\"\n"
+}
+tasks.test.dependsOn createPythonVersionFile
+tasks.condaBuild.dependsOn createPythonVersionFile
+
 task tox(type: Exec) {
     inputs.dir("python")
     outputs.dir("${buildDir}/tox/log")
