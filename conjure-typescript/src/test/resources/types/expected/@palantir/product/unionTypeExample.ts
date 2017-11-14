@@ -121,6 +121,43 @@ function interface_(
         type: "interface",
     };
 }
+export interface IUnionTypeExampleVisitor<T> {
+    'alsoAnInteger': (obj: number) => T;
+    'if': (obj: number) => T;
+    'interface': (obj: number) => T;
+    'new': (obj: number) => T;
+    'set': (obj: string[]) => T;
+    'stringExample': (obj: IStringExample) => T;
+    'thisFieldIsAnInteger': (obj: number) => T;
+    'unknown': (obj: IUnionTypeExample) => T;
+}
+function visit<T>(
+    obj: IUnionTypeExample,
+    visitor: IUnionTypeExampleVisitor<T>
+): T {
+    if (isStringExample(obj)) {
+        return visitor.stringExample(obj.stringExample);
+    }
+    if (isSet(obj)) {
+        return visitor.set(obj.set);
+    }
+    if (isThisFieldIsAnInteger(obj)) {
+        return visitor.thisFieldIsAnInteger(obj.thisFieldIsAnInteger);
+    }
+    if (isAlsoAnInteger(obj)) {
+        return visitor.alsoAnInteger(obj.alsoAnInteger);
+    }
+    if (isIf(obj)) {
+        return visitor.if(obj.if);
+    }
+    if (isNew(obj)) {
+        return visitor.new(obj.new);
+    }
+    if (isInterface(obj)) {
+        return visitor.interface(obj.interface);
+    }
+    return visitor.unknown(obj);
+}
 export const IUnionTypeExample = {
     alsoAnInteger: alsoAnInteger,
     if: if_,
@@ -136,4 +173,5 @@ export const IUnionTypeExample = {
     set: set_,
     stringExample: stringExample,
     thisFieldIsAnInteger: thisFieldIsAnInteger,
+    visit: visit,
 };

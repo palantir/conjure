@@ -17,16 +17,20 @@ import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.typescript.poet.AssignStatement;
 import com.palantir.conjure.gen.typescript.poet.CastExpression;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
+import com.palantir.conjure.gen.typescript.poet.FunctionCallExpression;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.JsonExpression;
 import com.palantir.conjure.gen.typescript.poet.RawExpression;
 import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
 import com.palantir.conjure.gen.typescript.poet.StringExpression;
+import com.palantir.conjure.gen.typescript.poet.TypescriptArrowFunctionType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptConditionalStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptEqualityClause;
 import com.palantir.conjure.gen.typescript.poet.TypescriptExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFieldSignature;
@@ -37,6 +41,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
 import com.palantir.conjure.gen.typescript.poet.TypescriptKeywords;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeAlias;
 import com.palantir.conjure.gen.typescript.poet.TypescriptTypeGuardType;
@@ -186,8 +191,12 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         List<TypescriptFunction> typeGuards = Lists.newArrayList();
         List<TypescriptFunction> factories = Lists.newArrayList();
         Map<String, TypescriptExpression> helperFunctionProps = Maps.newHashMap();
+        SortedSet<TypescriptFieldSignature> visitFunctionVisitorInterfaceProps = Sets.newTreeSet();
+        List<TypescriptExpression> visitFunctionConditionalExpressions = Lists.newArrayList();
+        List<TypescriptStatement> visitFunctionVisitorCalls = Lists.newArrayList();
         String mainName = "I" + typeName.name();
         TypescriptType mainType = TypescriptSimpleType.of(mainName);
+        TypescriptSimpleType genericType = TypescriptSimpleType.of("T");
 
         baseTypeDef.union().forEach((memberName, memberType) -> {
             String capitalizedMemberName = memberName.capitalize();
@@ -201,74 +210,71 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
 
             // build interface
-            SortedSet<TypescriptFieldSignature> propertySignatures = Sets.newTreeSet();
-            propertySignatures.add(TypescriptFieldSignature.builder()
-                    .name("type")
-                    .typescriptType(TypescriptSimpleType.of(quotedMemberName.emitToString()))
-                    .build());
-            propertySignatures.add(TypescriptFieldSignature.builder()
-                    .name(memberName.name())
-                    .typescriptType(typescriptMemberType)
-                    .build());
-            subInterfaces.add(TypescriptInterface.builder()
-                    .name(interfaceName)
-                    .propertySignatures(propertySignatures)
-                    .build());
+            subInterfaces.add(buildSubtypeInterface(memberName, interfaceName, quotedMemberName,
+                    typescriptMemberType));
 
             // build type guard function
-            TypescriptFunctionSignature functionSignature = TypescriptFunctionSignature.builder()
-                    .addParameters(TypescriptTypeSignature.builder()
-                            .name("obj")
-                            .typescriptType(mainType)
-                            .build())
-                    .name(typeGuardName)
-                    .returnType(TypescriptTypeGuardType.builder()
-                            .variableName("obj")
-                            .predicateType(interfaceType)
-                            .build())
-                    .build();
-            TypescriptFunctionBody functionBody = TypescriptFunctionBody.builder()
-                    .addStatements(ReturnStatement.builder()
-                            .expression(TypescriptEqualityClause.builder()
-                                    .lhs(RawExpression.of("obj.type"))
-                                    .rhs(quotedMemberName).build())
-                            .build())
-                    .build();
-
-            typeGuards.add(TypescriptFunction.builder()
-                    .functionSignature(functionSignature)
-                    .functionBody(functionBody)
-                    .isMethod(false)
-                    .build());
+            typeGuards.add(buildSubtypeTypeGuardFunction(mainType, typeGuardName, interfaceType,
+                    quotedMemberName));
             helperFunctionProps.put(typeGuardName, RawExpression.of(typeGuardName));
 
             // build factory function
             String sanitizedMemberName =
                     TypescriptKeywords.isKeyword(memberName.name()) ? memberName.name() + "_" : memberName.name();
-            TypescriptFunctionSignature factorySignature = TypescriptFunctionSignature.builder()
-                    .addParameters(TypescriptTypeSignature.builder()
-                            .name(sanitizedMemberName)
-                            .typescriptType(typescriptMemberType)
-                            .build())
-                    .name(sanitizedMemberName)
-                    .returnType(interfaceType)
-                    .build();
-            TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
-                    .addStatements(ReturnStatement.builder()
-                            .expression(JsonExpression.builder()
-                                    .putKeyValues("type", StringExpression.of(memberName.name()))
-                                    .putKeyValues(memberName.name(), RawExpression.of(sanitizedMemberName))
-                                    .build())
-                            .build())
-                    .build();
-            factories.add(TypescriptFunction.builder()
-                    .functionSignature(factorySignature)
-                    .functionBody(factoryBody)
-                    .isMethod(false)
-                    .build());
+            factories.add(buildSubtypeFactoryFunction(memberName, sanitizedMemberName, interfaceType,
+                    typescriptMemberType));
             helperFunctionProps.put(memberName.name(), RawExpression.of(sanitizedMemberName));
+
+            // build method type for visitor
+            visitFunctionVisitorInterfaceProps.add(TypescriptFieldSignature.builder()
+                    .name(memberName.name())
+                    .typescriptType(TypescriptArrowFunctionType.builder()
+                            .addParameters(TypescriptTypeSignature.builder()
+                                    .name("obj")
+                                    .typescriptType(typescriptMemberType)
+                                    .build())
+                            .returnType(genericType)
+                            .build())
+                    .build());
+
+            // build expressions that will be used in visit method impl
+            visitFunctionConditionalExpressions.add(FunctionCallExpression.builder()
+                    .name(typeGuardName)
+                    .addArguments(RawExpression.of("obj"))
+                    .build());
+            visitFunctionVisitorCalls.add(ReturnStatement.builder()
+                    .expression(FunctionCallExpression.builder()
+                            .name("visitor." + memberName.name())
+                            .addArguments(RawExpression.of("obj." + memberName.name()))
+                            .build())
+                    .build());
         });
 
+        // build interface for visit function visitor object
+        String unknownHandlerName = "unknown";
+        String visitFunctionVisitorInterfaceName = mainName + "Visitor";
+        visitFunctionVisitorInterfaceProps.add(TypescriptFieldSignature.builder()
+                .name(unknownHandlerName)
+                .typescriptType(TypescriptArrowFunctionType.builder()
+                        .addParameters(TypescriptTypeSignature.builder()
+                                .name("obj")
+                                .typescriptType(TypescriptSimpleType.of(mainName))
+                                .build())
+                        .returnType(genericType)
+                        .build())
+                .build());
+        TypescriptInterface visitFunctionVisitorInterface = TypescriptInterface.builder()
+                .name(visitFunctionVisitorInterfaceName)
+                .addGenericTypes(genericType)
+                .propertySignatures(visitFunctionVisitorInterfaceProps)
+                .build();
+        TypescriptFunction visitFunction = buildVisitFunction(visitFunctionConditionalExpressions,
+                visitFunctionVisitorCalls, mainType, unknownHandlerName, visitFunctionVisitorInterfaceName);
+
+
+        helperFunctionProps.put("visit", RawExpression.of("visit"));
+
+        // build last details: import statements, the main union type, etc.
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
                 typeName, packageLocation, mapper);
         List<ImportStatement> starImportStatements = GenerationUtils.generateStarImportStatements(referencedTypes,
@@ -296,8 +302,125 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .addEmittables(mainTypeAlias)
                 .addAllEmittables(typeGuards)
                 .addAllEmittables(factories)
+                .addEmittables(visitFunctionVisitorInterface)
+                .addEmittables(visitFunction)
                 .addEmittables(typeGuardObj)
                 .parentFolderPath(parentFolderPath)
+                .build();
+    }
+
+    private TypescriptInterface buildSubtypeInterface(FieldName memberName, String subtypeInterfaceName,
+            StringExpression quotedMemberName, TypescriptSimpleType subtypeConcreteType) {
+        SortedSet<TypescriptFieldSignature> propertySignatures = Sets.newTreeSet();
+        propertySignatures.add(TypescriptFieldSignature.builder()
+                .name("type")
+                .typescriptType(TypescriptSimpleType.of(quotedMemberName.emitToString()))
+                .build());
+        propertySignatures.add(TypescriptFieldSignature.builder()
+                .name(memberName.name())
+                .typescriptType(subtypeConcreteType)
+                .build());
+        return TypescriptInterface.builder()
+                .name(subtypeInterfaceName)
+                .propertySignatures(propertySignatures)
+                .build();
+    }
+
+    private TypescriptFunction buildSubtypeTypeGuardFunction(TypescriptType mainUnionType, String typeGuardName,
+            TypescriptSimpleType subtypeType, StringExpression quotedMemberName) {
+        TypescriptFunctionSignature functionSignature = TypescriptFunctionSignature.builder()
+                .addParameters(TypescriptTypeSignature.builder()
+                        .name("obj")
+                        .typescriptType(mainUnionType)
+                        .build())
+                .name(typeGuardName)
+                .returnType(TypescriptTypeGuardType.builder()
+                        .variableName("obj")
+                        .predicateType(subtypeType)
+                        .build())
+                .build();
+        TypescriptFunctionBody functionBody = TypescriptFunctionBody.builder()
+                .addStatements(ReturnStatement.builder()
+                        .expression(TypescriptEqualityClause.builder()
+                                .lhs(RawExpression.of("obj.type"))
+                                .rhs(quotedMemberName).build())
+                        .build())
+                .build();
+        return TypescriptFunction.builder()
+                .functionSignature(functionSignature)
+                .functionBody(functionBody)
+                .isMethod(false)
+                .build();
+    }
+
+    private TypescriptFunction buildSubtypeFactoryFunction(FieldName memberName, String sanitizedMemberName,
+            TypescriptSimpleType subtypeType, TypescriptSimpleType subtypeConcreteType) {
+        TypescriptFunctionSignature factorySignature = TypescriptFunctionSignature.builder()
+                .addParameters(TypescriptTypeSignature.builder()
+                        .name(sanitizedMemberName)
+                        .typescriptType(subtypeConcreteType)
+                        .build())
+                .name(sanitizedMemberName)
+                .returnType(subtypeType)
+                .build();
+        TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
+                .addStatements(ReturnStatement.builder()
+                        .expression(JsonExpression.builder()
+                                .putKeyValues("type", StringExpression.of(memberName.name()))
+                                .putKeyValues(memberName.name(), RawExpression.of(sanitizedMemberName))
+                                .build())
+                        .build())
+                .build();
+        return TypescriptFunction.builder()
+                .functionSignature(factorySignature)
+                .functionBody(factoryBody)
+                .isMethod(false)
+                .build();
+    }
+
+    private TypescriptFunction buildVisitFunction(List<TypescriptExpression> conditionalExpressions,
+            List<TypescriptStatement> visitorCalls, TypescriptType mainUnionType, String unknownHandlerName,
+            String visitorInterfaceName) {
+        TypescriptSimpleType genericType = TypescriptSimpleType.of("T");
+
+        // add a conditional / visitor call for each possible union subtype
+        List<TypescriptStatement> visitFunctionBodyStatements = Lists.newArrayList();
+        for (int i = 0; i < conditionalExpressions.size(); i++) {
+            TypescriptExpression condition = conditionalExpressions.get(i);
+            TypescriptStatement body = visitorCalls.get(i);
+            visitFunctionBodyStatements.add(TypescriptConditionalStatement.builder()
+                    .conditionalExpression(condition)
+                    .equalityBody(body)
+                    .build());
+        }
+
+        // add the visitor call for an unknown subtype
+        visitFunctionBodyStatements.add(ReturnStatement.builder()
+                .expression(FunctionCallExpression.builder()
+                        .name("visitor." + unknownHandlerName)
+                        .addArguments(RawExpression.of("obj"))
+                        .build())
+                .build());
+
+        // return full visit function
+        return TypescriptFunction.builder()
+                .functionSignature(TypescriptFunctionSignature.builder()
+                        .addGenericTypes(genericType)
+                        .addParameters(TypescriptTypeSignature.builder()
+                                .name("obj")
+                                .typescriptType(mainUnionType)
+                                .build())
+                        .addParameters(TypescriptTypeSignature.builder()
+                                .name("visitor")
+                                .typescriptType(TypescriptSimpleType.of(visitorInterfaceName + "<T>"))
+                                .build())
+                        .name("visit")
+                        .returnType(genericType)
+                        .build())
+                .functionBody(TypescriptFunctionBody.builder()
+                        .addAllStatements(visitFunctionBodyStatements)
+                        .build())
+                .isMethod(false)
                 .build();
     }
 

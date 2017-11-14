@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    TS union types now come with a `visit` method that forces all cases
+    to be handled exhaustively.
+  link: https://github.palantir.build/foundry/conjure/pull/600

@@ -9,11 +9,11 @@ export class DuplicateService {
         this.bridge = bridge;
     }
 
-    public copy1(): Promise<void> {
+    public copy2(): Promise<void> {
         return this.bridge.callEndpoint<void>({
             data: undefined,
-            endpointName: "copy1",
-            endpointPath: "/copy1",
+            endpointName: "copy2",
+            endpointPath: "/copy2",
             headers: {
             },
             method: "GET",

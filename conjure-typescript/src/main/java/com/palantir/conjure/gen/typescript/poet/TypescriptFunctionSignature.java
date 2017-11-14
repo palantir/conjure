@@ -16,6 +16,7 @@ import org.immutables.value.Value;
 public interface TypescriptFunctionSignature extends Comparable<TypescriptFunctionSignature>, Emittable {
 
     String name();
+    List<TypescriptSimpleType> genericTypes();
     List<TypescriptTypeSignature> parameters();
     Optional<TypescriptType> returnType();
 
@@ -27,6 +28,11 @@ public interface TypescriptFunctionSignature extends Comparable<TypescriptFuncti
     @Override
     default void emit(TypescriptPoetWriter writer) {
         writer.write(name());
+        if (genericTypes().size() > 0) {
+            writer.write("<");
+            writer.emitJoin(genericTypes(), ", ");
+            writer.write(">");
+        }
         writer.write("(");
 
         List<TypescriptTypeSignature> parametersOptionalAtEnd = parameters().stream()

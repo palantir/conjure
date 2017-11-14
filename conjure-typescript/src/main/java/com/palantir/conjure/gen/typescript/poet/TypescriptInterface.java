@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.typescript.poet;
 
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 import org.immutables.value.Value;
@@ -25,6 +26,9 @@ public interface TypescriptInterface extends Emittable, TypescriptType {
      */
     Optional<String> name();
 
+    List<TypescriptSimpleType> genericTypes();
+
+
     @Value.Default
     default SortedSet<TypescriptFieldSignature> propertySignatures() {
         return Sets.newTreeSet();
@@ -37,17 +41,23 @@ public interface TypescriptInterface extends Emittable, TypescriptType {
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-
-        StringBuilder identifier = new StringBuilder();
         if (export()) {
-            identifier.append("export ");
+            writer.writeIndented("export ");
         }
 
-        name().ifPresent(name ->
-                identifier.append("interface ").append(name).append(" "));
+        if (name().isPresent()) {
+            writer.write("interface " + name().get());
+            if (genericTypes().size() > 0) {
+                writer.write("<");
+                writer.emitJoin(genericTypes(), ", ");
+                writer.write(">");
+            }
+            writer.write(" ");
+        }
 
-        writer.writeIndentedLine(identifier + "{")
+        writer.writeLine("{")
                 .increaseIndent();
+
         propertySignatures().forEach(property -> {
             writer.writeIndented();
             property.emit(writer);

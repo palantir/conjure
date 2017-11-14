@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript.poet;
 
 import java.io.PrintStream;
+import java.util.List;
 
 public final class TypescriptPoetWriter {
 
@@ -70,6 +71,17 @@ public final class TypescriptPoetWriter {
     public TypescriptPoetWriter emitIndented(Emittable emittable) {
         writeIndented();
         emittable.emit(this);
+        return this;
+    }
+
+    public TypescriptPoetWriter emitJoin(List<? extends Emittable> emittables, String joinStr) {
+        if (emittables.size() > 0) {
+            emittables.get(0).emit(this);
+            emittables.subList(1, emittables.size()).forEach(emittable -> {
+                write(joinStr);
+                emittable.emit(this);
+            });
+        }
         return this;
     }
 }
