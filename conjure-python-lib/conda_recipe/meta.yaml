@@ -14,7 +14,7 @@ requirements:
     - setuptools
 
   run:
-    - enum34
+    - enum34  # [py<34]
     - python
     - requests
     - typing
