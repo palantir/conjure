@@ -6,9 +6,11 @@ package com.palantir.conjure.gen.typescript;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.ConjureSubfolderRunner;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.gen.typescript.errors.DefaultErrorGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.IOException;
@@ -24,7 +26,9 @@ public final class TypescriptGeneratorTest {
 
     private final ConjureTypeScriptClientGenerator generator = new ConjureTypeScriptClientGenerator(
             new DefaultServiceGenerator(),
-            new DefaultTypeGenerator());
+            new DefaultTypeGenerator(),
+            new DefaultErrorGenerator(),
+            ImmutableSet.of(ExperimentalFeatures.TypeScriptErrorTypes));
 
     @ConjureSubfolderRunner.Test
     public void assertThatFilesRenderAsExpected(Path folder) throws IOException {

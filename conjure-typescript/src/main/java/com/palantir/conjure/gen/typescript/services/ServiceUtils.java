@@ -62,7 +62,7 @@ public final class ServiceUtils {
         return TypescriptFunctionSignature.builder()
                 .name(name)
                 .parameters(generateParameters(value.argsWithAutoDefined().orElse(ImmutableMap.of()), typeMapper))
-                .returnType(TypescriptSimpleType.builder().name("Promise<" + innerReturnType + ">").build())
+                .returnType(TypescriptSimpleType.of("Promise<" + innerReturnType + ">"))
                 .build();
     }
 

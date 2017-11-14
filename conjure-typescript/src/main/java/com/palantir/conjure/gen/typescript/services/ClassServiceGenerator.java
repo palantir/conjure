@@ -72,7 +72,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         .rhs(RawExpression.of("bridge"))
                         .build())
                 .build();
-        TypescriptSimpleType bridgeType = TypescriptSimpleType.builder().name("IHttpApiBridge").build();
+        TypescriptSimpleType bridgeType = TypescriptSimpleType.of("IHttpApiBridge");
         TypescriptConstructor constructor = TypescriptConstructor.builder()
                 .addParameters(TypescriptTypeSignature.builder().name("bridge").typescriptType(bridgeType).build())
                 .functionBody(constructorBody).build();

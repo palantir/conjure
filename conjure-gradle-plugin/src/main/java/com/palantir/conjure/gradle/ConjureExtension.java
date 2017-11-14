@@ -5,10 +5,11 @@
 package com.palantir.conjure.gradle;
 
 import com.google.common.collect.Sets;
-import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
@@ -54,15 +55,32 @@ public class ConjureExtension {
                 .collect(Collectors.toSet());
     }
 
-    public final Set<ExperimentalFeatures> getJavaExperimentalFeatures() {
+    public final Set<com.palantir.conjure.gen.java.ExperimentalFeatures> getJavaExperimentalFeatures() {
         return getExperimentalFeatures().stream()
-                .map(ExperimentalFeatures::valueOf)
+                .flatMap(maybeValueOf(com.palantir.conjure.gen.java.ExperimentalFeatures::valueOf))
                 .collect(Collectors.toSet());
     }
 
     public final Set<PythonBeanGenerator.ExperimentalFeatures> getPythonExperimentalFeatures() {
         return getExperimentalFeatures().stream()
-                .map(PythonBeanGenerator.ExperimentalFeatures::valueOf)
+                .flatMap(maybeValueOf(PythonBeanGenerator.ExperimentalFeatures::valueOf))
                 .collect(Collectors.toSet());
+    }
+
+    public final Set<com.palantir.conjure.gen.typescript.ExperimentalFeatures> getTypescriptExperimentalFeatures() {
+        return getExperimentalFeatures().stream()
+                .flatMap(maybeValueOf(com.palantir.conjure.gen.typescript.ExperimentalFeatures::valueOf))
+                .collect(Collectors.toSet());
+    }
+
+    private static <T> Function<String, Stream<T>> maybeValueOf(Function<String, T> valueOf) {
+        return string -> {
+            try {
+                T validValue = valueOf.apply(string);
+                return Stream.of(validValue);
+            } catch (IllegalArgumentException e) {
+                return Stream.empty();
+            }
+        };
     }
 }

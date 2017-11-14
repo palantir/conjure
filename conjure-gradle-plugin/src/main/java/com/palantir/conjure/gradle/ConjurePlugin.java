@@ -8,6 +8,7 @@ import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
+import com.palantir.conjure.gen.typescript.errors.DefaultErrorGenerator;
 import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.File;
@@ -187,6 +188,8 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.setNodeModulesOutputDirectory(new File(subproj.getBuildDir(), "node_modules"));
                             task.setServiceGenerator(new DefaultServiceGenerator());
                             task.setTypeGenerator(new DefaultTypeGenerator());
+                            task.setErrorGenerator(new DefaultErrorGenerator());
+                            task.setExperimentalFeatures(extension::getTypescriptExperimentalFeatures);
                             conjureTask.dependsOn(task);
                         });
             });

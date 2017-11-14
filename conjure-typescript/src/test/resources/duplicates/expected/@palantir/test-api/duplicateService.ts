@@ -1,3 +1,3 @@
 export interface IDuplicateService {
-    copy1(): Promise<void>;
+    copy2(): Promise<void>;
 }

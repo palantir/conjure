@@ -11,6 +11,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 @Value.Immutable
 public interface TypescriptSimpleType extends TypescriptType {
+
+    @Value.Parameter
     String name();
 
     @Value.Derived
@@ -23,9 +25,7 @@ public interface TypescriptSimpleType extends TypescriptType {
         writer.write(name());
     }
 
-    static Builder builder() {
-        return new Builder();
+    static TypescriptSimpleType of(String name) {
+        return ImmutableTypescriptSimpleType.of(name);
     }
-
-    class Builder extends ImmutableTypescriptSimpleType.Builder {}
 }

@@ -6,14 +6,24 @@ package com.palantir.conjure.gen.typescript.poet;
 
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Optional;
 import java.util.SortedSet;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
 @Value.Immutable
-public interface TypescriptInterface extends Emittable {
+public interface TypescriptInterface extends Emittable, TypescriptType {
 
-    String name();
+    @Value.Default
+    default boolean export() {
+        return true;
+    }
+
+    /**
+     * Omit this to make an inline interface, e.g. `let myPoint: {x: number; y: number} = `
+     * https://basarat.gitbooks.io/typescript/docs/types/interfaces.html
+     */
+    Optional<String> name();
 
     @Value.Default
     default SortedSet<TypescriptFieldSignature> propertySignatures() {
@@ -27,7 +37,16 @@ public interface TypescriptInterface extends Emittable {
 
     @Override
     default void emit(TypescriptPoetWriter writer) {
-        writer.writeIndentedLine("export interface " + name() + " {")
+
+        StringBuilder identifier = new StringBuilder();
+        if (export()) {
+            identifier.append("export ");
+        }
+
+        name().ifPresent(name ->
+                identifier.append("interface ").append(name).append(" "));
+
+        writer.writeIndentedLine(identifier + "{")
                 .increaseIndent();
         propertySignatures().forEach(property -> {
             writer.writeIndented();

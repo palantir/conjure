@@ -187,13 +187,13 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         List<TypescriptFunction> factories = Lists.newArrayList();
         Map<String, TypescriptExpression> helperFunctionProps = Maps.newHashMap();
         String mainName = "I" + typeName.name();
-        TypescriptType mainType = TypescriptSimpleType.builder().name(mainName).build();
+        TypescriptType mainType = TypescriptSimpleType.of(mainName);
 
         baseTypeDef.union().forEach((memberName, memberType) -> {
             String capitalizedMemberName = memberName.capitalize();
             String interfaceName = String.format("%s_%s", mainName, capitalizedMemberName);
             String typeGuardName = String.format("is%s", capitalizedMemberName);
-            TypescriptSimpleType interfaceType = TypescriptSimpleType.builder().name(interfaceName).build();
+            TypescriptSimpleType interfaceType = TypescriptSimpleType.of(interfaceName);
             StringExpression quotedMemberName = StringExpression.of(memberName.name());
             ConjureType conjureTypeOfMemberType = memberType.type();
             TypescriptSimpleType typescriptMemberType = mapper.getTypescriptType(conjureTypeOfMemberType);
@@ -204,7 +204,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
             SortedSet<TypescriptFieldSignature> propertySignatures = Sets.newTreeSet();
             propertySignatures.add(TypescriptFieldSignature.builder()
                     .name("type")
-                    .typescriptType(TypescriptSimpleType.builder().name(quotedMemberName.emitToString()).build())
+                    .typescriptType(TypescriptSimpleType.of(quotedMemberName.emitToString()))
                     .build());
             propertySignatures.add(TypescriptFieldSignature.builder()
                     .name(memberName.name())
@@ -276,7 +276,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
         TypescriptUnionType unionType = TypescriptUnionType.builder()
                 .types(subInterfaces.stream().map(
-                        i -> TypescriptSimpleType.builder().name(i.name()).build()).collect(Collectors.toList()))
+                        i -> TypescriptSimpleType.of(i.name().get())).collect(Collectors.toList()))
                 .build();
         TypescriptTypeAlias mainTypeAlias = TypescriptTypeAlias.builder()
                 .name(mainName)

@@ -12,6 +12,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.gen.typescript.errors.ErrorGenerator;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
@@ -38,11 +39,18 @@ public final class ConjureTypeScriptClientGenerator {
 
     private final ServiceGenerator serviceGenerator;
     private final TypeGenerator typeGenerator;
+    private final ErrorGenerator errorGenerator;
+    private final Set<ExperimentalFeatures> experimentalFeatures;
 
-    public ConjureTypeScriptClientGenerator(ServiceGenerator serviceGenerator,
-            TypeGenerator typeGenerator) {
+    public ConjureTypeScriptClientGenerator(
+            ServiceGenerator serviceGenerator,
+            TypeGenerator typeGenerator,
+            ErrorGenerator errorGenerator,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         this.serviceGenerator = serviceGenerator;
         this.typeGenerator = typeGenerator;
+        this.errorGenerator = errorGenerator;
+        this.experimentalFeatures = experimentalFeatures;
     }
 
     /**
@@ -59,6 +67,12 @@ public final class ConjureTypeScriptClientGenerator {
         conjureDefinitions.forEach(definition -> {
             allFiles.addAll(serviceGenerator.generate(definition));
             allFiles.addAll(typeGenerator.generate(definition.types()));
+
+            if (experimentalFeatures.contains(ExperimentalFeatures.TypeScriptErrorTypes)) {
+                allFiles.addAll(errorGenerator.generate(
+                        definition.types().definitions().errors(),
+                        definition.types().definitions().defaultConjurePackage()));
+            }
         });
         allFiles.forEach(f -> emit(f, outputDir));
 
@@ -99,6 +113,12 @@ public final class ConjureTypeScriptClientGenerator {
                 .forEach((conjurePackage, exports) -> allExports.putAll(conjurePackage, exports)));
         conjureDefinitions.forEach(conjureDef -> typeGenerator.generateExports(conjureDef.types())
                 .forEach((conjurePackage, exports) -> allExports.putAll(conjurePackage, exports)));
+        if (experimentalFeatures.contains(ExperimentalFeatures.TypeScriptErrorTypes)) {
+            conjureDefinitions.forEach(conjureDef -> errorGenerator.generateExports(
+                    conjureDef.types().definitions().errors(),
+                    conjureDef.types().definitions().defaultConjurePackage()).forEach(
+                            (conjurePackage, exports) -> allExports.putAll(conjurePackage, exports)));
+        }
 
         allExports.asMap().forEach((conjurePackage, exports) -> {
             TypescriptFile indexFile = TypescriptFile.builder()

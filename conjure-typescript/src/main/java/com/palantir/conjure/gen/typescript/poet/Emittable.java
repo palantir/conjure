@@ -4,6 +4,6 @@
 
 package com.palantir.conjure.gen.typescript.poet;
 
-interface Emittable {
+public interface Emittable {
     void emit(TypescriptPoetWriter writer);
 }

@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +32,7 @@ public interface TypescriptFile {
     String parentFolderPath();
 
     default void writeTo(File file) throws IOException {
-        String name = name();
-        name = StringUtils.uncapitalize(name);
-        File thisFile = new File(new File(file, parentFolderPath()), name + TS_EXTENSION);
+        File thisFile = file.toPath().resolve(path() + TS_EXTENSION).toFile();
         Files.createDirectories(thisFile.getParentFile().toPath());
         if (!thisFile.exists()) {
             Files.createFile(thisFile.toPath());
@@ -58,6 +58,11 @@ public interface TypescriptFile {
             writeTo(output);
         }
         return baos.toString(StandardCharsets.UTF_8.name());
+    }
+
+    default Path path() {
+        String name = StringUtils.uncapitalize(name());
+        return Paths.get(parentFolderPath()).resolve(name);
     }
 
     static Builder builder() {

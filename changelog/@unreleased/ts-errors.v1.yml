@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    Conjure can now generate a typescript interface for any user defined Conjure errors.
+    Use `experimentalFeature 'TypeScriptErrorTypes'` to try this out.
+  link: https://github.palantir.build/foundry/conjure/pull/684

@@ -48,7 +48,7 @@ public final class TypeMapper {
     }
 
     public TypescriptSimpleType getTypescriptType(ConjureType conjureType) {
-        return TypescriptSimpleType.builder().name(getTypeNameFromConjureType(conjureType)).build();
+        return TypescriptSimpleType.of(getTypeNameFromConjureType(conjureType));
     }
 
     public Set<ReferenceType> getReferencedConjureNames(ConjureType conjureType) {
