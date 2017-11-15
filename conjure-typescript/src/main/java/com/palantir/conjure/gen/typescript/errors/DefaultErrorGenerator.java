@@ -19,13 +19,22 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ExportStatement;
+import com.palantir.conjure.gen.typescript.poet.Exportable;
+import com.palantir.conjure.gen.typescript.poet.RawExpression;
+import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
 import com.palantir.conjure.gen.typescript.poet.StringExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFieldSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFile;
+import com.palantir.conjure.gen.typescript.poet.TypescriptFunction;
+import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionBody;
+import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptInterface;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptStringLiteralType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptTypeGuardType;
+import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.util.Collection;
 import java.util.List;
@@ -76,7 +85,7 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
     private Set<FileWithExports> generateAllFiles(
             Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
 
-        Multimap<ConjurePackage, TypescriptInterface> codeByPackage =
+        Multimap<ConjurePackage, Exportable> codeByPackage =
                 generateCodeByPackage(definitions, defaultPackage);
 
         return codeByPackage.asMap().entrySet()
@@ -89,8 +98,8 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
                             .build();
 
                     List<String> names = entry.getValue().stream()
-                            .map(TypescriptInterface::name)
-                            .map(Optional::get)
+                            .map(exportable -> exportable.exportName().<IllegalStateException>orElseThrow(() ->
+                                    new IllegalStateException("Expected non-empty exportName: " + exportable)))
                             .collect(toList());
 
                     return ImmutableFileWithExports.builder()
@@ -102,22 +111,61 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
                 .collect(toSet());
     }
 
-    private Multimap<ConjurePackage, TypescriptInterface> generateCodeByPackage(
+    private Multimap<ConjurePackage, Exportable> generateCodeByPackage(
             Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
 
         // we're going to have a single 'errors' file per package
-        ListMultimap<ConjurePackage, TypescriptInterface> codeByPackage = ArrayListMultimap.create();
+        ListMultimap<ConjurePackage, Exportable> codeByPackage = ArrayListMultimap.create();
 
         definitions.forEach((typeName, definition) -> {
             ConjurePackage conjurePackage = definition.conjurePackage().orElse(defaultPackage
                     .orElseThrow(() -> new IllegalArgumentException("No package for: " + typeName.name())));
 
-            TypescriptInterface emittable = createSingleInterface(typeName, definition);
+            TypescriptInterface errorInterface = createSingleInterface(typeName, definition);
+            TypescriptFunction typeGuard = createTypeGuard(typeName, errorInterface, definition);
 
-            codeByPackage.put(conjurePackage, emittable);
+            codeByPackage.put(conjurePackage, errorInterface);
+            codeByPackage.put(conjurePackage, typeGuard);
         });
 
         return codeByPackage;
+    }
+
+    private TypescriptFunction createTypeGuard(
+            TypeName typeName,
+            TypescriptInterface errorInterface,
+            ErrorTypeDefinition definition) {
+
+        TypescriptTypeSignature param = TypescriptTypeSignature.builder()
+                .name("arg")
+                .typescriptType(TypescriptSimpleType.of("any"))
+                .build();
+
+        TypescriptTypeGuardType functionReturnType = TypescriptTypeGuardType.builder()
+                .variableName("arg")
+                .predicateType(TypescriptSimpleType.of(errorInterface.name().get()))
+                .build();
+
+        TypescriptFunctionSignature signature = TypescriptFunctionSignature.builder()
+                .name("is" + typeName.name())
+                .addParameters(param)
+                .returnType(functionReturnType)
+                .build();
+
+        TypescriptStatement statement = ReturnStatement.of(RawExpression.of(
+                "arg && arg.errorName === '" + errorName(typeName, definition) + "'"));
+        TypescriptFunctionBody body = TypescriptFunctionBody.builder().addStatements(statement).build();
+
+        return TypescriptFunction.builder()
+                .export(true)
+                .isMethod(false)
+                .functionSignature(signature)
+                .functionBody(body)
+                .build();
+    }
+
+    private static String errorName(TypeName typeName, ErrorTypeDefinition definition) {
+        return definition.namespace().name() + ":" + typeName.name();
     }
 
     /**
@@ -135,7 +183,7 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
         TypescriptFieldSignature errorName = TypescriptFieldSignature.builder()
                 .name("errorName")
                 .typescriptType(TypescriptStringLiteralType.of(
-                        StringExpression.of(definition.namespace().name() + ":" + typeName.name())))
+                        StringExpression.of(errorName(typeName, definition))))
                 .build();
 
         TypescriptFieldSignature errorInstanceId = TypescriptFieldSignature.builder()

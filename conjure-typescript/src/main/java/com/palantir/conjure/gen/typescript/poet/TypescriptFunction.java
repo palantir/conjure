@@ -5,11 +5,13 @@
 package com.palantir.conjure.gen.typescript.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
 @Value.Immutable
-public interface TypescriptFunction extends Emittable {
+public interface TypescriptFunction extends Emittable, Exportable {
+
     TypescriptFunctionBody functionBody();
     TypescriptFunctionSignature functionSignature();
 
@@ -18,8 +20,22 @@ public interface TypescriptFunction extends Emittable {
         return true;
     }
 
+    @Value.Default
+    default boolean export() {
+        return false;
+    }
+
+    @Override
+    @Value.Derived
+    default Optional<String> exportName() {
+        return export() ? Optional.of(functionSignature().name()) : Optional.empty();
+    }
+
     @Override
     default void emit(TypescriptPoetWriter writer) {
+        if (export()) {
+            writer.write("export ");
+        }
         if (!isMethod()) {
             writer.writeIndented("function ");
         } else {

@@ -1,0 +1,10 @@
+type: improvement
+improvement:
+  description: >
+    Conjure typescript can now generate type guard functions, e.g.
+    ```
+    function isFooError(arg: any): arg is IFooError {
+        return arg && arg.errorName === "MyErrors:FooError";
+    }
+    ```
+    Use `experimentalFeature 'TypeScriptErrorTypes'` to try this out.

@@ -13,7 +13,7 @@ import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
 @Value.Immutable
-public interface TypescriptInterface extends Emittable, TypescriptType {
+public interface TypescriptInterface extends Emittable, TypescriptType, Exportable {
 
     @Value.Default
     default boolean export() {
@@ -26,8 +26,13 @@ public interface TypescriptInterface extends Emittable, TypescriptType {
      */
     Optional<String> name();
 
-    List<TypescriptSimpleType> genericTypes();
+    @Override
+    @Value.Derived
+    default Optional<String> exportName() {
+        return export() ? Optional.of(name().get()) : Optional.empty();
+    }
 
+    List<TypescriptSimpleType> genericTypes();
 
     @Value.Default
     default SortedSet<TypescriptFieldSignature> propertySignatures() {

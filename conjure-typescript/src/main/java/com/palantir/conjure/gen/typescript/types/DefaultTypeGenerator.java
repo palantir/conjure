@@ -242,12 +242,10 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                     .name(typeGuardName)
                     .addArguments(RawExpression.of("obj"))
                     .build());
-            visitFunctionVisitorCalls.add(ReturnStatement.builder()
-                    .expression(FunctionCallExpression.builder()
-                            .name("visitor." + memberName.name())
-                            .addArguments(RawExpression.of("obj." + memberName.name()))
-                            .build())
-                    .build());
+            visitFunctionVisitorCalls.add(ReturnStatement.of(FunctionCallExpression.builder()
+                    .name("visitor." + memberName.name())
+                    .addArguments(RawExpression.of("obj." + memberName.name()))
+                    .build()));
         });
 
         // build interface for visit function visitor object
@@ -340,11 +338,9 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         .build())
                 .build();
         TypescriptFunctionBody functionBody = TypescriptFunctionBody.builder()
-                .addStatements(ReturnStatement.builder()
-                        .expression(TypescriptEqualityClause.builder()
-                                .lhs(RawExpression.of("obj.type"))
-                                .rhs(quotedMemberName).build())
-                        .build())
+                .addStatements(ReturnStatement.of(TypescriptEqualityClause.builder()
+                        .lhs(RawExpression.of("obj.type"))
+                        .rhs(quotedMemberName).build()))
                 .build();
         return TypescriptFunction.builder()
                 .functionSignature(functionSignature)
@@ -364,12 +360,10 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .returnType(subtypeType)
                 .build();
         TypescriptFunctionBody factoryBody = TypescriptFunctionBody.builder()
-                .addStatements(ReturnStatement.builder()
-                        .expression(JsonExpression.builder()
-                                .putKeyValues("type", StringExpression.of(memberName.name()))
-                                .putKeyValues(memberName.name(), RawExpression.of(sanitizedMemberName))
-                                .build())
-                        .build())
+                .addStatements(ReturnStatement.of(JsonExpression.builder()
+                        .putKeyValues("type", StringExpression.of(memberName.name()))
+                        .putKeyValues(memberName.name(), RawExpression.of(sanitizedMemberName))
+                        .build()))
                 .build();
         return TypescriptFunction.builder()
                 .functionSignature(factorySignature)
@@ -395,12 +389,10 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         }
 
         // add the visitor call for an unknown subtype
-        visitFunctionBodyStatements.add(ReturnStatement.builder()
-                .expression(FunctionCallExpression.builder()
-                        .name("visitor." + unknownHandlerName)
-                        .addArguments(RawExpression.of("obj"))
-                        .build())
-                .build());
+        visitFunctionBodyStatements.add(ReturnStatement.of(FunctionCallExpression.builder()
+                .name("visitor." + unknownHandlerName)
+                .addArguments(RawExpression.of("obj"))
+                .build()));
 
         // return full visit function
         return TypescriptFunction.builder()

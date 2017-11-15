@@ -10,6 +10,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 @Value.Immutable
 public interface ReturnStatement extends TypescriptStatement {
+    @Value.Parameter
     TypescriptExpression expression();
 
     @Override
@@ -19,9 +20,7 @@ public interface ReturnStatement extends TypescriptStatement {
         writer.writeLine(";");
     }
 
-    static Builder builder() {
-        return new Builder();
+    static ReturnStatement of(TypescriptExpression expression) {
+        return ImmutableReturnStatement.of(expression);
     }
-
-    class Builder extends ImmutableReturnStatement.Builder {}
 }

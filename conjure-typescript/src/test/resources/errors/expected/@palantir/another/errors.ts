@@ -6,3 +6,8 @@ export interface IDifferentPackage {
     }
 ;
 }
+export function isDifferentPackage(
+    arg: any
+): arg is IDifferentPackage {
+    return arg && arg.errorName === 'Conjure:DifferentPackage';
+}

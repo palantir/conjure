@@ -1,1 +1,1 @@
-export { IInvalidServiceDefinition, IInvalidTypeDefinition, IJavaCompilationFailed } from "@palantir/product/errors";
+export { IInvalidServiceDefinition, IInvalidTypeDefinition, IJavaCompilationFailed, isInvalidServiceDefinition, isInvalidTypeDefinition, isJavaCompilationFailed } from "@palantir/product/errors";

@@ -1,1 +1,1 @@
-export { IDifferentPackage } from "@palantir/another/errors";
+export { IDifferentPackage, isDifferentPackage } from "@palantir/another/errors";

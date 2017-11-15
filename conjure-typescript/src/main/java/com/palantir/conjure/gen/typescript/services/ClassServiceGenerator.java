@@ -188,7 +188,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 "this.bridge.callEndpoint<" + genericParam + ">").addArguments(
                 JsonExpression.builder().keyValues(keyValues).build()).build();
         return TypescriptFunctionBody.builder().addStatements(
-                ReturnStatement.builder().expression(call).build()).build();
+                ReturnStatement.of(call)).build();
     }
 
     @Override
