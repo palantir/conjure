@@ -52,7 +52,7 @@ public class CompileTypeScriptJavaScriptTask extends ConventionTask {
                     "install",
                     "--prefix",
                     getProject().getBuildDir().getAbsolutePath(),
-                    "typescript@2.1.4");
+                    "typescript@2.6.1");
         });
         File tscExecutable = new File(getProject().getBuildDir(), "node_modules/typescript/bin/tsc");
 

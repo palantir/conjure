@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: >
+    `./gradlew publishTypeScriptJavaScript` now uses tsc 2.6.1 to compile to javascript.
+  links:
+    - https://github.palantir.build/foundry/conjure/issues/412
+    - https://github.com/Microsoft/TypeScript/releases/tag/v2.6.1
