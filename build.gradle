@@ -1,3 +1,9 @@
+/*
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ */
+import com.palantir.conda.gradle.CondaUtils
+import org.gradle.internal.os.OperatingSystem;
+
 buildscript {
     repositories {
         maven {
@@ -9,11 +15,11 @@ buildscript {
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.1'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.17.1'
+        classpath "com.palantir.conda.gradle:conda-gradle-plugin:0.7.0"
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
         classpath 'com.palantir.gradle.changelog:gradle-changelog:2.3.0'
         classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
-        classpath 'gradle.plugin.com.palantir.python:gradle-miniconda-plugin:0.8.0'
     }
 }
 
@@ -31,10 +37,15 @@ allprojects {
     version gitVersion()
     group 'com.palantir.conjure'
 
+    ext {
+        condaArch = findProperty('condaArch') ?: OperatingSystem.current().isMacOsX() ? 'osx-64' : 'linux-64'
+        defaultTruststore = rootProject.file("defaultJREAndPalantirTruststore.jks")
+        pythonVersion = CondaUtils.formatCondaVersion(versionDetails())
+    }
+
     repositories {
-        maven {
-            url 'https://artifactory.palantir.build/artifactory/all-jar/'
-        }
+        maven {url 'https://artifactory.palantir.build/artifactory/all-jar/'}
+        maven {url 'https://artifactory.palantir.build/artifactory/internal-dist-release'}
     }
     apply plugin: 'com.palantir.configuration-resolver'
     apply plugin: 'com.palantir.exartisi-dependencies'

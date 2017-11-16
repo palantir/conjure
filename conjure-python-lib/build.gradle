@@ -1,13 +1,21 @@
-apply from: "${rootDir}/gradle/python-conda.gradle"
+/*
+ * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ */
+
+apply from: "${rootDir}/gradle/python.gradle"
+apply from: "${rootDir}/gradle/conda.gradle"
+
+ext {
+    condaPackage = { arch, py -> "${condaBuild.condaRepoPath}/${arch}/conjure-python-lib-${pythonVersion}-${py}_0.tar.bz2" }
+}
 
 task createPythonVersionFile {
-    def modifiedVersion = project.version.replace('-', '_')
     def file = new File("$projectDir/python/conjure/_version.py")
     file.createNewFile()
-    file.text = "__version__ = \"$modifiedVersion\"\n"
+    file.text = "__version__ = \"${pythonVersion}\"\n"
 }
-tasks.test.dependsOn createPythonVersionFile
 tasks.condaBuild.dependsOn createPythonVersionFile
+tasks.test.dependsOn createPythonVersionFile
 
 task tox(type: Exec) {
     inputs.dir("python")
@@ -18,19 +26,36 @@ task tox(type: Exec) {
     commandLine 'tox', '--workdir', "${buildDir}/tox"
 }
 
-task condaPublish {
+tasks.test.dependsOn tox
+
+task condaConvert(dependsOn: ['condaBuild']) {
     doLast {
-        def modifiedVersion = project.version.replace('-', '_')
-        // TODO(bduffield): modify conda gradle plugin to provide this as output file
-        def modulePath = "${project.buildDir}/conda-dist/noarch/conjure-python-lib-${modifiedVersion}-py_0.tar.bz2"
-        exec {
-            // TODO(bduffield): use snapshot repo for snapshots
-            commandLine "curl", "-k", "-u", "${System.env.ARTIFACTORY_USERNAME}:${System.env.ARTIFACTORY_PASSWORD}", "--upload-file", modulePath,
-                "https://publish.artifactory.palantir.build/artifactory/internal-conda-release/noarch/"
+        ['py27', 'py36'].each { py ->
+            exec {
+                executable condaBuild.executionEnvironment.executable()
+                environment condaBuild.executionEnvironment.environmentVariables()
+
+                args 'convert', condaPackage(condaArch, py)
+                args '--output-dir', "${condaBuild.condaRepoPath}"
+                args '--platform', 'all'
+            }
         }
     }
 }
+tasks.build.dependsOn condaBuild, condaConvert
 
-tasks.test.dependsOn tox
-tasks.check.dependsOn condaBuildCheck
-condaPublish.dependsOn tasks.condaBuild
+task condaPublish(dependsOn: ['condaConvert']) {
+    doLast {
+        ['linux-64', 'osx-64'].each { arch ->
+            ['py27', 'py36'].each { py ->
+                exec {
+                    commandLine "curl", "--fail", "-k", "-u",
+                            "${System.env.ARTIFACTORY_USERNAME}:${System.env.ARTIFACTORY_PASSWORD}",
+                            "https://publish.artifactory.palantir.build/artifactory/internal-conda-release/${arch}/",
+                            "--upload-file", condaPackage(arch, py)
+
+                }
+            }
+        }
+    }
+}

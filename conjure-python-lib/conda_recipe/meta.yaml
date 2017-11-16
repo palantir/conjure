@@ -1,21 +1,18 @@
 package:
   name: conjure-python-lib
-  version: {{ GIT_VERSION_STRING.replace("-", "_") }}
+  version: "{{ PACKAGE_VERSION }}"
 
 source:
   path: ../python
 
-build:
-  noarch: python
-
 requirements:
   build:
-    - python
+    - python {{ python }}
     - setuptools
 
   run:
-    - enum34  # [py<34]
     - python
+    - enum34 # [py<34]
     - requests
     - typing
 

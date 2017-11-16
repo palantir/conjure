@@ -1,0 +1,28 @@
+/*
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ */
+
+apply plugin: 'com.palantir.conda.packaging'
+
+configurations {
+    condaInstaller
+    condaw
+}
+
+dependencies {
+    condaw "com.palantir.conda.wrapper:conda-wrapper@gz"
+    condaInstaller "com.palantir.conda.installer:conda-installer::${condaArch}@sh"
+}
+
+conda {
+    trustStore = defaultTruststore
+    wrapper {
+        condaWrapperFileCollection = configurations.condaw
+        condaInstallerUri = configurations.condaInstaller.singleFile.toURI()
+        truststore = defaultTruststore
+    }
+    channels = [
+            'https://artifactory.palantir.build/artifactory/external-conda-anaconda',
+            'https://artifactory.palantir.build/artifactory/external-conda-forge'
+    ]
+}

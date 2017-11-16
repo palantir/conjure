@@ -1,0 +1,22 @@
+/*
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ */
+
+apply plugin: 'base'
+apply plugin: 'idea'
+apply plugin: "java-library" // for source roots, also adds 'test'
+
+configurations {
+    test {
+    }
+}
+
+check.dependsOn test
+
+idea {
+    module {
+        sourceDirs += file("python")
+        testSourceDirs += file("python/test")
+        testSourceDirs += file("python/integration")
+    }
+}
