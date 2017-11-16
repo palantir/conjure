@@ -828,8 +828,8 @@ Feature Requests
 Conjure is a widely-used framework and as such has comparatively strict back-compatibility requirements. Further, since
 Conjure supports multiple language, features can only be added if we have confidence in its implementation across
 supported languages. This implies that the default position regarding new features is conservative: we prefer Conjure to
-be as small as possible. If you would like to propose a feature, please reach out to conjure-interest@palantir.com or
-start a discussion on a Github issue.
+be as small as possible. If you would like to propose a feature, please reach out to 
+pd-foundry-infrastructure-dev@palantir.com or start a discussion on a Github issue.
 
 Below is a list of features that we have considered but are unlikely to support:
 
@@ -844,3 +844,12 @@ Polymorphic types are hard to implement, in particular across languages. Followi
 Buffers, we do not support polymorphic types or interfaces. Union types offer a limited form of polymorphism that allows
 library authors to encode alternative return values. For example, see
 https://github.palantir.build/foundry/conjure/issues/201 .
+
+### Imports from other Conjure APIs
+Conjure does not support importing objects from other Conjure APIs. If you must reference objects from another service's
+API, the recommendation is to redefine these types in your own service's Conjure definition. 
+
+Cross-API imports are undesirable for a few reasons:
+1. API version coupling: breaks in the dependency's API result in breaks in the consuming API.
+2. Transitive dependency complexity and the introduction of [diamond dependency](http://www.well-typed.com/blog/9/) risk
+
