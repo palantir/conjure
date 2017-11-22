@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    Added Alias Support in Typescript
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/709

@@ -147,10 +147,10 @@ public final class TypeMapper {
             BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
             if (defType != null) {
                 if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
-                        || defType instanceof UnionTypeDefinition) {
+                        || defType instanceof UnionTypeDefinition || defType instanceof AliasTypeDefinition) {
                     return Optional.of(ConjurePackages.getPackage(
                             defType.conjurePackage(), defaultPackage, type.type()));
-                } else if (!(defType instanceof AliasTypeDefinition)) {
+                } else {
                     throw new IllegalArgumentException("Unknown base object type definition");
                 }
             }
@@ -248,10 +248,7 @@ public final class TypeMapper {
         }
 
         private String extractTypescriptName(ReferenceType referenceType, BaseObjectTypeDefinition defType) {
-            if (defType instanceof AliasTypeDefinition) {
-                // in typescript we collapse alias types to concrete types
-                return getAliasedType(referenceType, (AliasTypeDefinition) defType).visit(this);
-            } else if (defType instanceof EnumTypeDefinition) {
+            if (defType instanceof EnumTypeDefinition || defType instanceof AliasTypeDefinition) {
                 return referenceType.type().name();
             } else {
                 // Interfaces are prepended with "I"
@@ -259,20 +256,5 @@ public final class TypeMapper {
             }
         }
 
-        // If the original ReferenceType is a ForeignReferenceType and the aliased type is a LocalReferenceType,
-        // then the LocalReferenceType has to be converted to a ForeignReferenceType for resolution to work
-        private ConjureType getAliasedType(ReferenceType referenceType, AliasTypeDefinition aliasTypeDefinition) {
-            ConjureType aliasedType = aliasTypeDefinition.alias();
-            if (referenceType instanceof ForeignReferenceType
-                    && aliasedType instanceof LocalReferenceType
-                    && !(aliasedType instanceof PrimitiveType)) {
-
-                LocalReferenceType localAliasedType = (LocalReferenceType) aliasedType;
-                return ForeignReferenceType.of(
-                        ((ForeignReferenceType) referenceType).namespace(),
-                        localAliasedType.type());
-            }
-            return aliasedType;
-        }
     }
 }
