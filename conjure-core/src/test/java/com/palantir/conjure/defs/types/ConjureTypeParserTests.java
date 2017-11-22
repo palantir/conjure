@@ -150,6 +150,16 @@ public final class ConjureTypeParserTests {
                         AnyType.of()));
     }
 
+    @Test(expected = ParseException.class)
+    public void testParser_invalidSuffixType() throws ParseException {
+        TypeParser.INSTANCE.parse("string[]");
+    }
+
+    @Test(expected = ParseException.class)
+    public void testParser_invalidType() throws ParseException {
+        TypeParser.INSTANCE.parse("[]");
+    }
+
     @Test
     public void testDeserializer_stringType() throws IOException {
         assertThat(new ObjectMapper().readValue("\"string\"", ConjureType.class))

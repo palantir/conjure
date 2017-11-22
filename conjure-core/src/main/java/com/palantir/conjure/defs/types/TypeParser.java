@@ -29,12 +29,21 @@ public enum TypeParser implements Parser<ConjureType> {
     INSTANCE;
 
     public ConjureType parse(String input) throws ParseException {
+        ParserState inputParserState = new StringParserState(input);
+        ConjureType resultType = Parsers.eof(typeParser()).parse(inputParserState);
+        if (resultType == null) {
+            throw new ParseException(input, inputParserState);
+        }
         return parse(new StringParserState(input));
     }
 
     @Override
     public ConjureType parse(ParserState input) throws ParseException {
-        Parser<ConjureType> parser = Parsers.or(
+        return typeParser().parse(input);
+    }
+
+    private Parser<ConjureType> typeParser() {
+        return Parsers.or(
                 MapTypeParser.INSTANCE,
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
@@ -44,8 +53,6 @@ public enum TypeParser implements Parser<ConjureType> {
                 TypeFromString.of("datetime", DateTimeType.of()),
                 ForeignReferenceTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
-
-        return parser.parse(input);
     }
 
     private enum TypeReferenceParser implements Parser<LocalReferenceType> {
@@ -66,7 +73,14 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public LocalReferenceType parse(ParserState input) throws ParseException {
-            return LocalReferenceType.of(TypeName.of(REF_PARSER.parse(input)));
+            input.mark();
+            String typeReference = REF_PARSER.parse(input);
+            if (typeReference == null) {
+                input.rewind();
+                return null;
+            }
+            input.release();
+            return LocalReferenceType.of(TypeName.of(typeReference));
         }
     }
 

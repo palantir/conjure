@@ -164,4 +164,16 @@ public final class TestUnitParsers {
         assertEquals("123", rsp.parse(state));
     }
 
+    @Test
+    public void testEofParser() throws ParseException {
+        assertEquals(ExpectationResult.CORRECT, Parsers.eof(new ExpectantParser("abc"))
+                .parse(new StringParserState("abc")));
+    }
+
+    @Test
+    public void testEofParserFails() throws ParseException {
+        assertNull(Parsers.eof(new ExpectantParser("abc"))
+                .parse(new StringParserState("abcdef")));
+    }
+
 }

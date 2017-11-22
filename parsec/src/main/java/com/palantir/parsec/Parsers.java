@@ -137,6 +137,20 @@ public final class Parsers {
         return new BetweenParser<T>(whitespace(expect(start)), whitespace(parser), whitespace(expect(end)));
     }
 
+    public static <T> Parser<T> eof(Parser<T> parser) {
+        return new Parser<T>() {
+            @Override
+            public T parse(ParserState input) throws ParseException {
+                T result = parser.parse(input);
+
+                if (input.next() != -1) {
+                    return null;
+                }
+                return result;
+            }
+        };
+    }
+
     /**
      * Returns true when the argument is null or is equal to {@link ExpectationResult#INCORRECT}.
      *

@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Invalid types now fail to compile, instead of silently ignoring part of the type string.
+  link: https://github.palantir.build/foundry/conjure/pull/699
