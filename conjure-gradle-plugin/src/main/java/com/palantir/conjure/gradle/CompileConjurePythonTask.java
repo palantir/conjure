@@ -60,7 +60,6 @@ public class CompileConjurePythonTask extends SourceTask {
         PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
 
         compileFiles(beanGenerator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
-        GitIgnore.writeGitIgnore(outputDirectory, "*.py\n");
     }
 
     private void compileFiles(PythonBeanGenerator beanGenerator, Collection<File> files) {

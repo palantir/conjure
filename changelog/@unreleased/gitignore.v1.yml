@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Generate `.gitignore` under the source directory to ensure conjure project folders are not ignored by root project.
+  link: https://github.palantir.build/foundry/conjure/issues/706

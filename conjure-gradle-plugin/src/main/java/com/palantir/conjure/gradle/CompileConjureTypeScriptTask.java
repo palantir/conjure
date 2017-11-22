@@ -77,7 +77,6 @@ public class CompileConjureTypeScriptTask extends SourceTask {
                 "Unable to make directory tree %s", nodeModulesOutputDirectory);
 
         compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()), outputDirectory);
-        GitIgnore.writeGitIgnore(outputDirectory, "*.ts\npackage.json\n");
 
         // make all generated code available for later compilation
         compileFiles(getSource().getFiles(), nodeModulesOutputDirectory);

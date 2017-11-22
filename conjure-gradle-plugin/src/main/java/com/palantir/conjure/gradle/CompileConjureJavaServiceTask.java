@@ -41,7 +41,6 @@ public class CompileConjureJavaServiceTask extends SourceTask {
                 "Unable to make directory tree %s", outputDirectory);
 
         compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()));
-        GitIgnore.writeGitIgnore(outputDirectory, "*.java\n");
     }
 
     private void compileFiles(Collection<File> files) {

@@ -103,8 +103,8 @@ class ConjurePluginTest extends IntegrationSpec {
         // java
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
-        fileExists('api/api-objects/src/generated/java/.gitignore')
-        file('api/api-objects/src/generated/java/.gitignore').text.contains('*.java')
+        fileExists('api/api-objects/src/.gitignore')
+        file('api/api-objects/src/.gitignore').text.contains('*.java')
 
         // typescript
         fileExists('api/api-typescript/src/@test/api/stringExample.ts')
@@ -145,7 +145,7 @@ class ConjurePluginTest extends IntegrationSpec {
         result.wasExecuted(':api:compileConjureObjects')
 
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
-        fileExists('api/api-objects/src/generated/java/.gitignore')
+        fileExists('api/api-objects/src/.gitignore')
     }
 
     def 'check code compiles when run in parallel with multiple build targets'() {
@@ -159,7 +159,7 @@ class ConjurePluginTest extends IntegrationSpec {
         result.wasExecuted(':api:compileConjureJersey')
 
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
-        fileExists('api/api-objects/src/generated/java/.gitignore')
+        fileExists('api/api-objects/src/.gitignore')
     }
 
     def 'clean cleans up src/generated/java'() {
