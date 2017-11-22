@@ -14,6 +14,10 @@ types:
       external:
         java: com.palantir.redaction.Safe
 
+    Nonnull:
+      external:
+        java: javax.annotation.Nonnull
+
   definitions:
     default-package: com.palantir.product
     objects:
@@ -50,6 +54,8 @@ services:
 
     endpoints:
       getFileSystems:
+        markers:
+          - Nonnull # requires ExperimentalFeatures.DangerousGothamMethodMarkers
         http: GET /fileSystems
         returns: map<string, BackingFileSystem>
         docs: |

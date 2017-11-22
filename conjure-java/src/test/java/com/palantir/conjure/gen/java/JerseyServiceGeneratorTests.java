@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -38,7 +40,7 @@ public final class JerseyServiceGeneratorTests extends TestBase {
     public void testConjureImports() throws IOException {
         ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
         File src = folder.newFolder("src");
-        JerseyServiceGenerator generator = new JerseyServiceGenerator();
+        JerseyServiceGenerator generator = new JerseyServiceGenerator(ImmutableSet.of());
         generator.emit(conjure, src);
 
         // Generated files contain imports
@@ -48,7 +50,8 @@ public final class JerseyServiceGeneratorTests extends TestBase {
 
     private void testServiceGeneration(String conjureFile) throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/" + conjureFile));
-        List<Path> files = new JerseyServiceGenerator().emit(def, folder.getRoot());
+        Set<ExperimentalFeatures> features = ImmutableSet.of(ExperimentalFeatures.DangerousGothamMethodMarkers);
+        List<Path> files = new JerseyServiceGenerator(features).emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("recreate", "false"))) {

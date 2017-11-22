@@ -4,6 +4,8 @@
 
 package com.palantir.conjure.gen.java.services;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -14,8 +16,10 @@ import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
+import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.Retrofit2MethodTypeClassNameVisitor;
@@ -110,6 +114,9 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                         .addMember("value", "$S", constructPath(basePath, endpointDef.http().path()))
                         .build());
 
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {
+            methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.markers()));
+        }
         if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Streaming")).build());
         }
@@ -229,6 +236,17 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 throw new IllegalArgumentException("Unknown authorization type: " + auth.type());
         }
         return Optional.empty();
+    }
+
+    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, Set<ConjureType> markers) {
+        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
+                "Markers must refer to reference types.");
+        return markers.stream()
+                .map(typeMapper::getClassName)
+                .map(ClassName.class::cast)
+                .map(AnnotationSpec::builder)
+                .map(AnnotationSpec.Builder::build)
+                .collect(Collectors.toSet());
     }
 
     private static ClassName httpMethodToClassName(String method) {

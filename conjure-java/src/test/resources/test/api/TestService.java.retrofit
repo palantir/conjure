@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Generated;
+import javax.annotation.Nonnull;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,6 +32,7 @@ import retrofit2.http.Streaming;
 public interface TestService {
     /** Returns a mapping from file system id to backing file system configuration. */
     @GET("/catalog/fileSystems")
+    @Nonnull
     Call<Map<String, BackingFileSystem>> getFileSystems(
             @Header("Authorization") AuthHeader authHeader);
 

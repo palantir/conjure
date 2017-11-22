@@ -22,8 +22,17 @@ public enum ExperimentalFeatures {
     ErrorTypes,
 
     /**
+     * Allow markers on service methods. This feature exists for gotham to migrate to conjure and will be removed once
+     * migration is complete.
+     *
+     * @see <a href="https://github.palantir.build/foundry/conjure/issues/708">708</a>
+     */
+    DangerousGothamMethodMarkers,
+
+    /**
      * Feature for gotham support.
      * @see <a href="https://github.palantir.build/foundry/conjure/issues/708">708</a>
      */
     DangerousGothamSerializableBeans,
+
 }

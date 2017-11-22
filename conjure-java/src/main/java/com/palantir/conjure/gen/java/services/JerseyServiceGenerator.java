@@ -18,6 +18,7 @@ import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.JerseyMethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.JerseyReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
@@ -36,6 +37,12 @@ import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
 public final class JerseyServiceGenerator implements ServiceGenerator {
+
+    private final Set<ExperimentalFeatures> experimentalFeatures;
+
+    public JerseyServiceGenerator(Set<ExperimentalFeatures> experimentalFeatures) {
+        this.experimentalFeatures = experimentalFeatures;
+    }
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
@@ -90,6 +97,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         .build())
                 .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, methodTypeMapper));
 
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {
+            methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.markers()));
+        }
         if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
                     .addMember("value", "$T.APPLICATION_OCTET_STREAM", ClassName.get("javax.ws.rs.core", "MediaType"))

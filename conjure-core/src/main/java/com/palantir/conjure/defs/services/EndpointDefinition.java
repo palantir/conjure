@@ -26,6 +26,8 @@ public interface EndpointDefinition {
 
     Optional<Map<ParameterName, ArgumentDefinition>> args();
 
+    Set<ConjureType> markers();
+
     /**
      * Returns the arguments for this endpoint where all instances of ParamType.AUTO have been set to
      * ParamType.PATH or ParamType.BODY.

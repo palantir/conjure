@@ -173,7 +173,8 @@ public class ConjurePlugin implements Plugin<Project> {
                             File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
                             File gitignoreDir = subproj.file(JAVA_GITIGNORE_DIRNAME);
                             task.setOutputDirectory(outputDir);
-                            task.setServiceGenerator(JerseyServiceGenerator::new);
+                            task.setServiceGenerator(() ->
+                                    new JerseyServiceGenerator(experimentalFeaturesSupplier.get()));
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);

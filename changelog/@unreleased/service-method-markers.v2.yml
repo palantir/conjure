@@ -1,0 +1,8 @@
+type: improvement
+improvement:
+  description: >
+    Markers are supported on service methods when DangerousGothamMethodMarkers
+    is enabled. This feature exists for gotham to migrate to conjure and will
+    be removed once migration is complete.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/705

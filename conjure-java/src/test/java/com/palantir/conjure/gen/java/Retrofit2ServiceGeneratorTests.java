@@ -30,7 +30,9 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
     public void testCompositionVanilla() throws IOException {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
 
-        List<Path> files = new Retrofit2ServiceGenerator(ImmutableSet.of()).emit(def, folder.getRoot());
+        List<Path> files = new Retrofit2ServiceGenerator(
+                ImmutableSet.of(ExperimentalFeatures.DangerousGothamMethodMarkers))
+                .emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
