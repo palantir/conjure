@@ -32,6 +32,7 @@ import com.palantir.conjure.gen.typescript.poet.ReturnStatement;
 import com.palantir.conjure.gen.typescript.poet.StringExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptArrowFunctionType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptConditionalStatement;
+import com.palantir.conjure.gen.typescript.poet.TypescriptDocumentation;
 import com.palantir.conjure.gen.typescript.poet.TypescriptEqualityClause;
 import com.palantir.conjure.gen.typescript.poet.TypescriptExpression;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFieldSignature;
@@ -138,6 +139,9 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         .isOptional(e.getValue().type() instanceof OptionalType)
                         .name(e.getKey().name())
                         .typescriptType(mapper.getTypescriptType(e.getValue().type()))
+                        .docs(e.getValue().docs()
+                                .map(docs -> Optional.of(TypescriptDocumentation.builder().docs(docs).build()))
+                                .orElse(Optional.empty()))
                         .build())
                 .collect(Collectors.toSet());
         TypescriptInterface thisInterface = TypescriptInterface.builder()

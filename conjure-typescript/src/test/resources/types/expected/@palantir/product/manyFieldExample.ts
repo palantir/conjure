@@ -1,12 +1,20 @@
 import { StringAliasExample } from "./stringAliasExample";
 
 export interface IManyFieldExample {
+    /** docs for alias field */
     'alias': StringAliasExample;
+    /** docs for doubleValue field */
     'doubleValue': number;
+    /** docs for integer field */
     'integer': number;
+    /** docs for items field */
     'items': string[];
+    /** docs for map field */
     'map': { [key: string]: string };
+    /** docs for set field */
     'set': string[];
+    /** docs for string field */
     'string': string;
+    /** docs for optionalItem field */
     'optionalItem'?: string;
 }

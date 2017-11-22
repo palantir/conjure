@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.typescript.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @ConjureImmutablesStyle
@@ -17,6 +18,7 @@ public interface TypescriptFieldSignature extends Comparable<TypescriptFieldSign
     }
     String name();
     TypescriptType typescriptType();
+    Optional<TypescriptDocumentation> docs();
 
     @Override
     default void emit(TypescriptPoetWriter writer) {

@@ -65,6 +65,10 @@ public interface TypescriptInterface extends Emittable, TypescriptType, Exportab
 
         propertySignatures().forEach(property -> {
             writer.writeIndented();
+            property.docs().ifPresent(docs -> {
+                docs.emit(writer);
+                writer.writeIndented();
+            });
             property.emit(writer);
             writer.writeLine(";");
         });
