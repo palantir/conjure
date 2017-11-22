@@ -3,11 +3,14 @@ package com.palantir.product;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.lib.SafeLong;
+import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class SafeLongAliasExample {
+public final class SafeLongAliasExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final SafeLong value;
 
     private SafeLongAliasExample(SafeLong value) {

@@ -20,6 +20,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.StableCollectors;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -55,7 +56,8 @@ public final class UnionGenerator {
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
             com.palantir.conjure.defs.types.names.TypeName typeName,
-            UnionTypeDefinition typeDef) {
+            UnionTypeDefinition typeDef,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage);
         ClassName unionClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
@@ -83,6 +85,10 @@ public final class UnionGenerator {
                 .addMethod(MethodSpecs.createEqualTo(unionClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
                 .addMethod(MethodSpecs.createToString(unionClass.simpleName(), fields));
+
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            SerializableSupport.enable(typeBuilder);
+        }
 
         typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
 

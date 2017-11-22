@@ -19,5 +19,11 @@ public enum ExperimentalFeatures {
      * Enables conjure error types in the {@link ObjectGenerator}.
      * YML files defining {@code types.definition.errors} will generate
      * static methods to throw remoting-api compatible ServiceExceptions. */
-    ErrorTypes
+    ErrorTypes,
+
+    /**
+     * Feature for gotham support.
+     * @see <a href="https://github.palantir.build/foundry/conjure/issues/708">708</a>
+     */
+    DangerousGothamSerializableBeans,
 }

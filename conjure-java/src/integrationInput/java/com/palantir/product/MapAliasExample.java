@@ -2,12 +2,15 @@ package com.palantir.product;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class MapAliasExample {
+public final class MapAliasExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Map<String, Object> value;
 
     private MapAliasExample(Map<String, Object> value) {

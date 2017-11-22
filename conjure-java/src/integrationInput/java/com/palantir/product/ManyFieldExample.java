@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +19,9 @@ import javax.annotation.Generated;
 
 @JsonDeserialize(builder = ManyFieldExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class ManyFieldExample {
+public final class ManyFieldExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String string;
 
     private final int integer;

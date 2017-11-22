@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +18,9 @@ import javax.annotation.Generated;
 
 /** A type which can either be a StringExample, a set of strings, or an integer. */
 @Generated("com.palantir.conjure.gen.java.types.UnionGenerator")
-public final class UnionTypeExample {
+public final class UnionTypeExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Base value;
 
     @JsonCreator

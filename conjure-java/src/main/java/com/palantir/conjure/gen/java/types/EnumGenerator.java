@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -22,6 +23,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,14 +35,15 @@ public final class EnumGenerator {
             Optional<ConjurePackage> defaultPackage,
             com.palantir.conjure.defs.types.names.TypeName typeName,
             EnumTypeDefinition typeDef,
-            boolean supportUnknownEnumValues) {
+            boolean supportUnknownEnumValues,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
         ClassName enumClass = ClassName.get(typePackage.name(), typeName.name(), "Value");
 
         TypeSpec spec;
         if (supportUnknownEnumValues) {
-            spec = createSafeEnum(typeName, typeDef, thisClass, enumClass);
+            spec = createSafeEnum(typeName, typeDef, thisClass, enumClass, experimentalFeatures);
         } else {
             spec = createEnum(thisClass, typeDef.values(), false);
             if (typeDef.docs().isPresent()) {
@@ -59,7 +62,8 @@ public final class EnumGenerator {
             com.palantir.conjure.defs.types.names.TypeName typeName,
             EnumTypeDefinition typeDef,
             ClassName thisClass,
-            ClassName enumClass) {
+            ClassName enumClass,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeName.name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
@@ -85,6 +89,9 @@ public final class EnumGenerator {
                 .addMethod(createHashCode())
                 .addMethod(createValueOf(thisClass, typeDef.values()));
 
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            SerializableSupport.enable(wrapper);
+        }
         if (typeDef.docs().isPresent()) {
             wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
         }

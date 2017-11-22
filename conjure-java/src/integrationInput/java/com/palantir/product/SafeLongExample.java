@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.lib.SafeLong;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +13,9 @@ import javax.annotation.Generated;
 
 @JsonDeserialize(builder = SafeLongExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class SafeLongExample {
+public final class SafeLongExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final SafeLong safeLongValue;
 
     private SafeLongExample(SafeLong safeLongValue) {

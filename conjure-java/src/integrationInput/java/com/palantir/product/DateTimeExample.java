@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,9 @@ import javax.annotation.Generated;
 
 @JsonDeserialize(builder = DateTimeExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class DateTimeExample {
+public final class DateTimeExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final ZonedDateTime datetime;
 
     private DateTimeExample(ZonedDateTime datetime) {

@@ -2,11 +2,14 @@ package com.palantir.product;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class ReferenceAliasExample {
+public final class ReferenceAliasExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final AnyExample value;
 
     private ReferenceAliasExample(AnyExample value) {

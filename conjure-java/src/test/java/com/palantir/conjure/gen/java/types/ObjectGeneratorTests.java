@@ -34,7 +34,7 @@ public final class ObjectGeneratorTests {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
         List<Path> files = new ObjectGenerator(
                 Settings.builder().ignoreUnknownProperties(true).build(),
-                ImmutableSet.of())
+                ImmutableSet.of(ExperimentalFeatures.DangerousGothamSerializableBeans))
                 .emit(def, folder.getRoot());
 
         assertThatFilesAreTheSame(files, REFERENCE_FILES_FOLDER);

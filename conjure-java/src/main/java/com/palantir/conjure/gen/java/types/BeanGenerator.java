@@ -20,6 +20,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +57,8 @@ public final class BeanGenerator {
             Optional<ConjurePackage> defaultPackage,
             TypeName typeName,
             ObjectTypeDefinition typeDef,
-            boolean ignoreUnknownProperties) {
+            boolean ignoreUnknownProperties,
+            Set<ExperimentalFeatures> experimentalFeatures) {
 
         ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
         ClassName objectClass = ClassName.get(typePackage.name(), typeName.name());
@@ -70,6 +73,10 @@ public final class BeanGenerator {
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
                 .addMethods(createGetters(fields));
+
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            SerializableSupport.enable(typeBuilder);
+        }
 
         if (!poetFields.isEmpty()) {
             typeBuilder

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +14,9 @@ import javax.annotation.Generated;
 
 @JsonDeserialize(builder = ListExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class ListExample {
+public final class ListExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final List<String> items;
 
     private final List<Integer> primitiveItems;

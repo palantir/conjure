@@ -2,6 +2,7 @@ package com.palantir.product;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Generated;
@@ -20,10 +21,12 @@ import javax.annotation.Generated;
  * compile time.
  */
 @Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
-public final class EnumExample {
+public final class EnumExample implements Serializable {
     public static final EnumExample ONE = new EnumExample(Value.ONE);
 
     public static final EnumExample TWO = new EnumExample(Value.TWO);
+
+    private static final long serialVersionUID = 1L;
 
     private final Value value;
 

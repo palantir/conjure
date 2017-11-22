@@ -3,11 +3,14 @@ package com.palantir.product;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.ri.ResourceIdentifier;
+import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.AliasGenerator")
-public final class RidAliasExample {
+public final class RidAliasExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final ResourceIdentifier value;
 
     private RidAliasExample(ResourceIdentifier value) {

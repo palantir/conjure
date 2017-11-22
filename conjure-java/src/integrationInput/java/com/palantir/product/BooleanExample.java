@@ -4,12 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Generated;
 
 @JsonDeserialize(builder = BooleanExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class BooleanExample {
+public final class BooleanExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final boolean coin;
 
     private BooleanExample(boolean coin) {

@@ -46,16 +46,19 @@ public final class ObjectGenerator implements TypeGenerator {
         TypeMapper typeMapper = new TypeMapper(types);
         if (typeDef instanceof ObjectTypeDefinition) {
             return BeanGenerator.generateBeanType(typeMapper,
-                    defaultPackage, typeName, (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties());
+                    defaultPackage, typeName, (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
+                    enabledExperimentalFeatures);
         } else if (typeDef instanceof UnionTypeDefinition) {
             return UnionGenerator.generateUnionType(
-                    typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef);
+                    typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef,
+                    enabledExperimentalFeatures);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return EnumGenerator.generateEnumType(
-                    defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues());
+                    defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
+                    enabledExperimentalFeatures);
         } else if (typeDef instanceof AliasTypeDefinition) {
             return AliasGenerator.generateAliasType(
-                    typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef);
+                    typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
     }

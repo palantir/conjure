@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -20,6 +21,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +33,8 @@ public final class AliasGenerator {
             TypeMapper typeMapper,
             Optional<ConjurePackage> defaultPackage,
             com.palantir.conjure.defs.types.names.TypeName typeName,
-            AliasTypeDefinition typeDef) {
+            AliasTypeDefinition typeDef,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         TypeName aliasTypeName = typeMapper.getClassName(typeDef.alias());
 
         ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
@@ -67,6 +70,10 @@ public final class AliasGenerator {
                         .returns(TypeName.INT)
                         .addCode(primitiveSafeHashCode(aliasTypeName))
                         .build());
+
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            SerializableSupport.enable(spec);
+        }
 
         Optional<CodeBlock> maybeValueOfFactoryMethod = valueOfFactoryMethod(typeDef.alias(), thisClass, aliasTypeName);
         if (maybeValueOfFactoryMethod.isPresent()) {

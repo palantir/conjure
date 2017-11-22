@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.lib.SafeLong;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.BearerToken;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +18,9 @@ import javax.annotation.Generated;
 
 @JsonDeserialize(builder = PrimitiveOptionalsExample.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class PrimitiveOptionalsExample {
+public final class PrimitiveOptionalsExample implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final OptionalDouble num;
 
     private final Optional<Boolean> bool;
