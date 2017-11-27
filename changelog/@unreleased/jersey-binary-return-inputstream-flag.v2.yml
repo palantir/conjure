@@ -1,0 +1,9 @@
+type: improvement
+improvement:
+  description: >
+    Jersey interface methods may return InputStream instead of StreamingOutput
+    when the DangerousGothamJerseyBinaryReturnInputStream flag is enabled.
+    This feature exists for gotham to migrate to conjure and will
+    be removed once migration is complete.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/714

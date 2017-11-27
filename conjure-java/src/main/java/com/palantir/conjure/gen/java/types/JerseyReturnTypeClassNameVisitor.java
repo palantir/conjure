@@ -15,15 +15,19 @@ import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+import java.util.Set;
 
 public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor {
 
     private final DefaultClassNameVisitor delegate;
+    private final Set<ExperimentalFeatures> experimentalFeatures;
 
-    public JerseyReturnTypeClassNameVisitor(TypesDefinition types) {
+    public JerseyReturnTypeClassNameVisitor(TypesDefinition types, Set<ExperimentalFeatures> experimentalFeatures) {
         this.delegate = new DefaultClassNameVisitor(types);
+        this.experimentalFeatures = experimentalFeatures;
     }
 
     @Override
@@ -68,7 +72,10 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
 
     @Override
     public TypeName visitBinary(BinaryType type) {
-        return ClassName.get(javax.ws.rs.core.StreamingOutput.class);
+        return ClassName.get(
+                experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamJerseyBinaryReturnInputStream)
+                        ? java.io.InputStream.class
+                        : javax.ws.rs.core.StreamingOutput.class);
     }
 
     @Override

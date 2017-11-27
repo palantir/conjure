@@ -1,0 +1,10 @@
+services:
+  TestService:
+    default-auth: none
+    base-path: /
+    package: test.api
+    name: Test Interface
+    endpoints:
+      getBinary:
+        http: GET /
+        returns: binary

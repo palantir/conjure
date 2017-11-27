@@ -46,7 +46,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper returnTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyReturnTypeClassNameVisitor::new);
+        TypeMapper returnTypeMapper = new TypeMapper(
+                conjureDefinition.types(),
+                types -> new JerseyReturnTypeClassNameVisitor(types, experimentalFeatures));
         TypeMapper methodTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyMethodTypeClassNameVisitor::new);
         return conjureDefinition.services().entrySet().stream()
                 .map(entry -> generateService(entry.getKey(), entry.getValue(), returnTypeMapper, methodTypeMapper))

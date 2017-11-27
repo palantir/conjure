@@ -35,4 +35,12 @@ public enum ExperimentalFeatures {
      */
     DangerousGothamSerializableBeans,
 
+    /**
+     * Feature for gotham support.
+     * Allows jax-rs interface methods to return <pre>InputStream</pre> objects
+     * as opposed to <pre>StreamingOutput</pre>.
+     * @see <a href="https://github.palantir.build/foundry/conjure/issues/708">708</a>
+     */
+    DangerousGothamJerseyBinaryReturnInputStream,
+
 }

@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.Rule;
@@ -46,6 +47,25 @@ public final class JerseyServiceGeneratorTests extends TestBase {
         // Generated files contain imports
         assertThat(compiledFileContent(src, "test/api/with/imports/TestService.java"))
                 .contains("import com.palantir.product.StringExample;");
+    }
+
+    @Test
+    public void testBinaryReturnInputStream() throws IOException {
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-binary.yml"));
+        List<Path> files = new JerseyServiceGenerator(
+                Collections.singleton(ExperimentalFeatures.DangerousGothamJerseyBinaryReturnInputStream))
+                .emit(def, folder.getRoot());
+
+        for (Path file : files) {
+            if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
+                Path output = Paths.get("src/test/resources/test/api/" + file.getFileName() + ".jersey");
+                Files.delete(output);
+                Files.copy(file, output);
+            }
+
+            assertThat(readFromFile(file))
+                    .isEqualTo(readFromResource("/test/api/" + file.getFileName() + ".jersey.binary"));
+        }
     }
 
     private void testServiceGeneration(String conjureFile) throws IOException {
