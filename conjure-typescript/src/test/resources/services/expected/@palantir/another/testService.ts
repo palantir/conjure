@@ -19,7 +19,7 @@ export interface ITestService {
 
     getDataset(
         datasetRid: string
-    ): Promise<IDataset | undefined>;
+    ): Promise<IDataset | null | undefined>;
 
     /** Returns a mapping from file system id to backing file system configuration. */
     getFileSystems(): Promise<{ [key: string]: IBackingFileSystem }>;
@@ -30,12 +30,12 @@ export interface ITestService {
 
     maybeGetRawData(
         datasetRid: string
-    ): Promise<any | undefined>;
+    ): Promise<any | null | undefined>;
 
     resolveBranch(
         datasetRid: string,
         branch: string
-    ): Promise<string | undefined>;
+    ): Promise<string | null | undefined>;
 
     testBoolean(): Promise<boolean>;
 
@@ -45,7 +45,7 @@ export interface ITestService {
 
     testParam(
         datasetRid: string
-    ): Promise<string | undefined>;
+    ): Promise<string | null | undefined>;
 
     uploadRawData(
         input: any

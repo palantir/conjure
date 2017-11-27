@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Improved the typescript generated for conjure `optional<T>` types so
+    that tsc `strictNullChecks` can better catch deseriaized values that could be `null`.

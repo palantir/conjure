@@ -16,5 +16,5 @@ export interface IManyFieldExample {
     /** docs for string field */
     'string': string;
     /** docs for optionalItem field */
-    'optionalItem'?: string;
+    'optionalItem'?: string | null;
 }

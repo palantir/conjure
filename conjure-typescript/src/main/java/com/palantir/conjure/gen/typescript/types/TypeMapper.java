@@ -185,7 +185,7 @@ public final class TypeMapper {
 
         @Override
         public String visitOptional(OptionalType type) {
-            return getTypeNameFromConjureType(type.itemType());
+            return getTypeNameFromConjureType(type.itemType()) + " | null";
         }
 
         @Override

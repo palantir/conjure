@@ -85,8 +85,8 @@ export class TestService {
 
     public getDataset(
         datasetRid: string
-    ): Promise<IDataset | undefined> {
-        return this.bridge.callEndpoint<IDataset | undefined>({
+    ): Promise<IDataset | null | undefined> {
+        return this.bridge.callEndpoint<IDataset | null | undefined>({
             data: undefined,
             endpointName: "getDataset",
             endpointPath: "/catalog/datasets/{datasetRid}",
@@ -151,8 +151,8 @@ export class TestService {
 
     public maybeGetRawData(
         datasetRid: string
-    ): Promise<any | undefined> {
-        return this.bridge.callEndpoint<any | undefined>({
+    ): Promise<any | null | undefined> {
+        return this.bridge.callEndpoint<any | null | undefined>({
             data: undefined,
             endpointName: "maybeGetRawData",
             endpointPath: "/catalog/datasets/{datasetRid}/raw-maybe",
@@ -175,8 +175,8 @@ export class TestService {
     public resolveBranch(
         datasetRid: string,
         branch: string
-    ): Promise<string | undefined> {
-        return this.bridge.callEndpoint<string | undefined>({
+    ): Promise<string | null | undefined> {
+        return this.bridge.callEndpoint<string | null | undefined>({
             data: undefined,
             endpointName: "resolveBranch",
             endpointPath: "/catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve",
@@ -259,8 +259,8 @@ export class TestService {
 
     public testParam(
         datasetRid: string
-    ): Promise<string | undefined> {
-        return this.bridge.callEndpoint<string | undefined>({
+    ): Promise<string | null | undefined> {
+        return this.bridge.callEndpoint<string | null | undefined>({
             data: undefined,
             endpointName: "testParam",
             endpointPath: "/catalog/datasets/{datasetRid}/testParam",

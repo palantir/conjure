@@ -1,8 +1,8 @@
 export interface IPrimitiveOptionalsExample {
-    'bearertoken'?: string;
-    'bool'?: boolean;
-    'integer'?: number;
-    'num'?: number;
-    'rid'?: string;
-    'safelong'?: number;
+    'bearertoken'?: string | null;
+    'bool'?: boolean | null;
+    'integer'?: number | null;
+    'num'?: number | null;
+    'rid'?: string | null;
+    'safelong'?: number | null;
 }
