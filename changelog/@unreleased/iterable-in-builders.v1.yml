@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: >
+    Java object builder methods now accept `Iterable<T>` instead of
+    `Collection<T>` for convenience.

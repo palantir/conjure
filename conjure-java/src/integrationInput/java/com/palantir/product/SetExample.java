@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.palantir.conjure.lib.internal.ConjureCollections;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -98,14 +98,16 @@ public final class SetExample implements Serializable {
         }
 
         @JsonSetter("items")
-        public Builder items(Collection<String> items) {
+        public Builder items(Iterable<String> items) {
             this.items.clear();
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+            ConjureCollections.addAll(
+                    this.items, Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder addAllItems(Collection<String> items) {
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+        public Builder addAllItems(Iterable<String> items) {
+            ConjureCollections.addAll(
+                    this.items, Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 

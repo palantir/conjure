@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.palantir.conjure.lib.internal.ConjureCollections;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -112,14 +112,16 @@ public final class ListExample implements Serializable {
         }
 
         @JsonSetter("items")
-        public Builder items(Collection<String> items) {
+        public Builder items(Iterable<String> items) {
             this.items.clear();
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+            ConjureCollections.addAll(
+                    this.items, Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
-        public Builder addAllItems(Collection<String> items) {
-            this.items.addAll(Objects.requireNonNull(items, "items cannot be null"));
+        public Builder addAllItems(Iterable<String> items) {
+            ConjureCollections.addAll(
+                    this.items, Objects.requireNonNull(items, "items cannot be null"));
             return this;
         }
 
@@ -129,15 +131,17 @@ public final class ListExample implements Serializable {
         }
 
         @JsonSetter("primitiveItems")
-        public Builder primitiveItems(Collection<Integer> primitiveItems) {
+        public Builder primitiveItems(Iterable<Integer> primitiveItems) {
             this.primitiveItems.clear();
-            this.primitiveItems.addAll(
+            ConjureCollections.addAll(
+                    this.primitiveItems,
                     Objects.requireNonNull(primitiveItems, "primitiveItems cannot be null"));
             return this;
         }
 
-        public Builder addAllPrimitiveItems(Collection<Integer> primitiveItems) {
-            this.primitiveItems.addAll(
+        public Builder addAllPrimitiveItems(Iterable<Integer> primitiveItems) {
+            ConjureCollections.addAll(
+                    this.primitiveItems,
                     Objects.requireNonNull(primitiveItems, "primitiveItems cannot be null"));
             return this;
         }

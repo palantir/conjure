@@ -21,6 +21,7 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.BeanGenerator.EnrichedField;
+import com.palantir.conjure.lib.internal.ConjureCollections;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -149,8 +150,8 @@ public final class BeanBuilderGenerator {
                 .build();
         boolean shouldClearFirst = true;
         return publicSetter(enriched)
-                .addParameter(widenToCollectionIfPossible(field.type, type), field.name)
-                .addCode(typeAwareSet(field, type, shouldClearFirst))
+                .addParameter(widenToIterableIfPossible(field.type, type), field.name)
+                .addCode(typeAwareAssignment(field, type, shouldClearFirst))
                 .addStatement("return this")
                 .addAnnotation(jsonSetterAnnotation)
                 .build();
@@ -164,30 +165,32 @@ public final class BeanBuilderGenerator {
                 .addJavadoc(enriched.conjureDef().docs().orElse(""))
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderClass)
-                .addParameter(widenToCollectionIfPossible(field.type, type), field.name)
-                .addCode(typeAwareSet(field, type, shouldClearFirst))
+                .addParameter(widenToIterableIfPossible(field.type, type), field.name)
+                .addCode(typeAwareAssignment(field, type, shouldClearFirst))
                 .addStatement("return this")
                 .build();
     }
 
-    private TypeName widenToCollectionIfPossible(TypeName current, ConjureType type) {
+    private TypeName widenToIterableIfPossible(TypeName current, ConjureType type) {
         if (type instanceof ListType) {
             TypeName typeName = typeMapper.getClassName(((ListType) type).itemType()).box();
-            return ParameterizedTypeName.get(ClassName.get(Collection.class), typeName);
+            return ParameterizedTypeName.get(ClassName.get(Iterable.class), typeName);
         }
 
         if (type instanceof SetType) {
             TypeName typeName = typeMapper.getClassName(((SetType) type).itemType()).box();
-            return ParameterizedTypeName.get(ClassName.get(Collection.class), typeName);
+            return ParameterizedTypeName.get(ClassName.get(Iterable.class), typeName);
         }
 
         return current;
     }
 
-    private static CodeBlock typeAwareSet(FieldSpec spec, ConjureType type, boolean shouldClearFirst) {
+    private static CodeBlock typeAwareAssignment(FieldSpec spec, ConjureType type, boolean shouldClearFirst) {
         if (type instanceof ListType || type instanceof SetType) {
             CodeBlock addStatement = CodeBlocks.statement(
-                    "this.$1N.addAll($2L)", spec.name,
+                    "$1T.addAll(this.$2N, $3L)",
+                    ConjureCollections.class,
+                    spec.name,
                     Expressions.requireNonNull(spec.name, spec.name + " cannot be null"));
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
