@@ -14,8 +14,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import org.assertj.core.api.SoftAssertions;
+import java.util.stream.Collectors;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,27 +35,19 @@ public final class DockerTscTest {
             "../conjure-publish-gradle-plugin/src/main/resources/tsconfig.json");
     private static final Path feLib = Paths.get(
             "../conjure-publish-gradle-plugin/src/main/resources/conjure-fe-lib_index.d.ts");
+
     private static final Supplier<String> dockerTag = Suppliers.memoize(() ->
             dockerBuild("conjure/tsc", "src/test/resources/Dockerfile"));
 
     @ConjureSubfolderRunner.Test
     public void assertThatGeneratedCodeCompilesWithTsc(Path directory) throws Exception {
-        SoftAssertions softly = new SoftAssertions();
-        String errors = dockerTsc(directory);
-        softly.assertThat(errors)
-                .as("tsc for " + directory)
-                .isEmpty();
-        softly.assertAll();
-    }
-
-    private String dockerTsc(Path directory) {
         log.info("Checking {}", directory);
         Stopwatch started = Stopwatch.createStarted();
 
         Path inputDirectory = directory.resolve("expected");
         if (!inputDirectory.toFile().exists() || inputDirectory.toFile().listFiles().length == 0) {
             log.info("Skipping empty {}", inputDirectory);
-            return "";
+            return;
         }
 
         String[] command = {
@@ -71,28 +64,33 @@ public final class DockerTscTest {
                 "--rm",
                 dockerTag.get()
         };
-        String tscOutput = runProcess(command);
+        runProcess(command);
         log.info("finished {} {}s", directory, started.elapsed(TimeUnit.SECONDS));
-        return tscOutput;
     }
 
+    /**
+     * Returns the SHA hash of the freshly built docker image, suitable for `docker run $SHA`
+     */
     private static String dockerBuild(String tag, String dockerfile) {
-        log.info("{}", runProcess("docker", "build",
-                Paths.get(dockerfile).getParent().toAbsolutePath().toString(),
-                "--tag", tag));
-        return "conjure/tsc";
+        String processOutput = runProcess("docker", "build",
+                Paths.get(dockerfile).getParent().toAbsolutePath().toString());
+        log.info("{}", processOutput);
+
+        // docker build is a noisy process, but we know the last line will contain the SHA we want
+        // e.g. 'Successfully built 6c0ec38cfd05'
+        String[] lines = processOutput.split("\n");
+        String lastLine = lines[lines.length - 1];
+        String sha = lastLine.replace("Successfully built ", "");
+        return sha;
     }
 
-    private static String mountPath(Path hostPath, String dockerPath) {
-        try {
-            return hostPath.toFile().getCanonicalFile().getAbsolutePath() + ":" + dockerPath;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private static String mountPath(Path hostPath, String dockerPath) throws IOException {
+        return hostPath.toFile().getCanonicalFile().getAbsolutePath() + ":" + dockerPath;
     }
 
     private static String runProcess(String... args) {
         try {
+            log.info("{}", Arrays.stream(args).collect(Collectors.joining(" ")));
             Process process = new ProcessBuilder()
                     .command(args)
                     .redirectError(ProcessBuilder.Redirect.INHERIT)
@@ -103,7 +101,14 @@ public final class DockerTscTest {
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ByteStreams.copy(process.getInputStream(), outputStream);
-            return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+            String standardOut = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+
+            if (process.exitValue() != 0) {
+                throw new RuntimeException(String.format(
+                        "Non-zero exit (%s): %s", process.exitValue(), standardOut));
+            }
+
+            return standardOut;
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
