@@ -1,3 +1,4 @@
+# don't forget to update conjure-python/src/test/resources/types/example-types.yml
 types:
   definitions:
     default-package: com.palantir.product
@@ -72,6 +73,8 @@ types:
         alias: map<string, any>
       ReferenceAliasExample:
         alias: AnyExample
+      DateTimeAliasExample:
+        alias: datetime
       PrimitiveOptionalsExample:
         fields:
           num: optional<double>
@@ -120,3 +123,12 @@ types:
           interface: integer
       EmptyObjectExample:
         fields: {}
+      AliasAsMapKeyExample:
+        fields:
+          strings: map<StringAliasExample, ManyFieldExample>
+          rids: map<RidAliasExample, ManyFieldExample>
+          bearertokens: map<BearerTokenAliasExample, ManyFieldExample>
+          integers: map<IntegerAliasExample, ManyFieldExample>
+          doubles: map<DoubleAliasExample, ManyFieldExample>
+          safelongs: map<SafeLongAliasExample, ManyFieldExample>
+          datetimes: map<DateTimeAliasExample, ManyFieldExample>

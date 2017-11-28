@@ -1,8 +1,6 @@
-import { StringAliasExample } from "./stringAliasExample";
-
 export interface IManyFieldExample {
     /** docs for alias field */
-    'alias': StringAliasExample;
+    'alias': string;
     /** docs for doubleValue field */
     'doubleValue': number;
     /** docs for integer field */

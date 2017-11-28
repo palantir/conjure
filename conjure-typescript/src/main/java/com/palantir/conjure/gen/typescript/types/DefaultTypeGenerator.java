@@ -5,7 +5,6 @@
 package com.palantir.conjure.gen.typescript.types;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -69,6 +68,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         types.definitions().defaultConjurePackage(),
                         type.getKey(),
                         type.getValue()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 
@@ -88,6 +89,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         entry -> entry.getValue().stream()
                                 .map(typeAndDefinition -> generateExport(
                                         typeAndDefinition.getKey(), typeAndDefinition.getValue()))
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
                                 .collect(Collectors.toSet())));
     }
 
@@ -98,37 +101,41 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     }
 
-    private TypescriptFile generateType(TypesDefinition types,
+    private Optional<TypescriptFile> generateType(TypesDefinition types,
             Optional<ConjurePackage> defaultPackage, TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
         ConjurePackage packageLocation =
                 ConjurePackages.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
         String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
         TypeMapper mapper = new TypeMapper(types, defaultPackage);
         if (baseTypeDef instanceof EnumTypeDefinition) {
-            return generateEnumFile(
-                    typeName, (EnumTypeDefinition) baseTypeDef, parentFolderPath);
+            return Optional.of(generateEnumFile(
+                    typeName, (EnumTypeDefinition) baseTypeDef, parentFolderPath));
         } else if (baseTypeDef instanceof ObjectTypeDefinition) {
-            return generateObjectFile(
-                    typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper);
+            return Optional.of(generateObjectFile(
+                    typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
         } else if (baseTypeDef instanceof AliasTypeDefinition) {
-            return generateAliasFile(
-                    typeName, (AliasTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper);
+            // in typescript we do nothing with this
+            return Optional.empty();
         } else if (baseTypeDef instanceof UnionTypeDefinition) {
-            return generateUnionTypeFile(
-                    typeName, (UnionTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper);
+            return Optional.of(generateUnionTypeFile(
+                    typeName, (UnionTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
         }
         throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
     }
 
-    private ExportStatement generateExport(TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
-        if (baseTypeDef instanceof EnumTypeDefinition || baseTypeDef instanceof AliasTypeDefinition) {
-            return GenerationUtils.createExportStatementRelativeToRoot(
-                    typeName.name(), typeName.name());
+    private Optional<ExportStatement> generateExport(TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
+        if (baseTypeDef instanceof EnumTypeDefinition) {
+            return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
+                    typeName.name(), typeName.name()));
         } else if (baseTypeDef instanceof ObjectTypeDefinition || baseTypeDef instanceof UnionTypeDefinition) {
-            return GenerationUtils.createExportStatementRelativeToRoot(
-                    "I" + typeName.name(), typeName.name());
+            return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
+                    "I" + typeName.name(), typeName.name()));
+        } else if (baseTypeDef instanceof AliasTypeDefinition) {
+            // in typescript we do nothing with this
+            return Optional.empty();
         }
         throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
+
     }
 
     private static TypescriptFile generateObjectFile(TypeName typeName, ObjectTypeDefinition typeDef,
@@ -156,28 +163,6 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
         return TypescriptFile.builder().name(typeName.name()).imports(importStatements)
                 .addEmittables(thisInterface).parentFolderPath(parentFolderPath).build();
-    }
-
-    private static TypescriptFile generateAliasFile(
-            TypeName typeName,
-            AliasTypeDefinition aliasTypeDefinition,
-            ConjurePackage packageLocation,
-            String parentFolderPath,
-            TypeMapper mapper
-    ) {
-        TypescriptSimpleType typescriptSimpleType = mapper.getTypescriptType(aliasTypeDefinition.alias());
-        List<ConjureType> referencedTypes = ImmutableList.of(aliasTypeDefinition.alias());
-        List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
-                typeName, packageLocation, mapper);
-        RawExpression typeRhs = RawExpression.of(typescriptSimpleType.name());
-        AssignStatement type = AssignStatement.builder().lhs(
-                "export type " + typeName.name()).rhs(typeRhs).build();
-        return TypescriptFile.builder()
-                .imports(importStatements)
-                .name(typeName.name())
-                .addEmittables(type)
-                .parentFolderPath(parentFolderPath)
-                .build();
     }
 
     private static TypescriptFile generateEnumFile(

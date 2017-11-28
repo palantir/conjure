@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: >
+    Revert a change to typescript codegen introduced in 0.47.0 that caused compilation
+    to fail when users define a conjure `map<SomeAlias, OtherType>`.
+  link: https://github.palantir.build/foundry/conjure/issues/719
