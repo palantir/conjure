@@ -91,7 +91,8 @@ public interface TestService {
     @GET("/catalog/test-query-params")
     CompletableFuture<Integer> testQueryParams(
             @Header("Authorization") AuthHeader authHeader,
-            @Query("different") ResourceIdentifier something);
+            @Query("different") ResourceIdentifier something,
+            @Query("implicit") ResourceIdentifier implicit);
 
     @GET("/catalog/boolean")
     CompletableFuture<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);

@@ -10,11 +10,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -43,6 +43,7 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -131,8 +132,10 @@ public final class ClassServiceGenerator implements ServiceGenerator {
             requestMediaType = MediaType.APPLICATION_JSON;
         }
 
+        Map<ParameterName, ArgumentDefinition> args = value.argsWithAutoDefined().orElse(Collections.emptyMap());
+
         ObjectExpression headers = ObjectExpression.builder().keyValues(
-                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
                         .collect(Collectors.toMap(
                                 e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()),
@@ -143,28 +146,32 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .addAll(authDefinition.type() == AuthDefinition.AuthType.HEADER
                         ? Lists.newArrayList(StringExpression.of("Authorization"))
                         : Lists.newArrayList())
-                .addAll(value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                .addAll(args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
                         .map(e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()))
                         .collect(Collectors.toList()))
                 .build());
 
         ArrayExpression pathArguments = ArrayExpression.of(
-                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
                         .map(e -> e.getKey().name())
                         .map(RawExpression::of)
                         .collect(Collectors.toList()));
 
-        JsonExpression queryArguments = JsonExpression.builder().keyValues(
-                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+        JsonExpression queryArguments = JsonExpression.builder()
+                .keyValues(args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
-                        .map(e -> e.getKey().name())
-                        .collect(Collectors.toMap(identifier -> identifier, RawExpression::of)))
+                        .collect(Collectors.toMap(
+                                arg -> {
+                                    ParameterName parameterName = arg.getValue().paramId().orElse(arg.getKey());
+                                    return parameterName.name();
+                                },
+                                arg -> RawExpression.of(arg.getKey().name()))))
                 .build();
 
         RawExpression data = Iterables.getOnlyElement(
-                value.argsWithAutoDefined().orElse(Maps.newHashMap()).entrySet().stream()
+                args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.BODY)
                         .map(e -> e.getKey().name())
                         .map(RawExpression::of)

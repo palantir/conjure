@@ -48,7 +48,8 @@ export interface ITestService {
     ): Promise<string | null | undefined>;
 
     testQueryParams(
-        something: string
+        something: string,
+        implicit: string
     ): Promise<number>;
 
     uploadRawData(

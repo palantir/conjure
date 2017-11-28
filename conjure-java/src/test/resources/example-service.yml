@@ -155,6 +155,9 @@ services:
             type: ResourceIdentifier
             param-id: different
             param-type: query
+          implicit:
+            type: ResourceIdentifier
+            param-type: query
         returns: integer
 
       testBoolean:

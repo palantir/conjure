@@ -105,7 +105,8 @@ public interface TestService {
     @Path("/test-query-params")
     int testQueryParams(
             @HeaderParam("Authorization") AuthHeader authHeader,
-            @QueryParam("different") ResourceIdentifier something);
+            @QueryParam("different") ResourceIdentifier something,
+            @QueryParam("implicit") ResourceIdentifier implicit);
 
     @GET
     @Path("/boolean")

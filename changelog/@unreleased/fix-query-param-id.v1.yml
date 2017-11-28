@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: >
+    Generated Typescript clients no longer ignore the specified `param-id` for query parameters.
+    (Previously, they'd just re-use the argument name.)
+  link: https://github.palantir.build/foundry/conjure/issues/623

@@ -281,7 +281,8 @@ export class TestService {
     }
 
     public testQueryParams(
-        something: string
+        something: string,
+        implicit: string
     ): Promise<number> {
         return this.bridge.callEndpoint<number>({
             data: undefined,
@@ -293,7 +294,8 @@ export class TestService {
             pathArguments: [
             ],
             queryArguments: {
-                something: something,
+                different: something,
+                implicit: implicit,
             },
             requestMediaType: "application/json",
             requiredHeaders: [

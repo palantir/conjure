@@ -93,7 +93,8 @@ public interface TestService {
     @GET("/catalog/test-query-params")
     Call<Integer> testQueryParams(
             @Header("Authorization") AuthHeader authHeader,
-            @Query("different") ResourceIdentifier something);
+            @Query("different") ResourceIdentifier something,
+            @Query("implicit") ResourceIdentifier implicit);
 
     @GET("/catalog/boolean")
     Call<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);

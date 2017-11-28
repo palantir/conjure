@@ -343,8 +343,8 @@ class TestService(Service):
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(str))
 
-    def testQueryParams(self, authHeader, something):
-        # type: (str, str) -> int
+    def testQueryParams(self, authHeader, something, implicit):
+        # type: (str, str, str) -> int
 
         _headers = {
             'Accept': 'application/json',
@@ -354,6 +354,7 @@ class TestService(Service):
 
         _params = {
             'different': something,
+            'implicit': implicit,
         } # type: Dict[str, Any]
 
         _path_params = {
