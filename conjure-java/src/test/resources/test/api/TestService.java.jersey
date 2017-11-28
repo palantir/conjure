@@ -22,6 +22,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -99,6 +100,12 @@ public interface TestService {
     Optional<String> testParam(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET
+    @Path("/test-query-params")
+    int testQueryParams(
+            @HeaderParam("Authorization") AuthHeader authHeader,
+            @QueryParam("different") ResourceIdentifier something);
 
     @GET
     @Path("/boolean")

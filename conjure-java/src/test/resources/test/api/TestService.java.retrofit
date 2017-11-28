@@ -25,6 +25,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 
 /** A Markdown description of the service. */
@@ -88,6 +89,11 @@ public interface TestService {
     Call<Optional<String>> testParam(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
+
+    @GET("/catalog/test-query-params")
+    Call<Integer> testQueryParams(
+            @Header("Authorization") AuthHeader authHeader,
+            @Query("different") ResourceIdentifier something);
 
     @GET("/catalog/boolean")
     Call<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);

@@ -148,6 +148,15 @@ services:
             param-type: path
         returns: optional<string>
 
+      testQueryParams:
+        http: GET /test-query-params
+        args:
+          something:
+            type: ResourceIdentifier
+            param-id: different
+            param-type: query
+        returns: integer
+
       testBoolean:
         http: GET /boolean
         returns: boolean

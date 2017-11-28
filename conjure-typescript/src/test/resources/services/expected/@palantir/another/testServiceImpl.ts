@@ -280,6 +280,29 @@ export class TestService {
         });
     }
 
+    public testQueryParams(
+        something: string
+    ): Promise<number> {
+        return this.bridge.callEndpoint<number>({
+            data: undefined,
+            endpointName: "testQueryParams",
+            endpointPath: "/catalog/test-query-params",
+            headers: {
+            },
+            method: "GET",
+            pathArguments: [
+            ],
+            queryArguments: {
+                something: something,
+            },
+            requestMediaType: "application/json",
+            requiredHeaders: [
+                "Authorization",
+            ],
+            responseMediaType: "application/json",
+        });
+    }
+
     public uploadRawData(
         input: any
     ): Promise<void> {

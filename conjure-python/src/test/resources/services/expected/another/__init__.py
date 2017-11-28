@@ -343,6 +343,39 @@ class TestService(Service):
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(str))
 
+    def testQueryParams(self, authHeader, something):
+        # type: (str, str) -> int
+
+        _headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': authHeader,
+        } # type: Dict[str, Any]
+
+        _params = {
+            'different': something,
+        } # type: Dict[str, Any]
+
+        _path_params = {
+        } # type: Dict[str, Any]
+
+        _json = None # type: Any
+
+        _path = '/catalog/test-query-params'
+        _path = _path.format(**_path_params)
+
+        _response = self._requests_session.request( # type: ignore
+            'GET',
+            self._uri + _path,
+            params=_params,
+            headers=_headers,
+            json=_json)
+
+        _response.raise_for_status()
+
+        _decoder = ConjureDecoder()
+        return _decoder.decode(_response.json(), int)
+
     def testBoolean(self, authHeader):
         # type: (str) -> bool
 

@@ -47,6 +47,10 @@ export interface ITestService {
         datasetRid: string
     ): Promise<string | null | undefined>;
 
+    testQueryParams(
+        something: string
+    ): Promise<number>;
+
     uploadRawData(
         input: any
     ): Promise<void>;
