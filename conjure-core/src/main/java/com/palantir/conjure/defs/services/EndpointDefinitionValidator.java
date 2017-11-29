@@ -27,6 +27,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
+    NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
@@ -122,6 +123,23 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
             Set<ParameterName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
                     "Path parameters defined path template but not present in endpoint: %s", missingParams);
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexPathParamValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            definition.argsWithAutoDefined().orElse(ImmutableMap.of()).entrySet().stream()
+                    .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+                    .forEach(entry -> {
+                        ConjureType conjureType = entry.getValue().type();
+
+                        Boolean isValid = conjureType.visit(IsValidPathParamVisitor.INSTANCE);
+                        Preconditions.checkState(isValid,
+                                "Path parameters must be primitives or aliases: \"%s\" is not allowed",
+                                entry.getKey());
+                    });
         }
     }
 

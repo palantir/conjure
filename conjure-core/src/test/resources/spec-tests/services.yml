@@ -20,7 +20,108 @@ positive:
               http:
                 method: DELETE
                 path: /myEndpoint
+  allowPrimitivesInPathParams:
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            string:
+              http: GET /string/{foo}
+              args:
+                foo: string
+            integer:
+              http: GET /integer/{foo}
+              args:
+                foo: integer
+            double:
+              http: GET /double/{foo}
+              args:
+                foo: double
+            boolean:
+              http: GET /boolean/{foo}
+              args:
+                foo: boolean
+            safelong:
+              http: GET /safelong/{foo}
+              args:
+                foo: safelong
+            rid:
+              http: GET /rid/{foo}
+              args:
+                foo: rid
+  allowDateTimeInPathParams:
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args: { foo: datetime }
 negative:
+  disallowAnyInPathParams:
+    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: any
+  disallowListInPathParams:
+    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: list<string>
+  disallowMapInPathParams:
+    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: map<string, string>
+  disallowOptionalInPathParams:
+    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: optional<string>
+  disallowSetInPathParams:
+    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: set<string>
   endpointPathMethodMustBeUnique:
     expected-error: 'Endpoint "GET /myEndpoint" is defined by multiple endpoints: [testEndpoint, otherTestEndpoint]'
     conjure:

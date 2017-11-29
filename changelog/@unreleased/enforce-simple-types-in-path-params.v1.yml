@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    Conjure validation will now fail fast if users attempt to define path
+    params with complex types like `map` or `list`.
+  link: https://github.palantir.build/foundry/conjure/issues/273
