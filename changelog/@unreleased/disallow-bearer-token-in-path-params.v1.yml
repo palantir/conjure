@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: >
+    Conjure will now refuse to generate code for a `bearertoken` path param as this
+    API choice would be insecure.
+  link: https://github.palantir.build/foundry/conjure/issues/736

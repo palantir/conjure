@@ -40,7 +40,7 @@ function downloadFilesToProjectDirectory(outputDirectory, project) {
   for (const file of projectFiles) {
     const localPath = "." + file.replace(GITHUB_RAW, "");
     console.log("Downloading file: ", localPath);
-    execSync(`cd ${outputDirectory} && mkdir -p $(dirname ${localPath}) && curl -H 'Authorization: token ${token}' -k ${file} -o ${localPath}`);
+    execSync(`cd ${outputDirectory} && mkdir -p $(dirname ${localPath}) && curl -H 'Authorization: token ${token}' -k ${file} -o ${localPath} -f || true`);
   }
 }
 

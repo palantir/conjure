@@ -58,6 +58,18 @@ positive:
               http: GET /{foo}
               args: { foo: datetime }
 negative:
+  disallowBearerTokenInPathParams:
+    expected-error: "Path parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: bearertoken
   disallowAnyInPathParams:
     expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
     conjure:

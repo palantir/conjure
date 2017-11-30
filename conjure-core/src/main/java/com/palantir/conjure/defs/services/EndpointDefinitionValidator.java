@@ -13,6 +13,7 @@ import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureValidator;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
+    NO_BEARER_TOKEN_PATH_PARAMS(new NoBearerTokenPathParams()),
     NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
@@ -138,6 +140,23 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                         Boolean isValid = conjureType.visit(IsValidPathParamVisitor.INSTANCE);
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
+                                entry.getKey());
+                    });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoBearerTokenPathParams implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            definition.argsWithAutoDefined().orElse(ImmutableMap.of()).entrySet().stream()
+                    .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+                    .forEach(entry -> {
+                        ConjureType conjureType = entry.getValue().type();
+
+                        Preconditions.checkState(!conjureType.equals(PrimitiveType.BEARERTOKEN),
+                                "Path parameters of type 'bearertoken' are not allowed as this "
+                                        + "would introduce a security vulnerability: \"%s\"",
                                 entry.getKey());
                     });
         }
