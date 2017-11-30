@@ -127,9 +127,12 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
                     typeName.name(), typeName.name()));
-        } else if (baseTypeDef instanceof ObjectTypeDefinition || baseTypeDef instanceof UnionTypeDefinition) {
+        } else if (baseTypeDef instanceof ObjectTypeDefinition) {
             return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
-                    "I" + typeName.name(), typeName.name()));
+                    typeName.name(), "I" + typeName.name()));
+        } else if (baseTypeDef instanceof UnionTypeDefinition) {
+            return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
+                    typeName.name(), "I" + typeName.name(), "I" + typeName.name() + "Visitor"));
         } else if (baseTypeDef instanceof AliasTypeDefinition) {
             // in typescript we do nothing with this
             return Optional.empty();

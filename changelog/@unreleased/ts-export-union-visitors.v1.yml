@@ -1,0 +1,4 @@
+type: fix
+fix:
+  description: Export union type visitors in index files.
+  link: https://github.palantir.build/foundry/conjure/pull/730

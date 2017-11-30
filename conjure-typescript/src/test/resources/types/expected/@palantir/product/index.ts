@@ -18,4 +18,4 @@ export { IRidExample } from "./ridExample";
 export { ISafeLongExample } from "./safeLongExample";
 export { ISetExample } from "./setExample";
 export { IStringExample } from "./stringExample";
-export { IUnionTypeExample } from "./unionTypeExample";
+export { IUnionTypeExample, IUnionTypeExampleVisitor } from "./unionTypeExample";

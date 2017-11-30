@@ -215,7 +215,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
     }
 
     private static ExportStatement generateExport(TypeName typeName) {
-        return GenerationUtils.createExportStatementRelativeToRoot(typeName.name(), getFilename(typeName));
+        return GenerationUtils.createExportStatementRelativeToRoot(getFilename(typeName), typeName.name());
     }
 
     private static String getFilename(TypeName typeName) {

@@ -113,10 +113,10 @@ public final class GenerationUtils {
                 .filter(referenceType -> !mapper.getTypescriptType(referenceType).isPrimitive());
     }
 
-    public static ExportStatement createExportStatementRelativeToRoot(String exportName, String sourceName) {
+    public static ExportStatement createExportStatementRelativeToRoot(String sourceName, String... exportNames) {
         String tsFilePath = getTypescriptFilePath(sourceName);
         return ExportStatement.builder()
-                .addNamesToExport(exportName)
+                .addNamesToExport(exportNames)
                 .filepathToExport(tsFilePath)
                 .build();
     }

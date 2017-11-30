@@ -73,7 +73,7 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
     }
 
     private static ExportStatement generateExport(TypeName typeName) {
-        return GenerationUtils.createExportStatementRelativeToRoot(getInterfaceName(typeName), typeName.name());
+        return GenerationUtils.createExportStatementRelativeToRoot(typeName.name(), getInterfaceName(typeName));
     }
 
     private static String getInterfaceName(TypeName typeName) {
