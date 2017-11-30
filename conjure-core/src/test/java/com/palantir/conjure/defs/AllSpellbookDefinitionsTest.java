@@ -51,7 +51,7 @@ public class AllSpellbookDefinitionsTest {
     @Test
     public void verify_conjure_yml_deserializes() throws Exception {
         String contents = new String(Files.readAllBytes(conjureYml), StandardCharsets.UTF_8);
-        assumeTrue("file doesn't use conjure imports", !contents.contains("conjure-imports"));
+        assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
 
         Conjure.parse(conjureYml.toFile());
     }

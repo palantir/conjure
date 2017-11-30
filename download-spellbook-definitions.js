@@ -23,11 +23,9 @@ if (argv.length <= 3) {
 const projects = downloadSpellbookProjectsJson();
 for (const name of Object.keys(projects)) {
   const project = projects[name];
-  const projectPath = path.join(outputDirectory, name).replace(/ /g, "\\ ");
 
-  execSync(`mkdir -p ${projectPath}`)
-  downloadFilesToProjectDirectory(projectPath, project);
-  createProjectManifest(project, name);
+  execSync(`mkdir -p ${outputDirectory}`)
+  downloadFilesToProjectDirectory(outputDirectory, project);
 }
 
 function downloadSpellbookProjectsJson() {
@@ -36,12 +34,13 @@ function downloadSpellbookProjectsJson() {
   );
 }
 
-function downloadFilesToProjectDirectory(projectPath, project) {
+function downloadFilesToProjectDirectory(outputDirectory, project) {
   const projectFiles = getProjectFiles(project);
 
   for (const file of projectFiles) {
-    console.log("Downloading file: ", file);
-    execSync(`cd ${projectPath} && curl -H 'Authorization: token ${token}' -k -O ${file}`);
+    const localPath = "." + file.replace(GITHUB_RAW, "");
+    console.log("Downloading file: ", localPath);
+    execSync(`cd ${outputDirectory} && mkdir -p $(dirname ${localPath}) && curl -H 'Authorization: token ${token}' -k ${file} -o ${localPath}`);
   }
 }
 
@@ -49,16 +48,6 @@ function getProjectFiles(project) {
   return project.hasOwnProperty("repo")
     ? getProjectFilesFromRepo(project.repo)
     : project.urls;
-}
-
-function createProjectManifest(project, name) {
-  const manifest = {
-    description: project.description,
-    repo: project.repo,
-    urls: project.urls
-  };
-  const manifestFile = path.join(outputDirectory, name, "manifest.json");
-  fs.writeFileSync(manifestFile, JSON.stringify(manifest), "utf8");
 }
 
 function getProjectFilesFromRepo(repo) {
