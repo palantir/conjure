@@ -1,7 +1,9 @@
 machine:
   post:
-    - wget -qO- https://artifactory.palantir.build/artifactory/internal-dist-thirdparty/oracle/jce_policy/8/jce_policy-8.zip | bsdtar -xvf- -C /tmp && sudo cp /tmp/UnlimitedJCEPolicyJDK8/* $JAVA_HOME/jre/lib/security/
-    - cd /home/ubuntu/.pyenv/plugins/python-build/../.. && git pull && cd - && pyenv install --skip-existing 3.6.0 && pyenv global 2.7.10 3.6.0
+    - wget -qO- https://artifactory.palantir.build/artifactory/internal-dist-thirdparty/oracle/jce_policy/8/jce_policy-8.zip
+      | bsdtar -xvf- -C /tmp && sudo cp /tmp/UnlimitedJCEPolicyJDK8/* $JAVA_HOME/jre/lib/security/
+    - cd /home/ubuntu/.pyenv/plugins/python-build/../.. && git pull && cd - && pyenv install --skip-existing 3.6.0 && pyenv
+      global 2.7.10 3.6.0
     - pyenv global 2.7.10 3.6.0
   java:
     version: oraclejdk8
