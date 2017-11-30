@@ -1,0 +1,4 @@
+type: fix
+fix:
+  description: Conjure YML files containing duplicate keys will now fail to deserialize.
+  link: https://github.palantir.build/foundry/conjure/issues/409

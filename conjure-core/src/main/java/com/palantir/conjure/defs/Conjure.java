@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.defs;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
@@ -84,11 +85,13 @@ public final class Conjure {
 
     @VisibleForTesting
     static ObjectMapper createConjureParserObjectMapper() {
-        return new ObjectMapper(new YAMLFactory())
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory())
                 .registerModule(new Jdk8Module())
                 .setAnnotationIntrospector(
                         AnnotationIntrospector.pair(
                                 new KebabCaseEnforcingAnnotationInspector(), // needs to come first.
                                 new JacksonAnnotationIntrospector()));
+        mapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+        return mapper;
     }
 }
