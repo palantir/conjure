@@ -8,10 +8,8 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # valid: "arg" and "aRg" should be separate path parameter variables
-                path: /path/{arg}/{aRg}
+              # valid: "arg" and "aRg" should be separate path parameter variables
+              http: GET /path/{arg}/{aRg}
               args:
                 arg: string
                 aRg: string
@@ -23,10 +21,8 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # valid: arg template for trailing path parameter can contain regular expression '.+'
-                path: /path/{arg:.+}
+              # valid: arg template for trailing path parameter can contain regular expression '.+'
+              http: GET /path/{arg:.+}
               args:
                 arg: string
   pathParamTrailingStarRegexp:
@@ -37,10 +33,8 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # valid: arg template for trailing path parameter can contain regular expression '.*'
-                path: /path/{arg:.*}
+              # valid: arg template for trailing path parameter can contain regular expression '.*'
+              http: GET /path/{arg:.*}
               args:
                 arg: string
   pathParamInlineRegexp:
@@ -51,10 +45,7 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # valid: arg template for path parameter can contain regular expression '.+' even if it is not the last parameter
-                path: /path/{arg:.+}/resolve
+              http: GET /path/{arg:.+}/resolve
               args:
                 arg: string
   pathWithPossibleConflictOK:
@@ -65,17 +56,13 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg:.+}
+              http: GET /path/{arg:.+}
               args:
                 arg: string
             otherEndpoint:
-              http:
-                method: GET
-                # valid: although all requests that match this endpoint will also be matched by "testEndpoint",
-                #        matching will be performed based on longest matching literal prefix and is legal.
-                path: /path/another/{arg:.+}
+              # valid: although all requests that match this endpoint will also be matched by "testEndpoint",
+              #        matching will be performed based on longest matching literal prefix and is legal.
+              http: GET /path/another/{arg:.+}
               args:
                 arg: string
   multiplePathsWithTwoArgsAndSamePrefix:
@@ -86,17 +73,13 @@ positive:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg1}/test/{arg2}
+              http: GET /path/{arg1}/test/{arg2}
               args:
                 arg1: string
                 arg2: string
             otherEndpoint:
-              http:
-                method: GET
-                # valid: this has a distinct path segment
-                path: /path/{arg1}/other/{arg2}
+              # valid: this has a distinct path segment
+              http: GET /path/{arg1}/other/{arg2}
               args:
                 arg1: string
                 arg2: string
@@ -110,9 +93,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg:.*}/foo
+              http: GET /path/{arg:.*}/foo
               args:
                 arg: string
   regexpMustBeMatchAll:
@@ -124,9 +105,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg:[0-9]+}
+              http: GET /path/{arg:[0-9]+}
               args:
                 arg: string
   keyAndParamIdClash:
@@ -138,9 +117,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg}
+              http: GET /path/{arg}
               args:
                 # invalid: cannot have multiple arguments with the same name and param-id if it will cause a collision
                 arg: string
@@ -156,10 +133,8 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # invalid: cannot have multiple path segments that use the same path parameter
-                path: /path/{arg}/{arg}
+              # invalid: cannot have multiple path segments that use the same path parameter
+              http: GET /path/{arg}/{arg}
               args:
                 arg: string
   multiplePathArgsInSamePosition:
@@ -171,16 +146,12 @@ negative:
           package: test.a
           endpoints:
             testEndpointA:
-              http:
-                method: GET
-                path: /path/{arg}/resolve
+              http: GET /path/{arg}/resolve
               args:
                 arg: string
             testEndpointB:
-              http:
-                method: GET
-                # invalid: cannot have multiple endpoints that differ only in path parameter
-                path: /path/{other:.+}/resolve
+              # invalid: cannot have multiple endpoints that differ only in path parameter
+              http: GET /path/{other:.+}/resolve
               args:
                 other: string
   multipleTwoPathArgsInSamePosition:
@@ -192,17 +163,13 @@ negative:
           package: test.a
           endpoints:
             testEndpointA:
-              http:
-                method: GET
-                path: /path/{arg}/resolve/{arg2}
+              http: GET /path/{arg}/resolve/{arg2}
               args:
                 arg: string
                 arg2: string
             testEndpointB:
-              http:
-                method: GET
-                # invalid: cannot have multiple endpoints that differ only in path parameter
-                path: /path/{other}/resolve/{other2:.+}
+              # invalid: cannot have multiple endpoints that differ only in path parameter
+              http: GET /path/{other}/resolve/{other2:.+}
               args:
                 other: string
                 other2: string
@@ -215,9 +182,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg}
+              http: GET /path/{arg}
               args:
                 # invalid: cannot have multiple arguments with the same param-id if it will cause a collision
                 argName:
@@ -235,10 +200,8 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # invalid: "arg" must be defined as a parameter
-                path: /path/{arg}
+              # invalid: "arg" must be defined as a parameter
+              http: GET /path/{arg}
   pathTemplateParamNestedBraces:
     expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
@@ -248,10 +211,8 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # invalid: braces cannot be nested
-                path: /path/{{arg}}/trailer
+              # invalid: braces cannot be nested
+              http: GET /path/{{arg}}/trailer
               args:
                 arg: string
   pathParamUnbalancedBraces:
@@ -263,10 +224,8 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                # invalid: braces must be balanced
-                path: /path/{{arg}/trailer
+              # invalid: braces must be balanced
+              http: GET /path/{{arg}/trailer
               args:
                 arg: string
   pathParamDefinedButNotInTemplate:
@@ -278,9 +237,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path
+              http: GET /path
               args:
                 # invalid: cannot have a path param that does not occur in the path template
                 arg:

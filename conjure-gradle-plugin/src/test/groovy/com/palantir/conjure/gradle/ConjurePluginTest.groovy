@@ -511,9 +511,8 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksWithFailure(':api:compileConjure')
 
         then:
-        result.getStandardError().contains("Failed to import 'external-imports/external-import.yml': " +
-                "com.fasterxml.jackson.databind.JsonMappingException: " +
-                "Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
+        result.getStandardError().contains("Failed to import 'external-imports/external-import.yml': ")
+        result.getStandardError().contains("Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
     }
 
     @Unroll

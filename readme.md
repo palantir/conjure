@@ -534,14 +534,6 @@ this service.
    http: GET /some/path/{someArg}
    ```
 
-   or in long-form:
-
-   ```yaml
-   http:
-     method: GET
-     path: /some/path/{someArg}
-   ```
-
      * `method` must be one of  `GET`, `POST`, `PUT` or `DELETE`
      * `path` is a path segment that must begin with a slash (`/`) and must not end in a slash
      * A path segment can be specified to be a path parameter argument by encapsulating the segment in curly braces (`{}`)

@@ -13,13 +13,9 @@ positive:
           endpoints:
             # valid: multiple endpoints can have the same path if method is unique
             testEndpoint:
-              http:
-                method: GET
-                path: /myEndpoint
+              http: GET /myEndpoint
             otherTestEndpoint:
-              http:
-                method: DELETE
-                path: /myEndpoint
+              http: DELETE /myEndpoint
   allowPrimitivesInPathParams:
     conjure:
       services:
@@ -132,10 +128,6 @@ negative:
           endpoints:
             # valid: cannot have multiple endpoints with the same method and path
             testEndpoint:
-              http:
-                method: GET
-                path: /myEndpoint
+              http: GET /myEndpoint
             otherTestEndpoint:
-              http:
-                method: GET
-                path: /myEndpoint
+              http: GET /myEndpoint

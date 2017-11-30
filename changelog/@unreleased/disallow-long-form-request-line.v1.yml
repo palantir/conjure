@@ -1,0 +1,6 @@
+type: break
+break:
+  description: >
+    Conjure YML files may only specify HTTP endpoints using the one-line
+    form, e.g. `GET /foo/{bar}`. The option to define these using a YML object
+    was unused and has been removed.

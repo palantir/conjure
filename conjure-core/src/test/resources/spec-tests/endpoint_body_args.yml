@@ -9,9 +9,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path
+              http: GET /path
               # invalid: cannot have multiple arguments with param-type "auto" that resolve to "body"
               args:
                 arg: string
@@ -25,9 +23,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path
+              http: GET /path
               # invalid: cannot have multiple arguments with param-type "body"
               args:
                 arg:
@@ -45,9 +41,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path
+              http: GET /path
               # invalid: cannot have multiple arguments with param-type "body"
               args:
                 arg: string
@@ -63,9 +57,7 @@ negative:
           package: test.a
           endpoints:
             testEndpoint:
-              http:
-                method: GET
-                path: /path/{arg}
+              http: GET /path/{arg}
               args:
                 # invalid: endpoint cannot have both a path and body parameter
                 arg: string
