@@ -208,26 +208,6 @@ types:
 
 Note that the imported object is referenced as `<namespace>.<type-name>`.
 
-The Conjure Gradle plugin facilitates procurement of imported files as follows:
-
-```yaml
-conjure {
-    # The conjureImports field accepts arbitrary Gradle `FileCollection`s, for example,
-    # `project.files(...)`, `project(':other-project').files(...)`, etc
-    conjureImports files('external-import.yml')
-}
-```
-
-For the compilation step, the files specified in `conjureImports` are made available in the `external-imports/`
-directory relative to each Conjure definition in `src/main/conjure`. In this example, the file `external-import.yml` can
-be imported by any file in `src/main/conjure` as:
-
-```yaml
-types:
-  conjure-imports:
-    foo: external-imports/external-import.yml
-```
-
 Furthermore, every file in the `src/main/conjure` source set is made available in the same directory and can be imported
 as:
 ```yaml

@@ -97,7 +97,7 @@ public final class DockerTscTest {
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .start();
 
-            process.waitFor(20, TimeUnit.SECONDS);
+            process.waitFor(1, TimeUnit.MINUTES);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ByteStreams.copy(process.getInputStream(), outputStream);

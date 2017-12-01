@@ -94,7 +94,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':api:compileConjure')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureObjects')
         result.wasExecuted(':api:compileConjureJersey')
         result.wasExecuted(':api:compileConjureRetrofit')
@@ -121,6 +120,7 @@ class ConjurePluginTest extends IntegrationSpec {
 
         conjure {
             conjureImports files('external-import.yml')
+            experimentalFeature 'GradleExternalImports'
         }
 
         tasks.getByName('compileConjurePython').enabled = true
@@ -140,7 +140,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':api:api-jersey:compileJava')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureJersey')
         result.wasExecuted(':api:compileConjureObjects')
 
@@ -155,7 +154,6 @@ class ConjurePluginTest extends IntegrationSpec {
         then:
         result.wasExecuted(':api:api-objects:compileJava')
         result.wasExecuted(':api:api-jersey:compileJava')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureJersey')
 
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
@@ -259,7 +257,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':api:api-jersey:compileJava')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureJersey')
 
         new File(System.getProperty('user.home') + '/.m2/repository/com/palantir/conjure/test/').exists()
@@ -277,6 +274,7 @@ class ConjurePluginTest extends IntegrationSpec {
 
         conjure {
             conjureImports files('external-import.yml')
+            experimentalFeature 'GradleExternalImports'
         }
         '''.stripIndent()
 
@@ -385,7 +383,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':api:compileConjure')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureObjects')
         !result.wasExecuted(':api:compileConjureJersey')
 
@@ -480,6 +477,7 @@ class ConjurePluginTest extends IntegrationSpec {
 
         conjure {
             conjureImports files('external-import.yml')
+            experimentalFeature 'GradleExternalImports'
         }
         '''.stripIndent()
 

@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gradle;
 
+import com.google.common.base.Preconditions;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
@@ -58,9 +59,16 @@ public class ConjurePlugin implements Plugin<Project> {
         // Copy conjure imports into build directory
         File buildDir = new File(project.getBuildDir(), "conjure");
         Task processConjureImports = project.getTasks().create("processConjureImports", DefaultTask.class);
-        processConjureImports.doLast(task ->
-                project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, EXTERNAL_IMPORTS_DIRNAME)))
-                        .from(extension.getConjureImports())));
+        processConjureImports.doLast(task -> {
+            if (!extension.getConjureImports().getFiles().isEmpty()) {
+                Preconditions.checkState(
+                        extension.getExperimentalFeatures().contains("GradleExternalImports"),
+                        "Gradle-defined conjure imports are an experimental feature and must be enabled "
+                                + "with the experimentalFeature 'GradleExternalImports' feature flag.");
+            }
+            project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, EXTERNAL_IMPORTS_DIRNAME)))
+                    .from(extension.getConjureImports()));
+        });
 
         // Copy conjure sources into build directory
         Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);

@@ -1,0 +1,9 @@
+type: break
+break:
+  description: >
+    Defining Conjure YML imports in gradle files is deprecated because it makes
+    static analysis of conjure files difficult. It will be removed in a major
+    version, please use `experimentalFeature 'GradleExternalImports'` to
+    re-enable this in the interim. Reach out to
+    `pd-foundry-infrastructure-dev` if you need help finding alternatives.
+  link: https://github.palantir.build/foundry/conjure/issues/735
