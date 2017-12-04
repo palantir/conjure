@@ -405,22 +405,22 @@ docs: optional docs
 #### Error Definitions
 Conjure offers first-class support for HTTP Remoting 3 [ServiceException](https://github.com/palantir/http-remoting#error-propagation)
 by providing the ability to define error types. An error definition consists of a type
-alias, a namespace, an error code, which should be one of 
+alias, a namespace, an error code, which should be one of
 [the codes defined in HTTP Remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors/src/main/java/com/palantir/remoting/api/errors/ErrorType.java#L38),
 optional documentation, and optional lists of safe and unsafe arguments. It lives in a different
 block from other object definitions, called `errors`.
 
 For each error definition, Conjure will generate an error type object and a factory method
 for creating `ServiceException`s associated with that error type. They will both be put in
-a class named `[YourNamespace]Errors`, along with the generated objects and factory methods 
-for other error definitions with the same namespace. Instead of having each error definition 
+a class named `[YourNamespace]Errors`, along with the generated objects and factory methods
+for other error definitions with the same namespace. Instead of having each error definition
 define its own package, the default package name is used for all error definitions.
 
-The type alias and namespace should be in `UpperCamelCase`, whereas error code should be 
+The type alias and namespace should be in `UpperCamelCase`, whereas error code should be
 in `UPPER_UNDERSCORE_CASE`.
 
-Error definition could optionally have two argument lists, `safe-args` and `unsafe-args`. 
-Each takes a list of fields, defined in the same syntax as fields in object definitions. 
+Error definition could optionally have two argument lists, `safe-args` and `unsafe-args`.
+Each takes a list of fields, defined in the same syntax as fields in object definitions.
 The difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
 Safe arguments come first in the generated factory methods.
 
@@ -520,7 +520,7 @@ this service.
      * A particular `method` + `path` combination can only be defined once per service. All path parameters are
        considered equivalent for the purposes of determining uniqueness -- for example, `GET /branch/{arg}/resolve` and
        `GET /branch/{id:.+}/resolve` are considered equivalent and thus cannot both be defined for a particular service.
-     * Non-header parameter names must be lowerCamelCase. Header parameter names must be Upper-Kebab-Case (valid header 
+     * Non-header parameter names must be lowerCamelCase. Header parameter names must be Upper-Kebab-Case (valid header
        names include `Cache-Control` or `Content-MD5`).
      * All path parameters that occur in the path must match a path argument specified in the `args` section
      * Path parameters must be unique: the same parameter cannot occur multiple times in the same path
@@ -693,20 +693,6 @@ In addition to generated code, compilation tasks will emit a non-optional `.giti
 file to assist in preventing source controlling generated code (prefer generating code
 as a compilation task).
 
-(Experimental) Optionally specify additional external imports using `conjureImports`, which
-accepts a Gradle `FileCollection`.
-
-As an example:
-```gradle
-conjure {
-    /**
-     * Experimental:
-     * Reference this file in Conjure source as external-imports/external-import.yml
-     */
-    conjureImports files('external-import.yml')
-}
-```
-
 To generate source, run `compileConjure`.
 
 Depend on a generated project using standard gradle syntax:
@@ -800,7 +786,7 @@ Feature Requests
 Conjure is a widely-used framework and as such has comparatively strict back-compatibility requirements. Further, since
 Conjure supports multiple language, features can only be added if we have confidence in its implementation across
 supported languages. This implies that the default position regarding new features is conservative: we prefer Conjure to
-be as small as possible. If you would like to propose a feature, please reach out to 
+be as small as possible. If you would like to propose a feature, please reach out to
 pd-foundry-infrastructure-dev@palantir.com or start a discussion on a Github issue.
 
 Below is a list of features that we have considered but are unlikely to support:
@@ -819,9 +805,8 @@ https://github.palantir.build/foundry/conjure/issues/201 .
 
 ### Imports from other Conjure APIs
 Conjure does not support importing objects from other Conjure APIs. If you must reference objects from another service's
-API, the recommendation is to redefine these types in your own service's Conjure definition. 
+API, the recommendation is to redefine these types in your own service's Conjure definition.
 
 Cross-API imports are undesirable for a few reasons:
 1. API version coupling: breaks in the dependency's API result in breaks in the consuming API.
 2. Transitive dependency complexity and the introduction of [diamond dependency](http://www.well-typed.com/blog/9/) risk
-
