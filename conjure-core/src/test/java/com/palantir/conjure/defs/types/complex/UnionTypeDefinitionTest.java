@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public final class UnionTypeDefinitionTest {
 
-    private static final UnionMemberTypeDefinition MEMBER = mock(UnionMemberTypeDefinition.class);
+    private static final FieldDefinition MEMBER = mock(FieldDefinition.class);
 
     @Test
     public void testUnionMemberKeyMustNotBeEmpty() throws Exception {

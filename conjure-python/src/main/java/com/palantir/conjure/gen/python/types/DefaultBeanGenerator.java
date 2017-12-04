@@ -9,8 +9,8 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -64,7 +64,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .entrySet()
                 .stream()
                 .map(entry -> {
-                    UnionMemberTypeDefinition unionMember = entry.getValue();
+                    FieldDefinition unionMember = entry.getValue();
                     ConjureType conjureType = unionMember.type();
                     return PythonField.builder()
                         .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))

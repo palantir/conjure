@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.types.complex.UnionMemberTypeDefinition;
+import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ConjurePackages;
@@ -118,10 +118,10 @@ public final class UnionGenerator {
     }
 
     private static List<MethodSpec> generateStaticFactories(
-            TypeMapper typeMapper, ClassName unionClass, Map<FieldName, UnionMemberTypeDefinition> memberTypeDefs) {
+            TypeMapper typeMapper, ClassName unionClass, Map<FieldName, FieldDefinition> memberTypeDefs) {
         return memberTypeDefs.entrySet().stream().map(entry -> {
             FieldName memberName = entry.getKey();
-            UnionMemberTypeDefinition memberTypeDef = entry.getValue();
+            FieldDefinition memberTypeDef = entry.getValue();
             TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
             // memberName is guarded to be a valid Java identifier and not to end in an underscore, so this is safe
@@ -243,7 +243,7 @@ public final class UnionGenerator {
     }
 
     private static List<TypeSpec> generateWrapperClasses(
-            TypeMapper typeMapper, ClassName baseClass, Map<FieldName, UnionMemberTypeDefinition> memberTypeDefs) {
+            TypeMapper typeMapper, ClassName baseClass, Map<FieldName, FieldDefinition> memberTypeDefs) {
         return memberTypeDefs.entrySet().stream().map(entry -> {
             FieldName memberName = entry.getKey();
             TypeName memberType = typeMapper.getClassName(entry.getValue().type());

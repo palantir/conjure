@@ -19,7 +19,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
 
-    Map<FieldName, UnionMemberTypeDefinition> union();
+    Map<FieldName, FieldDefinition> union();
 
     @Value.Check
     default void check() {
