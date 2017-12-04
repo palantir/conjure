@@ -9,6 +9,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.defs.services.IsPrimitiveOrReferenceType;
+import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.FieldName;
@@ -22,7 +24,8 @@ import java.util.Map;
 @com.google.errorprone.annotations.Immutable
 public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefinition> {
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
-    PACKAGE_DEFINED(new PackageDefinedValidator());
+    PACKAGE_DEFINED(new PackageDefinedValidator()),
+    NO_COMPLEX_KEYS(new NoComplexKeysValidator());
 
     private final ConjureValidator<ObjectsDefinition> validator;
 
@@ -97,6 +100,29 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
             definition.objects().entrySet().stream().forEach(entry -> {
                 if (!entry.getValue().conjurePackage().isPresent()) {
                     throw new IllegalStateException("No package is defined for object " + entry.getKey().name());
+                }
+            });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexKeysValidator implements ConjureValidator<ObjectsDefinition> {
+        @Override
+        public void validate(ObjectsDefinition definition) {
+            definition.objects().values().stream().forEach(baseObjectTypeDefinition -> {
+                if (baseObjectTypeDefinition instanceof ObjectTypeDefinition) {
+                    ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) baseObjectTypeDefinition;
+                    objectTypeDefinition.fields().entrySet().stream().forEach(entry -> {
+                        FieldDefinition fieldDefinition = entry.getValue();
+                        if (fieldDefinition.type() instanceof MapType) {
+                            MapType mapType = (MapType) fieldDefinition.type();
+                            if (!mapType.keyType().visit(IsPrimitiveOrReferenceType.INSTANCE)) {
+                                throw new IllegalStateException(
+                                        String.format("Complex type '%s' not allowed in map key: %s.",
+                                                mapType.keyType(), entry.getKey().name()));
+                            }
+                        }
+                    });
                 }
             });
         }

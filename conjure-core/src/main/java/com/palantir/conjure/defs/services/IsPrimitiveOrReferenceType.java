@@ -16,8 +16,8 @@ import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
-public final class IsValidPathParamVisitor implements ConjureTypeVisitor<Boolean> {
-    public static final IsValidPathParamVisitor INSTANCE = new IsValidPathParamVisitor();
+public final class IsPrimitiveOrReferenceType implements ConjureTypeVisitor<Boolean> {
+    public static final IsPrimitiveOrReferenceType INSTANCE = new IsPrimitiveOrReferenceType();
 
     @Override
     public Boolean visitAny(AnyType type) {
