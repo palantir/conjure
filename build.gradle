@@ -20,18 +20,16 @@ buildscript {
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
         classpath 'com.palantir.gradle.changelog:gradle-changelog:2.3.0'
         classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
     }
-}
-
-plugins {
-    id 'com.palantir.git-version' version '0.5.2'
-    id 'org.inferred.processors' version '1.2.12'
 }
 
 apply plugin: 'java'
 apply plugin: 'com.palantir.baseline-config'
 apply plugin: 'com.palantir.baseline-idea'
 apply plugin: 'com.palantir.circle.style'
+apply plugin: 'com.palantir.git-version'
 
 allprojects {
     version gitVersion()
