@@ -48,10 +48,10 @@ public class PublishTypeScriptTask extends ConventionTask {
                             npmrcInputDirectory.getAbsolutePath(),
                             scopeDir.getName(),
                             packageDir.getName(),
-                            GenerateNpmrcTask.NPMRC_FILENAME).toFile();
+                            Npmrc.FILENAME).toFile();
                     if (npmrcFile.exists()) {
                         try {
-                            FileUtils.copyFile(npmrcFile, new File(packageDir, GenerateNpmrcTask.NPMRC_FILENAME));
+                            FileUtils.copyFile(npmrcFile, new File(packageDir, Npmrc.FILENAME));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

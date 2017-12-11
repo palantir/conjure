@@ -19,24 +19,28 @@ public class ConjurePublishPlugin implements Plugin<Project> {
         File compileTypeScriptOutput = new File(project.getBuildDir(), "compileTypeScriptOutput");
         File generateNpmrcOutput = new File(project.getBuildDir(), "generateNpmrcOutput");
 
-        CompileTypeScriptJavaScriptTask compileTypescriptJavascriptTask = project.getTasks()
-                .create("compileTypeScriptJavaScript", CompileTypeScriptJavaScriptTask.class);
-        compileTypescriptJavascriptTask.setInputDirectory(project.file("src"));
-        compileTypescriptJavascriptTask.setNodeModulesInputDirectory(new File(project.getBuildDir(), "node_modules"));
-        compileTypescriptJavascriptTask.setOutputDirectory(compileTypeScriptOutput);
+        CompileTypeScriptJavaScriptTask compileTypeScriptJavaScript = project.getTasks()
+                .create("compileTypeScriptJavaScript", CompileTypeScriptJavaScriptTask.class, task -> {
+                    task.setInputDirectory(project.file("src"));
+                    task.setNodeModulesInputDirectory(new File(project.getBuildDir(), "node_modules"));
+                    task.setOutputDirectory(compileTypeScriptOutput);
+                });
 
-        GenerateNpmrcTask generateNpmrcTask = project.getTasks().create("generateNpmrc", GenerateNpmrcTask.class);
-        generateNpmrcTask.setInputDirectory(project.file("src"));
-        generateNpmrcTask.setOutputDirectory(generateNpmrcOutput);
+        GenerateNpmrcTask generateNpmrc = project.getTasks()
+                .create("generateNpmrc", GenerateNpmrcTask.class, task -> {
+                    task.setInputDirectory(project.file("src"));
+                    task.setOutputDirectory(generateNpmrcOutput);
+                });
 
-        PublishTypeScriptTask publishTypeScriptTask = project.getTasks()
-                .create("publishTypeScript", PublishTypeScriptTask.class);
-        publishTypeScriptTask.setJavaScriptInputDirectory(compileTypeScriptOutput);
-        publishTypeScriptTask.setNpmrcInputDirectory(generateNpmrcOutput);
-        publishTypeScriptTask.dependsOn(compileTypescriptJavascriptTask);
-        publishTypeScriptTask.dependsOn(generateNpmrcTask);
+        PublishTypeScriptTask publishTypeScript = project.getTasks()
+                .create("publishTypeScript", PublishTypeScriptTask.class, task -> {
+                    task.setJavaScriptInputDirectory(compileTypeScriptOutput);
+                    task.setNpmrcInputDirectory(generateNpmrcOutput);
+                    task.dependsOn(compileTypeScriptJavaScript);
+                    task.dependsOn(generateNpmrc);
+                });
 
-        project.afterEvaluate(p -> project.getTasks().maybeCreate("publish").dependsOn(publishTypeScriptTask));
+        project.afterEvaluate(p -> project.getTasks().maybeCreate("publish").dependsOn(publishTypeScript));
     }
 
     public static String readResource(String path) {
@@ -62,5 +66,4 @@ public class ConjurePublishPlugin implements Plugin<Project> {
             throw new RuntimeException(e);
         }
     }
-
 }

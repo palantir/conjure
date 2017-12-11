@@ -7,6 +7,8 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp'
     compile 'commons-io:commons-io'
 
+    processor 'org.immutables:value'
+
     testCompile gradleTestKit()
     testCompile 'com.netflix.nebula:nebula-test'
     testCompile 'com.squareup.okhttp3:mockwebserver'
