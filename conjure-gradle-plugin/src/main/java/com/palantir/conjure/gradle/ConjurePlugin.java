@@ -37,7 +37,7 @@ public class ConjurePlugin implements Plugin<Project> {
     private static final String EXTERNAL_IMPORTS_DIRNAME = "external-imports";
     private static final String JAVA_GENERATED_SOURCE_DIRNAME = "src/generated/java";
     private static final String JAVA_GITIGNORE_DIRNAME = "src";
-    private static final String JAVA_GITIGNORE_CONTENTS = "*.java\n";
+    private static final String JAVA_GITIGNORE_CONTENTS = "generated/**/*.java\n";
 
     private final SourceDirectorySetFactory sourceDirectorySetFactory;
 
