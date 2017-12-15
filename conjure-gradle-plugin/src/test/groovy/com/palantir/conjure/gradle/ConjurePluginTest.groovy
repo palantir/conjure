@@ -103,7 +103,7 @@ class ConjurePluginTest extends IntegrationSpec {
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
         file('api/api-objects/src/generated/java/test/test/api/StringExample.java').text.contains('ignoreUnknown')
         fileExists('api/api-objects/src/.gitignore')
-        file('api/api-objects/src/.gitignore').text.contentEquals('generated/**/*.java\n')
+        file('api/api-objects/src/.gitignore').text.contentEquals('/generated/**/*.java\n')
 
         // typescript
         fileExists('api/api-typescript/src/@test/api/stringExample.ts')
