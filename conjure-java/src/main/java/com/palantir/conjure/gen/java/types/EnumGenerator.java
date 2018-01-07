@@ -91,6 +91,11 @@ public final class EnumGenerator {
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
             SerializableSupport.enable(wrapper);
+            wrapper.addMethod(MethodSpec.methodBuilder("readResolve")
+                    .addModifiers(Modifier.PRIVATE)
+                    .addStatement("return valueOf(this.string)")
+                    .returns(Object.class)
+                    .build());
         }
         if (typeDef.docs().isPresent()) {
             wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));

@@ -78,6 +78,10 @@ public final class EnumExample implements Serializable {
         }
     }
 
+    private Object readResolve() {
+        return valueOf(this.string);
+    }
+
     @Generated("com.palantir.conjure.gen.java.types.EnumGenerator")
     public enum Value {
         ONE,
