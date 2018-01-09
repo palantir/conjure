@@ -23,19 +23,23 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.util.GFileUtils;
 
 public class CompileConjurePythonTask extends SourceTask {
 
-    @OutputDirectory
     private File outputDirectory;
 
-    @Input
     private ClientGenerator clientGenerator;
 
     private Supplier<Set<PythonBeanGenerator.ExperimentalFeatures>> experimentalFeatures;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    @OutputDirectory
+    public final File getOutputDirectory() {
+        return outputDirectory;
     }
 
     public final void setClientGenerator(ClientGenerator clientGenerator) {
@@ -56,6 +60,7 @@ public class CompileConjurePythonTask extends SourceTask {
     public final void compileFiles() throws IOException {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
+        GFileUtils.cleanDirectory(outputDirectory);
 
         PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
 

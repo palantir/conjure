@@ -25,12 +25,13 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.SourceDirectorySetFactory;
+import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
-import org.gradle.api.tasks.Delete;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
+import org.gradle.util.GFileUtils;
 
 public class ConjurePlugin implements Plugin<Project> {
 
@@ -49,6 +50,7 @@ public class ConjurePlugin implements Plugin<Project> {
     @Override
     @SuppressWarnings("checkstyle:methodlength")
     public final void apply(Project project) {
+        project.getPlugins().apply(BasePlugin.class);
         ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class, project);
 
         // Conjure code source set
@@ -58,29 +60,25 @@ public class ConjurePlugin implements Plugin<Project> {
 
         // Copy conjure imports into build directory
         File buildDir = new File(project.getBuildDir(), "conjure");
-        Task processConjureImports = project.getTasks().create("processConjureImports", DefaultTask.class);
-        processConjureImports.doLast(task -> {
+
+        // Copy conjure sources into build directory
+        Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);
+        copyConjureSourcesTask.into(project.file(buildDir))
+                .from(conjureSourceSet)
+                .from(extension.getConjureImports(), action -> action.into(new File(EXTERNAL_IMPORTS_DIRNAME)));
+
+        copyConjureSourcesTask.doFirst(task -> {
             if (!extension.getConjureImports().getFiles().isEmpty()) {
                 Preconditions.checkState(
                         extension.getExperimentalFeatures().contains("GradleExternalImports"),
                         "Gradle-defined conjure imports are an experimental feature and must be enabled "
                                 + "with the experimentalFeature 'GradleExternalImports' feature flag.");
             }
-            project.copy(copySpec -> copySpec.into(project.file(new File(buildDir, EXTERNAL_IMPORTS_DIRNAME)))
-                    .from(extension.getConjureImports()));
+            GFileUtils.deleteDirectory(buildDir);
         });
 
-        // Copy conjure sources into build directory
-        Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);
-        copyConjureSourcesTask.into(project.file(buildDir)).from(conjureSourceSet);
-
-        Delete cleanCopiedConjureSources = project.getTasks().create("cleanCopiedConjureSources", Delete.class);
-        cleanCopiedConjureSources.delete(buildDir);
-
-        copyConjureSourcesTask.dependsOn(cleanCopiedConjureSources);
-
-        final Task cleanTask = project.getTasks().maybeCreate("clean", Delete.class);
-        cleanTask.dependsOn(cleanCopiedConjureSources);
+        final Task cleanTask = project.getTasks().findByName("clean");
+        cleanTask.dependsOn(project.getTasks().findByName("cleanCopyConjureSourcesIntoBuild"));
 
         // Set up conjure compile task
         Task conjureTask = project.getTasks().create("compileConjure", DefaultTask.class);
@@ -104,7 +102,6 @@ public class ConjurePlugin implements Plugin<Project> {
                         "compileConjureObjects",
                         CompileConjureJavaObjectsTask.class,
                         (task) -> {
-                            task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
                             File gitignoreDir = subproj.file(JAVA_GITIGNORE_DIRNAME);
@@ -114,11 +111,11 @@ public class ConjurePlugin implements Plugin<Project> {
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
                             task.dependsOn(
-                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureObjects", outputDir));
-                            task.dependsOn(
                                     createWriteGitignoreTask(subproj, "gitignoreConjureObjects", gitignoreDir,
                                             JAVA_GITIGNORE_CONTENTS));
                         });
+
+                cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjureObjects"));
 
                 subproj.getDependencies().add("compile", "com.palantir.conjure:conjure-java-lib");
             });
@@ -140,22 +137,22 @@ public class ConjurePlugin implements Plugin<Project> {
                         "compileConjureRetrofit",
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
-                            task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
                             File gitignoreDir = subproj.file(JAVA_GITIGNORE_DIRNAME);
                             task.setOutputDirectory(outputDir);
-                            task.setServiceGenerator(
-                                    () -> new Retrofit2ServiceGenerator(experimentalFeaturesSupplier.get()));
+                            task.setServiceGeneratorFactory(Retrofit2ServiceGenerator::new);
+                            task.setExperimentalFeatures(experimentalFeaturesSupplier);
                             conjureTask.dependsOn(task);
+
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
-                            task.dependsOn(
-                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureRetrofit", outputDir));
                             task.dependsOn(
                                     createWriteGitignoreTask(subproj, "gitignoreConjureRetrofit", gitignoreDir,
                                             JAVA_GITIGNORE_CONTENTS));
                         });
+
+                cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjureRetrofit"));
 
                 subproj.getDependencies().add("compile", objectsProject);
                 subproj.getDependencies().add("compile", "com.squareup.retrofit2:retrofit");
@@ -176,22 +173,21 @@ public class ConjurePlugin implements Plugin<Project> {
                         "compileConjureJersey",
                         CompileConjureJavaServiceTask.class,
                         (task) -> {
-                            task.dependsOn(processConjureImports);
                             task.setSource(copyConjureSourcesTask);
                             File outputDir = subproj.file(JAVA_GENERATED_SOURCE_DIRNAME);
                             File gitignoreDir = subproj.file(JAVA_GITIGNORE_DIRNAME);
                             task.setOutputDirectory(outputDir);
-                            task.setServiceGenerator(() ->
-                                    new JerseyServiceGenerator(experimentalFeaturesSupplier.get()));
+                            task.setServiceGeneratorFactory(JerseyServiceGenerator::new);
+                            task.setExperimentalFeatures(experimentalFeaturesSupplier);
                             conjureTask.dependsOn(task);
                             subproj.getTasks().getByName("compileJava").dependsOn(task);
                             applyDependencyForIdeTasks(subproj, task);
                             task.dependsOn(
-                                    createCleanConjureTaskForJavaProject(subproj, "cleanConjureJersey", outputDir));
-                            task.dependsOn(
                                     createWriteGitignoreTask(subproj, "gitignoreConjureJersey", gitignoreDir,
                                             JAVA_GITIGNORE_CONTENTS));
                         });
+
+                cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjureJersey"));
 
                 subproj.getDependencies().add("compile", objectsProject);
                 subproj.getDependencies().add("compile", "javax.ws.rs:javax.ws.rs-api");
@@ -206,7 +202,6 @@ public class ConjurePlugin implements Plugin<Project> {
                         CompileConjureTypeScriptTask.class,
                         (task) -> {
                             task.setSource(copyConjureSourcesTask);
-                            task.dependsOn(processConjureImports);
                             File outputDir = subproj.file("src");
                             task.setOutputDirectory(outputDir);
                             task.setNodeModulesOutputDirectory(new File(subproj.getBuildDir(), "node_modules"));
@@ -216,9 +211,12 @@ public class ConjurePlugin implements Plugin<Project> {
                             task.setExperimentalFeatures(extension::getTypescriptExperimentalFeatures);
                             conjureTask.dependsOn(task);
                             task.dependsOn(
-                                    createWriteGitignoreTask(subproj, "gitignoreConjureTypeScript", outputDir,
+                                    createWriteGitignoreTask(
+                                            subproj, "gitignoreConjureTypeScript", subproj.getProjectDir(),
                                             "*.ts\npackage.json\n"));
                         });
+
+                cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjureTypeScript"));
             });
         }
 
@@ -230,16 +228,18 @@ public class ConjurePlugin implements Plugin<Project> {
                         CompileConjurePythonTask.class,
                         (task) -> {
                             task.setSource(copyConjureSourcesTask);
-                            task.dependsOn(processConjureImports);
                             File outputDir = subproj.file("python");
                             task.setOutputDirectory(outputDir);
                             task.setClientGenerator(new ClientGenerator());
                             task.setExperimentalFeatures(extension::getPythonExperimentalFeatures);
                             conjureTask.dependsOn(task);
                             task.dependsOn(
-                                    createWriteGitignoreTask(subproj, "gitignoreConjureTypeScript", outputDir,
+                                    createWriteGitignoreTask(
+                                            subproj, "gitignoreConjurePython", subproj.getProjectDir(),
                                             "*.py\n"));
                         });
+
+                cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjurePython"));
             });
         }
     }
@@ -271,13 +271,6 @@ public class ConjurePlugin implements Plugin<Project> {
                 task.dependsOn(conjureTask);
             }
         });
-    }
-
-    private static Task createCleanConjureTaskForJavaProject(Project project, String taskName, File outputDir) {
-        Delete cleanConjureTask = project.getTasks().create(taskName, Delete.class);
-        cleanConjureTask.delete(outputDir);
-        project.getTasks().findByName("clean").dependsOn(cleanConjureTask);
-        return cleanConjureTask;
     }
 
     private static Task createWriteGitignoreTask(Project project, String taskName, File outputDir, String contents) {

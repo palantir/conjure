@@ -24,25 +24,16 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.util.GFileUtils;
 
 public class CompileConjureTypeScriptTask extends SourceTask {
 
-    @OutputDirectory
     private File outputDirectory;
-
-    @OutputDirectory
     private File nodeModulesOutputDirectory;
-
-    @Input
     private ServiceGenerator serviceGenerator;
-
-    @Input
     private TypeGenerator typeGenerator;
-
-    @Input
     private ErrorGenerator errorGenerator;
 
-    @Input
     private Supplier<Set<ExperimentalFeatures>> experimentalFeatures;
 
     public final void setErrorGenerator(ErrorGenerator errorGenerator) {
@@ -53,8 +44,18 @@ public class CompileConjureTypeScriptTask extends SourceTask {
         this.outputDirectory = outputDirectory;
     }
 
+    @OutputDirectory
+    public final File getOutputDirectory() {
+        return outputDirectory;
+    }
+
     public final void setNodeModulesOutputDirectory(File nodeModulesOutputDirectory) {
         this.nodeModulesOutputDirectory = nodeModulesOutputDirectory;
+    }
+
+    @OutputDirectory
+    public final File getNodeModulesOutputDirectory() {
+        return nodeModulesOutputDirectory;
     }
 
     public final void setServiceGenerator(ServiceGenerator serviceGenerator) {
@@ -69,12 +70,18 @@ public class CompileConjureTypeScriptTask extends SourceTask {
         this.experimentalFeatures = experimentalFeatures;
     }
 
+    @Input
+    public final Set<ExperimentalFeatures> getExperimentalFeatures() {
+        return experimentalFeatures.get();
+    }
+
     @TaskAction
     public final void compileFiles() throws IOException {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
         checkState(nodeModulesOutputDirectory.exists() || nodeModulesOutputDirectory.mkdirs(),
                 "Unable to make directory tree %s", nodeModulesOutputDirectory);
+        GFileUtils.cleanDirectory(outputDirectory);
 
         compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()), outputDirectory);
 

@@ -109,9 +109,9 @@ class ConjurePluginTest extends IntegrationSpec {
         fileExists('api/api-typescript/src/@test/api/stringExample.ts')
         fileExists('api/api-typescript/src/@test/api/package.json')
         fileExists('api/api-typescript/src/@test/api/index.ts')
-        fileExists('api/api-typescript/src/.gitignore')
-        file('api/api-typescript/src/.gitignore').text.contains('*.ts')
-        file('api/api-typescript/src/.gitignore').text.contains('package.json')
+        fileExists('api/api-typescript/.gitignore')
+        file('api/api-typescript/.gitignore').text.contains('*.ts')
+        file('api/api-typescript/.gitignore').text.contains('package.json')
     }
 
     def 'pythonTask generates code when enabled'() {
@@ -166,9 +166,9 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksSuccessfully('clean')
 
         then:
-        result.wasExecuted(':api:api-jersey:cleanConjureJersey')
-        result.wasExecuted(':api:api-objects:cleanConjureObjects')
-        result.wasExecuted(':api:api-retrofit:cleanConjureRetrofit')
+        result.wasExecuted(':api:cleanCompileConjureJersey')
+        result.wasExecuted(':api:cleanCompileConjureObjects')
+        result.wasExecuted(':api:cleanCompileConjureRetrofit')
 
         !fileExists('api/api-jersey/src/generated/java')
         !fileExists('api/api-objects/src/generated/java')
@@ -189,31 +189,82 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksSuccessfully('clean')
 
         then:
-        result.wasExecuted(':api:cleanCopiedConjureSources')
+        result.wasExecuted(':api:cleanCopyConjureSourcesIntoBuild')
 
         !fileExists('api/build/conjure')
     }
 
-    def 'copyConjureSources runs cleanCopiedConjureSources'() {
+    def 'compileConjure does not run tasks if up to date'() {
         when:
-        ExecutionResult result = runTasksSuccessfully(':api:copyConjureSources')
+        runTasksSuccessfully("compileConjure")
+        ExecutionResult result = runTasksSuccessfully("compileConjure")
 
         then:
-        result.wasExecuted(':api:cleanCopiedConjureSources')
+        result.wasUpToDate(':api:api-objects:gitignoreConjureObjects')
+        result.wasUpToDate(':api:api-jersey:gitignoreConjureJersey')
+        result.wasUpToDate(':api:api-retrofit:gitignoreConjureRetrofit')
+        result.wasUpToDate(':api:api-typescript:gitignoreConjureTypeScript')
+        result.wasUpToDate(':api:api-python:gitignoreConjurePython')
+        result.wasUpToDate(':api:compileConjureObjects')
+        result.wasUpToDate(':api:compileConjureJersey')
+        result.wasUpToDate(':api:compileConjureRetrofit')
+        result.wasUpToDate(':api:compileConjureTypeScript')
+        result.wasUpToDate(':api:compileConjurePython')
+        result.wasUpToDate(':api:copyConjureSourcesIntoBuild')
     }
 
-    def 'cleanCopiedConjureSources task is registered correctly as a dependency if the clean task exists already'() {
-        file('build.gradle') << '''
-            task clean(type: Delete) {
-                // do nothing
-            }
-        '''.stripIndent()
-
+    def 'compileConjure does run tasks if not up to date'() {
         when:
-        ExecutionResult result = runTasksSuccessfully('clean')
+        runTasksSuccessfully("compileConjure")
+        createFile('api/src/main/conjure/api.yml').write '''
+        types:
+          definitions:
+            default-package: test.test.api
+            objects:
+              StringExample:
+                fields:
+                  string: string
+        services:
+          TestServiceFoo:
+            name: Changed name of Test Service Foo
+            package: test.test.api
+
+            endpoints:
+              post:
+                http: POST /post
+                args:
+                  object: StringExample
+                returns: StringExample
+        '''.stripIndent()
+        ExecutionResult result = runTasksSuccessfully("compileConjure")
 
         then:
-        result.wasExecuted(':api:cleanCopiedConjureSources')
+        result.wasExecuted(':api:compileConjureObjects')
+        result.wasExecuted(':api:compileConjureJersey')
+        result.wasExecuted(':api:compileConjureRetrofit')
+        result.wasExecuted(':api:compileConjureTypeScript')
+        result.wasExecuted(':api:compileConjurePython')
+        result.wasExecuted(':api:copyConjureSourcesIntoBuild')
+    }
+
+    def 'conjure files which no longer exist are removed from build dir'() {
+        when:
+        String path = 'api/src/main/conjure/todelete.yml'
+        createFile(path) << '''
+        types:
+          definitions:
+            default-package: test.a.api
+            objects:
+              UnionTypeExample:
+                union:
+                  number: integer
+        '''.stripIndent()
+        runTasksSuccessfully("copyConjureSourcesIntoBuild")
+        file(path).delete()
+        runTasksSuccessfully("copyConjureSourcesIntoBuild")
+
+        then:
+        !fileExists('api/build/conjure/todelete.yml')
     }
 
     def 'check publication'() {
@@ -333,7 +384,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.wasExecuted(':api:compileConjure')
-        result.wasExecuted(':api:processConjureImports')
         result.wasExecuted(':api:compileConjureJersey')
         result.wasExecuted(':api:compileConjureObjects')
         result.wasExecuted(':api:compileConjureRetrofit')

@@ -23,16 +23,21 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.util.GFileUtils;
 
 public class CompileConjureJavaObjectsTask extends SourceTask {
 
-    @OutputDirectory
     private File outputDirectory;
 
     private Supplier<Set<ExperimentalFeatures>> experimentalFeatures;
 
     public final void setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    @OutputDirectory
+    public final File getOutputDirectory() {
+        return outputDirectory;
     }
 
     public final void setExperimentalFeatures(Supplier<Set<ExperimentalFeatures>> experimentalFeatures) {
@@ -48,6 +53,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
     public final void compileFiles() throws IOException {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
+        GFileUtils.cleanDirectory(outputDirectory);
 
         Settings settings = Settings.builder()
                 .ignoreUnknownProperties(true)

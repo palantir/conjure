@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
 package com.palantir.conjure.gradle;
@@ -10,14 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
 public class WriteGitignoreTask extends DefaultTask {
-
-    @OutputFile
     private Path outputFile;
-
     private String contents;
 
     public final void setOutputDirectory(File outputDirectory) {
@@ -26,6 +24,16 @@ public class WriteGitignoreTask extends DefaultTask {
 
     public final void setContents(String contents) {
         this.contents = contents;
+    }
+
+    @Input
+    public final String getContents() {
+        return contents;
+    }
+
+    @OutputFile
+    public final File getOutputFile() {
+        return outputFile.toFile();
     }
 
     @TaskAction

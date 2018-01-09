@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: >
+    Task inputs and outputs are set appropriately, enabling up-to-date checks by Gradle.
+  link: https://github.palantir.build/foundry/conjure/pull/771
