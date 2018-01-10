@@ -79,8 +79,8 @@ public final class UnionGenerator {
                 .addMethod(generateAcceptVisitMethod(visitorClass, memberTypes.keySet()))
                 .addType(generateVisitor(visitorClass, memberTypes))
                 .addType(generateBase(baseClass, memberTypes))
-                .addTypes(generateWrapperClasses(typeMapper, baseClass, typeDef.union()))
-                .addType(generateUnknownWrapper(baseClass))
+                .addTypes(generateWrapperClasses(typeMapper, baseClass, typeDef.union(), experimentalFeatures))
+                .addType(generateUnknownWrapper(baseClass, experimentalFeatures))
                 .addMethod(generateEquals(unionClass, memberTypes))
                 .addMethod(MethodSpecs.createEqualTo(unionClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
@@ -243,7 +243,10 @@ public final class UnionGenerator {
     }
 
     private static List<TypeSpec> generateWrapperClasses(
-            TypeMapper typeMapper, ClassName baseClass, Map<FieldName, FieldDefinition> memberTypeDefs) {
+            TypeMapper typeMapper,
+            ClassName baseClass,
+            Map<FieldName, FieldDefinition> memberTypeDefs,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         return memberTypeDefs.entrySet().stream().map(entry -> {
             FieldName memberName = entry.getKey();
             TypeName memberType = typeMapper.getClassName(entry.getValue().type());
@@ -254,7 +257,7 @@ public final class UnionGenerator {
             List<FieldSpec> fields = ImmutableList.of(
                     FieldSpec.builder(memberType, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
-            return TypeSpec.classBuilder(wrapperClass)
+            TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(wrapperClass)
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
                     .addSuperinterface(baseClass)
                     .addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
@@ -280,12 +283,18 @@ public final class UnionGenerator {
                     .addMethod(MethodSpecs.createEquals(wrapperClass))
                     .addMethod(MethodSpecs.createEqualTo(wrapperClass, fields))
                     .addMethod(MethodSpecs.createHashCode(fields))
-                    .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields))
-                    .build();
+                    .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields));
+
+            if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+                SerializableSupport.enable(typeBuilder);
+            }
+            return typeBuilder.build();
         }).collect(Collectors.toList());
     }
 
-    private static TypeSpec generateUnknownWrapper(ClassName baseClass) {
+    private static TypeSpec generateUnknownWrapper(
+            ClassName baseClass,
+            Set<ExperimentalFeatures> experimentalFeatures) {
         ParameterizedTypeName genericMapType = ParameterizedTypeName.get(Map.class, String.class, Object.class);
         ParameterizedTypeName genericHashMapType = ParameterizedTypeName.get(HashMap.class, String.class, Object.class);
         ParameterSpec typeParameter = ParameterSpec.builder(String.class, "type").build();
@@ -297,7 +306,7 @@ public final class UnionGenerator {
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(String.class, "type", Modifier.PRIVATE, Modifier.FINAL).build(),
                 FieldSpec.builder(genericMapType, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
-        return TypeSpec.classBuilder(wrapperClass)
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(wrapperClass)
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
                 .addSuperinterface(baseClass)
                 .addAnnotation(AnnotationSpec.builder(JsonTypeInfo.class)
@@ -345,8 +354,11 @@ public final class UnionGenerator {
                 .addMethod(MethodSpecs.createEquals(wrapperClass))
                 .addMethod(MethodSpecs.createEqualTo(wrapperClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
-                .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields))
-                .build();
+                .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields));
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            SerializableSupport.enable(typeBuilder);
+        }
+        return typeBuilder.build();
     }
 
     private static TypeName rawBoxedType(TypeName memberType) {

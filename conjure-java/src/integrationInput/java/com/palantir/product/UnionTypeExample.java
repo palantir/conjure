@@ -168,7 +168,9 @@ public final class UnionTypeExample implements Serializable {
     private interface Base {}
 
     @JsonTypeName("stringExample")
-    private static class StringExampleWrapper implements Base {
+    private static class StringExampleWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final StringExample value;
 
         @JsonCreator
@@ -211,7 +213,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("set")
-    private static class SetWrapper implements Base {
+    private static class SetWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final Set<String> value;
 
         @JsonCreator
@@ -252,7 +256,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("thisFieldIsAnInteger")
-    private static class ThisFieldIsAnIntegerWrapper implements Base {
+    private static class ThisFieldIsAnIntegerWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final int value;
 
         @JsonCreator
@@ -295,7 +301,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("alsoAnInteger")
-    private static class AlsoAnIntegerWrapper implements Base {
+    private static class AlsoAnIntegerWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final int value;
 
         @JsonCreator
@@ -338,7 +346,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("if")
-    private static class IfWrapper implements Base {
+    private static class IfWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final int value;
 
         @JsonCreator
@@ -379,7 +389,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("new")
-    private static class NewWrapper implements Base {
+    private static class NewWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final int value;
 
         @JsonCreator
@@ -420,7 +432,9 @@ public final class UnionTypeExample implements Serializable {
     }
 
     @JsonTypeName("interface")
-    private static class InterfaceWrapper implements Base {
+    private static class InterfaceWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final int value;
 
         @JsonCreator
@@ -467,7 +481,9 @@ public final class UnionTypeExample implements Serializable {
         property = "type",
         visible = true
     )
-    private static class UnknownWrapper implements Base {
+    private static class UnknownWrapper implements Base, Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final String type;
 
         private final Map<String, Object> value;

@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    Union type wrappers are java serializable when DangerousGothamSerializableBeans
+    is enabled.
+  link: https://github.palantir.build/foundry/conjure/issues/765

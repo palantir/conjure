@@ -10,12 +10,15 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.product.BearerTokenExample;
 import com.palantir.product.BooleanExample;
+import com.palantir.product.EnumExample;
 import com.palantir.product.ListExample;
 import com.palantir.product.MapExample;
 import com.palantir.product.RidExample;
 import com.palantir.product.SafeLongExample;
 import com.palantir.product.SetExample;
+import com.palantir.product.UnionTypeExample;
 import com.palantir.remoting3.ext.jackson.ObjectMappers;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -69,6 +72,17 @@ public final class BeanSerdeIntegrationTests {
         // Important for ensuring additive changes don't affect clients adversely
         BooleanExample boolExample = mapper.readValue("{\"coin\": true, \"ignored\": \"field\"}", BooleanExample.class);
         assertThat(boolExample.getCoin()).isEqualTo(true);
+    }
+
+    @Test
+    public void testUnionSerialization() {
+        UnionTypeExample expected = UnionTypeExample.alsoAnInteger(123);
+        assertThat(SerializationUtils.roundtrip(expected)).isEqualTo(expected);
+    }
+
+    @Test
+    public void testEnumSerialization() {
+        assertThat(SerializationUtils.roundtrip(EnumExample.TWO)).isSameAs(EnumExample.TWO);
     }
 
     private static <T> void testSerde(String json, Class<T> clazz) throws Exception {
