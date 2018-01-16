@@ -2,6 +2,7 @@ from typing import TypeVar, Type, List, Any
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
+from requests.packages.urllib3.util import Retry
 import requests
 import random
 
@@ -21,6 +22,8 @@ class ServiceConfiguration:
     read_timeout = None  # type: int
     write_timeout = None  # type: int
     uris = []  # type: List[str]
+    max_num_retries = 3  # type: int
+    backoff_slot_size = 500  # type: int
 
 
 class Service:
@@ -85,7 +88,15 @@ class RequestsClient:
     def create(cls, service_class, user_agent, service_config):
         # type: (Type[T], str, ServiceConfiguration) -> T
 
-        transport_adapter = TransportAdapter()
+        # setup retry to match java remoting
+        # https://github.com/palantir/http-remoting/tree/3.12.0#quality-of-service-retry-failover-throttling
+        retry = Retry(
+            total=service_config.max_num_retries,
+            status_forcelist=[308, 429, 503],
+            backoff_factor=float(service_config.backoff_slot_size) / 1000
+        )
+
+        transport_adapter = TransportAdapter(max_retries=retry)
 
         # create a session, for shared connection polling, user agent, etc
         session = requests.Session()

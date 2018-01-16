@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: >
+    The generated python client retries on QoS exceptions.
+  link: https://github.palantir.build/foundry/conjure/pull/774
