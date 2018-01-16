@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: >
+    Conjure now generates the typescript signature `number | "NaN"` for any conjure
+    `double` fields as this is how the Java value is currently serialized. 
+    Note that generated TypeScript for `map<double, ?>` will now fail to compile.
+  link: https://github.palantir.build/foundry/conjure/issues/759

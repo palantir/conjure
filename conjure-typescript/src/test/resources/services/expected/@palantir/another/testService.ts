@@ -39,7 +39,7 @@ export interface ITestService {
 
     testBoolean(): Promise<boolean>;
 
-    testDouble(): Promise<number>;
+    testDouble(): Promise<number | "NaN">;
 
     testInteger(): Promise<number>;
 

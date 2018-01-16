@@ -15,7 +15,7 @@ The JSON format `json(o)` for a Conjure object `o` can be recursively defined as
   - Conjure `bearertoken` → JSON `string`
   - Conjure `integer` → JSON `number`
   - Conjure `safelong` → JSON `number`
-  - Conjure `double` → JSON `number`
+  - Conjure `double` → JSON `number` | JSON `string` literal "NaN"
   - Conjure `boolean` → JSON `boolean`.
 - If `o` is a Conjure `object`, then `json(o)` is a JSON `object` whose keys and values are obtained from `o`'s keys and
   values using `json(·)`. For any key with Conjure type `optional<?>`, the key/value pair may be omitted from the JSON map
@@ -129,6 +129,11 @@ then, for `C`s:
 ```json
 {"bin": "AAEC"} == {"bin": "AAEC"}
 ```
+
+### Warning: `NaN` doesn't implement equality
+
+Note, [Java specifies `NaN != NaN`](https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html), so any Conjure object containing a `NaN` value will not be equal after
+round-trip serialization.
 
 ### Objects that implement hashCode must implement deep hashCode.
 Objects must, in particular, be well behaved for any nested Conjure types. For any

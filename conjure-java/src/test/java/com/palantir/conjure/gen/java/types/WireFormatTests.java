@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import com.palantir.product.BinaryExample;
 import com.palantir.product.DateTimeExample;
 import com.palantir.product.DoubleAliasExample;
+import com.palantir.product.DoubleExample;
 import com.palantir.product.EmptyObjectExample;
 import com.palantir.product.EnumExample;
 import com.palantir.product.IntegerAliasExample;
@@ -71,6 +72,18 @@ public final class WireFormatTests {
                 .hasMessageContaining("Some required fields have not been set: [string]");
 
         // TODO(melliot): integer and double primitives must also throw (#245)
+    }
+
+    @Test
+    public void double_nan_fields_should_be_serialized_as_a_string() throws Exception {
+        assertThat(mapper.writeValueAsString(DoubleExample.of(Double.NaN)))
+                .isEqualTo("{\"doubleValue\":\"NaN\"}");
+    }
+
+    @Test
+    public void double_nan_fields_should_deserialize_from_a_string() throws Exception {
+        DoubleExample deserialized = mapper.readValue("{\"doubleValue\":\"NaN\"}", DoubleExample.class);
+        assertThat(deserialized.getDoubleValue()).isNaN();
     }
 
     @Test

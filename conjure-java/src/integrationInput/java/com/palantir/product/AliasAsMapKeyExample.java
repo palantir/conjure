@@ -26,8 +26,6 @@ public final class AliasAsMapKeyExample implements Serializable {
 
     private final Map<IntegerAliasExample, ManyFieldExample> integers;
 
-    private final Map<DoubleAliasExample, ManyFieldExample> doubles;
-
     private final Map<SafeLongAliasExample, ManyFieldExample> safelongs;
 
     private final Map<DateTimeAliasExample, ManyFieldExample> datetimes;
@@ -37,15 +35,13 @@ public final class AliasAsMapKeyExample implements Serializable {
             Map<RidAliasExample, ManyFieldExample> rids,
             Map<BearerTokenAliasExample, ManyFieldExample> bearertokens,
             Map<IntegerAliasExample, ManyFieldExample> integers,
-            Map<DoubleAliasExample, ManyFieldExample> doubles,
             Map<SafeLongAliasExample, ManyFieldExample> safelongs,
             Map<DateTimeAliasExample, ManyFieldExample> datetimes) {
-        validateFields(strings, rids, bearertokens, integers, doubles, safelongs, datetimes);
+        validateFields(strings, rids, bearertokens, integers, safelongs, datetimes);
         this.strings = Collections.unmodifiableMap(strings);
         this.rids = Collections.unmodifiableMap(rids);
         this.bearertokens = Collections.unmodifiableMap(bearertokens);
         this.integers = Collections.unmodifiableMap(integers);
-        this.doubles = Collections.unmodifiableMap(doubles);
         this.safelongs = Collections.unmodifiableMap(safelongs);
         this.datetimes = Collections.unmodifiableMap(datetimes);
     }
@@ -70,11 +66,6 @@ public final class AliasAsMapKeyExample implements Serializable {
         return this.integers;
     }
 
-    @JsonProperty("doubles")
-    public Map<DoubleAliasExample, ManyFieldExample> getDoubles() {
-        return this.doubles;
-    }
-
     @JsonProperty("safelongs")
     public Map<SafeLongAliasExample, ManyFieldExample> getSafelongs() {
         return this.safelongs;
@@ -96,14 +87,13 @@ public final class AliasAsMapKeyExample implements Serializable {
                 && this.rids.equals(other.rids)
                 && this.bearertokens.equals(other.bearertokens)
                 && this.integers.equals(other.integers)
-                && this.doubles.equals(other.doubles)
                 && this.safelongs.equals(other.safelongs)
                 && this.datetimes.equals(other.datetimes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(strings, rids, bearertokens, integers, doubles, safelongs, datetimes);
+        return Objects.hash(strings, rids, bearertokens, integers, safelongs, datetimes);
     }
 
     @Override
@@ -126,10 +116,6 @@ public final class AliasAsMapKeyExample implements Serializable {
                 .append(": ")
                 .append(integers)
                 .append(", ")
-                .append("doubles")
-                .append(": ")
-                .append(doubles)
-                .append(", ")
                 .append("safelongs")
                 .append(": ")
                 .append(safelongs)
@@ -146,7 +132,6 @@ public final class AliasAsMapKeyExample implements Serializable {
             Map<RidAliasExample, ManyFieldExample> rids,
             Map<BearerTokenAliasExample, ManyFieldExample> bearertokens,
             Map<IntegerAliasExample, ManyFieldExample> integers,
-            Map<DoubleAliasExample, ManyFieldExample> doubles,
             Map<SafeLongAliasExample, ManyFieldExample> safelongs,
             Map<DateTimeAliasExample, ManyFieldExample> datetimes) {
         List<String> missingFields = null;
@@ -154,7 +139,6 @@ public final class AliasAsMapKeyExample implements Serializable {
         missingFields = addFieldIfMissing(missingFields, rids, "rids");
         missingFields = addFieldIfMissing(missingFields, bearertokens, "bearertokens");
         missingFields = addFieldIfMissing(missingFields, integers, "integers");
-        missingFields = addFieldIfMissing(missingFields, doubles, "doubles");
         missingFields = addFieldIfMissing(missingFields, safelongs, "safelongs");
         missingFields = addFieldIfMissing(missingFields, datetimes, "datetimes");
         if (missingFields != null) {
@@ -168,7 +152,7 @@ public final class AliasAsMapKeyExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(7);
+                missingFields = new ArrayList<>(6);
             }
             missingFields.add(fieldName);
         }
@@ -190,8 +174,6 @@ public final class AliasAsMapKeyExample implements Serializable {
 
         private Map<IntegerAliasExample, ManyFieldExample> integers = new LinkedHashMap<>();
 
-        private Map<DoubleAliasExample, ManyFieldExample> doubles = new LinkedHashMap<>();
-
         private Map<SafeLongAliasExample, ManyFieldExample> safelongs = new LinkedHashMap<>();
 
         private Map<DateTimeAliasExample, ManyFieldExample> datetimes = new LinkedHashMap<>();
@@ -203,7 +185,6 @@ public final class AliasAsMapKeyExample implements Serializable {
             rids(other.getRids());
             bearertokens(other.getBearertokens());
             integers(other.getIntegers());
-            doubles(other.getDoubles());
             safelongs(other.getSafelongs());
             datetimes(other.getDatetimes());
             return this;
@@ -280,23 +261,6 @@ public final class AliasAsMapKeyExample implements Serializable {
             return this;
         }
 
-        @JsonSetter("doubles")
-        public Builder doubles(Map<DoubleAliasExample, ManyFieldExample> doubles) {
-            this.doubles.clear();
-            this.doubles.putAll(Objects.requireNonNull(doubles, "doubles cannot be null"));
-            return this;
-        }
-
-        public Builder putAllDoubles(Map<DoubleAliasExample, ManyFieldExample> doubles) {
-            this.doubles.putAll(Objects.requireNonNull(doubles, "doubles cannot be null"));
-            return this;
-        }
-
-        public Builder doubles(DoubleAliasExample key, ManyFieldExample value) {
-            this.doubles.put(key, value);
-            return this;
-        }
-
         @JsonSetter("safelongs")
         public Builder safelongs(Map<SafeLongAliasExample, ManyFieldExample> safelongs) {
             this.safelongs.clear();
@@ -333,7 +297,7 @@ public final class AliasAsMapKeyExample implements Serializable {
 
         public AliasAsMapKeyExample build() {
             return new AliasAsMapKeyExample(
-                    strings, rids, bearertokens, integers, doubles, safelongs, datetimes);
+                    strings, rids, bearertokens, integers, safelongs, datetimes);
         }
     }
 }

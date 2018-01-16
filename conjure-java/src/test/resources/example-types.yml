@@ -129,6 +129,6 @@ types:
           rids: map<RidAliasExample, ManyFieldExample>
           bearertokens: map<BearerTokenAliasExample, ManyFieldExample>
           integers: map<IntegerAliasExample, ManyFieldExample>
-          doubles: map<DoubleAliasExample, ManyFieldExample>
+          # doubles: map<DoubleAliasExample, ManyFieldExample> # typescript freaks out with the 'NaN'
           safelongs: map<SafeLongAliasExample, ManyFieldExample>
           datetimes: map<DateTimeAliasExample, ManyFieldExample>

@@ -2,7 +2,7 @@ export interface IManyFieldExample {
     /** docs for alias field */
     'alias': string;
     /** docs for doubleValue field */
-    'doubleValue': number;
+    'doubleValue': number | "NaN";
     /** docs for integer field */
     'integer': number;
     /** docs for items field */

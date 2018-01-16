@@ -217,8 +217,8 @@ export class TestService {
         });
     }
 
-    public testDouble(): Promise<number> {
-        return this.bridge.callEndpoint<number>({
+    public testDouble(): Promise<number | "NaN"> {
+        return this.bridge.callEndpoint<number | "NaN">({
             data: undefined,
             endpointName: "testDouble",
             endpointPath: "/catalog/double",

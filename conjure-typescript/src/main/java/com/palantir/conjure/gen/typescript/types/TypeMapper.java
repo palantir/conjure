@@ -192,6 +192,7 @@ public final class TypeMapper {
         public String visitPrimitive(PrimitiveType type) {
             switch (type) {
                 case DOUBLE:
+                    return "number | \"NaN\"";
                 case INTEGER:
                 case SAFELONG:
                     return "number";
