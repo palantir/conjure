@@ -34,7 +34,9 @@ public final class Conjure {
      * declared import are made available as imported types.
      */
     public static ConjureDefinition parse(File file) {
-        return parse(file, true /* inline imports */);
+        ConjureDefinition definition = parse(file, true /* inline imports */);
+        ConjureMetrics.recordMetrics(definition);
+        return definition;
     }
 
     private static ConjureDefinition parse(File file, boolean inlineImports) {
@@ -94,4 +96,6 @@ public final class Conjure {
         mapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
         return mapper;
     }
+
+
 }

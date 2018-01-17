@@ -7,6 +7,7 @@ package com.palantir.conjure.defs.types.primitive;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
+import com.palantir.conjure.defs.ConjureMetrics;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
@@ -60,6 +61,11 @@ public enum PrimitiveType implements LocalReferenceType {
         PrimitiveType candidate = types.get(type);
         Preconditions.checkArgument(candidate != null || !reservedTypes.contains(type),
                 "Invalid use of a built-in identifier (please check case): %s", type);
+
+        if (candidate != null) {
+            ConjureMetrics.incrementCounter(PrimitiveType.class, candidate.type().name());
+        }
+
         return Optional.ofNullable(candidate);
     }
 }

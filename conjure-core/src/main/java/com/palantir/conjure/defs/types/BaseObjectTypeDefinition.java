@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.palantir.conjure.defs.ConjureMetrics;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition.BaseObjectTypeDefinitionDeserializer;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -33,15 +33,27 @@ public interface BaseObjectTypeDefinition {
         public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
             TreeNode tree = parser.readValueAsTree();
             if (tree.get("fields") != null) {
-                return ObjectTypeDefinition.fromJson(parser, tree);
+                ObjectTypeDefinition object = ObjectTypeDefinition.fromJson(parser, tree);
+                ConjureMetrics.incrementCounter(ObjectTypeDefinition.class);
+                ConjureMetrics.histogram(object.fields().size(), ObjectTypeDefinition.class, "fields");
+                return object;
             } else if (tree.get("values") != null) {
-                return EnumTypeDefinition.fromJson(parser, tree);
+                EnumTypeDefinition enumTypeDefinition = EnumTypeDefinition.fromJson(parser, tree);
+                ConjureMetrics.incrementCounter(EnumTypeDefinition.class);
+                ConjureMetrics.histogram(enumTypeDefinition.values().size(), EnumTypeDefinition.class, "values");
+                return enumTypeDefinition;
             } else if (tree.get("alias") != null) {
-                return AliasTypeDefinition.fromJson(parser, tree);
+                ConjureMetrics.incrementCounter(AliasTypeDefinition.class);
+                AliasTypeDefinition aliasTypeDefinition = AliasTypeDefinition.fromJson(parser, tree);
+                ConjureMetrics.incrementCounter(AliasTypeDefinition.class,
+                        "inner",
+                        aliasTypeDefinition.alias().getClass().getSimpleName());
+                return aliasTypeDefinition;
             } else if (tree.get("union") != null) {
-                return UnionTypeDefinition.fromJson(parser, tree);
-            } else if (tree.get("namespace") != null) {
-                return ErrorTypeDefinition.fromJson(parser, tree);
+                UnionTypeDefinition union = UnionTypeDefinition.fromJson(parser, tree);
+                ConjureMetrics.incrementCounter(UnionTypeDefinition.class);
+                ConjureMetrics.histogram(union.union().size(), UnionTypeDefinition.class, "variants");
+                return union;
             } else {
                 throw new IllegalArgumentException(
                         "Unrecognized definition, objects must have either fields, values or an alias defined.");

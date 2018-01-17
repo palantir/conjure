@@ -7,6 +7,7 @@ package com.palantir.conjure.defs.services;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.ConjureMetrics;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ public abstract class PathDefinition {
                     "Path parameter %s appears more than once in path %s", var, path());
             templateVars.add(var);
         });
+        ConjureMetrics.histogram(templateVars.size(), PathDefinition.class, "template-vars");
 
         UriTemplateParser uriTemplateParser = new UriTemplateParser(path().toString());
         Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();

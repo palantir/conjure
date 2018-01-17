@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.defs.types;
 
+import com.palantir.conjure.defs.ConjureMetrics;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -48,9 +49,9 @@ public enum TypeParser implements Parser<ConjureType> {
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
                 OptionalTypeParser.INSTANCE,
-                TypeFromString.of("any", AnyType.of()),
-                TypeFromString.of("binary", BinaryType.of()),
-                TypeFromString.of("datetime", DateTimeType.of()),
+                TypeFromString.of("any", AnyType.of(), AnyType.class),
+                TypeFromString.of("binary", BinaryType.of(), BinaryType.class),
+                TypeFromString.of("datetime", DateTimeType.of(), DateTimeType.class),
                 ForeignReferenceTypeParser.INSTANCE,
                 TypeReferenceParser.INSTANCE);
     }
@@ -80,6 +81,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
             input.release();
+            ConjureMetrics.incrementCounter(LocalReferenceType.class);
             return LocalReferenceType.of(TypeName.of(typeReference));
         }
     }
@@ -108,6 +110,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
+            ConjureMetrics.incrementCounter(ForeignReferenceType.class);
             return ForeignReferenceType.of(Namespace.of(namespace), TypeName.of(ref));
         }
     }
@@ -123,6 +126,7 @@ public enum TypeParser implements Parser<ConjureType> {
             }
 
             ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureMetrics.incrementCounter(ListType.class);
             return ListType.of(itemType);
         }
     }
@@ -138,6 +142,7 @@ public enum TypeParser implements Parser<ConjureType> {
             }
 
             ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureMetrics.incrementCounter(SetType.class);
             return SetType.of(itemType);
         }
     }
@@ -153,6 +158,7 @@ public enum TypeParser implements Parser<ConjureType> {
             }
 
             ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureMetrics.incrementCounter(OptionalType.class);
             return OptionalType.of(itemType);
         }
     }
@@ -176,6 +182,7 @@ public enum TypeParser implements Parser<ConjureType> {
                     ">");
 
             KeyValue<ConjureType, ConjureType> types = kv.parse(input);
+            ConjureMetrics.incrementCounter(MapType.class);
             return MapType.of(types.getKey(), types.getValue());
         }
     }
@@ -183,10 +190,12 @@ public enum TypeParser implements Parser<ConjureType> {
     private static final class TypeFromString<T> implements Parser<T> {
         private final String type;
         private final T instance;
+        private final Class<T> metric;
 
-        TypeFromString(String type, T instance) {
+        TypeFromString(String type, T instance, Class<T> metric) {
             this.type = type;
             this.instance = instance;
+            this.metric = metric;
         }
 
         @Override
@@ -196,11 +205,12 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
+            ConjureMetrics.incrementCounter(metric);
             return instance;
         }
 
-        public static <T> TypeFromString<T> of(String type, T instance) {
-            return new TypeFromString<>(type, instance);
+        public static <T> TypeFromString<T> of(String type, T instance, Class<T> metric) {
+            return new TypeFromString<>(type, instance, metric);
         }
     }
 }

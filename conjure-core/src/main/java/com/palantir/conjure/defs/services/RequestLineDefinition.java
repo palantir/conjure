@@ -9,6 +9,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.ConjureMetrics;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.glassfish.jersey.uri.UriTemplate;
@@ -41,6 +42,7 @@ public interface RequestLineDefinition {
         checkArgument(parts.length == 2,
                 "Request line must be of the form: [METHOD] [PATH], instead was '%s'",
                 oneline);
+        ConjureMetrics.incrementCounter(RequestLineDefinition.class, "method", parts[0]);
         return of(parts[0], PathDefinition.of(parts[1]));
     }
 

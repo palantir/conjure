@@ -7,6 +7,8 @@ package com.palantir.conjure.defs;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assume.assumeTrue;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -48,12 +52,29 @@ public class AllSpellbookDefinitionsTest {
                 .collect(toList());
     }
 
+    @BeforeClass
+    public static final void beforeClass() {
+        SharedMetricRegistries.setDefault("conjure-test", new MetricRegistry());
+    }
+
     @Test
     public void verify_conjure_yml_deserializes() throws Exception {
         String contents = new String(Files.readAllBytes(conjureYml), StandardCharsets.UTF_8);
         assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
 
         Conjure.parse(conjureYml.toFile());
+    }
+
+    @AfterClass
+    public static final void afterClass() {
+        SharedMetricRegistries.getDefault().getCounters()
+                .forEach((name, value) -> System.out.printf("%s: %d%n", name, value.getCount()));
+
+        SharedMetricRegistries.getDefault().getHistograms()
+                .forEach((name, value) -> System.out.printf("%s: %s %s %s%n", name,
+                        value.getSnapshot().getMin(),
+                        value.getSnapshot().getMean(),
+                        value.getSnapshot().getMax()));
     }
 
     private static void downloadFreshTgz(String token) throws IOException, InterruptedException {

@@ -13,6 +13,7 @@ dependencies {
     compile 'org.glassfish.jersey.core:jersey-common'
     compile 'org.slf4j:slf4j-api'
     implementation 'com.google.errorprone:error_prone_annotations'
+    implementation 'io.dropwizard.metrics:metrics-core'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
