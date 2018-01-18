@@ -2,7 +2,7 @@ com.fasterxml.jackson.*:jackson-* = 2.7.4
 com.fasterxml.jackson.datatype:jackson-datatype-jdk7 = 2.6.7
 com.google.googlejavaformat:google-java-format = 1.5
 com.google.guava:guava = 22.0
-com.netflix.nebula:nebula-test = 6.1.2
+com.netflix.nebula:nebula-test = 6.2.0
 com.palantir.baseline:* = 0.17.1
 com.palantir.conda.installer:conda-installer = 3.0.0
 com.palantir.conda.wrapper:* = 1.6.2
@@ -22,7 +22,7 @@ org.immutables:value = 2.5.6
 org.mockito:mockito-core = 2.13.0
 org.slf4j:* = 1.7.25
 com.google.errorprone:error_prone_annotations = 2.2.0
-io.dropwizard.metrics:metrics-core = 3.2.5
+io.dropwizard.metrics:metrics-core = 4.0.2
 
 # Resolve conflicts
 com.google.code.findbugs:jsr305 = 3.0.2
