@@ -58,8 +58,6 @@ is an experiment towards the latter choice and has the following advantages:
 
 - Conjure simplifies non-Java implementations of API servers and clients. The Typescript bindings are a great example.
 - Conjure allows us to specify the wire format independently of existing client/server libraries (e.g., Jersey).
-- Conjure reduces the binary coupling to particular Java features. For example, a Conjure API can be compiled into
-  Java7-compatible client code with Guava Optional types, or into Java8 code with Java8 Optionals.
 - Value types are very simple to specify.
 - Conjure can act as a bridge format to some other IDL we may eventually want to use. For example, Conjure can likely
   be compiled into Protobuf if we ever wanted to move our service implementations to gRPC.
