@@ -1,8 +1,8 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs;
+package com.palantir.conjure.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public final class KebabCaseEnforcingAnnotationInspectorTest {
 
-    private static final ObjectMapper mapper = Conjure.createConjureParserObjectMapper();
+    private static final ObjectMapper mapper = ConjureParser.createConjureParserObjectMapper();
 
     private static class ValidTarget {
         String fooBar;

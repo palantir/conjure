@@ -4,16 +4,12 @@
 
 package com.palantir.conjure.gen.typescript.services;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.typescript.poet.ImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptFunctionSignature;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
@@ -26,24 +22,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class ServiceUtils {
-    private ServiceUtils() {
-        // No
-    }
 
-    public static List<ImportStatement> generateImportStatements(ServiceDefinition serviceDef,
-            TypeName name, ConjurePackage packageLocation, TypeMapper typeMapper) {
+    private ServiceUtils() {}
+
+    public static List<ImportStatement> generateImportStatements(ServiceDefinition serviceDef, TypeMapper typeMapper) {
         List<ConjureType> usedTypes = serviceDef.endpoints().values().stream()
                 .flatMap(endpoint -> {
-                    Stream<ConjureType> endpointTypes = endpoint.argsWithAutoDefined().orElse(
-                            Maps.newHashMap()).values().stream()
-                            .map(ArgumentDefinition::type);
+                    Stream<ConjureType> endpointTypes = endpoint.args().values().stream().map(ArgumentDefinition::type);
                     if (endpoint.returns().isPresent()) {
                         endpointTypes = Stream.concat(endpointTypes, Stream.of(endpoint.returns().get()));
                     }
                     return endpointTypes;
                 })
                 .collect(Collectors.toList());
-        return GenerationUtils.generateImportStatements(usedTypes, name, packageLocation, typeMapper);
+        return GenerationUtils.generateImportStatements(usedTypes, serviceDef.serviceName(), typeMapper);
     }
 
     public static String generateFunctionSignatureReturnType(EndpointDefinition value, TypeMapper typeMapper) {
@@ -61,7 +53,7 @@ public final class ServiceUtils {
         String innerReturnType = generateFunctionSignatureReturnType(value, typeMapper);
         return TypescriptFunctionSignature.builder()
                 .name(name)
-                .parameters(generateParameters(value.argsWithAutoDefined().orElse(ImmutableMap.of()), typeMapper))
+                .parameters(generateParameters(value.args(), typeMapper))
                 .returnType(TypescriptSimpleType.of("Promise<" + innerReturnType + ">"))
                 .build();
     }

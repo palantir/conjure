@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.palantir.conjure.parser.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,8 +60,8 @@ public final class ConjureSpecTest {
             String testName = String.format("positive case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                MAPPER.readValue(yml, ConjureDefinition.class);
-            } catch (IOException e) {
+                com.palantir.conjure.defs.ConjureDefinition.fromParse(MAPPER.readValue(yml, ConjureDefinition.class));
+            } catch (Exception e) {
                 Assertions.fail("Conjure for case should be valid according to the spec: " + testName, e);
             }
         });
@@ -70,9 +71,9 @@ public final class ConjureSpecTest {
             String testName = String.format("negative case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                MAPPER.readValue(yml, ConjureDefinition.class);
+                com.palantir.conjure.defs.ConjureDefinition.fromParse(MAPPER.readValue(yml, ConjureDefinition.class));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Assertions.assertThat(e).withFailMessage("Failure message for case did not match expectation: "
                         + testName + "\nMessage:\n" + e.getMessage() + "\ndid not contain:\n"
                         + entry.getValue().expectedError()).hasMessageContaining(entry.getValue().expectedError());

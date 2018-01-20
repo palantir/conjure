@@ -27,7 +27,7 @@ positive:
           package: test.api
 negative:
   typesPackageRequired:
-    expected-error: 'No package is defined for object SimpleObject'
+    expected-error: 'Must provide default conjure package or explicit conjure package for every object and service'
     conjure:
       types:
         definitions:

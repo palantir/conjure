@@ -1,0 +1,16 @@
+test-case-name: "unique-objects-names"
+negative:
+  duplicateObjectAndErrorNamesNotAllowed:
+    expected-error: 'Type and error names must be unique across locally defined and imported objects'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            Foo:
+              fields:
+                bar: string
+          errors:
+            Foo:
+              namespace: Conjure
+              code: INVALID_ARGUMENT

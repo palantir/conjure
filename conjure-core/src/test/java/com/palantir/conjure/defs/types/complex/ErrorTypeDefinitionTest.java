@@ -7,9 +7,11 @@ package com.palantir.conjure.defs.types.complex;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
+import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ErrorCode;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
 import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.TypeName;
 import org.junit.Test;
 
 public class ErrorTypeDefinitionTest {
@@ -19,6 +21,7 @@ public class ErrorTypeDefinitionTest {
     @Test
     public void testUniqueArgNamesValidator() throws Exception {
         ErrorTypeDefinition.Builder definition = ErrorTypeDefinition.builder()
+                .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
                 .putSafeArgs(FieldName.of("fooBar"), FIELD)
@@ -30,6 +33,7 @@ public class ErrorTypeDefinitionTest {
                         + "foo-bar vs fooBar");
 
         definition = ErrorTypeDefinition.builder()
+                .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
                 .putSafeArgs(FieldName.of("foo-bar"), FIELD)

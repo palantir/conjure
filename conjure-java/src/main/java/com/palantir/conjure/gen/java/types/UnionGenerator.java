@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.SourceVersion;
@@ -54,12 +52,10 @@ public final class UnionGenerator {
 
     public static JavaFile generateUnionType(
             TypeMapper typeMapper,
-            Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.names.TypeName typeName,
             UnionTypeDefinition typeDef,
             Set<ExperimentalFeatures> experimentalFeatures) {
-        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage);
-        ClassName unionClass = ClassName.get(typePackage.name(), typeName.name());
+        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
+        ClassName unionClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
         Map<FieldName, TypeName> memberTypes = typeDef.union().entrySet().stream()
@@ -69,7 +65,7 @@ public final class UnionGenerator {
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.typeName().name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(UnionGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(fields)

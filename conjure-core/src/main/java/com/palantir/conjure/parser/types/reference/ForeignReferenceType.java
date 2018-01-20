@@ -1,13 +1,13 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs.types.reference;
+package com.palantir.conjure.parser.types.reference;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.names.Namespace;
-import com.palantir.conjure.defs.types.names.TypeName;
+import com.palantir.conjure.parser.types.ConjureTypeVisitor;
+import com.palantir.conjure.parser.types.names.Namespace;
+import com.palantir.conjure.parser.types.names.TypeName;
 import org.immutables.value.Value;
 
 @Value.Immutable

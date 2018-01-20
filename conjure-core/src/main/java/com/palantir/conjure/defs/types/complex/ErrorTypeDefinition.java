@@ -4,20 +4,17 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
+import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
 import com.palantir.conjure.defs.types.names.ErrorCode;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
 import com.palantir.conjure.defs.types.names.FieldName;
-import java.io.IOException;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableErrorTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
@@ -26,10 +23,8 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
 
     ErrorCode code();
 
-    @JsonProperty("safe-args")
     Map<FieldName, FieldDefinition> safeArgs();
 
-    @JsonProperty("unsafe-args")
     Map<FieldName, FieldDefinition> unsafeArgs();
 
     @Value.Check
@@ -39,8 +34,18 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
         }
     }
 
-    static ErrorTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        return parser.getCodec().treeToValue(json, ImmutableErrorTypeDefinition.class);
+    static ErrorTypeDefinition parseFrom(
+            TypeName name,
+            com.palantir.conjure.parser.types.complex.ErrorTypeDefinition def,
+            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+        return builder()
+                .typeName(name)
+                .namespace(ErrorNamespace.of(def.namespace().name()))
+                .code(ErrorCode.of(def.code().name()))
+                .safeArgs(ObjectTypeDefParserVisitor.parseFieldDef(def.safeArgs(), typeResolver))
+                .unsafeArgs(ObjectTypeDefParserVisitor.parseFieldDef(def.unsafeArgs(), typeResolver))
+                .docs(def.docs())
+                .build();
     }
 
     static Builder builder() {

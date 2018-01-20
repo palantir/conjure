@@ -15,7 +15,6 @@ import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ParameterName;
-import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -43,7 +42,6 @@ import com.palantir.conjure.gen.typescript.poet.TypescriptTypeSignature;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
 import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -55,17 +53,16 @@ public final class ClassServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(),
-                conjureDefinition.types().definitions().defaultConjurePackage());
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types()
+        );
         return conjureDefinition.services()
-                .entrySet()
                 .stream()
-                .map(e -> generate(e.getKey(), e.getValue(), typeMapper))
+                .map(serviceDef -> generate(serviceDef, typeMapper))
                 .collect(Collectors.toSet());
     }
 
-    private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
-        ConjurePackage packageLocation = serviceDef.conjurePackage();
+    private TypescriptFile generate(ServiceDefinition serviceDef, TypeMapper typeMapper) {
+        ConjurePackage packageLocation = serviceDef.serviceName().conjurePackage();
         String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
         TypescriptFunctionBody constructorBody = TypescriptFunctionBody.builder().addStatements(
                 AssignStatement.builder()
@@ -82,8 +79,8 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .map(e -> {
                     TypescriptFunctionSignature functionSignature = ServiceUtils.generateFunctionSignature(e.getKey(),
                             e.getValue(), typeMapper);
-                    TypescriptFunctionBody functionBody = generateFunctionBody(serviceDef.basePath(), e.getKey(),
-                            e.getValue(), serviceDef.defaultAuth(), typeMapper);
+                    TypescriptFunctionBody functionBody = generateFunctionBody(e.getKey(),
+                            e.getValue(), typeMapper);
                     return TypescriptFunction.builder().functionSignature(functionSignature)
                             .functionBody(functionBody).build();
                 })
@@ -91,27 +88,27 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                 .collect(Collectors.toList());
         List<AssignStatement> fields = Lists.newArrayList(
                 AssignStatement.builder().lhs("private bridge: IHttpApiBridge").build());
+        TypeName serviceName = serviceDef.serviceName();
         TypescriptClass typescriptClass = TypescriptClass.builder()
                 .constructor(Optional.of(constructor))
                 .fields(fields)
-                .name(typeName.name())
+                .name(serviceName.name())
                 .methods(methods)
                 .build();
         return TypescriptFile.builder()
                 .addEmittables(typescriptClass)
-                .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
+                .imports(ServiceUtils.generateImportStatements(serviceDef, typeMapper))
                 .addImports(StandardImportStatement.builder()
                         .addNamesToImport("IHttpApiBridge")
                         .filepathToImport(ConjureTypeScriptClientGenerator.CONJURE_FE_LIB)
                         .build())
-                .name(getFilename(typeName))
+                .name(getFilename(serviceName))
                 .parentFolderPath(parentFolderPath)
                 .build();
     }
 
-    private TypescriptFunctionBody generateFunctionBody(PathDefinition serviceBasePath, String name,
-            EndpointDefinition value, AuthDefinition defaultAuth, TypeMapper typeMapper) {
-        AuthDefinition authDefinition = value.auth().orElse(defaultAuth);
+    private TypescriptFunctionBody generateFunctionBody(String name, EndpointDefinition value, TypeMapper typeMapper) {
+        AuthDefinition authDefinition = value.auth();
 
         String responseMediaType;
         if (value.returns().map(type -> type instanceof BinaryType).orElse(false)) {
@@ -120,10 +117,9 @@ public final class ClassServiceGenerator implements ServiceGenerator {
             responseMediaType = MediaType.APPLICATION_JSON;
         }
 
-        boolean consumesTypeIsBinary = value.args().map(
-                args -> args.values().stream()
-                        .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
-                                ArgumentDefinition.ParamType.BODY))).orElse(false);
+        boolean consumesTypeIsBinary = value.args().values().stream()
+                .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
+                        ArgumentDefinition.ParamType.BODY));
 
         String requestMediaType;
         if (consumesTypeIsBinary) {
@@ -132,13 +128,12 @@ public final class ClassServiceGenerator implements ServiceGenerator {
             requestMediaType = MediaType.APPLICATION_JSON;
         }
 
-        Map<ParameterName, ArgumentDefinition> args = value.argsWithAutoDefined().orElse(Collections.emptyMap());
-
+        Map<ParameterName, ArgumentDefinition> args = value.args();
         ObjectExpression headers = ObjectExpression.builder().keyValues(
                 args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
                         .collect(Collectors.toMap(
-                                e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()),
+                                e -> StringExpression.of(e.getValue().paramId().name()),
                                 e -> RawExpression.of(e.getKey().name()))))
                 .build();
 
@@ -148,7 +143,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         : Lists.newArrayList())
                 .addAll(args.entrySet().stream()
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.HEADER)
-                        .map(e -> StringExpression.of(e.getValue().paramId().orElse(e.getKey()).name()))
+                        .map(e -> StringExpression.of(e.getValue().paramId().name()))
                         .collect(Collectors.toList()))
                 .build());
 
@@ -164,7 +159,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         .filter(e -> e.getValue().paramType() == ArgumentDefinition.ParamType.QUERY)
                         .collect(Collectors.toMap(
                                 arg -> {
-                                    ParameterName parameterName = arg.getValue().paramId().orElse(arg.getKey());
+                                    ParameterName parameterName = arg.getValue().paramId();
                                     return parameterName.name();
                                 },
                                 arg -> RawExpression.of(arg.getKey().name()))))
@@ -178,8 +173,7 @@ public final class ClassServiceGenerator implements ServiceGenerator {
                         .collect(Collectors.toList()), RawExpression.of("undefined"));
 
         Map<String, TypescriptExpression> keyValues = ImmutableMap.<String, TypescriptExpression>builder()
-                .put("endpointPath", StringExpression.of(
-                        serviceBasePath.resolve(value.http().path()).path().toString()))
+                .put("endpointPath", StringExpression.of(value.http().path().path().toString()))
                 .put("endpointName", StringExpression.of(name))
                 .put("headers", headers)
                 .put("method", StringExpression.of(value.http().method()))
@@ -200,18 +194,17 @@ public final class ClassServiceGenerator implements ServiceGenerator {
 
     @Override
     public Map<ConjurePackage, Collection<ExportStatement>> generateExports(ConjureDefinition conjureDefinition) {
-        Map<ConjurePackage, Set<Map.Entry<TypeName, ServiceDefinition>>> definitionsByPackage =
-                conjureDefinition.services().entrySet().stream()
-                .collect(Collectors.groupingBy(entry -> entry.getValue().conjurePackage(), Collectors.toSet()));
+        Map<ConjurePackage, Set<ServiceDefinition>> definitionsByPackage =
+                conjureDefinition.services().stream().collect(
+                        Collectors.groupingBy(def -> def.serviceName().conjurePackage(), Collectors.toSet()));
         return definitionsByPackage
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> generateExports(entry.getValue())));
     }
 
-    private static Collection<ExportStatement> generateExports(
-            Set<Map.Entry<TypeName, ServiceDefinition>> definitions) {
-        return Collections2.transform(definitions, typeAndDefinition -> generateExport(typeAndDefinition.getKey()));
+    private static Collection<ExportStatement> generateExports(Set<ServiceDefinition> definitions) {
+        return Collections2.transform(definitions, serviceDef -> generateExport(serviceDef.serviceName()));
     }
 
     private static ExportStatement generateExport(TypeName typeName) {

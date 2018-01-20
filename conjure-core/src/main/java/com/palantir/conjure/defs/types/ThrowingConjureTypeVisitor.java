@@ -12,7 +12,6 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 public interface ThrowingConjureTypeVisitor<T> extends ConjureTypeVisitor<T> {
@@ -43,11 +42,6 @@ public interface ThrowingConjureTypeVisitor<T> extends ConjureTypeVisitor<T> {
 
     @Override
     default T visitLocalReference(LocalReferenceType type) {
-        throw createException(type);
-    }
-
-    @Override
-    default T visitForeignReference(ForeignReferenceType type) {
         throw createException(type);
     }
 

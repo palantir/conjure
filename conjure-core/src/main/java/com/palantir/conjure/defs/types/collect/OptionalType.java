@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types.collect;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
@@ -14,7 +13,6 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface OptionalType extends ConjureType {
 
-    @JsonProperty("item-type")
     ConjureType itemType();
 
     @Override

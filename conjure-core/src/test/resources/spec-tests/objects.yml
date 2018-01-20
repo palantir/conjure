@@ -29,7 +29,7 @@ negative:
                   # invalid: recursive definition not allowed
                   self: SelfRecursiveObject
   cycleNotAllowed:
-    expected-error: 'Illegal recursive data type: Other -> One -> Other'
+    expected-error: 'Illegal recursive data type: '
     conjure:
       types:
         definitions:
@@ -37,13 +37,13 @@ negative:
           objects:
             # invalid: cyclic definition not allowed
             One:
-                fields:
-                  other: Other
+              fields:
+                other: Other
             Other:
-                fields:
-                  other: One
+              fields:
+                other: One
   cycleViaAliasNotAllowed:
-    expected-error: 'Illegal recursive data type: Other -> One -> Other'
+    expected-error: 'Illegal recursive data type: '
     conjure:
       types:
         definitions:

@@ -26,8 +26,6 @@ public interface PythonEndpointDefinition extends Emittable {
 
     String methodName();
 
-    PathDefinition basePath();
-
     RequestLineDefinition http();
 
     AuthDefinition authDefinition();
@@ -60,8 +58,7 @@ public interface PythonEndpointDefinition extends Emittable {
                             .build())
                     .addAll(params())
                     .build() : params();
-            paramsWithHeader = paramsWithHeader.stream()
-                    .collect(Collectors.toList());
+            paramsWithHeader = paramsWithHeader.stream().collect(Collectors.toList());
 
             poetWriter.writeIndentedLine("def %s(self, %s):",
                     methodName(),
@@ -135,7 +132,7 @@ public interface PythonEndpointDefinition extends Emittable {
             // fix the path, add path params
             poetWriter.writeLine();
 
-            PathDefinition fullPath = basePath().resolve(http().path());
+            PathDefinition fullPath = http().path();
             String fixedPath = fullPath.toString().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
             poetWriter.writeIndentedLine("_path = '%s'", fixedPath);
             poetWriter.writeIndentedLine("_path = _path.format(**_path_params)");
@@ -185,9 +182,8 @@ public interface PythonEndpointDefinition extends Emittable {
         String paramName();
 
         /**
-         * An identifier to use as a parameter value
-         * (e.g. if this is a header parameter, param-id defines the header key);
-         * by default the argument name is used as the param-id
+         * An identifier to use as a parameter value (e.g. if this is a header parameter, param-id defines the header
+         * key); by default the argument name is used as the param-id
          */
         Optional<String> paramId();
 

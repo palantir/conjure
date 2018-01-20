@@ -4,10 +4,9 @@
 
 package com.palantir.conjure.defs.services;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.ConjureMetrics;
+import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
 import java.util.HashSet;
@@ -100,7 +99,6 @@ public abstract class PathDefinition {
     }
 
     /** Creates a new {@link PathDefinition} from the given string, or throws an exception if it fails to validate. */
-    @JsonCreator
     public static PathDefinition of(String path) {
         Path parsed = Paths.get(path);
         return ImmutablePathDefinition.builder().path(parsed).build();

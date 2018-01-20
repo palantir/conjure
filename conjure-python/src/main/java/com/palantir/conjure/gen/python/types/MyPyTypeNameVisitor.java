@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.python.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
 import com.palantir.conjure.defs.types.TypesDefinition;
@@ -16,20 +17,23 @@ import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
+import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import java.util.Map;
 
 /**
  * The mypy type for the conjure type.
  */
 public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
 
-    private final TypesDefinition types;
+    private final Map<TypeName, BaseObjectTypeDefinition> typesByName;
+    private final Map<TypeName, ExternalTypeDefinition> importsByName;
 
     public MyPyTypeNameVisitor(TypesDefinition types) {
-        this.types = types;
+        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().objects(), t -> t.typeName());
+        this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
     }
 
 
@@ -75,19 +79,14 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
     @Override
     public String visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
-        BaseObjectTypeDefinition baseType = types.definitions().objects().get(type.type());
+        BaseObjectTypeDefinition baseType = typesByName.get(type.type());
         if (baseType != null) {
             return type.type().name();
         } else {
-            ExternalTypeDefinition depType = types.imports().get(type.type());
+            ExternalTypeDefinition depType = importsByName.get(type.type());
             checkNotNull(depType, "Unable to resolve type %s", type.type());
             return visitPrimitive(depType.baseType());
         }
-    }
-
-    @Override
-    public String visitForeignReference(ForeignReferenceType type) {
-        return type.type().name();
     }
 
     @Override

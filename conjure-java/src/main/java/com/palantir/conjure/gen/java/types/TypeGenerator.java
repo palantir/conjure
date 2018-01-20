@@ -11,15 +11,11 @@ import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ObjectsDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public interface TypeGenerator {
@@ -30,16 +26,12 @@ public interface TypeGenerator {
         Set<JavaFile> files = Sets.newLinkedHashSet();
 
         // Generate java files for object definitions
-        objectsDefinition.objects().entrySet().stream().map(
-                type -> generateObjectType(
-                        types,
-                        objectsDefinition.defaultConjurePackage(),
-                        type.getKey(),
-                        type.getValue()))
+        objectsDefinition.objects().stream().map(
+                type -> generateObjectType(types, type))
                 .forEach(files::add);
 
         // Generate java files for error definitions
-        generateErrorTypes(types, objectsDefinition.defaultConjurePackage(), objectsDefinition.errors())
+        generateErrorTypes(types, objectsDefinition.errors())
                 .forEach(files::add);
 
         return files;
@@ -60,12 +52,9 @@ public interface TypeGenerator {
 
     JavaFile generateObjectType(
             TypesDefinition allTypes,
-            Optional<ConjurePackage> defaultPackage,
-            TypeName typeName,
             BaseObjectTypeDefinition typeDef);
 
     Set<JavaFile> generateErrorTypes(
             TypesDefinition allTypes,
-            Optional<ConjurePackage> defaultPackage,
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef);
+            List<ErrorTypeDefinition> errorTypeNameToDef);
 }

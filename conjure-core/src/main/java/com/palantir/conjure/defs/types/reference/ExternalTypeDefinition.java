@@ -4,28 +4,35 @@
 
 package com.palantir.conjure.defs.types.reference;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableExternalTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ExternalTypeDefinition {
 
+    TypeName typeName();
+
     Map<String, String> external();
 
-    @JsonProperty("base-type")
-    @Value.Default
-    default PrimitiveType baseType() {
-        return PrimitiveType.STRING;
-    }
+    PrimitiveType baseType();
 
     static ExternalTypeDefinition javaType(String external) {
-        return ImmutableExternalTypeDefinition.builder().putExternal("java", external).build();
+        return ImmutableExternalTypeDefinition.builder()
+                .baseType(PrimitiveType.STRING)
+                .putExternal("java", external)
+                .build();
     }
 
+    static ExternalTypeDefinition fromParse(
+            TypeName name, com.palantir.conjure.parser.types.reference.ExternalTypeDefinition def) {
+        return ImmutableExternalTypeDefinition.builder()
+                .typeName(name)
+                .baseType(PrimitiveType.parseFrom(def.baseType()))
+                .putAllExternal(def.external())
+                .build();
+    }
 }

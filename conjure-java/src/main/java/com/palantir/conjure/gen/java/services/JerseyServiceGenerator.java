@@ -15,7 +15,6 @@ import com.palantir.conjure.defs.services.ParameterName;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
@@ -50,18 +49,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 conjureDefinition.types(),
                 types -> new JerseyReturnTypeClassNameVisitor(types, experimentalFeatures));
         TypeMapper methodTypeMapper = new TypeMapper(conjureDefinition.types(), JerseyMethodTypeClassNameVisitor::new);
-        return conjureDefinition.services().entrySet().stream()
-                .map(entry -> generateService(entry.getKey(), entry.getValue(), returnTypeMapper, methodTypeMapper))
+        return conjureDefinition.services().stream()
+                .map(serviceDef -> generateService(serviceDef, returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toSet());
     }
 
-    private JavaFile generateService(TypeName serviceName, ServiceDefinition serviceDefinition,
+    private JavaFile generateService(ServiceDefinition serviceDefinition,
             TypeMapper returnTypeMapper, TypeMapper methodTypeMapper) {
-        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName.name())
+        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceDefinition.serviceName().name())
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", serviceDefinition.basePath())
-                        .build())
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Consumes"))
                         .addMember("value", "$T.APPLICATION_JSON", ClassName.get("javax.ws.rs.core", "MediaType"))
                         .build())
@@ -77,10 +73,10 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .map(endpoint -> generateServiceMethod(
                         endpoint.getKey(),
                         endpoint.getValue(),
-                        serviceDefinition.defaultAuth(), returnTypeMapper, methodTypeMapper))
+                        returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toList()));
 
-        return JavaFile.builder(serviceDefinition.conjurePackage().name(), serviceBuilder.build())
+        return JavaFile.builder(serviceDefinition.serviceName().conjurePackage().name(), serviceBuilder.build())
                 .indent("    ")
                 .build();
     }
@@ -88,7 +84,6 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     private MethodSpec generateServiceMethod(
             String endpointName,
             EndpointDefinition endpointDef,
-            AuthDefinition defaultAuth,
             TypeMapper returnTypeMapper,
             TypeMapper methodTypeMapper) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
@@ -97,7 +92,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", endpointDef.http().path())
                         .build())
-                .addParameters(createServiceMethodParameters(endpointDef, defaultAuth, methodTypeMapper));
+                .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {
             methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.markers()));
@@ -108,10 +103,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                     .build());
         }
 
-        boolean consumesTypeIsBinary = endpointDef.args().map(
-                args -> args.values().stream()
-                        .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
-                                ArgumentDefinition.ParamType.BODY))).orElse(false);
+        boolean consumesTypeIsBinary = endpointDef.args().values().stream()
+                .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
+                        ArgumentDefinition.ParamType.BODY));
 
         if (consumesTypeIsBinary) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Consumes"))
@@ -132,18 +126,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     private static List<ParameterSpec> createServiceMethodParameters(
             EndpointDefinition endpointDef,
-            AuthDefinition defaultAuth,
             TypeMapper typeMapper) {
         List<ParameterSpec> parameterSpecs = new ArrayList<>();
 
-        AuthDefinition auth = endpointDef.auth().orElse(defaultAuth);
+        AuthDefinition auth = endpointDef.auth();
         createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
-        if (endpointDef.argsWithAutoDefined().isPresent()) {
-            endpointDef.argsWithAutoDefined().get().forEach((name, def) -> {
-                parameterSpecs.add(createServiceMethodParameterArg(typeMapper, name, def));
-            });
-        }
+        endpointDef.args().forEach((name, def) -> {
+            parameterSpecs.add(createServiceMethodParameterArg(typeMapper, name, def));
+        });
         return ImmutableList.copyOf(parameterSpecs);
     }
 
@@ -205,7 +196,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
         }
         return Optional.of(AnnotationSpec.builder(ClassName.get("javax.ws.rs", annotationType))
-                .addMember("value", "$S", def.paramId().orElse(argName))
+                .addMember("value", "$S", def.paramId())
                 .build());
     }
 

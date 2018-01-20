@@ -4,8 +4,6 @@
 
 package com.palantir.conjure.defs.services;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
@@ -21,10 +19,8 @@ public abstract class ParameterName {
     public static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
     public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
 
-    @JsonValue
     public abstract String name();
 
-    @JsonCreator
     public static ParameterName of(String name) {
         return ImmutableParameterName.builder().name(name).build();
     }

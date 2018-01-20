@@ -16,9 +16,7 @@ import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.AnnotationSpec;
@@ -35,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -54,21 +51,19 @@ public final class BeanGenerator {
 
     public static JavaFile generateBeanType(
             TypeMapper typeMapper,
-            Optional<ConjurePackage> defaultPackage,
-            TypeName typeName,
             ObjectTypeDefinition typeDef,
             boolean ignoreUnknownProperties,
             Set<ExperimentalFeatures> experimentalFeatures) {
 
-        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
-        ClassName objectClass = ClassName.get(typePackage.name(), typeName.name());
+        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
+        ClassName objectClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
         Collection<FieldSpec> nonPrimitivePoetFields = Collections2.filter(poetFields, f -> !f.type.isPrimitive());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeName.name())
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.typeName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, nonPrimitivePoetFields))
@@ -80,13 +75,13 @@ public final class BeanGenerator {
 
         if (!poetFields.isEmpty()) {
             typeBuilder
-                .addMethod(MethodSpecs.createEquals(objectClass))
-                .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
-                .addMethod(MethodSpecs.createHashCode(poetFields));
+                    .addMethod(MethodSpecs.createEquals(objectClass))
+                    .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
+                    .addMethod(MethodSpecs.createHashCode(poetFields));
         }
 
         typeBuilder
-                .addMethod(MethodSpecs.createToString(typeName.name(), poetFields));
+                .addMethod(MethodSpecs.createToString(typeDef.typeName().name(), poetFields));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));

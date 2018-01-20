@@ -13,7 +13,6 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 public final class IsPrimitiveOrReferenceType implements ConjureTypeVisitor<Boolean> {
@@ -46,11 +45,6 @@ public final class IsPrimitiveOrReferenceType implements ConjureTypeVisitor<Bool
 
     @Override
     public Boolean visitLocalReference(LocalReferenceType type) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitForeignReference(ForeignReferenceType type) {
         return true;
     }
 

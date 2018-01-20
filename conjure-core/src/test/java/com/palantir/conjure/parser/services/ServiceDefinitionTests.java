@@ -1,8 +1,8 @@
 /*
- * (c) Copyright 2016 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs.services;
+package com.palantir.conjure.parser.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,24 +11,24 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
-import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ObjectsDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.parser.ConjureDefinition;
+import com.palantir.conjure.parser.ConjureParser;
+import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.parser.types.ObjectsDefinition;
+import com.palantir.conjure.parser.types.TypesDefinition;
+import com.palantir.conjure.parser.types.builtin.AnyType;
+import com.palantir.conjure.parser.types.collect.MapType;
+import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
+import com.palantir.conjure.parser.types.complex.FieldDefinition;
+import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.parser.types.names.ConjurePackage;
+import com.palantir.conjure.parser.types.names.FieldName;
+import com.palantir.conjure.parser.types.names.TypeName;
+import com.palantir.conjure.parser.types.primitive.PrimitiveType;
+import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.parser.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
@@ -78,12 +78,13 @@ public final class ServiceDefinitionTests {
                 .isEqualTo(EndpointDefinition.builder()
                         .http(RequestLineDefinition.of("GET", PathDefinition.of("/{foo}")))
                         .auth(AuthDefinition.header())
-                        .args(ImmutableMap.of(ParameterName.of("arg"), ArgumentDefinition.builder()
-                                .type(PrimitiveType.STRING)
-                                .docs("foo-docs")
-                                .paramId(ParameterName.of("foo"))
-                                .paramType(ArgumentDefinition.ParamType.PATH)
-                                .build()))
+                        .args(ImmutableMap.of(
+                                ParameterName.of("arg"), ArgumentDefinition.builder()
+                                        .type(PrimitiveType.STRING)
+                                        .docs("foo-docs")
+                                        .paramId(ParameterName.of("foo"))
+                                        .paramType(ArgumentDefinition.ParamType.PATH)
+                                        .build()))
                         .returns(PrimitiveType.STRING)
                         .docs("docs")
                         .build());
@@ -156,8 +157,9 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testParseConjureFile() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/test-service.yml"));
+        ConjureDefinition def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def).isEqualTo(
                 ConjureDefinition.builder()
                         .types(TypesDefinition.builder()
@@ -172,7 +174,7 @@ public final class ServiceDefinitionTests {
                                         .build())
                                 .build())
                         .putServices(TypeName.of("TestService"), ServiceDefinition.builder()
-                                .name("Test Service")
+                                .doNotUseName("Test Service")
                                 .conjurePackage(ConjurePackage.of("test.api"))
                                 .putEndpoints("get", EndpointDefinition.builder()
                                         .http(RequestLineDefinition.of("GET", PathDefinition.of("/get")))

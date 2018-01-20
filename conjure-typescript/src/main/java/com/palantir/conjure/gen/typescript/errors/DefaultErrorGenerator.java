@@ -39,7 +39,6 @@ import com.palantir.conjure.gen.typescript.utils.GenerationUtils;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -51,17 +50,15 @@ import org.immutables.value.Value;
 public final class DefaultErrorGenerator implements ErrorGenerator {
 
     @Override
-    public Set<TypescriptFile> generate(
-            Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
-        return generateAllFiles(definitions, defaultPackage).stream()
+    public Set<TypescriptFile> generate(List<ErrorTypeDefinition> definitions) {
+        return generateAllFiles(definitions).stream()
                 .map(FileWithExports::file)
                 .collect(toSet());
     }
 
     @Override
-    public Map<ConjurePackage, Collection<ExportStatement>> generateExports(
-            Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
-        return generateAllFiles(definitions, defaultPackage).stream().collect(Collectors.toMap(
+    public Map<ConjurePackage, Collection<ExportStatement>> generateExports(List<ErrorTypeDefinition> definitions) {
+        return generateAllFiles(definitions).stream().collect(Collectors.toMap(
                 FileWithExports::conjurePackage,
                 fileWithExports -> ImmutableList.of(fileWithExports.toExportStatement()),
                 this::concatLists));
@@ -82,12 +79,8 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
         }
     }
 
-    private Set<FileWithExports> generateAllFiles(
-            Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
-
-        Multimap<ConjurePackage, Exportable> codeByPackage =
-                generateCodeByPackage(definitions, defaultPackage);
-
+    private Set<FileWithExports> generateAllFiles(List<ErrorTypeDefinition> definitions) {
+        Multimap<ConjurePackage, Exportable> codeByPackage = generateCodeByPackage(definitions);
         return codeByPackage.asMap().entrySet()
                 .stream()
                 .map(entry -> {
@@ -111,16 +104,13 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
                 .collect(toSet());
     }
 
-    private Multimap<ConjurePackage, Exportable> generateCodeByPackage(
-            Map<TypeName, ErrorTypeDefinition> definitions, Optional<ConjurePackage> defaultPackage) {
-
+    private Multimap<ConjurePackage, Exportable> generateCodeByPackage(List<ErrorTypeDefinition> definitions) {
         // we're going to have a single 'errors' file per package
         ListMultimap<ConjurePackage, Exportable> codeByPackage = ArrayListMultimap.create();
 
-        definitions.forEach((typeName, definition) -> {
-            ConjurePackage conjurePackage = definition.conjurePackage().orElse(defaultPackage
-                    .orElseThrow(() -> new IllegalArgumentException("No package for: " + typeName.name())));
-
+        definitions.forEach(definition -> {
+            ConjurePackage conjurePackage = definition.typeName().conjurePackage();
+            TypeName typeName = definition.typeName();
             TypescriptInterface errorInterface = createSingleInterface(typeName, definition);
             TypescriptFunction typeGuard = createTypeGuard(typeName, errorInterface, definition);
 

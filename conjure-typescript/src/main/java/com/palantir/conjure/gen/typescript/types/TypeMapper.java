@@ -8,6 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
@@ -24,27 +25,26 @@ import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
+import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
-import com.palantir.conjure.defs.types.reference.ImportedTypes;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
 public final class TypeMapper {
 
-    private final Optional<ConjurePackage> defaultPackage;
-    private final TypesDefinition types;
+    private final Map<TypeName, BaseObjectTypeDefinition> typesByName;
+    private final Map<TypeName, ExternalTypeDefinition> importsByName;
 
-    public TypeMapper(TypesDefinition types, Optional<ConjurePackage> defaultPackage) {
-        this.types = types;
-        this.defaultPackage = defaultPackage;
+    public TypeMapper(TypesDefinition types) {
+        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().objects(), t -> t.typeName());
+        this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
     }
 
     public TypescriptSimpleType getTypescriptType(ConjureType conjureType) {
@@ -113,12 +113,6 @@ public final class TypeMapper {
         }
 
         @Override
-        public Void visitForeignReference(ForeignReferenceType type) {
-            result.add(type);
-            return null;
-        }
-
-        @Override
         public Void visitSet(SetType type) {
             stack.add(type.itemType());
             return null;
@@ -144,23 +138,19 @@ public final class TypeMapper {
     private class ContainingPackageVisitor implements ThrowingConjureTypeVisitor<Optional<ConjurePackage>> {
         @Override
         public Optional<ConjurePackage> visitLocalReference(LocalReferenceType type) {
-            BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
+            BaseObjectTypeDefinition defType = typesByName.get(type.type());
+
             if (defType != null) {
                 if (defType instanceof ObjectTypeDefinition || defType instanceof EnumTypeDefinition
                         || defType instanceof UnionTypeDefinition) {
-                    return Optional.of(ConjurePackages.getPackage(
-                            defType.conjurePackage(), defaultPackage, type.type()));
+                    return Optional.of(defType.typeName().conjurePackage());
                 } else if (!(defType instanceof AliasTypeDefinition)) {
                     throw new IllegalArgumentException("Unknown base object type definition");
                 }
             }
+
             // TODO(rmcnamara): for now assume to generate primitive types for external definitions
             return Optional.empty();
-        }
-
-        @Override
-        public Optional<ConjurePackage> visitForeignReference(ForeignReferenceType type) {
-            return Optional.of(types.getImportsForRefNameSpace(type).getPackageForImportedType(type));
         }
     }
 
@@ -209,25 +199,11 @@ public final class TypeMapper {
 
         @Override
         public String visitLocalReference(LocalReferenceType type) {
-            BaseObjectTypeDefinition defType = types.definitions().objects().get(type.type());
+            BaseObjectTypeDefinition defType = typesByName.get(type.type());
             if (defType != null) {
                 return extractTypescriptName(type, defType);
             } else {
-                ExternalTypeDefinition depType = types.imports().get(type.type());
-                checkNotNull(depType, "Unable to resolve type %s", type.type());
-                return getTypeNameFromConjureType(depType.baseType());
-            }
-        }
-
-        @Override
-        public String visitForeignReference(ForeignReferenceType type) {
-            ImportedTypes importedTypes = types.conjureImports().get(type.namespace());
-            if (importedTypes != null) {
-                BaseObjectTypeDefinition defType = importedTypes.importedTypes().objects().get(type.type());
-                checkNotNull(defType, "Unable to resolve imported conjure type %s", type.type());
-                return extractTypescriptName(type, defType);
-            } else {
-                ExternalTypeDefinition depType = types.imports().get(type.type());
+                ExternalTypeDefinition depType = importsByName.get(type.type());
                 checkNotNull(depType, "Unable to resolve type %s", type.type());
                 return getTypeNameFromConjureType(depType.baseType());
             }
@@ -251,7 +227,7 @@ public final class TypeMapper {
         private String extractTypescriptName(ReferenceType referenceType, BaseObjectTypeDefinition defType) {
             if (defType instanceof AliasTypeDefinition) {
                 // in typescript we collapse alias types to concrete types
-                return getAliasedType(referenceType, (AliasTypeDefinition) defType).visit(this);
+                return getAliasedType((AliasTypeDefinition) defType).visit(this);
             } else if (defType instanceof EnumTypeDefinition) {
                 return referenceType.type().name();
             } else {
@@ -260,20 +236,12 @@ public final class TypeMapper {
             }
         }
 
+        // TODO(rfink): Remove this comment once I know the implementation is correct.
         // If the original ReferenceType is a ForeignReferenceType and the aliased type is a LocalReferenceType,
         // then the LocalReferenceType has to be converted to a ForeignReferenceType for resolution to work
-        private ConjureType getAliasedType(ReferenceType referenceType, AliasTypeDefinition aliasTypeDefinition) {
-            ConjureType aliasedType = aliasTypeDefinition.alias();
-            if (referenceType instanceof ForeignReferenceType
-                    && aliasedType instanceof LocalReferenceType
-                    && !(aliasedType instanceof PrimitiveType)) {
-
-                LocalReferenceType localAliasedType = (LocalReferenceType) aliasedType;
-                return ForeignReferenceType.of(
-                        ((ForeignReferenceType) referenceType).namespace(),
-                        localAliasedType.type());
-            }
-            return aliasedType;
+        private ConjureType getAliasedType(AliasTypeDefinition aliasTypeDefinition) {
+            // TODO(rfink): Is this correct?
+            return aliasTypeDefinition.alias();
         }
     }
 }

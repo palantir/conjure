@@ -9,9 +9,7 @@ import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.UnsafeArg;
@@ -23,8 +21,9 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -35,11 +34,9 @@ public final class ErrorGenerator {
     private ErrorGenerator() {}
 
     public static Set<JavaFile> generateErrorTypes(
-            TypeMapper typeMapper,
-            Optional<ConjurePackage> defaultPackage,
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
+            TypeMapper typeMapper, List<ErrorTypeDefinition> errorTypeNameToDef) {
 
-        return splitErrorDefsByNamespace(errorTypeNameToDef, defaultPackage)
+        return splitErrorDefsByNamespace(errorTypeNameToDef)
                 .entrySet()
                 .stream()
                 .flatMap(entry ->
@@ -47,25 +44,28 @@ public final class ErrorGenerator {
                                 .entrySet()
                                 .stream()
                                 .map(innerEntry -> generateErrorTypesForNamespace(
-                                        typeMapper, ConjurePackage.of(entry.getKey()), innerEntry.getKey(),
+                                        typeMapper,
+                                        ConjurePackage.of(entry.getKey()),
+                                        innerEntry.getKey(),
                                         innerEntry.getValue()))
                 ).collect(Collectors.toSet());
     }
 
-    private static Map<String, Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>>> splitErrorDefsByNamespace(
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef, Optional<ConjurePackage> defaultPackage) {
+    private static Map<String, Map<ErrorNamespace, List<ErrorTypeDefinition>>> splitErrorDefsByNamespace(
+            List<ErrorTypeDefinition> errorTypeNameToDef) {
 
-        Map<String, Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>>> pkgToNamespacedErrorDefs =
+        Map<String, Map<ErrorNamespace, List<ErrorTypeDefinition>>> pkgToNamespacedErrorDefs =
                 Maps.newHashMap();
-        errorTypeNameToDef.entrySet().stream().forEach(entry -> {
-            ConjurePackage errorPkg = ConjurePackages.getPackage(entry.getValue().conjurePackage(), defaultPackage);
+        errorTypeNameToDef.stream().forEach(errorDef -> {
+            ConjurePackage errorPkg = errorDef.typeName().conjurePackage();
             pkgToNamespacedErrorDefs.computeIfAbsent(errorPkg.name(), key -> Maps.newHashMap());
 
-            Map<ErrorNamespace, Map<TypeName, ErrorTypeDefinition>> namespacedErrorDefs = pkgToNamespacedErrorDefs.get(
-                    errorPkg.name());
-            ErrorNamespace namespace = entry.getValue().namespace();
-            namespacedErrorDefs.computeIfAbsent(namespace, key -> Maps.newHashMap());
-            namespacedErrorDefs.get(namespace).put(entry.getKey(), entry.getValue());
+            Map<ErrorNamespace, List<ErrorTypeDefinition>> namespacedErrorDefs =
+                    pkgToNamespacedErrorDefs.get(errorPkg.name());
+            ErrorNamespace namespace = errorDef.namespace();
+            // TODO(rfink): Use Multimap?
+            namespacedErrorDefs.computeIfAbsent(namespace, key -> new ArrayList<>());
+            namespacedErrorDefs.get(namespace).add(errorDef);
         });
         return pkgToNamespacedErrorDefs;
     }
@@ -74,38 +74,38 @@ public final class ErrorGenerator {
             TypeMapper typeMapper,
             ConjurePackage conjurePackage,
             ErrorNamespace namespace,
-            Map<TypeName, ErrorTypeDefinition> errorTypeDefinitionMap) {
+            List<ErrorTypeDefinition> errorTypeDefinitionMap) {
 
         ClassName className = errorTypesClassName(conjurePackage, namespace);
 
         // Generate ErrorType definitions
-        Set<FieldSpec> fieldSpecs = errorTypeDefinitionMap.entrySet().stream().map(e -> {
+        Set<FieldSpec> fieldSpecs = errorTypeDefinitionMap.stream().map(errorDef -> {
             CodeBlock initializer = CodeBlock.of("ErrorType.create(ErrorType.Code.$L, \"$L:$L\")",
-                    e.getValue().code().name(),
+                    errorDef.code().name(),
                     namespace.name(),
-                    e.getKey().name());
+                    errorDef.typeName().name());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(
                     ClassName.get(ErrorType.class),
-                    CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, e.getKey().name()),
+                    CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, errorDef.typeName().name()),
                     Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(initializer);
-            e.getValue().docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs));
+            errorDef.docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs));
             return fieldSpecBuilder.build();
         }).collect(Collectors.toSet());
 
         // Generate ServiceException factory methods
-        Set<MethodSpec> methodSpecs = errorTypeDefinitionMap.entrySet().stream().map(entry -> {
-            String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.getKey().name());
-            String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.getKey().name());
+        Set<MethodSpec> methodSpecs = errorTypeDefinitionMap.stream().map(entry -> {
+            String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
+            String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.typeName().name());
 
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .returns(ClassName.get(ServiceException.class));
 
             methodBuilder.addCode("return new $T($L", ServiceException.class, typeName);
-            entry.getValue().safeArgs().entrySet().stream().forEach(arg ->
+            entry.safeArgs().entrySet().stream().forEach(arg ->
                     processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), true));
-            entry.getValue().unsafeArgs().entrySet().stream().forEach(arg ->
+            entry.unsafeArgs().entrySet().stream().forEach(arg ->
                     processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), false));
             methodBuilder.addCode(");");
 

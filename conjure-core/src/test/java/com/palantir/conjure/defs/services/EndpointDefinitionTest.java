@@ -19,13 +19,19 @@ public final class EndpointDefinitionTest {
             RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
     private static final ArgumentDefinition BODY_ARG = ArgumentDefinition.builder()
             .type(AnyType.of())
+            .paramId(ParameterName.of("unused"))
             .paramType(ArgumentDefinition.ParamType.BODY)
             .build();
 
     @Test
     public void testArgumentTypeValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map(ParameterName.of("testArg"), ArgumentDefinition.of(BinaryType.of())))
+                .auth(AuthDefinition.none())
+                .args(map(ParameterName.of("testArg"), ArgumentDefinition.builder()
+                        .type(BinaryType.of())
+                        .paramId(ParameterName.of("testArg"))
+                        .paramType(ArgumentDefinition.ParamType.HEADER)
+                        .build()))
                 .http(mock(RequestLineDefinition.class));
 
         assertThatThrownBy(definition::build)
@@ -37,8 +43,10 @@ public final class EndpointDefinitionTest {
     @SuppressWarnings("CheckReturnValue")
     public void testArgumentBodyTypeValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .args(map(ParameterName.of("testArg"), ArgumentDefinition.builder()
                         .type(BinaryType.of())
+                        .paramId(ParameterName.of("unused"))
                         .paramType(ArgumentDefinition.ParamType.BODY)
                         .build()))
                 .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")));
@@ -50,6 +58,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testSingleBodyParamValidator() throws Exception {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .args(map(ParameterName.of("bodyArg1"), BODY_ARG, ParameterName.of("bodyArg2"), BODY_ARG))
                 .http(GET_REQUEST);
 
@@ -67,6 +76,7 @@ public final class EndpointDefinitionTest {
                 .build();
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .args(map(ParameterName.of("pathArg1"), paramDefinition, ParameterName.of("pathArg2"), paramDefinition))
                 .http(GET_REQUEST);
 
@@ -80,32 +90,37 @@ public final class EndpointDefinitionTest {
         ArgumentDefinition namedParameter = ArgumentDefinition.builder()
                 .type(AnyType.of())
                 .paramType(ArgumentDefinition.ParamType.PATH)
-                .paramId(ParameterName.of("paramName"))
+                .paramId(ParameterName.of("paramId"))
                 .build();
         ArgumentDefinition unNamedParameter = ArgumentDefinition.builder()
                 .type(AnyType.of())
                 .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramId(ParameterName.of("paramId"))
                 .build();
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(map(ParameterName.of("someName"), namedParameter, ParameterName.of("paramName"),
-                        unNamedParameter))
+                .auth(AuthDefinition.none())
+                .args(map(
+                        ParameterName.of("paramName"), namedParameter,
+                        ParameterName.of("otherName"), unNamedParameter))
                 .http(GET_REQUEST);
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
+                .hasMessage("Path parameter with identifier \"paramId\" is defined multiple times for endpoint");
     }
 
     @Test
     public void testPathParamValidatorExtraParams() throws Exception {
         ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
                 .type(AnyType.of())
+                .paramId(ParameterName.of("paramName"))
                 .paramType(ArgumentDefinition.ParamType.PATH)
                 .build();
 
         RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .args(map(ParameterName.of("paramName"), paramDefinition))
                 .http(noParamRequest);
 
@@ -119,6 +134,7 @@ public final class EndpointDefinitionTest {
         RequestLineDefinition requestWithPathParam =
                 RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path/{paramName}"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .http(requestWithPathParam);
 
         assertThatThrownBy(definition::build)
@@ -129,6 +145,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testNoGetBodyValidator() throws Exception {
         EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
+                .auth(AuthDefinition.none())
                 .args(map(ParameterName.of("bodyArg"), BODY_ARG))
                 .http(GET_REQUEST);
 

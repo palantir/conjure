@@ -14,12 +14,14 @@ import org.junit.Test;
 
 public final class TypeNameTest {
 
+    private static final ConjurePackage PACKAGE = ConjurePackage.of("package");
+
     @Test
     public void testValidNames() {
-        TypeName.of("Camel");
-        TypeName.of("CamelCase");
-        TypeName.of("CamelCase1");
-        TypeName.of("Camel1Case2");
+        TypeName.of("Camel", PACKAGE);
+        TypeName.of("CamelCase", PACKAGE);
+        TypeName.of("CamelCase1", PACKAGE);
+        TypeName.of("Camel1Case2", PACKAGE);
 
         // Primitive types are guaranteed to work due to the static construction in PrimitiveType enum. Anyway.
         Set<String> primitiveTypeNames = Sets.newHashSet();
@@ -33,7 +35,7 @@ public final class TypeNameTest {
     @Test
     public void testInvalidNames() throws Exception {
         for (String invalid : new String[] {"a", "IFoo", "ABC", "$Special", "snake_case", "kebab-case", "Camel1B"}) {
-            assertThatThrownBy(() -> TypeName.of(invalid))
+            assertThatThrownBy(() -> TypeName.of(invalid, PACKAGE))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("TypeNames must be a primitive type"
                             + " [unknown, string, integer, double, boolean, safelong, rid, bearertoken] or "

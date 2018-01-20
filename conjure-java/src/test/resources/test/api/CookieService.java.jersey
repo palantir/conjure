@@ -9,12 +9,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/cookies")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
 public interface CookieService {
     @GET
-    @Path("/")
+    @Path("/cookies")
     void eatCookies(@CookieParam("PALANTIR_TOKEN") BearerToken token);
 }

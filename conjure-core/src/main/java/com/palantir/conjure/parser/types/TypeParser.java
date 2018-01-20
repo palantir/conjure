@@ -1,21 +1,21 @@
 /*
- * (c) Copyright 2016 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs.types;
+package com.palantir.conjure.parser.types;
 
-import com.palantir.conjure.defs.ConjureMetrics;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.names.Namespace;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.parser.ConjureMetrics;
+import com.palantir.conjure.parser.types.builtin.AnyType;
+import com.palantir.conjure.parser.types.builtin.BinaryType;
+import com.palantir.conjure.parser.types.builtin.DateTimeType;
+import com.palantir.conjure.parser.types.collect.ListType;
+import com.palantir.conjure.parser.types.collect.MapType;
+import com.palantir.conjure.parser.types.collect.OptionalType;
+import com.palantir.conjure.parser.types.collect.SetType;
+import com.palantir.conjure.parser.types.names.Namespace;
+import com.palantir.conjure.parser.types.names.TypeName;
+import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
+import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;

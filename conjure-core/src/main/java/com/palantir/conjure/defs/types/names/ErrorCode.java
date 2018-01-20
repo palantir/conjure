@@ -4,9 +4,6 @@
 
 package com.palantir.conjure.defs.types.names;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
@@ -17,10 +14,9 @@ import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 /**
- * Represents the code of a conjure {@link ErrorTypeDefinition#code() error}.
- * Must be the UpperCamel version of one of the http-remoting {@link ErrorType.Code error codes}.
+ * Represents the code of a conjure {@link ErrorTypeDefinition#code() error}. Must be the UpperCamel version of one of
+ * the http-remoting {@link ErrorType.Code error codes}.
  */
-@JsonDeserialize(as = ImmutableErrorCode.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class ErrorCode {
@@ -29,7 +25,6 @@ public abstract class ErrorCode {
             .map(ErrorType.Code::name)
             .collect(Collectors.toSet());
 
-    @JsonValue
     public abstract String name();
 
     @Value.Check
@@ -38,7 +33,6 @@ public abstract class ErrorCode {
                 "Invalid error code %s. Must be one of: %s", name(), VALID_ERROR_CODE_NAMES);
     }
 
-    @JsonCreator
     public static ErrorCode of(String name) {
         return ImmutableErrorCode.builder().name(name).build();
     }

@@ -13,7 +13,6 @@ import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonBean;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
@@ -39,26 +38,23 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     @Override
     public PythonClass generateObject(TypesDefinition types,
             PackageNameProcessor packageNameProcessor,
-            TypeName typeName,
             BaseObjectTypeDefinition typeDef) {
         if (typeDef instanceof ObjectTypeDefinition) {
-            return generateObject(types, packageNameProcessor, typeName, (ObjectTypeDefinition) typeDef);
+            return generateObject(types, packageNameProcessor, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
-            return generateObject(packageNameProcessor, typeName, (EnumTypeDefinition) typeDef);
+            return generateObject(packageNameProcessor, (EnumTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
-            return generateObject(types, packageNameProcessor, typeName, (UnionTypeDefinition) typeDef);
+            return generateObject(types, packageNameProcessor, (UnionTypeDefinition) typeDef);
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
         }
     }
 
-    private PythonClass generateObject(TypesDefinition types, PackageNameProcessor packageNameProcessor,
-            TypeName typeName, UnionTypeDefinition typeDef) {
+    private PythonClass generateObject(
+            TypesDefinition types, PackageNameProcessor packageNameProcessor, UnionTypeDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
-        ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
-                types, packageNameProcessor);
 
         List<PythonField> options = typeDef.union()
                 .entrySet()
@@ -67,35 +63,32 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                     FieldDefinition unionMember = entry.getValue();
                     ConjureType conjureType = unionMember.type();
                     return PythonField.builder()
-                        .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))
-                        .docs(unionMember.docs())
-                        .jsonIdentifier(entry.getKey().name())
-                        .myPyType(myPyMapper.getTypeName(conjureType))
-                        .pythonType(mapper.getTypeName(conjureType))
-                        .build();
+                            .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))
+                            .docs(unionMember.docs())
+                            .jsonIdentifier(entry.getKey().name())
+                            .myPyType(myPyMapper.getTypeName(conjureType))
+                            .pythonType(mapper.getTypeName(conjureType))
+                            .build();
                 })
                 .collect(Collectors.toList());
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
         return PythonUnionTypeDefinition.builder()
-            .packageName(packageName.name())
-            .className(typeName.name())
-            .docs(typeDef.docs())
-            .addAllOptions(options)
-            .build();
+                .packageName(packageName.name())
+                .className(typeDef.typeName().name())
+                .docs(typeDef.docs())
+                .addAllOptions(options)
+                .build();
     }
 
-    private PythonEnum generateObject(
-            PackageNameProcessor packageNameProcessor,
-            TypeName typeName,
-            EnumTypeDefinition typeDef) {
+    private PythonEnum generateObject(PackageNameProcessor packageNameProcessor, EnumTypeDefinition typeDef) {
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
         return PythonEnum.builder()
                 .packageName(packageName.name())
-                .className(typeName.name())
+                .className(typeDef.typeName().name())
                 .docs(typeDef.docs())
                 .values(typeDef.values().stream()
                         .map(value -> PythonEnumValue.of(value.value(), value.docs()))
@@ -104,17 +97,14 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     }
 
     private PythonBean generateObject(
-            TypesDefinition types,
-            PackageNameProcessor packageNameProcessor,
-            TypeName typeName,
-            ObjectTypeDefinition typeDef) {
+            TypesDefinition types, PackageNameProcessor packageNameProcessor, ObjectTypeDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProcessor);
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.conjurePackage());
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
         Set<PythonImport> imports = typeDef.fields().entrySet()
                 .stream()
@@ -127,7 +117,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .packageName(packageName.name())
                 .addAllRequiredImports(PythonBean.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
-                .className(typeName.name())
+                .className(typeDef.typeName().name())
                 .docs(typeDef.docs())
                 .fields(typeDef.fields()
                         .entrySet()

@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types.collect;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
@@ -14,10 +13,8 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface MapType extends ConjureType {
 
-    @JsonProperty("key-type")
     ConjureType keyType();
 
-    @JsonProperty("value-type")
     ConjureType valueType();
 
     @Override
@@ -28,5 +25,4 @@ public interface MapType extends ConjureType {
     static MapType of(ConjureType keyType, ConjureType valueType) {
         return ImmutableMapType.builder().keyType(keyType).valueType(valueType).build();
     }
-
 }

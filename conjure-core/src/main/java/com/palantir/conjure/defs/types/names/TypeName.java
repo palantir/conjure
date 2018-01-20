@@ -4,8 +4,6 @@
 
 package com.palantir.conjure.defs.types.names;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
@@ -14,9 +12,10 @@ import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
 /**
- * Represents the name of a conjure {@link ObjectsDefinition#objects() object}.
+ * Represents the name of a conjure {@link ObjectsDefinition#objects() object} by a name and its conjure package.
  */
 @com.google.errorprone.annotations.Immutable
+@SuppressWarnings("Immutable")
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class TypeName {
@@ -25,11 +24,9 @@ public abstract class TypeName {
     static final ImmutableSet<String> PRIMITIVE_TYPES =
             ImmutableSet.of("unknown", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken");
 
-
-    public static final TypeName UNKNOWN = TypeName.of("unknown");
-
-    @JsonValue
     public abstract String name();
+
+    public abstract ConjurePackage conjurePackage();
 
     @Value.Check
     protected final void check() {
@@ -39,8 +36,7 @@ public abstract class TypeName {
                 PRIMITIVE_TYPES, CUSTOM_TYPE_PATTERN, name());
     }
 
-    @JsonCreator
-    public static TypeName of(String name) {
-        return ImmutableTypeName.builder().name(name).build();
+    public static TypeName of(String name, ConjurePackage conjurePackage) {
+        return ImmutableTypeName.builder().name(name).conjurePackage(conjurePackage).build();
     }
 }

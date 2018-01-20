@@ -401,6 +401,7 @@ class ConjurePluginTest extends IntegrationSpec {
                 'import test.api.internal.InternalImport;')
         file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.external.ExternalImport;')
+        fileExists('api/api-objects/src/generated/java/test/api/internal/InternalImport.java')
         !fileExists('api/api-objects/src/generated/java/test/api/external/ExternalImport.java')
         !fileExists('api/api-jersey/src/generated/java/test/api/external/ExternalService.java')
         !fileExists('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java')
@@ -475,7 +476,8 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksSuccessfully(':api:compileConjureObjects')
 
         then:
-        result.getStandardOutput().contains("'UnionTypes' are no longer considered experimental and are now enabled by default - please remove this from your build.gradle.")
+        result.getStandardOutput().contains(
+                "'UnionTypes' are no longer considered experimental and are now enabled by default - please remove this from your build.gradle.")
     }
 
     def 'experimental ErrorTypes feature can be enabled'() {
@@ -559,8 +561,8 @@ class ConjurePluginTest extends IntegrationSpec {
         ExecutionResult result = runTasksWithFailure(':api:compileConjure')
 
         then:
-        result.getStandardError().contains("Failed to import 'external-imports/external-import.yml': ")
-        result.getStandardError().contains("Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
+        result.getStandardError().contains(
+                "Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
     }
 
     @Unroll
@@ -575,5 +577,4 @@ class ConjurePluginTest extends IntegrationSpec {
         where:
         version << ['4.3', '4.2', '4.1', '4.0', '3.5']
     }
-
 }

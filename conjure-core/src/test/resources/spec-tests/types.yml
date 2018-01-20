@@ -87,6 +87,8 @@ positive:
         definitions:
           default-package: test.api
           objects:
+            StringExample:
+              alias: string
             UnionTypeExample:
               union:
                 stringExample:

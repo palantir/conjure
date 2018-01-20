@@ -16,7 +16,6 @@ import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
@@ -62,12 +61,8 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     @Override
     public Set<TypescriptFile> generate(TypesDefinition types) {
-        return types.definitions().objects().entrySet().stream().map(
-                type -> generateType(
-                        types,
-                        types.definitions().defaultConjurePackage(),
-                        type.getKey(),
-                        type.getValue()))
+        return types.definitions().objects().stream().map(
+                type -> generateType(types, type))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
@@ -75,11 +70,10 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     @Override
     public Map<ConjurePackage, Collection<ExportStatement>> generateExports(TypesDefinition types) {
-        Optional<ConjurePackage> defaultPackage = types.definitions().defaultConjurePackage();
-        Map<ConjurePackage, Set<Map.Entry<TypeName, BaseObjectTypeDefinition>>> definitionsbyPackage =
-                types.definitions().objects().entrySet().stream()
+        Map<ConjurePackage, Set<BaseObjectTypeDefinition>> definitionsbyPackage =
+                types.definitions().objects().stream()
                         .collect(Collectors.groupingBy(
-                                entry -> conjurePackage(entry.getValue(), defaultPackage),
+                                typeDef -> typeDef.typeName().conjurePackage(),
                                 Collectors.toSet()));
         return definitionsbyPackage
                 .entrySet()
@@ -87,43 +81,33 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> entry.getValue().stream()
-                                .map(typeAndDefinition -> generateExport(
-                                        typeAndDefinition.getKey(), typeAndDefinition.getValue()))
+                                .map(this::generateExport)
                                 .filter(Optional::isPresent)
                                 .map(Optional::get)
                                 .collect(Collectors.toSet())));
     }
 
-    private static ConjurePackage conjurePackage(BaseObjectTypeDefinition definition,
-            Optional<ConjurePackage> defaultPackage) {
-        return definition.conjurePackage().orElse(defaultPackage
-                .orElseThrow(() -> new IllegalStateException("object package or default package must be specified")));
-
+    private static String getParentFolderPathForPackage(ConjurePackage conjurePackage) {
+        return GenerationUtils.packageToScopeAndModule(conjurePackage);
     }
 
-    private Optional<TypescriptFile> generateType(TypesDefinition types,
-            Optional<ConjurePackage> defaultPackage, TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
-        ConjurePackage packageLocation =
-                ConjurePackages.getPackage(baseTypeDef.conjurePackage(), defaultPackage, typeName);
-        String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
-        TypeMapper mapper = new TypeMapper(types, defaultPackage);
+    private Optional<TypescriptFile> generateType(TypesDefinition types, BaseObjectTypeDefinition baseTypeDef) {
+        TypeMapper mapper = new TypeMapper(types);
         if (baseTypeDef instanceof EnumTypeDefinition) {
-            return Optional.of(generateEnumFile(
-                    typeName, (EnumTypeDefinition) baseTypeDef, parentFolderPath));
+            return Optional.of(generateEnumFile((EnumTypeDefinition) baseTypeDef));
         } else if (baseTypeDef instanceof ObjectTypeDefinition) {
-            return Optional.of(generateObjectFile(
-                    typeName, (ObjectTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
+            return Optional.of(generateObjectFile((ObjectTypeDefinition) baseTypeDef, mapper));
         } else if (baseTypeDef instanceof AliasTypeDefinition) {
             // in typescript we do nothing with this
             return Optional.empty();
         } else if (baseTypeDef instanceof UnionTypeDefinition) {
-            return Optional.of(generateUnionTypeFile(
-                    typeName, (UnionTypeDefinition) baseTypeDef, packageLocation, parentFolderPath, mapper));
+            return Optional.of(generateUnionTypeFile((UnionTypeDefinition) baseTypeDef, mapper));
         }
         throw new IllegalArgumentException("Unknown object definition type: " + baseTypeDef.getClass());
     }
 
-    private Optional<ExportStatement> generateExport(TypeName typeName, BaseObjectTypeDefinition baseTypeDef) {
+    private Optional<ExportStatement> generateExport(BaseObjectTypeDefinition baseTypeDef) {
+        TypeName typeName = baseTypeDef.typeName();
         if (baseTypeDef instanceof EnumTypeDefinition) {
             return Optional.of(GenerationUtils.createExportStatementRelativeToRoot(
                     typeName.name(), typeName.name()));
@@ -141,8 +125,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
 
     }
 
-    private static TypescriptFile generateObjectFile(TypeName typeName, ObjectTypeDefinition typeDef,
-            ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
+    private static TypescriptFile generateObjectFile(ObjectTypeDefinition typeDef, TypeMapper mapper) {
         Set<TypescriptFieldSignature> propertySignatures = typeDef.fields().entrySet()
                 .stream()
                 .map(e -> TypescriptFieldSignature.builder()
@@ -155,25 +138,31 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         .build())
                 .collect(Collectors.toSet());
         TypescriptInterface thisInterface = TypescriptInterface.builder()
-                .name("I" + typeName.name())
+                .name("I" + typeDef.typeName().name())
                 .propertySignatures(new TreeSet<>(propertySignatures))
                 .build();
 
         List<ConjureType> referencedTypes = typeDef.fields().values().stream()
                 .map(e -> e.type()).collect(Collectors.toList());
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
-                typeName, packageLocation, mapper);
+                typeDef.typeName(), mapper);
 
-        return TypescriptFile.builder().name(typeName.name()).imports(importStatements)
-                .addEmittables(thisInterface).parentFolderPath(parentFolderPath).build();
+        return TypescriptFile.builder()
+                .name(typeDef.typeName().name())
+                .imports(importStatements)
+                .addEmittables(thisInterface)
+                .parentFolderPath(getParentFolderPathForPackage(typeDef.typeName().conjurePackage()))
+                .build();
     }
 
-    private static TypescriptFile generateEnumFile(
-            TypeName typeName, EnumTypeDefinition typeDef, String parentFolderPath) {
+    private static TypescriptFile generateEnumFile(EnumTypeDefinition typeDef) {
         RawExpression typeRhs = RawExpression.of(Joiner.on(" | ").join(
                 typeDef.values().stream().map(value -> StringExpression.of(value.value()).emitToString()).collect(
                         Collectors.toList())));
-        AssignStatement type = AssignStatement.builder().lhs("export type " + typeName.name()).rhs(typeRhs).build();
+        AssignStatement type = AssignStatement.builder()
+                .lhs("export type " + typeDef.typeName().name())
+                .rhs(typeRhs)
+                .build();
         Map<String, TypescriptExpression> jsonMap = typeDef.values().stream().collect(Collectors.toMap(
                 value -> value.value(),
                 value -> CastExpression.builder()
@@ -182,17 +171,16 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                         .build()));
         JsonExpression constantRhs = JsonExpression.builder().putAllKeyValues(jsonMap).build();
         AssignStatement constant = AssignStatement.builder().lhs(
-                "export const " + typeName.name()).rhs(constantRhs).build();
+                "export const " + typeDef.typeName().name()).rhs(constantRhs).build();
         return TypescriptFile.builder()
-                .name(typeName.name())
+                .name(typeDef.typeName().name())
                 .addEmittables(type)
                 .addEmittables(constant)
-                .parentFolderPath(parentFolderPath)
+                .parentFolderPath(getParentFolderPathForPackage(typeDef.typeName().conjurePackage()))
                 .build();
     }
 
-    private TypescriptFile generateUnionTypeFile(TypeName typeName, UnionTypeDefinition baseTypeDef,
-            ConjurePackage packageLocation, String parentFolderPath, TypeMapper mapper) {
+    private TypescriptFile generateUnionTypeFile(UnionTypeDefinition baseTypeDef, TypeMapper mapper) {
         List<ConjureType> referencedTypes = Lists.newArrayList();
         List<TypescriptInterface> subInterfaces = Lists.newArrayList();
         List<TypescriptFunction> typeGuards = Lists.newArrayList();
@@ -201,7 +189,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         SortedSet<TypescriptFieldSignature> visitFunctionVisitorInterfaceProps = Sets.newTreeSet();
         List<TypescriptExpression> visitFunctionConditionalExpressions = Lists.newArrayList();
         List<TypescriptStatement> visitFunctionVisitorCalls = Lists.newArrayList();
-        String mainName = "I" + typeName.name();
+        String mainName = "I" + baseTypeDef.typeName().name();
         TypescriptType mainType = TypescriptSimpleType.of(mainName);
         TypescriptSimpleType genericType = TypescriptSimpleType.of("T");
 
@@ -276,14 +264,13 @@ public final class DefaultTypeGenerator implements TypeGenerator {
         TypescriptFunction visitFunction = buildVisitFunction(visitFunctionConditionalExpressions,
                 visitFunctionVisitorCalls, mainType, unknownHandlerName, visitFunctionVisitorInterfaceName);
 
-
         helperFunctionProps.put("visit", RawExpression.of("visit"));
 
         // build last details: import statements, the main union type, etc.
         List<ImportStatement> importStatements = GenerationUtils.generateImportStatements(referencedTypes,
-                typeName, packageLocation, mapper);
-        List<ImportStatement> starImportStatements = GenerationUtils.generateStarImportStatements(referencedTypes,
-                this::getUnusedVariableName, typeName, packageLocation, mapper);
+                baseTypeDef.typeName(), mapper);
+        List<ImportStatement> starImportStatements = GenerationUtils.generateStarImportStatements(
+                referencedTypes, this::getUnusedVariableName, baseTypeDef.typeName(), mapper);
 
         TypescriptUnionType unionType = TypescriptUnionType.builder()
                 .types(subInterfaces.stream().map(
@@ -300,7 +287,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .build();
 
         return TypescriptFile.builder()
-                .name(typeName.name())
+                .name(baseTypeDef.typeName().name())
                 .addAllImports(importStatements)
                 .addAllImports(starImportStatements)
                 .addAllEmittables(subInterfaces)
@@ -310,7 +297,7 @@ public final class DefaultTypeGenerator implements TypeGenerator {
                 .addEmittables(visitFunctionVisitorInterface)
                 .addEmittables(visitFunction)
                 .addEmittables(typeGuardObj)
-                .parentFolderPath(parentFolderPath)
+                .parentFolderPath(getParentFolderPathForPackage(baseTypeDef.typeName().conjurePackage()))
                 .build();
     }
 

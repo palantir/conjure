@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.types;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -18,14 +19,16 @@ import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @com.google.errorprone.annotations.Immutable
 public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefinition> {
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
-    PACKAGE_DEFINED(new PackageDefinedValidator()),
-    NO_COMPLEX_KEYS(new NoComplexKeysValidator());
+    NO_COMPLEX_KEYS(new NoComplexKeysValidator()),
+    UNIQUE_NAMES(new UniqueNamesValidator());
 
     private final ConjureValidator<ObjectsDefinition> validator;
 
@@ -44,30 +47,30 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         public void validate(ObjectsDefinition definition) {
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
-            for (Map.Entry<TypeName, BaseObjectTypeDefinition> currEntry : definition.objects().entrySet()) {
-                if (currEntry.getValue() instanceof ObjectTypeDefinition) {
-                    ObjectTypeDefinition objectDef = (ObjectTypeDefinition) currEntry.getValue();
+            for (BaseObjectTypeDefinition typeDef : definition.objects()) {
+                if (typeDef instanceof ObjectTypeDefinition) {
+                    ObjectTypeDefinition objectDef = (ObjectTypeDefinition) typeDef;
                     for (Map.Entry<FieldName, FieldDefinition> currField : objectDef.fields().entrySet()) {
                         if (currField.getValue().type() instanceof ReferenceType) {
                             typeToRefFields.put(
-                                    currEntry.getKey(),
+                                    typeDef.typeName(),
                                     ((ReferenceType) currField.getValue().type()).type()
                             );
                         }
                     }
-                } else if (currEntry.getValue() instanceof AliasTypeDefinition) {
-                    AliasTypeDefinition aliasDef = (AliasTypeDefinition) currEntry.getValue();
+                } else if (typeDef instanceof AliasTypeDefinition) {
+                    AliasTypeDefinition aliasDef = (AliasTypeDefinition) typeDef;
                     if (aliasDef.alias() instanceof ReferenceType) {
                         typeToRefFields.put(
-                                currEntry.getKey(),
+                                typeDef.typeName(),
                                 ((ReferenceType) aliasDef.alias()).type()
                         );
                     }
                 }
             }
 
-            for (TypeName currType : typeToRefFields.keySet()) {
-                verifyTypeHasNoRecursiveDefinitions(currType, typeToRefFields, new ArrayList<>());
+            for (TypeName name : typeToRefFields.keySet()) {
+                verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
             }
         }
 
@@ -76,7 +79,7 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
             if (path.contains(typeName)) {
                 path.add(typeName);
                 throw new IllegalStateException("Illegal recursive data type: "
-                        + Joiner.on(" -> ").join(Lists.transform(path, p -> p.name())));
+                        + Joiner.on(" -> ").join(Lists.transform(path, TypeName::name)));
             }
 
             path.add(typeName);
@@ -88,30 +91,12 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class PackageDefinedValidator implements ConjureValidator<ObjectsDefinition> {
-        @Override
-        public void validate(ObjectsDefinition definition) {
-            if (definition.defaultConjurePackage().isPresent()
-                    && definition.defaultConjurePackage().get().name().length() > 0) {
-                // default package is defined -- nothing to do
-                return;
-            }
-
-            definition.objects().entrySet().stream().forEach(entry -> {
-                if (!entry.getValue().conjurePackage().isPresent()) {
-                    throw new IllegalStateException("No package is defined for object " + entry.getKey().name());
-                }
-            });
-        }
-    }
-
-    @com.google.errorprone.annotations.Immutable
     private static final class NoComplexKeysValidator implements ConjureValidator<ObjectsDefinition> {
         @Override
         public void validate(ObjectsDefinition definition) {
-            definition.objects().values().stream().forEach(baseObjectTypeDefinition -> {
-                if (baseObjectTypeDefinition instanceof ObjectTypeDefinition) {
-                    ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) baseObjectTypeDefinition;
+            definition.objects().stream().forEach(typeDef -> {
+                if (typeDef instanceof ObjectTypeDefinition) {
+                    ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) typeDef;
                     objectTypeDefinition.fields().entrySet().stream().forEach(entry -> {
                         FieldDefinition fieldDefinition = entry.getValue();
                         if (fieldDefinition.type() instanceof MapType) {
@@ -125,6 +110,22 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
                     });
                 }
             });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class UniqueNamesValidator implements ConjureValidator<ObjectsDefinition> {
+        @Override
+        public void validate(ObjectsDefinition definition) {
+            Set<String> seenNames = new HashSet<>();
+            definition.objects().forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.typeName().name()));
+            definition.errors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.typeName().name()));
+        }
+
+        private static void verifyNameIsUnique(Set<String> seenNames, String name) {
+            boolean isNewName = seenNames.add(name);
+            Verify.verify(isNewName,
+                    "Type and error names must be unique across locally defined and imported objects: %s", name);
         }
     }
 }

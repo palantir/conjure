@@ -39,12 +39,14 @@ public final class ConjurePythonGeneratorTest {
     }
 
     private void assertFoldersEqual(Path expected) throws IOException {
-        long count = java.nio.file.Files.walk(expected)
-                .filter(path -> path.toFile().isFile())
-                .map(expected::relativize)
-                .peek(path -> assertThat(expected.resolve(path))
-                        .hasContent(pythonFileWriter.getPythonFiles().get(path)))
-                .count();
+        long count = 0;
+        for (Path path : java.nio.file.Files.walk(expected).collect(Collectors.toList())) {
+            if (!path.toFile().isFile()) {
+                continue;
+            }
+            assertThat(path).hasContent(pythonFileWriter.getPythonFiles().get(expected.relativize(path)));
+            count += 1;
+        }
         System.out.println(count + " files checked");
     }
 

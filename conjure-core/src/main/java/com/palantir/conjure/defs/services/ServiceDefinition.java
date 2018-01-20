@@ -4,39 +4,21 @@
 
 package com.palantir.conjure.defs.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
+import com.palantir.conjure.defs.types.names.TypeName;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableServiceDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ServiceDefinition {
 
-    /** Human-readable name of the service. */
-    // TODO(rfink): This is unused. Remove?
-    String name();
-
-    @JsonProperty("package")
-    ConjurePackage conjurePackage();
+    TypeName serviceName();
 
     Optional<String> docs();
-
-    @JsonProperty("default-auth")
-    @Value.Default
-    default AuthDefinition defaultAuth() {
-        return AuthDefinition.none();
-    }
-
-    @JsonProperty("base-path")
-    @Value.Default
-    default PathDefinition basePath() {
-        return PathDefinition.of("/");
-    }
 
     Map<String, EndpointDefinition> endpoints();
 
@@ -45,6 +27,21 @@ public interface ServiceDefinition {
         for (ServiceDefinitionValidator validator : ServiceDefinitionValidator.values()) {
             validator.validate(this);
         }
+    }
+
+    static ServiceDefinition fromParse(
+            com.palantir.conjure.parser.services.ServiceDefinition parsed,
+            TypeName serviceName,
+            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+        Map<String, EndpointDefinition> endpoints = new LinkedHashMap<>();
+        parsed.endpoints().forEach((name, def) -> endpoints.put(
+                name, EndpointDefinition.parseFrom(
+                        def, parsed.basePath(), AuthDefinition.parseFrom(parsed.defaultAuth()), typeResolver)));
+        return builder()
+                .serviceName(serviceName)
+                .docs(parsed.docs())
+                .putAllEndpoints(endpoints)
+                .build();
     }
 
     static Builder builder() {

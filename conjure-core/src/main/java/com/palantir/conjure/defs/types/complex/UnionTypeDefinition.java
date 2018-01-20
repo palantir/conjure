@@ -4,17 +4,15 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
+import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
 import com.palantir.conjure.defs.types.names.FieldName;
-import java.io.IOException;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableUnionTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
@@ -28,8 +26,15 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
         }
     }
 
-    static UnionTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        return parser.getCodec().treeToValue(json, UnionTypeDefinition.class);
+    static BaseObjectTypeDefinition parseFrom(
+            TypeName name,
+            com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
+            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+        return builder()
+                .typeName(name)
+                .union(ObjectTypeDefParserVisitor.parseFieldDef(def.union(), typeResolver))
+                .docs(def.docs())
+                .build();
     }
 
     static Builder builder() {

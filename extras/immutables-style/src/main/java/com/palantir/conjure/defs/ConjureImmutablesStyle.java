@@ -14,6 +14,4 @@ import org.immutables.value.Value.Style.ImplementationVisibility;
         overshadowImplementation = true,
         visibility = ImplementationVisibility.PACKAGE
 )
-public @interface ConjureImmutablesStyle {
-
-}
+public @interface ConjureImmutablesStyle {}

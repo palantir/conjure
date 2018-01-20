@@ -12,15 +12,12 @@ import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.JavaFile;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 
 public final class ObjectGenerator implements TypeGenerator {
@@ -38,36 +35,29 @@ public final class ObjectGenerator implements TypeGenerator {
     }
 
     @Override
-    public JavaFile generateObjectType(
-            TypesDefinition types,
-            Optional<ConjurePackage> defaultPackage,
-            TypeName typeName,
-            BaseObjectTypeDefinition typeDef) {
+    public JavaFile generateObjectType(TypesDefinition types, BaseObjectTypeDefinition typeDef) {
         TypeMapper typeMapper = new TypeMapper(types);
         if (typeDef instanceof ObjectTypeDefinition) {
             return BeanGenerator.generateBeanType(typeMapper,
-                    defaultPackage, typeName, (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
+                    (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
                     enabledExperimentalFeatures);
         } else if (typeDef instanceof UnionTypeDefinition) {
             return UnionGenerator.generateUnionType(
-                    typeMapper, defaultPackage, typeName, (UnionTypeDefinition) typeDef,
+                    typeMapper, (UnionTypeDefinition) typeDef,
                     enabledExperimentalFeatures);
         } else if (typeDef instanceof EnumTypeDefinition) {
             return EnumGenerator.generateEnumType(
-                    defaultPackage, typeName, (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
+                    (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
                     enabledExperimentalFeatures);
         } else if (typeDef instanceof AliasTypeDefinition) {
             return AliasGenerator.generateAliasType(
-                    typeMapper, defaultPackage, typeName, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
+                    typeMapper, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
         }
         throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
     }
 
     @Override
-    public Set<JavaFile> generateErrorTypes(
-            TypesDefinition allTypes,
-            Optional<ConjurePackage> defaultPackage,
-            Map<TypeName, ErrorTypeDefinition> errorTypeNameToDef) {
+    public Set<JavaFile> generateErrorTypes(TypesDefinition allTypes, List<ErrorTypeDefinition> errorTypeNameToDef) {
         if (errorTypeNameToDef.isEmpty()) {
             return Collections.emptySet();
         }
@@ -75,7 +65,7 @@ public final class ObjectGenerator implements TypeGenerator {
         requireExperimentalFeature(ExperimentalFeatures.ErrorTypes);
 
         TypeMapper typeMapper = new TypeMapper(allTypes);
-        return ErrorGenerator.generateErrorTypes(typeMapper, defaultPackage, errorTypeNameToDef);
+        return ErrorGenerator.generateErrorTypes(typeMapper, errorTypeNameToDef);
     }
 
     private void requireExperimentalFeature(ExperimentalFeatures feature) {

@@ -4,17 +4,14 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.ConjureValidator;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import java.io.IOException;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableEnumTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EnumTypeDefinition extends BaseObjectTypeDefinition {
@@ -28,8 +25,14 @@ public interface EnumTypeDefinition extends BaseObjectTypeDefinition {
         }
     }
 
-    static EnumTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        return parser.getCodec().treeToValue(json, EnumTypeDefinition.class);
+    static BaseObjectTypeDefinition parseFrom(
+            TypeName name,
+            com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
+        return builder()
+                .typeName(name)
+                .values(def.values().stream().map(EnumValueDefinition::parseFrom).collect(Collectors.toList()))
+                .docs(def.docs())
+                .build();
     }
 
     static Builder builder() {

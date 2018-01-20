@@ -10,6 +10,7 @@ import static org.junit.Assume.assumeTrue;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Strings;
+import com.palantir.conjure.parser.ConjureParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -62,7 +63,17 @@ public class AllSpellbookDefinitionsTest {
         String contents = new String(Files.readAllBytes(conjureYml), StandardCharsets.UTF_8);
         assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
 
-        Conjure.parse(conjureYml.toFile());
+        try {
+            Conjure.parse(conjureYml.toFile());
+        } catch (ConjureParser.ImportNotFoundException e) {
+            if (e.getMessage().contains("external-imports")) {
+                // OK: External imports are expected to not work.
+            } else {
+                throw e;
+            }
+        } catch (ConjureParser.CyclicImportException e) {
+            log.warn("Cyclic Conjure definition in {}", conjureYml, e);
+        }
     }
 
     @AfterClass

@@ -69,9 +69,7 @@ public final class ConjureTypeScriptClientGenerator {
             allFiles.addAll(typeGenerator.generate(definition.types()));
 
             if (experimentalFeatures.contains(ExperimentalFeatures.TypeScriptErrorTypes)) {
-                allFiles.addAll(errorGenerator.generate(
-                        definition.types().definitions().errors(),
-                        definition.types().definitions().defaultConjurePackage()));
+                allFiles.addAll(errorGenerator.generate(definition.types().definitions().errors()));
             }
         });
         allFiles.forEach(f -> emit(f, outputDir));
@@ -114,9 +112,8 @@ public final class ConjureTypeScriptClientGenerator {
         conjureDefinitions.forEach(conjureDef -> typeGenerator.generateExports(conjureDef.types())
                 .forEach((conjurePackage, exports) -> allExports.putAll(conjurePackage, exports)));
         if (experimentalFeatures.contains(ExperimentalFeatures.TypeScriptErrorTypes)) {
-            conjureDefinitions.forEach(conjureDef -> errorGenerator.generateExports(
-                    conjureDef.types().definitions().errors(),
-                    conjureDef.types().definitions().defaultConjurePackage()).forEach(
+            conjureDefinitions.forEach(conjureDef ->
+                    errorGenerator.generateExports(conjureDef.types().definitions().errors()).forEach(
                             (conjurePackage, exports) -> allExports.putAll(conjurePackage, exports)));
         }
 

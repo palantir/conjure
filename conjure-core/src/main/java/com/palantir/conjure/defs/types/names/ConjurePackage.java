@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.defs.types.names;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -20,12 +19,17 @@ import org.immutables.value.Value;
  * dot-separated [a-z] words. Generators for different languages translate packages into language-specific notions of
  * "package".
  */
+@com.google.errorprone.annotations.Immutable
+@SuppressWarnings("Immutable")
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class ConjurePackage {
 
-    /** The unique empty/undefined package. */
-    public static final ConjurePackage NONE = ConjurePackage.of("");
+    /** Primitive types have an empty package. */
+    public static final ConjurePackage PRIMITIVE = ConjurePackage.of("");
+
+    /** External imports have an empty package. */
+    public static final ConjurePackage EXTERNAL_IMPORT = ConjurePackage.of("");
 
     @JsonValue
     public abstract String name();
@@ -44,12 +48,15 @@ public abstract class ConjurePackage {
                 "Conjure package names must match pattern %s: %s", validPackage.pattern(), name());
     }
 
-    @JsonCreator
     public static ConjurePackage of(String name) {
         return ImmutableConjurePackage.builder().name(name).build();
     }
 
     public static ConjurePackage of(Iterable<String> components) {
         return of(Joiner.on('.').join(components));
+    }
+
+    public static ConjurePackage parseFrom(com.palantir.conjure.parser.types.names.ConjurePackage parsed) {
+        return ConjurePackage.of(parsed.name());
     }
 }

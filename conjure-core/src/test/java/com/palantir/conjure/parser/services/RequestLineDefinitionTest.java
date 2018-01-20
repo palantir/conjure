@@ -1,8 +1,8 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs.services;
+package com.palantir.conjure.parser.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,6 +17,7 @@ public class RequestLineDefinitionTest {
         RequestLineDefinition original = RequestLineDefinition.of("GET", PathDefinition.of("/path"));
         String string = mapper.writeValueAsString(original);
 
-        assertThat(mapper.readValue(string, RequestLineDefinition.class)).isEqualTo(original);
+        assertThat(mapper.readValue(string, RequestLineDefinition.class))
+                .isEqualTo(original);
     }
 }

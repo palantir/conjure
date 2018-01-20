@@ -4,18 +4,11 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.ConjureValidator;
-import com.palantir.conjure.defs.types.complex.EnumValueDefinition.EnumValueDeserializer;
-import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(using = EnumValueDeserializer.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EnumValueDefinition {
@@ -31,25 +24,16 @@ public interface EnumValueDefinition {
         }
     }
 
+    static EnumValueDefinition parseFrom(com.palantir.conjure.parser.types.complex.EnumValueDefinition def) {
+        return builder()
+                .value(def.value())
+                .docs(def.docs())
+                .build();
+    }
+
     static EnumValueDefinition.Builder builder() {
         return new Builder();
     }
 
     class Builder extends ImmutableEnumValueDefinition.Builder {}
-
-    class EnumValueDeserializer extends JsonDeserializer<EnumValueDefinition> {
-        @SuppressWarnings("deprecation")
-        @Override
-        public EnumValueDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
-                throws IOException {
-            String candidate = parser.getValueAsString();
-            if (candidate != null) {
-                return builder().value(candidate).build();
-            }
-
-            return ImmutableEnumValueDefinition.fromJson(
-                    parser.readValueAs(ImmutableEnumValueDefinition.Json.class));
-        }
-    }
-
 }

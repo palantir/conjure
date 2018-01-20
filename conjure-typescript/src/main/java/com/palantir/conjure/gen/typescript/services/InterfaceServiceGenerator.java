@@ -25,17 +25,15 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
 
     @Override
     public Set<TypescriptFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types(),
-                conjureDefinition.types().definitions().defaultConjurePackage());
+        TypeMapper typeMapper = new TypeMapper(conjureDefinition.types());
         return conjureDefinition.services()
-                .entrySet()
                 .stream()
-                .map(e -> generate(e.getKey(), e.getValue(), typeMapper))
+                .map(serviceDef -> generate(serviceDef, typeMapper))
                 .collect(Collectors.toSet());
     }
 
-    private TypescriptFile generate(TypeName typeName, ServiceDefinition serviceDef, TypeMapper typeMapper) {
-        ConjurePackage packageLocation = serviceDef.conjurePackage();
+    private TypescriptFile generate(ServiceDefinition serviceDef, TypeMapper typeMapper) {
+        ConjurePackage packageLocation = serviceDef.serviceName().conjurePackage();
         String parentFolderPath = GenerationUtils.packageToScopeAndModule(packageLocation);
         Set<TypescriptInterfaceFunctionSignature> methodSignatures = serviceDef.endpoints().entrySet()
                 .stream()
@@ -45,31 +43,31 @@ public final class InterfaceServiceGenerator implements ServiceGenerator {
                         .build())
                 .collect(Collectors.toSet());
         TypescriptInterface serviceInterface = TypescriptInterface.builder()
-                .name(getInterfaceName(typeName))
+                .name(getInterfaceName(serviceDef.serviceName()))
                 .methodSignatures(new TreeSet<>(methodSignatures))
                 .build();
         return TypescriptFile.builder()
                 .addEmittables(serviceInterface)
-                .imports(ServiceUtils.generateImportStatements(serviceDef, typeName, packageLocation, typeMapper))
-                .name(typeName.name())
+                .imports(ServiceUtils.generateImportStatements(serviceDef, typeMapper))
+                .name(serviceDef.serviceName().name())
                 .parentFolderPath(parentFolderPath)
                 .build();
     }
 
     @Override
     public Map<ConjurePackage, Collection<ExportStatement>> generateExports(ConjureDefinition conjureDefinition) {
-        Map<ConjurePackage, Set<Map.Entry<TypeName, ServiceDefinition>>> definitionsByPackage =
-                conjureDefinition.services().entrySet().stream()
-                .collect(Collectors.groupingBy(entry -> entry.getValue().conjurePackage(), Collectors.toSet()));
+        Map<ConjurePackage, Set<ServiceDefinition>> definitionsByPackage =
+                conjureDefinition.services().stream()
+                        .collect(Collectors.groupingBy(def -> def.serviceName().conjurePackage(), Collectors.toSet()));
         return definitionsByPackage
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> generateExports(entry.getValue())));
     }
 
-    private static Collection<ExportStatement> generateExports(
-            Set<Map.Entry<TypeName, ServiceDefinition>> definitions) {
-        return Collections2.transform(definitions, typeAndDefinition -> generateExport(typeAndDefinition.getKey()));
+    private static Collection<ExportStatement> generateExports(Set<ServiceDefinition> definitions) {
+        return Collections2.transform(definitions,
+                typeAndDefinition -> generateExport(typeAndDefinition.serviceName()));
     }
 
     private static ExportStatement generateExport(TypeName typeName) {

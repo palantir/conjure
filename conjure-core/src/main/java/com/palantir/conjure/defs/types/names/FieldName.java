@@ -4,8 +4,6 @@
 
 package com.palantir.conjure.defs.types.names;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
@@ -91,7 +89,6 @@ public abstract class FieldName {
         abstract String convertTo(FieldName fieldName, Case targetCase);
     }
 
-    @JsonValue
     public abstract String name();
 
     @Value.Check
@@ -121,7 +118,6 @@ public abstract class FieldName {
         throw new IllegalStateException("Could not find case for FieldName, this is a bug: " + name());
     }
 
-    @JsonCreator
     public static FieldName of(String name) {
         return ImmutableFieldName.builder().name(name).build();
     }
@@ -132,8 +128,8 @@ public abstract class FieldName {
     }
 
     /**
-     * Converts this {@link FieldName} to an upper camel case string (e.g. myVariant -> MyVariant).
-     * Note that the resultant string is no longer a valid {@link FieldName}.
+     * Converts this {@link FieldName} to an upper camel case string (e.g. myVariant -> MyVariant). Note that the
+     * resultant string is no longer a valid {@link FieldName}.
      */
     public final String capitalize() {
         return StringUtils.capitalize(name());

@@ -7,7 +7,6 @@ package com.palantir.conjure.gen.typescript.utils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -18,9 +17,6 @@ import com.palantir.conjure.gen.typescript.poet.StandardImportStatement;
 import com.palantir.conjure.gen.typescript.poet.StarImportStatement;
 import com.palantir.conjure.gen.typescript.poet.TypescriptSimpleType;
 import com.palantir.conjure.gen.typescript.types.TypeMapper;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,10 +46,10 @@ public final class GenerationUtils {
         return String.format("@%s/%s", scope, module);
     }
 
-    public static List<ImportStatement> generateImportStatements(List<ConjureType> conjureTypes,
-            TypeName sourceName, ConjurePackage sourcePackage, TypeMapper mapper) {
+    public static List<ImportStatement> generateImportStatements(
+            List<ConjureType> conjureTypes, TypeName sourceName, TypeMapper mapper) {
         return getReferenceTypeStream(conjureTypes, sourceName, mapper)
-                .map(referenceType -> generateImportStatement(referenceType, sourcePackage, mapper))
+                .map(referenceType -> generateImportStatement(referenceType, sourceName.conjurePackage(), mapper))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -78,11 +74,11 @@ public final class GenerationUtils {
     }
 
     public static List<ImportStatement> generateStarImportStatements(List<ConjureType> conjureTypes,
-            Function<TypescriptSimpleType, String> getVariableName, TypeName sourceName, ConjurePackage sourcePackage,
+            Function<TypescriptSimpleType, String> getVariableName, TypeName sourceName,
             TypeMapper mapper) {
         return getReferenceTypeStream(conjureTypes, sourceName, mapper)
                 .map(referenceType -> generateStarImportStatement(
-                        referenceType, getVariableName, sourcePackage, mapper))
+                        referenceType, getVariableName, sourceName.conjurePackage(), mapper))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -104,8 +100,8 @@ public final class GenerationUtils {
         });
     }
 
-    private static Stream<ReferenceType> getReferenceTypeStream(List<ConjureType> conjureTypes,
-            TypeName sourceName, TypeMapper mapper) {
+    private static Stream<ReferenceType> getReferenceTypeStream(
+            List<ConjureType> conjureTypes, TypeName sourceName, TypeMapper mapper) {
         return conjureTypes.stream()
                 .flatMap(conjureType -> mapper.getReferencedConjureNames(conjureType).stream())
                 .distinct()
@@ -119,10 +115,6 @@ public final class GenerationUtils {
                 .addNamesToExport(exportNames)
                 .filepathToExport(tsFilePath)
                 .build();
-    }
-
-    public static String getCharSource(File file) throws IOException {
-        return Files.asCharSource(file, StandardCharsets.UTF_8).read();
     }
 
     public static String getTypescriptFilePath(String name) {

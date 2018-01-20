@@ -4,17 +4,15 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
+import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
 import com.palantir.conjure.defs.types.names.FieldName;
-import java.io.IOException;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableObjectTypeDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
@@ -28,8 +26,15 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
         }
     }
 
-    static ObjectTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        return parser.getCodec().treeToValue(json, ImmutableObjectTypeDefinition.class);
+    static BaseObjectTypeDefinition parseFrom(
+            TypeName name,
+            com.palantir.conjure.parser.types.complex.ObjectTypeDefinition def,
+            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+        return builder()
+                .typeName(name)
+                .fields(ObjectTypeDefParserVisitor.parseFieldDef(def.fields(), typeResolver))
+                .docs(def.docs())
+                .build();
     }
 
     static Builder builder() {
@@ -37,5 +42,4 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     class Builder extends ImmutableObjectTypeDefinition.Builder {}
-
 }

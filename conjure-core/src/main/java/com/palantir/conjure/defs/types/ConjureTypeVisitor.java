@@ -12,7 +12,6 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ForeignReferenceType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 
 public interface ConjureTypeVisitor<T> {
@@ -22,7 +21,6 @@ public interface ConjureTypeVisitor<T> {
     T visitOptional(OptionalType type);
     T visitPrimitive(PrimitiveType type);
     T visitLocalReference(LocalReferenceType type);
-    T visitForeignReference(ForeignReferenceType type);
     T visitSet(SetType type);
     T visitBinary(BinaryType type);
     T visitDateTime(DateTimeType type);

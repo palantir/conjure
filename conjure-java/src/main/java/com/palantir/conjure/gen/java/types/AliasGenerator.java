@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.ConjurePackages;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -31,16 +30,14 @@ public final class AliasGenerator {
 
     public static JavaFile generateAliasType(
             TypeMapper typeMapper,
-            Optional<ConjurePackage> defaultPackage,
-            com.palantir.conjure.defs.types.names.TypeName typeName,
             AliasTypeDefinition typeDef,
             Set<ExperimentalFeatures> experimentalFeatures) {
         TypeName aliasTypeName = typeMapper.getClassName(typeDef.alias());
 
-        ConjurePackage typePackage = ConjurePackages.getPackage(typeDef.conjurePackage(), defaultPackage, typeName);
-        ClassName thisClass = ClassName.get(typePackage.name(), typeName.name());
+        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
+        ClassName thisClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
 
-        TypeSpec.Builder spec = TypeSpec.classBuilder(typeName.name())
+        TypeSpec.Builder spec = TypeSpec.classBuilder(typeDef.typeName().name())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(AliasGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(aliasTypeName, "value", Modifier.PRIVATE, Modifier.FINAL)

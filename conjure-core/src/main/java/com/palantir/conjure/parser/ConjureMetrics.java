@@ -1,13 +1,13 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs;
+package com.palantir.conjure.parser;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
-import com.palantir.conjure.defs.types.ObjectsDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.parser.types.ObjectsDefinition;
+import com.palantir.conjure.parser.types.TypesDefinition;
 import java.util.Optional;
 
 public final class ConjureMetrics {

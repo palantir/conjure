@@ -5,7 +5,6 @@
 package com.palantir.conjure.gen.python;
 
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
@@ -33,28 +32,16 @@ public final class ConjurePythonGenerator {
     public List<PythonFile> generate(ConjureDefinition conjureDefinition) {
         TypesDefinition types = conjureDefinition.types();
 
-        PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor(
-                new DefaultPackageNameProcessor(conjureDefinition.types().definitions().defaultConjurePackage()));
-
+        PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor();
         List<PythonClass> beanClasses = types.definitions()
                 .objects()
-                .entrySet()
                 .stream()
-                .map(entry -> {
-                    BaseObjectTypeDefinition objectDefinition = entry.getValue();
-                    return beanGenerator.generateObject(
-                            types,
-                            packageNameProcessor,
-                            entry.getKey(),
-                            objectDefinition);
-                })
+                .map(objectDefinition -> beanGenerator.generateObject(types, packageNameProcessor, objectDefinition))
                 .collect(Collectors.toList());
 
         List<PythonClass> serviceClasses = conjureDefinition.services()
-                .entrySet()
                 .stream()
-                .map(entry -> clientGenerator.generateClient(
-                        types, packageNameProcessor, entry.getKey(), entry.getValue()))
+                .map(serviceDef -> clientGenerator.generateClient(types, packageNameProcessor, serviceDef))
                 .collect(Collectors.toList());
 
         Map<String, List<PythonClass>> classesByPackageName =
