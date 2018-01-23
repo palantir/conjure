@@ -138,11 +138,11 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
 External types, or imports, consist of references to types defined outside
 the context of a Conjure file (possibly in other Conjure files, possibly
 in external systems). A `base-type` is provided as a hint to generators for
-how to handle this type when no external type reference is provided. Note
+how to handle this type when no external type reference is provided. **Note
 that the `base-type` fallback mechanism will only work if the referenced type
 is serialized as a primitive -- if the imported type is a non-primitive JSON
 object, then even if a generator falls back on the `base-type` the resulting
-APIs will not handle serialization correctly.
+APIs will not handle serialization correctly.**
 
 References to external types are encoded in a language-specific map and must
 refer to the fully qualified type name.
