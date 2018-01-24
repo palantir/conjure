@@ -3,6 +3,7 @@ export interface IInvalidTypeDefinition {
     'errorInstanceId': string;
     'errorName': "Conjure:InvalidTypeDefinition";
     'parameters': {
+        'typeDef': any;
         'typeName': any;
     }
 ;
@@ -17,6 +18,7 @@ export interface IInvalidServiceDefinition {
     'errorInstanceId': string;
     'errorName': "Conjure:InvalidServiceDefinition";
     'parameters': {
+        'serviceDef': any;
         'serviceName': any;
     }
 ;

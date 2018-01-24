@@ -183,7 +183,7 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
 
         TypescriptFieldSignature parameters = TypescriptFieldSignature.builder()
                 .name("parameters")
-                .typescriptType(createParametersInterface(definition.safeArgs()))
+                .typescriptType(createParametersInterface(definition.safeArgs(), definition.unsafeArgs()))
                 .build();
 
         SortedSet<TypescriptFieldSignature> propertySignatures = Sets.newTreeSet();
@@ -199,17 +199,18 @@ public final class DefaultErrorGenerator implements ErrorGenerator {
     }
 
     /**
-     * We need a nice inline interface for the safeargs block.
+     * We need a nice inline interface for the args block.
      */
-    private TypescriptType createParametersInterface(Map<FieldName, FieldDefinition> safeArgs) {
+    private TypescriptType createParametersInterface(Map<FieldName, FieldDefinition> safeArgs,
+            Map<FieldName, FieldDefinition> unsafeArgs) {
 
-        Set<TypescriptFieldSignature> signatures = safeArgs.entrySet()
-                .stream()
-                .map(safeArg -> TypescriptFieldSignature.builder()
-                        .name(safeArg.getKey().name())
-                        .typescriptType(TypescriptSimpleType.of("any"))
-                        .build())
-                .collect(toSet());
+        Set<TypescriptFieldSignature> signatures =
+                Stream.concat(safeArgs.keySet().stream(), unsafeArgs.keySet().stream())
+                        .map(arg -> TypescriptFieldSignature.builder()
+                                .name(arg.name())
+                                .typescriptType(TypescriptSimpleType.of("any"))
+                                .build())
+                        .collect(Collectors.toSet());
 
         return TypescriptInterface.builder()
                 .export(false)

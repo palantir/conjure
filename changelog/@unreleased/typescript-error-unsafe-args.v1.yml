@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: >
+    When generating Typescript error types, Conjure now generates parameter definitions
+    for unsafe args in addition to safe args. Note that all error parameters are still
+    generated with an `any` type.
+  link: https://github.palantir.build/foundry/conjure/pull/804
