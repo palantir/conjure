@@ -38,7 +38,7 @@ public final class TypeNameTest {
             assertThatThrownBy(() -> TypeName.of(invalid, PACKAGE))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("TypeNames must be a primitive type"
-                            + " [unknown, string, integer, double, boolean, safelong, rid, bearertoken] or "
+                            + " [unknown, string, integer, double, boolean, safelong, rid, bearertoken, uuid] or "
                             + "match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s", invalid);
         }
     }

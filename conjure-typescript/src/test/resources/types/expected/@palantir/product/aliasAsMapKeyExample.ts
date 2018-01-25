@@ -7,4 +7,5 @@ export interface IAliasAsMapKeyExample {
     'rids': { [key: string]: IManyFieldExample };
     'safelongs': { [key: number]: IManyFieldExample };
     'strings': { [key: string]: IManyFieldExample };
+    'uuids': { [key: string]: IManyFieldExample };
 }

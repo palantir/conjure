@@ -267,6 +267,7 @@ public final class BeanBuilderGenerator {
                 case STRING:
                 case RID:
                 case BEARERTOKEN:
+                case UUID:
                 default:
                     // not special
             }

@@ -189,6 +189,7 @@ public final class TypeMapper {
                 case STRING:
                 case RID:
                 case BEARERTOKEN:
+                case UUID:
                     return "string";
                 case BOOLEAN:
                     return "boolean";

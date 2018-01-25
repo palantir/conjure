@@ -132,6 +132,9 @@ public final class AliasGenerator {
             case BEARERTOKEN:
                 return CodeBlock.builder()
                         .addStatement("return new $T($T.valueOf(value))", thisClass, aliasTypeName).build();
+            case UUID:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.fromString(value))", thisClass, aliasTypeName).build();
             default:
                 throw new IllegalStateException("Unknown primitive type: " + primitiveType);
         }

@@ -67,6 +67,12 @@ public final class ConjureTypeParserTests {
     }
 
     @Test
+    public void testParser_uuidType() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("uuid"))
+                .isEqualTo(PrimitiveType.UUID);
+    }
+
+    @Test
     public void testParser_refType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("Foo"))
                 .isEqualTo(LocalReferenceType.of(TypeName.of("Foo")));

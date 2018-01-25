@@ -63,6 +63,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             case STRING:
             case RID:
             case BEARERTOKEN:
+            case UUID:
                 return "str";
             case BOOLEAN:
                 return "bool";

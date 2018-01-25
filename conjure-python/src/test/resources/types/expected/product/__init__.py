@@ -126,6 +126,26 @@ class DateTimeExample(ConjureBeanType):
         # type: () -> str
         return self._datetime
 
+class UuidExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'uuid': ConjureFieldDefinition('uuid', str)
+        }
+
+    _uuid = None # type: str
+
+    def __init__(self, uuid):
+        # type: (str) -> None
+        self._uuid = uuid
+
+    @property
+    def uuid(self):
+        # type: () -> str
+        return self._uuid
+
 class DoubleExample(ConjureBeanType):
 
     @classmethod
@@ -336,7 +356,8 @@ class PrimitiveOptionalsExample(ConjureBeanType):
             'integer': ConjureFieldDefinition('integer', OptionalType(int)),
             'safelong': ConjureFieldDefinition('safelong', OptionalType(int)),
             'rid': ConjureFieldDefinition('rid', OptionalType(str)),
-            'bearertoken': ConjureFieldDefinition('bearertoken', OptionalType(str))
+            'bearertoken': ConjureFieldDefinition('bearertoken', OptionalType(str)),
+            'uuid': ConjureFieldDefinition('uuid', OptionalType(str))
         }
 
     _num = None # type: Optional[float]
@@ -345,15 +366,17 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     _safelong = None # type: Optional[int]
     _rid = None # type: Optional[str]
     _bearertoken = None # type: Optional[str]
+    _uuid = None # type: Optional[str]
 
-    def __init__(self, num, bool, integer, safelong, rid, bearertoken):
-        # type: (Optional[float], Optional[bool], Optional[int], Optional[int], Optional[str], Optional[str]) -> None
+    def __init__(self, num, bool, integer, safelong, rid, bearertoken, uuid):
+        # type: (Optional[float], Optional[bool], Optional[int], Optional[int], Optional[str], Optional[str], Optional[str]) -> None
         self._num = num
         self._bool = bool
         self._integer = integer
         self._safelong = safelong
         self._rid = rid
         self._bearertoken = bearertoken
+        self._uuid = uuid
 
     @property
     def num(self):
@@ -384,6 +407,11 @@ class PrimitiveOptionalsExample(ConjureBeanType):
     def bearertoken(self):
         # type: () -> Optional[str]
         return self._bearertoken
+
+    @property
+    def uuid(self):
+        # type: () -> Optional[str]
+        return self._uuid
 
 class ManyFieldExample(ConjureBeanType):
 

@@ -59,6 +59,7 @@ public interface ThrowingConjureTypeVisitor<T> extends ConjureTypeVisitor<T> {
     default T visitDateTime(DateTimeType type) {
         throw createException(type);
     }
+
     default UnsupportedOperationException createException(Object type) {
         return new UnsupportedOperationException(String.format(
                 "visit() method not implemented for visitor %s and type %s",

@@ -30,20 +30,24 @@ public final class AliasAsMapKeyExample implements Serializable {
 
     private final Map<DateTimeAliasExample, ManyFieldExample> datetimes;
 
+    private final Map<UuidAliasExample, ManyFieldExample> uuids;
+
     private AliasAsMapKeyExample(
             Map<StringAliasExample, ManyFieldExample> strings,
             Map<RidAliasExample, ManyFieldExample> rids,
             Map<BearerTokenAliasExample, ManyFieldExample> bearertokens,
             Map<IntegerAliasExample, ManyFieldExample> integers,
             Map<SafeLongAliasExample, ManyFieldExample> safelongs,
-            Map<DateTimeAliasExample, ManyFieldExample> datetimes) {
-        validateFields(strings, rids, bearertokens, integers, safelongs, datetimes);
+            Map<DateTimeAliasExample, ManyFieldExample> datetimes,
+            Map<UuidAliasExample, ManyFieldExample> uuids) {
+        validateFields(strings, rids, bearertokens, integers, safelongs, datetimes, uuids);
         this.strings = Collections.unmodifiableMap(strings);
         this.rids = Collections.unmodifiableMap(rids);
         this.bearertokens = Collections.unmodifiableMap(bearertokens);
         this.integers = Collections.unmodifiableMap(integers);
         this.safelongs = Collections.unmodifiableMap(safelongs);
         this.datetimes = Collections.unmodifiableMap(datetimes);
+        this.uuids = Collections.unmodifiableMap(uuids);
     }
 
     @JsonProperty("strings")
@@ -76,6 +80,11 @@ public final class AliasAsMapKeyExample implements Serializable {
         return this.datetimes;
     }
 
+    @JsonProperty("uuids")
+    public Map<UuidAliasExample, ManyFieldExample> getUuids() {
+        return this.uuids;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -88,12 +97,13 @@ public final class AliasAsMapKeyExample implements Serializable {
                 && this.bearertokens.equals(other.bearertokens)
                 && this.integers.equals(other.integers)
                 && this.safelongs.equals(other.safelongs)
-                && this.datetimes.equals(other.datetimes);
+                && this.datetimes.equals(other.datetimes)
+                && this.uuids.equals(other.uuids);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(strings, rids, bearertokens, integers, safelongs, datetimes);
+        return Objects.hash(strings, rids, bearertokens, integers, safelongs, datetimes, uuids);
     }
 
     @Override
@@ -123,6 +133,10 @@ public final class AliasAsMapKeyExample implements Serializable {
                 .append("datetimes")
                 .append(": ")
                 .append(datetimes)
+                .append(", ")
+                .append("uuids")
+                .append(": ")
+                .append(uuids)
                 .append("}")
                 .toString();
     }
@@ -133,7 +147,8 @@ public final class AliasAsMapKeyExample implements Serializable {
             Map<BearerTokenAliasExample, ManyFieldExample> bearertokens,
             Map<IntegerAliasExample, ManyFieldExample> integers,
             Map<SafeLongAliasExample, ManyFieldExample> safelongs,
-            Map<DateTimeAliasExample, ManyFieldExample> datetimes) {
+            Map<DateTimeAliasExample, ManyFieldExample> datetimes,
+            Map<UuidAliasExample, ManyFieldExample> uuids) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, strings, "strings");
         missingFields = addFieldIfMissing(missingFields, rids, "rids");
@@ -141,6 +156,7 @@ public final class AliasAsMapKeyExample implements Serializable {
         missingFields = addFieldIfMissing(missingFields, integers, "integers");
         missingFields = addFieldIfMissing(missingFields, safelongs, "safelongs");
         missingFields = addFieldIfMissing(missingFields, datetimes, "datetimes");
+        missingFields = addFieldIfMissing(missingFields, uuids, "uuids");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -152,7 +168,7 @@ public final class AliasAsMapKeyExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(6);
+                missingFields = new ArrayList<>(7);
             }
             missingFields.add(fieldName);
         }
@@ -178,6 +194,8 @@ public final class AliasAsMapKeyExample implements Serializable {
 
         private Map<DateTimeAliasExample, ManyFieldExample> datetimes = new LinkedHashMap<>();
 
+        private Map<UuidAliasExample, ManyFieldExample> uuids = new LinkedHashMap<>();
+
         private Builder() {}
 
         public Builder from(AliasAsMapKeyExample other) {
@@ -187,6 +205,7 @@ public final class AliasAsMapKeyExample implements Serializable {
             integers(other.getIntegers());
             safelongs(other.getSafelongs());
             datetimes(other.getDatetimes());
+            uuids(other.getUuids());
             return this;
         }
 
@@ -295,9 +314,26 @@ public final class AliasAsMapKeyExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("uuids")
+        public Builder uuids(Map<UuidAliasExample, ManyFieldExample> uuids) {
+            this.uuids.clear();
+            this.uuids.putAll(Objects.requireNonNull(uuids, "uuids cannot be null"));
+            return this;
+        }
+
+        public Builder putAllUuids(Map<UuidAliasExample, ManyFieldExample> uuids) {
+            this.uuids.putAll(Objects.requireNonNull(uuids, "uuids cannot be null"));
+            return this;
+        }
+
+        public Builder uuids(UuidAliasExample key, ManyFieldExample value) {
+            this.uuids.put(key, value);
+            return this;
+        }
+
         public AliasAsMapKeyExample build() {
             return new AliasAsMapKeyExample(
-                    strings, rids, bearertokens, integers, safelongs, datetimes);
+                    strings, rids, bearertokens, integers, safelongs, datetimes, uuids);
         }
     }
 }

@@ -1,0 +1,6 @@
+type: feature
+feature:
+  description: >
+    Conjure now supports `uuid` primitive type. Note that it uses java.util.UUID
+    for java and string type for typescript and python.
+  link: https://github.palantir.build/foundry/conjure/pull/802

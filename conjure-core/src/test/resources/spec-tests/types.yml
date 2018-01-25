@@ -27,6 +27,9 @@ positive:
             BearerToken:
               fields:
                 bearertoken: bearertoken
+            UuidExample:
+              fields:
+                uuid: uuid
   builtins:
     conjure:
       types:

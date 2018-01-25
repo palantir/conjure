@@ -55,6 +55,9 @@ types:
       AnyMapExample:
         fields:
           items: map<string, any>
+      UuidExample:
+        fields:
+          uuid: uuid
       StringAliasExample:
         alias: string
       DoubleAliasExample:
@@ -69,6 +72,8 @@ types:
         alias: rid
       BearerTokenAliasExample:
         alias: bearertoken
+      UuidAliasExample:
+        alias: uuid
       MapAliasExample:
         alias: map<string, any>
       ReferenceAliasExample:
@@ -83,6 +88,7 @@ types:
           safelong: optional<safelong>
           rid: optional<rid>
           bearertoken: optional<bearertoken>
+          uuid: optional<uuid>
       ManyFieldExample:
         fields:
           string:
@@ -132,3 +138,4 @@ types:
           # doubles: map<DoubleAliasExample, ManyFieldExample> # typescript freaks out with the 'NaN'
           safelongs: map<SafeLongAliasExample, ManyFieldExample>
           datetimes: map<DateTimeAliasExample, ManyFieldExample>
+          uuids: map<UuidAliasExample, ManyFieldExample>

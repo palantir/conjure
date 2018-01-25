@@ -19,3 +19,4 @@ export { ISafeLongExample } from "./safeLongExample";
 export { ISetExample } from "./setExample";
 export { IStringExample } from "./stringExample";
 export { IUnionTypeExample, IUnionTypeExampleVisitor } from "./unionTypeExample";
+export { IUuidExample } from "./uuidExample";

@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.UUID;
 import javax.annotation.Generated;
 
 @JsonDeserialize(builder = PrimitiveOptionalsExample.Builder.class)
@@ -33,20 +34,24 @@ public final class PrimitiveOptionalsExample implements Serializable {
 
     private final Optional<BearerToken> bearertoken;
 
+    private final Optional<UUID> uuid;
+
     private PrimitiveOptionalsExample(
             OptionalDouble num,
             Optional<Boolean> bool,
             OptionalInt integer,
             Optional<SafeLong> safelong,
             Optional<ResourceIdentifier> rid,
-            Optional<BearerToken> bearertoken) {
-        validateFields(num, bool, integer, safelong, rid, bearertoken);
+            Optional<BearerToken> bearertoken,
+            Optional<UUID> uuid) {
+        validateFields(num, bool, integer, safelong, rid, bearertoken, uuid);
         this.num = num;
         this.bool = bool;
         this.integer = integer;
         this.safelong = safelong;
         this.rid = rid;
         this.bearertoken = bearertoken;
+        this.uuid = uuid;
     }
 
     @JsonProperty("num")
@@ -79,6 +84,11 @@ public final class PrimitiveOptionalsExample implements Serializable {
         return this.bearertoken;
     }
 
+    @JsonProperty("uuid")
+    public Optional<UUID> getUuid() {
+        return this.uuid;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -92,12 +102,13 @@ public final class PrimitiveOptionalsExample implements Serializable {
                 && this.integer.equals(other.integer)
                 && this.safelong.equals(other.safelong)
                 && this.rid.equals(other.rid)
-                && this.bearertoken.equals(other.bearertoken);
+                && this.bearertoken.equals(other.bearertoken)
+                && this.uuid.equals(other.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(num, bool, integer, safelong, rid, bearertoken);
+        return Objects.hash(num, bool, integer, safelong, rid, bearertoken, uuid);
     }
 
     @Override
@@ -127,6 +138,10 @@ public final class PrimitiveOptionalsExample implements Serializable {
                 .append("bearertoken")
                 .append(": ")
                 .append(bearertoken)
+                .append(", ")
+                .append("uuid")
+                .append(": ")
+                .append(uuid)
                 .append("}")
                 .toString();
     }
@@ -137,7 +152,8 @@ public final class PrimitiveOptionalsExample implements Serializable {
             OptionalInt integer,
             Optional<SafeLong> safelong,
             Optional<ResourceIdentifier> rid,
-            Optional<BearerToken> bearertoken) {
+            Optional<BearerToken> bearertoken,
+            Optional<UUID> uuid) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, num, "num");
         missingFields = addFieldIfMissing(missingFields, bool, "bool");
@@ -145,6 +161,7 @@ public final class PrimitiveOptionalsExample implements Serializable {
         missingFields = addFieldIfMissing(missingFields, safelong, "safelong");
         missingFields = addFieldIfMissing(missingFields, rid, "rid");
         missingFields = addFieldIfMissing(missingFields, bearertoken, "bearertoken");
+        missingFields = addFieldIfMissing(missingFields, uuid, "uuid");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -156,7 +173,7 @@ public final class PrimitiveOptionalsExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(6);
+                missingFields = new ArrayList<>(7);
             }
             missingFields.add(fieldName);
         }
@@ -182,6 +199,8 @@ public final class PrimitiveOptionalsExample implements Serializable {
 
         private Optional<BearerToken> bearertoken = Optional.empty();
 
+        private Optional<UUID> uuid = Optional.empty();
+
         private Builder() {}
 
         public Builder from(PrimitiveOptionalsExample other) {
@@ -191,6 +210,7 @@ public final class PrimitiveOptionalsExample implements Serializable {
             safelong(other.getSafelong());
             rid(other.getRid());
             bearertoken(other.getBearertoken());
+            uuid(other.getUuid());
             return this;
         }
 
@@ -262,8 +282,20 @@ public final class PrimitiveOptionalsExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("uuid")
+        public Builder uuid(Optional<UUID> uuid) {
+            this.uuid = Objects.requireNonNull(uuid, "uuid cannot be null");
+            return this;
+        }
+
+        public Builder uuid(UUID uuid) {
+            this.uuid = Optional.of(Objects.requireNonNull(uuid, "uuid cannot be null"));
+            return this;
+        }
+
         public PrimitiveOptionalsExample build() {
-            return new PrimitiveOptionalsExample(num, bool, integer, safelong, rid, bearertoken);
+            return new PrimitiveOptionalsExample(
+                    num, bool, integer, safelong, rid, bearertoken, uuid);
         }
     }
 }

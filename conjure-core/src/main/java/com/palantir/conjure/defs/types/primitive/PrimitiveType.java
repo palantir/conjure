@@ -26,7 +26,8 @@ public enum PrimitiveType implements LocalReferenceType {
     BOOLEAN(TypeName.of("boolean", ConjurePackage.PRIMITIVE)),
     SAFELONG(TypeName.of("safelong", ConjurePackage.PRIMITIVE)),
     RID(TypeName.of("rid", ConjurePackage.PRIMITIVE)),
-    BEARERTOKEN(TypeName.of("bearertoken", ConjurePackage.PRIMITIVE));
+    BEARERTOKEN(TypeName.of("bearertoken", ConjurePackage.PRIMITIVE)),
+    UUID(TypeName.of("uuid", ConjurePackage.PRIMITIVE));
 
     private static final Map<TypeName, PrimitiveType> types =
             EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(PrimitiveType::type, t -> t));

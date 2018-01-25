@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.UUID;
 
 /**
  * Maps the conjure type into the 'standard' java type i.e. the type one would use in beans/normal variables (as opposed
@@ -66,6 +67,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
+    @SuppressWarnings("CyclomaticComplexity")
     public TypeName visitOptional(OptionalType type) {
         if (type.itemType() instanceof PrimitiveType) {
             // special handling for primitive optionals with Java 8
@@ -80,6 +82,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                 case STRING:
                 case RID:
                 case BEARERTOKEN:
+                case UUID:
                 default:
                     // treat normally
             }
@@ -110,6 +113,8 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                 return ClassName.get(ResourceIdentifier.class);
             case BEARERTOKEN:
                 return ClassName.get(BearerToken.class);
+            case UUID:
+                return ClassName.get(UUID.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }
@@ -144,4 +149,5 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     public TypeName visitDateTime(DateTimeType type) {
         return ClassName.get(ZonedDateTime.class);
     }
+
 }

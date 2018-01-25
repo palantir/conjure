@@ -24,11 +24,13 @@ import com.palantir.product.SetExample;
 import com.palantir.product.StringAliasExample;
 import com.palantir.product.StringExample;
 import com.palantir.product.UnionTypeExample;
+import com.palantir.product.UuidExample;
 import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import java.nio.ByteBuffer;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -260,7 +262,6 @@ public final class WireFormatTests {
         assertThat(mapper.readValue("{\"datetime\":\"2017-01-02T03:04:05.000000Z\"}", DateTimeExample.class))
                 .isEqualTo(secondsOnly);
     }
-
     @Test
     public void testDateTimeType_equality() throws Exception {
         ZonedDateTime aa = ZonedDateTime.parse("2017-01-02T03:04:05.000000006Z");
@@ -287,6 +288,29 @@ public final class WireFormatTests {
         assertThat(one.hashCode()).isEqualTo(two.hashCode());
         assertThat(one.hashCode()).isEqualTo(three.hashCode());
         assertThat(two.hashCode()).isEqualTo(three.hashCode());
+    }
+
+    @Test
+    public void testUuidType_roundTrip() throws Exception {
+        String serialized = "{\"uuid\":\"0db30881-8f3e-46f4-a8bb-df5883bf7eb8\"}";
+        UuidExample deserialized = UuidExample.of(UUID.fromString("0db30881-8f3e-46f4-a8bb-df5883bf7eb8"));
+
+        assertThat(mapper.writeValueAsString(deserialized)).isEqualTo(serialized);
+        assertThat(mapper.readValue(serialized, UuidExample.class)).isEqualTo(deserialized);
+    }
+
+    @Test
+    public void testUuidType_equality() throws Exception {
+        UUID randomUuid = UUID.randomUUID();
+        UuidExample uuidA = UuidExample.of(randomUuid);
+        UuidExample uuidB = UuidExample.of(UUID.randomUUID());
+        UuidExample uuidC = UuidExample.builder().from(uuidA).build();
+
+        assertThat(uuidA).isEqualTo(uuidC);
+        assertThat(uuidA).isNotEqualTo(uuidB);
+
+        assertThat(uuidA.hashCode()).isEqualTo(uuidC.hashCode());
+        assertThat(uuidA.hashCode()).isNotEqualTo(uuidB.hashCode());
     }
 
     private static class TestVisitor implements UnionTypeExample.Visitor<Integer> {

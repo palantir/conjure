@@ -5,4 +5,5 @@ export interface IPrimitiveOptionalsExample {
     'num'?: number | "NaN" | null;
     'rid'?: string | null;
     'safelong'?: number | null;
+    'uuid'?: string | null;
 }
