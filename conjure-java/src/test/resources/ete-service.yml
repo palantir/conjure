@@ -1,0 +1,43 @@
+services:
+  EteService:
+    name: Ete Service
+    package: com.palantir.product
+    default-auth: header
+    base-path: /base
+
+    endpoints:
+      string:
+        http: GET /string
+        returns: string
+
+      integer:
+        http: GET /integer
+        returns: integer
+
+      double_:
+        http: GET /double
+        returns: double
+
+      boolean_:
+        http: GET /boolean
+        returns: boolean
+
+      safelong:
+        http: GET /safelong
+        returns: safelong
+
+      rid:
+        http: GET /rid
+        returns: rid
+
+      bearertoken:
+        http: GET /bearertoken
+        returns: bearertoken
+
+      optionalString:
+        http: GET /optionalString
+        returns: optional<string>
+
+      datetime:
+        http: GET /datetime
+        returns: datetime

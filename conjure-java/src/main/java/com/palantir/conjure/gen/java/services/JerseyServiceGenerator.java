@@ -64,6 +64,9 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Produces"))
                         .addMember("value", "$T.APPLICATION_JSON", ClassName.get("javax.ws.rs.core", "MediaType"))
                         .build())
+                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
+                        .addMember("value", "$S", "/")
+                        .build())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(JerseyServiceGenerator.class));
 
         serviceDefinition.docs().ifPresent(docs ->
@@ -90,7 +93,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", endpointDef.http().path())
+                        .addMember("value", "$S", endpointDef.http().path().toString().replaceFirst("/", ""))
                         .build())
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
 

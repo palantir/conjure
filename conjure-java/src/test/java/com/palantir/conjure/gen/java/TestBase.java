@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 public abstract class TestBase {
 
-    protected final String readFromFile(Path file) {
+    protected static final String readFromFile(Path file) {
         try {
             return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
         } catch (IOException e) {

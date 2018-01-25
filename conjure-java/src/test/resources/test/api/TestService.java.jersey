@@ -29,48 +29,49 @@ import javax.ws.rs.core.StreamingOutput;
 /** A Markdown description of the service. */
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Path("/")
 @Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
 public interface TestService {
     /** Returns a mapping from file system id to backing file system configuration. */
     @GET
-    @Path("/catalog/fileSystems")
+    @Path("catalog/fileSystems")
     @Nonnull
     Map<String, BackingFileSystem> getFileSystems(
             @HeaderParam("Authorization") AuthHeader authHeader);
 
     @POST
-    @Path("/catalog/datasets")
+    @Path("catalog/datasets")
     Dataset createDataset(
             @HeaderParam("Authorization") AuthHeader authHeader,
             CreateDatasetRequest request,
             @HeaderParam("Test-Header") String testHeaderArg);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}")
+    @Path("catalog/datasets/{datasetRid}")
     Optional<Dataset> getDataset(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}/raw")
+    @Path("catalog/datasets/{datasetRid}/raw")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     StreamingOutput getRawData(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}/raw-maybe")
+    @Path("catalog/datasets/{datasetRid}/raw-maybe")
     Optional<ByteBuffer> maybeGetRawData(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @POST
-    @Path("/catalog/datasets/upload-raw")
+    @Path("catalog/datasets/upload-raw")
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     void uploadRawData(@HeaderParam("Authorization") AuthHeader authHeader, InputStream input);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}/branches")
+    @Path("catalog/datasets/{datasetRid}/branches")
     Set<String> getBranches(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
@@ -81,41 +82,41 @@ public interface TestService {
      * @deprecated use getBranches instead
      */
     @GET
-    @Path("/catalog/datasets/{datasetRid}/branchesDeprecated")
+    @Path("catalog/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
     Set<String> getBranchesDeprecated(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve")
+    @Path("catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve")
     Optional<String> resolveBranch(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") @Safe ResourceIdentifier datasetRid,
             @PathParam("branch") String branch);
 
     @GET
-    @Path("/catalog/datasets/{datasetRid}/testParam")
+    @Path("catalog/datasets/{datasetRid}/testParam")
     Optional<String> testParam(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @PathParam("datasetRid") ResourceIdentifier datasetRid);
 
     @GET
-    @Path("/catalog/test-query-params")
+    @Path("catalog/test-query-params")
     int testQueryParams(
             @HeaderParam("Authorization") AuthHeader authHeader,
             @QueryParam("different") ResourceIdentifier something,
             @QueryParam("implicit") ResourceIdentifier implicit);
 
     @GET
-    @Path("/catalog/boolean")
+    @Path("catalog/boolean")
     boolean testBoolean(@HeaderParam("Authorization") AuthHeader authHeader);
 
     @GET
-    @Path("/catalog/double")
+    @Path("catalog/double")
     double testDouble(@HeaderParam("Authorization") AuthHeader authHeader);
 
     @GET
-    @Path("/catalog/integer")
+    @Path("catalog/integer")
     int testInteger(@HeaderParam("Authorization") AuthHeader authHeader);
 }

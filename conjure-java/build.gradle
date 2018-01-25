@@ -33,6 +33,10 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
+    testCompile 'com.palantir.remoting3:jaxrs-clients'
+    testCompile('com.palantir.witchcraft:witchcraft-core') {
+        exclude module: 'conjure-java-lib'
+    }
 
     integrationInputCompile project(':conjure-java-lib')
 
