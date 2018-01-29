@@ -34,11 +34,13 @@ dependencies {
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.mockito:mockito-core'
     testCompile 'com.palantir.remoting3:jaxrs-clients'
+    testCompile 'com.palantir.remoting3:retrofit2-clients'
     testCompile('com.palantir.witchcraft:witchcraft-core') {
         exclude module: 'conjure-java-lib'
     }
 
     integrationInputCompile project(':conjure-java-lib')
+    integrationInputCompile 'com.squareup.retrofit2:retrofit'
 
     processor 'org.immutables:value'
 }

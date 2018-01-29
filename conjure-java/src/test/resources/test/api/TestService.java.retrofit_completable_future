@@ -31,37 +31,37 @@ import retrofit2.http.Streaming;
 @Generated("com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator")
 public interface TestService {
     /** Returns a mapping from file system id to backing file system configuration. */
-    @GET("/catalog/fileSystems")
+    @GET("catalog/fileSystems")
     CompletableFuture<Map<String, BackingFileSystem>> getFileSystems(
             @Header("Authorization") AuthHeader authHeader);
 
-    @POST("/catalog/datasets")
+    @POST("catalog/datasets")
     CompletableFuture<Dataset> createDataset(
             @Header("Authorization") AuthHeader authHeader,
             @Body CreateDatasetRequest request,
             @Header("Test-Header") String testHeaderArg);
 
-    @GET("/catalog/datasets/{datasetRid}")
+    @GET("catalog/datasets/{datasetRid}")
     CompletableFuture<Optional<Dataset>> getDataset(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @GET("/catalog/datasets/{datasetRid}/raw")
+    @GET("catalog/datasets/{datasetRid}/raw")
     @Streaming
     CompletableFuture<ResponseBody> getRawData(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @GET("/catalog/datasets/{datasetRid}/raw-maybe")
+    @GET("catalog/datasets/{datasetRid}/raw-maybe")
     CompletableFuture<Optional<ByteBuffer>> maybeGetRawData(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @POST("/catalog/datasets/upload-raw")
+    @POST("catalog/datasets/upload-raw")
     CompletableFuture<Void> uploadRawData(
             @Header("Authorization") AuthHeader authHeader, @Body RequestBody input);
 
-    @GET("/catalog/datasets/{datasetRid}/branches")
+    @GET("catalog/datasets/{datasetRid}/branches")
     CompletableFuture<Set<String>> getBranches(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
@@ -71,35 +71,35 @@ public interface TestService {
      *
      * @deprecated use getBranches instead
      */
-    @GET("/catalog/datasets/{datasetRid}/branchesDeprecated")
+    @GET("catalog/datasets/{datasetRid}/branchesDeprecated")
     @Deprecated
     CompletableFuture<Set<String>> getBranchesDeprecated(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @GET("/catalog/datasets/{datasetRid}/branches/{branch}/resolve")
+    @GET("catalog/datasets/{datasetRid}/branches/{branch}/resolve")
     CompletableFuture<Optional<String>> resolveBranch(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid,
             @Path(value = "branch", encoded = true) String branch);
 
-    @GET("/catalog/datasets/{datasetRid}/testParam")
+    @GET("catalog/datasets/{datasetRid}/testParam")
     CompletableFuture<Optional<String>> testParam(
             @Header("Authorization") AuthHeader authHeader,
             @Path("datasetRid") ResourceIdentifier datasetRid);
 
-    @GET("/catalog/test-query-params")
+    @GET("catalog/test-query-params")
     CompletableFuture<Integer> testQueryParams(
             @Header("Authorization") AuthHeader authHeader,
             @Query("different") ResourceIdentifier something,
             @Query("implicit") ResourceIdentifier implicit);
 
-    @GET("/catalog/boolean")
+    @GET("catalog/boolean")
     CompletableFuture<Boolean> testBoolean(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("/catalog/double")
+    @GET("catalog/double")
     CompletableFuture<Double> testDouble(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("/catalog/integer")
+    @GET("catalog/integer")
     CompletableFuture<Integer> testInteger(@Header("Authorization") AuthHeader authHeader);
 }

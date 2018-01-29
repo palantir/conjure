@@ -14,6 +14,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,4 +56,9 @@ public interface EteService {
     @GET
     @Path("base/datetime")
     ZonedDateTime datetime(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @GET
+    @Path("base/binary")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    StreamingOutput binary(@HeaderParam("Authorization") AuthHeader authHeader);
 }

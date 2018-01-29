@@ -1,0 +1,10 @@
+type: fix
+fix:
+  description: >
+    Generated Retrofit clients now work when the server has a non-empty context-path.
+    Previously, a url of `https://localhost/multipass/api` and an endpoint defined as `/me`
+    would result in a request to `https://localhost/me`, resulting in a 404. This bug has
+    been present since at least 0.45.0.
+  links:
+  - https://github.palantir.build/foundry/conjure/issues/814
+  - https://github.palantir.build/foundry/conjure/issues/701

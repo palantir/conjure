@@ -1,6 +1,6 @@
 services:
-  EteService:
-    name: Ete Service
+  EteService2:
+    name: Ete Service for retrofit
     package: com.palantir.product
     default-auth: header
     base-path: /base

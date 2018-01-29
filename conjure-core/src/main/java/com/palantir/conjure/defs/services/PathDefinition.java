@@ -83,6 +83,10 @@ public abstract class PathDefinition {
         }
     }
 
+    public final String withoutLeadingSlash() {
+        return toString().substring(1);
+    }
+
     /**
      * Returns this path "concatenated" with the given other path. For example, {@code "/abc".resolve("/def")} is the
      * path {@code /abc/def}.

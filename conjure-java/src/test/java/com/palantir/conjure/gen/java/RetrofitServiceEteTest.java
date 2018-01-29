@@ -8,10 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
+import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.lib.SafeLong;
-import com.palantir.product.EteService;
-import com.palantir.remoting3.jaxrs.JaxRsClient;
+import com.palantir.product.EteService2;
+import com.palantir.remoting3.retrofit2.Retrofit2Client;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
 import java.io.File;
@@ -33,72 +33,78 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class JerseyServiceEteTest extends TestBase {
+public class RetrofitServiceEteTest extends TestBase {
 
     @ClassRule
     public static final TemporaryFolder folder = new TemporaryFolder();
 
     @Rule
     public final WitchcraftEteServer server = new WitchcraftEteServer();
-    private final EteService client;
+    private final EteService2 client;
 
-    public JerseyServiceEteTest() {
-        client = JaxRsClient.create(
-                EteService.class,
+    public RetrofitServiceEteTest() {
+        this.client = Retrofit2Client.create(
+                EteService2.class,
                 server.clientUserAgent(),
-                server.clientConfiguration());
-
+                server.clientConfiguration()
+        );
         server.witchcraft().api(new EteResource());
     }
 
     @Ignore // https://github.palantir.build/foundry/conjure/issues/182
     @Test
-    public void http_remoting_client_can_retrieve_a_string_from_witchcraft() throws Exception {
-        assertThat(client.string(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_can_retrieve_a_string_from_witchcraft() throws Exception {
+        assertThat(client.string(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo("Hello, world!");
     }
 
     @Test
-    public void http_remoting_client_can_retrieve_a_double_from_witchcraft() throws Exception {
-        assertThat(client.double_(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_a_double_from_witchcraft() throws Exception {
+        assertThat(client.double_(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(1 / 3d);
     }
 
     @Test
-    public void http_remoting_client_can_retrieve_a_boolean_from_witchcraft() throws Exception {
-        assertThat(client.boolean_(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_a_boolean_from_witchcraft() throws Exception {
+        assertThat(client.boolean_(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(true);
     }
 
     @Test
-    public void http_remoting_client_can_retrieve_a_safelong_from_witchcraft() throws Exception {
-        assertThat(client.safelong(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_a_safelong_from_witchcraft() throws Exception {
+        assertThat(client.safelong(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(SafeLong.of(12345));
     }
 
     @Test
-    public void http_remoting_client_can_retrieve_an_rid_from_witchcraft() throws Exception {
-        assertThat(client.rid(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_an_rid_from_witchcraft() throws Exception {
+        assertThat(client.rid(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(ResourceIdentifier.of("ri.foundry.main.dataset.1234"));
     }
 
     @Ignore // https://github.palantir.build/foundry/conjure/issues/182
     @Test
-    public void http_remoting_client_can_retrieve_an_optional_string_from_witchcraft() throws Exception {
-        assertThat(client.optionalString(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_an_optional_string_from_witchcraft() throws Exception {
+        assertThat(client.optionalString(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(Optional.of("foo"));
     }
 
     @Test
-    public void http_remoting_client_can_retrieve_a_date_time_from_witchcraft() throws Exception {
-        assertThat(client.datetime(AuthHeader.valueOf("authHeader")))
+    public void retrofit2_client_can_retrieve_a_date_time_from_witchcraft() throws Exception {
+        assertThat(client.datetime(AuthHeader.valueOf("authHeader")).execute().body())
                 .isEqualTo(ZonedDateTime.ofInstant(Instant.ofEpochMilli(1234), ZoneId.from(ZoneOffset.UTC)));
+    }
+
+    @Test
+    public void retrofit2_client_can_retrieve_binary_data_from_witchcraft() throws Exception {
+        assertThat(client.binary(AuthHeader.valueOf("authHeader")).execute().body().string())
+                .isEqualTo("Hello, world!");
     }
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/ete-service.yml"));
-        List<Path> files = new JerseyServiceGenerator(Collections.emptySet()).emit(def, folder.getRoot());
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/ete-service2.yml"));
+        List<Path> files = new Retrofit2ServiceGenerator(Collections.emptySet()).emit(def, folder.getRoot());
 
         for (Path file : files) {
             Path output = Paths.get("src/integrationInput/java/com/palantir/product/" + file.getFileName());

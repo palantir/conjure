@@ -93,7 +93,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", endpointDef.http().path().toString().replaceFirst("/", ""))
+                        .addMember("value", "$S", endpointDef.http().path().withoutLeadingSlash())
                         .build())
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
 

@@ -74,6 +74,16 @@ public final class PathDefinitionTest {
         assertThat(path("/a/b/c").resolve(path("/d/e/f"))).isEqualTo(path("/a/b/c/d/e/f"));
     }
 
+    @Test
+    public void without_leading_slash_should_strip_only_the_first_slash() throws Exception {
+        assertThat(path("/leave/other/slashes").withoutLeadingSlash()).isEqualTo("leave/other/slashes");
+    }
+
+    @Test
+    public void without_leading_slash_should_return_empty_string_if_appropriate() throws Exception {
+        assertThat(path("/").withoutLeadingSlash()).isEqualTo("");
+    }
+
     private static PathDefinition path(String path) {
         return PathDefinition.of(path);
     }
