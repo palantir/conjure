@@ -18,7 +18,7 @@ buildscript {
         classpath "com.palantir.conda.gradle:conda-gradle-plugin:0.7.0"
         classpath 'com.palantir.exartisi:gradle-exartisi-plugin:2.0.0'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
-        classpath 'com.palantir.gradle.changelog:gradle-changelog:2.5.1'
+        classpath 'com.palantir.gradle.changelog:gradle-changelog:2.6.0'
         classpath 'com.palantir.internalpublish:gradle-internal-publish-plugin:0.2.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
