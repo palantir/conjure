@@ -52,7 +52,6 @@ allprojects {
 
     dependencyRecommendations {
         strategy OverrideTransitives
-        mavenBom module: 'com.palantir.witchcraft:witchcraft-core-bom'
         propertiesFile file: project.rootProject.file('versions.props')
         def subprojectVersions = project.file('versions.props')
         if (subprojectVersions.exists()) {

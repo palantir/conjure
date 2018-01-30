@@ -22,10 +22,26 @@ org.slf4j:* = 1.7.25
 com.google.errorprone:error_prone_annotations = 2.2.0
 
 # Resolve conflicts
+com.ea.agentloader:ea-agent-loader = 1.0.3
 com.google.code.findbugs:jsr305 = 3.0.2
 org.objenesis:objenesis = 2.6
 
 # dependency-upgrader:OFF
+
 # pinned to http-remoting, witchcraft
 org.glassfish.jersey.core:jersey-common = 2.25.1
 javax.ws.rs:javax.ws.rs-api = 2.0.1
+
+# from witchcraft-bom - we don't want this directly because it would force a version of conjure-java-lib
+ch.qos.logback:logback-classic = 1.2.3
+com.palantir.remoting-api:* = 1.7.0
+com.palantir.remoting3:* = 3.14.0
+com.palantir.ri:resource-identifier = 1.0.0
+com.palantir.safe-logging:safe-logging = 1.0.1
+com.palantir.tritium:tritium-registry = 0.9.0
+com.palantir.witchcraft:witchcraft-core = 0.70.0
+com.squareup.okhttp3:okhttp = 3.9.1
+com.squareup.retrofit2:retrofit = 2.3.0
+io.dropwizard.metrics:metrics-core = 3.2.5
+org.eclipse.jetty:* = 9.4.8.v20171121
+org.glassfish.jersey.core:jersey-server = 2.25.1
