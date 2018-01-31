@@ -74,12 +74,12 @@ public final class ErrorGenerator {
             TypeMapper typeMapper,
             ConjurePackage conjurePackage,
             ErrorNamespace namespace,
-            List<ErrorTypeDefinition> errorTypeDefinitionMap) {
+            List<ErrorTypeDefinition> errorTypeDefinitions) {
 
         ClassName className = errorTypesClassName(conjurePackage, namespace);
 
         // Generate ErrorType definitions
-        Set<FieldSpec> fieldSpecs = errorTypeDefinitionMap.stream().map(errorDef -> {
+        List<FieldSpec> fieldSpecs = errorTypeDefinitions.stream().map(errorDef -> {
             CodeBlock initializer = CodeBlock.of("ErrorType.create(ErrorType.Code.$L, \"$L:$L\")",
                     errorDef.code().name(),
                     namespace.name(),
@@ -91,10 +91,10 @@ public final class ErrorGenerator {
                     .initializer(initializer);
             errorDef.docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs));
             return fieldSpecBuilder.build();
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
 
         // Generate ServiceException factory methods
-        Set<MethodSpec> methodSpecs = errorTypeDefinitionMap.stream().map(entry -> {
+        List<MethodSpec> methodSpecs = errorTypeDefinitions.stream().map(entry -> {
             String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
             String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.typeName().name());
 
@@ -110,7 +110,7 @@ public final class ErrorGenerator {
             methodBuilder.addCode(");");
 
             return methodBuilder.build();
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(className)
                 .addMethod(privateConstructor())

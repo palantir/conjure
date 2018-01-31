@@ -8,15 +8,22 @@ import javax.annotation.Generated;
 
 @Generated("com.palantir.conjure.gen.java.types.ErrorGenerator")
 public final class ConjureErrors {
-    /** Invalid Conjure service definition. */
-    public static final ErrorType INVALID_SERVICE_DEFINITION =
-            ErrorType.create(ErrorType.Code.INVALID_ARGUMENT, "Conjure:InvalidServiceDefinition");
-
     /** Invalid Conjure type definition. */
     public static final ErrorType INVALID_TYPE_DEFINITION =
             ErrorType.create(ErrorType.Code.INVALID_ARGUMENT, "Conjure:InvalidTypeDefinition");
 
+    /** Invalid Conjure service definition. */
+    public static final ErrorType INVALID_SERVICE_DEFINITION =
+            ErrorType.create(ErrorType.Code.INVALID_ARGUMENT, "Conjure:InvalidServiceDefinition");
+
     private ConjureErrors() {}
+
+    public static ServiceException invalidTypeDefinition(String typeName, Object typeDef) {
+        return new ServiceException(
+                INVALID_TYPE_DEFINITION,
+                SafeArg.of("typeName", typeName),
+                UnsafeArg.of("typeDef", typeDef));
+    }
 
     /**
      * @param serviceName Name of the invalid service definition.
@@ -27,12 +34,5 @@ public final class ConjureErrors {
                 INVALID_SERVICE_DEFINITION,
                 SafeArg.of("serviceName", serviceName),
                 UnsafeArg.of("serviceDef", serviceDef));
-    }
-
-    public static ServiceException invalidTypeDefinition(String typeName, Object typeDef) {
-        return new ServiceException(
-                INVALID_TYPE_DEFINITION,
-                SafeArg.of("typeName", typeName),
-                UnsafeArg.of("typeDef", typeDef));
     }
 }
