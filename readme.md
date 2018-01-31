@@ -496,8 +496,8 @@ and rendering:
     * `none`: do not apply authorization requirements
     * `header`: apply an `Authorization` header argument/requirement to every
       endpoint.
-    * `cookie:<cookie id>`: apply a cookie argument/requirement to every
-      endpoint with cookie name `<cookie id>`.
+    * `cookie:<cookie name>`: apply a cookie argument/requirement to every
+      endpoint with cookie name `<cookie name>`.
  * `docs`: a standard string and generally treated throughout rendering as
    Markdown.
 
