@@ -5,9 +5,7 @@
 package com.palantir.conjure.defs.services;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
 import com.palantir.conjure.defs.types.names.TypeName;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -27,21 +25,6 @@ public interface ServiceDefinition {
         for (ServiceDefinitionValidator validator : ServiceDefinitionValidator.values()) {
             validator.validate(this);
         }
-    }
-
-    static ServiceDefinition fromParse(
-            com.palantir.conjure.parser.services.ServiceDefinition parsed,
-            TypeName serviceName,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
-        Map<String, EndpointDefinition> endpoints = new LinkedHashMap<>();
-        parsed.endpoints().forEach((name, def) -> endpoints.put(
-                name, EndpointDefinition.parseFrom(
-                        def, parsed.basePath(), AuthDefinition.parseFrom(parsed.defaultAuth()), typeResolver)));
-        return builder()
-                .serviceName(serviceName)
-                .docs(parsed.docs())
-                .putAllEndpoints(endpoints)
-                .build();
     }
 
     static Builder builder() {

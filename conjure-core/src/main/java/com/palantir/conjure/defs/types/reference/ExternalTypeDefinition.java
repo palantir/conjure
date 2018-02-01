@@ -21,18 +21,16 @@ public interface ExternalTypeDefinition {
     PrimitiveType baseType();
 
     static ExternalTypeDefinition javaType(String external) {
-        return ImmutableExternalTypeDefinition.builder()
+        return new Builder()
                 .baseType(PrimitiveType.STRING)
                 .putExternal("java", external)
                 .build();
     }
 
-    static ExternalTypeDefinition fromParse(
-            TypeName name, com.palantir.conjure.parser.types.reference.ExternalTypeDefinition def) {
-        return ImmutableExternalTypeDefinition.builder()
-                .typeName(name)
-                .baseType(PrimitiveType.parseFrom(def.baseType()))
-                .putAllExternal(def.external())
-                .build();
+    static Builder builder() {
+        return new Builder();
     }
+
+    class Builder extends ImmutableExternalTypeDefinition.Builder {}
+
 }

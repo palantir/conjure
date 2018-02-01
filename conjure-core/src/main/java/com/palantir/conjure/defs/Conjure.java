@@ -15,6 +15,6 @@ public final class Conjure {
      * Deserializes a {@link ConjureDefinition} from its YAML representation in the given file.
      */
     public static ConjureDefinition parse(File file) {
-        return ConjureDefinition.fromParse(ConjureParser.parse(file));
+        return ConjureParserUtils.parseConjureDef(ConjureParser.parse(file));
     }
 }

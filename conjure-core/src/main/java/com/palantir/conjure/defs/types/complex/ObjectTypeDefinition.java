@@ -6,10 +6,7 @@ package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
-import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
 import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -24,17 +21,6 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
         for (ObjectTypeDefinitionValidator validator : ObjectTypeDefinitionValidator.values()) {
             validator.validate(this);
         }
-    }
-
-    static BaseObjectTypeDefinition parseFrom(
-            TypeName name,
-            com.palantir.conjure.parser.types.complex.ObjectTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
-        return builder()
-                .typeName(name)
-                .fields(ObjectTypeDefParserVisitor.parseFieldDef(def.fields(), typeResolver))
-                .docs(def.docs())
-                .build();
     }
 
     static Builder builder() {

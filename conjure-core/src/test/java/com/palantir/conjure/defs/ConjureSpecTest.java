@@ -60,7 +60,7 @@ public final class ConjureSpecTest {
             String testName = String.format("positive case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                com.palantir.conjure.defs.ConjureDefinition.fromParse(MAPPER.readValue(yml, ConjureDefinition.class));
+                ConjureParserUtils.parseConjureDef(MAPPER.readValue(yml, ConjureDefinition.class));
             } catch (Exception e) {
                 Assertions.fail("Conjure for case should be valid according to the spec: " + testName, e);
             }
@@ -71,7 +71,7 @@ public final class ConjureSpecTest {
             String testName = String.format("negative case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                com.palantir.conjure.defs.ConjureDefinition.fromParse(MAPPER.readValue(yml, ConjureDefinition.class));
+                ConjureParserUtils.parseConjureDef(MAPPER.readValue(yml, ConjureDefinition.class));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
             } catch (Exception e) {
                 Assertions.assertThat(e).withFailMessage("Failure message for case did not match expectation: "

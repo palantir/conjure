@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.types;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.defs.ConjureParserUtils;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
@@ -56,7 +57,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Conjur
         private static TypeName resolveFromTypeName(
                 com.palantir.conjure.parser.types.names.TypeName name, TypesDefinition types) {
             Optional<ConjurePackage> defaultPackage =
-                    types.definitions().defaultConjurePackage().map(ConjurePackage::parseFrom);
+                    types.definitions().defaultConjurePackage().map(ConjureParserUtils::parseConjurePackage);
             BaseObjectTypeDefinition maybeDirectDef = types.definitions().objects().get(name);
             final ConjurePackage conjurePackage;
             if (maybeDirectDef == null) {
@@ -69,8 +70,8 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Conjur
                 conjurePackage = ConjurePackage.EXTERNAL_IMPORT;
             } else {
                 // Conjure-defined object
-                conjurePackage =
-                        ObjectTypeDefParserVisitor.orElseOrThrow(maybeDirectDef.conjurePackage(), defaultPackage);
+                conjurePackage = ConjureParserUtils.parsePackageOrElseThrow(
+                        maybeDirectDef.conjurePackage(), defaultPackage);
             }
 
             return TypeName.of(name.name(), conjurePackage);
@@ -106,7 +107,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Conjur
 
     @Override
     public ConjureType visitPrimitive(PrimitiveType type) {
-        return com.palantir.conjure.defs.types.primitive.PrimitiveType.parseFrom(type);
+        return ConjureParserUtils.parsePrimitiveType(type);
     }
 
     @Override

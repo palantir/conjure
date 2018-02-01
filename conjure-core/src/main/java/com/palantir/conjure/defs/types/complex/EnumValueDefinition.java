@@ -24,13 +24,6 @@ public interface EnumValueDefinition {
         }
     }
 
-    static EnumValueDefinition parseFrom(com.palantir.conjure.parser.types.complex.EnumValueDefinition def) {
-        return builder()
-                .value(def.value())
-                .docs(def.docs())
-                .build();
-    }
-
     static EnumValueDefinition.Builder builder() {
         return new Builder();
     }

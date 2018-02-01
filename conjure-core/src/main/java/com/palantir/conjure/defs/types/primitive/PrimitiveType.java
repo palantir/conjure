@@ -65,7 +65,4 @@ public enum PrimitiveType implements LocalReferenceType {
         return Optional.ofNullable(candidate);
     }
 
-    public static PrimitiveType parseFrom(com.palantir.conjure.parser.types.primitive.PrimitiveType primitiveType) {
-        return PrimitiveType.valueOf(primitiveType.name());
-    }
 }

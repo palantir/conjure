@@ -31,8 +31,4 @@ public interface RequestLineDefinition {
         return ImmutableRequestLineDefinition.builder().method(method).path(path).build();
     }
 
-    static RequestLineDefinition parseFrom(com.palantir.conjure.parser.services.PathDefinition basePath,
-            com.palantir.conjure.parser.services.RequestLineDefinition def) {
-        return RequestLineDefinition.of(def.method(), PathDefinition.of(basePath.resolve(def.path()).toString()));
-    }
 }

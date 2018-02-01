@@ -6,10 +6,7 @@ package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
-import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
 import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
@@ -24,17 +21,6 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
         for (UnionTypeDefinitionValidator validator : UnionTypeDefinitionValidator.values()) {
             validator.validate(this);
         }
-    }
-
-    static BaseObjectTypeDefinition parseFrom(
-            TypeName name,
-            com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
-        return builder()
-                .typeName(name)
-                .union(ObjectTypeDefParserVisitor.parseFieldDef(def.union(), typeResolver))
-                .docs(def.docs())
-                .build();
     }
 
     static Builder builder() {

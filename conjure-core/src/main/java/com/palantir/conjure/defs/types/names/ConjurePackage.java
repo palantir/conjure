@@ -56,7 +56,4 @@ public abstract class ConjurePackage {
         return of(Joiner.on('.').join(components));
     }
 
-    public static ConjurePackage parseFrom(com.palantir.conjure.parser.types.names.ConjurePackage parsed) {
-        return ConjurePackage.of(parsed.name());
-    }
 }
