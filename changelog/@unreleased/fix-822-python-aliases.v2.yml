@@ -1,0 +1,5 @@
+fix:
+  description: Conjure python generator can now handle alias definitions.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/822
+type: fix

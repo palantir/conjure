@@ -126,26 +126,6 @@ class DateTimeExample(ConjureBeanType):
         # type: () -> str
         return self._datetime
 
-class UuidExample(ConjureBeanType):
-
-    @classmethod
-    def _fields(cls):
-        # type: () -> Dict[str, ConjureFieldDefinition]
-        return {
-            'uuid': ConjureFieldDefinition('uuid', str)
-        }
-
-    _uuid = None # type: str
-
-    def __init__(self, uuid):
-        # type: (str) -> None
-        self._uuid = uuid
-
-    @property
-    def uuid(self):
-        # type: () -> str
-        return self._uuid
-
 class DoubleExample(ConjureBeanType):
 
     @classmethod
@@ -345,6 +325,48 @@ class AnyMapExample(ConjureBeanType):
         # type: () -> Dict[str, Any]
         return self._items
 
+class UuidExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'uuid': ConjureFieldDefinition('uuid', str)
+        }
+
+    _uuid = None # type: str
+
+    def __init__(self, uuid):
+        # type: (str) -> None
+        self._uuid = uuid
+
+    @property
+    def uuid(self):
+        # type: () -> str
+        return self._uuid
+
+StringAliasExample = str
+
+DoubleAliasExample = float
+
+IntegerAliasExample = int
+
+BooleanAliasExample = bool
+
+SafeLongAliasExample = int
+
+RidAliasExample = str
+
+BearerTokenAliasExample = str
+
+UuidAliasExample = str
+
+MapAliasExample = DictType(str, object)
+
+ReferenceAliasExample = AnyExample
+
+DateTimeAliasExample = str
+
 class PrimitiveOptionalsExample(ConjureBeanType):
 
     @classmethod
@@ -425,7 +447,8 @@ class ManyFieldExample(ConjureBeanType):
             'optional_item': ConjureFieldDefinition('optionalItem', OptionalType(str)),
             'items': ConjureFieldDefinition('items', ListType(str)),
             'set': ConjureFieldDefinition('set', ListType(str)),
-            'map': ConjureFieldDefinition('map', DictType(str, str))
+            'map': ConjureFieldDefinition('map', DictType(str, str)),
+            'alias': ConjureFieldDefinition('alias', StringAliasExample)
         }
 
     _string = None # type: str
@@ -435,9 +458,10 @@ class ManyFieldExample(ConjureBeanType):
     _items = None # type: List[str]
     _set = None # type: List[str]
     _map = None # type: Dict[str, str]
+    _alias = None # type: StringAliasExample
 
-    def __init__(self, string, integer, double_value, optional_item, items, set, map):
-        # type: (str, int, float, Optional[str], List[str], List[str], Dict[str, str]) -> None
+    def __init__(self, string, integer, double_value, optional_item, items, set, map, alias):
+        # type: (str, int, float, Optional[str], List[str], List[str], Dict[str, str], StringAliasExample) -> None
         self._string = string
         self._integer = integer
         self._double_value = double_value
@@ -445,6 +469,7 @@ class ManyFieldExample(ConjureBeanType):
         self._items = items
         self._set = set
         self._map = map
+        self._alias = alias
 
     @property
     def string(self):
@@ -487,6 +512,12 @@ class ManyFieldExample(ConjureBeanType):
         # type: () -> Dict[str, str]
         '''docs for map field'''
         return self._map
+
+    @property
+    def alias(self):
+        # type: () -> StringAliasExample
+        '''docs for alias field'''
+        return self._alias
 
 class UnionTypeExample(ConjureUnionType):
     '''A type which can either be a StringExample, a set of strings, or an integer.'''
@@ -583,4 +614,72 @@ class EmptyObjectExample(ConjureBeanType):
         }
 
 
+
+class AliasAsMapKeyExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'strings': ConjureFieldDefinition('strings', DictType(StringAliasExample, ManyFieldExample)),
+            'rids': ConjureFieldDefinition('rids', DictType(RidAliasExample, ManyFieldExample)),
+            'bearertokens': ConjureFieldDefinition('bearertokens', DictType(BearerTokenAliasExample, ManyFieldExample)),
+            'integers': ConjureFieldDefinition('integers', DictType(IntegerAliasExample, ManyFieldExample)),
+            'safelongs': ConjureFieldDefinition('safelongs', DictType(SafeLongAliasExample, ManyFieldExample)),
+            'datetimes': ConjureFieldDefinition('datetimes', DictType(DateTimeAliasExample, ManyFieldExample)),
+            'uuids': ConjureFieldDefinition('uuids', DictType(UuidAliasExample, ManyFieldExample))
+        }
+
+    _strings = None # type: Dict[StringAliasExample, ManyFieldExample]
+    _rids = None # type: Dict[RidAliasExample, ManyFieldExample]
+    _bearertokens = None # type: Dict[BearerTokenAliasExample, ManyFieldExample]
+    _integers = None # type: Dict[IntegerAliasExample, ManyFieldExample]
+    _safelongs = None # type: Dict[SafeLongAliasExample, ManyFieldExample]
+    _datetimes = None # type: Dict[DateTimeAliasExample, ManyFieldExample]
+    _uuids = None # type: Dict[UuidAliasExample, ManyFieldExample]
+
+    def __init__(self, strings, rids, bearertokens, integers, safelongs, datetimes, uuids):
+        # type: (Dict[StringAliasExample, ManyFieldExample], Dict[RidAliasExample, ManyFieldExample], Dict[BearerTokenAliasExample, ManyFieldExample], Dict[IntegerAliasExample, ManyFieldExample], Dict[SafeLongAliasExample, ManyFieldExample], Dict[DateTimeAliasExample, ManyFieldExample], Dict[UuidAliasExample, ManyFieldExample]) -> None
+        self._strings = strings
+        self._rids = rids
+        self._bearertokens = bearertokens
+        self._integers = integers
+        self._safelongs = safelongs
+        self._datetimes = datetimes
+        self._uuids = uuids
+
+    @property
+    def strings(self):
+        # type: () -> Dict[StringAliasExample, ManyFieldExample]
+        return self._strings
+
+    @property
+    def rids(self):
+        # type: () -> Dict[RidAliasExample, ManyFieldExample]
+        return self._rids
+
+    @property
+    def bearertokens(self):
+        # type: () -> Dict[BearerTokenAliasExample, ManyFieldExample]
+        return self._bearertokens
+
+    @property
+    def integers(self):
+        # type: () -> Dict[IntegerAliasExample, ManyFieldExample]
+        return self._integers
+
+    @property
+    def safelongs(self):
+        # type: () -> Dict[SafeLongAliasExample, ManyFieldExample]
+        return self._safelongs
+
+    @property
+    def datetimes(self):
+        # type: () -> Dict[DateTimeAliasExample, ManyFieldExample]
+        return self._datetimes
+
+    @property
+    def uuids(self):
+        # type: () -> Dict[UuidAliasExample, ManyFieldExample]
+        return self._uuids
 

@@ -13,7 +13,9 @@ import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
+import com.palantir.conjure.gen.python.poet.PythonAlias;
 import com.palantir.conjure.gen.python.poet.PythonBean;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
 import com.palantir.conjure.gen.python.poet.PythonClass;
@@ -45,6 +47,8 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
             return generateObject(packageNameProcessor, (EnumTypeDefinition) typeDef);
         } else if (typeDef instanceof UnionTypeDefinition) {
             return generateObject(types, packageNameProcessor, (UnionTypeDefinition) typeDef);
+        } else if (typeDef instanceof AliasTypeDefinition) {
+            return generateObject(types, packageNameProcessor, (AliasTypeDefinition) typeDef);
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
         }
@@ -55,6 +59,11 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
+
+        ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
+                types, packageNameProcessor);
+
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
         List<PythonField> options = typeDef.union()
                 .entrySet()
@@ -72,13 +81,20 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 })
                 .collect(Collectors.toList());
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+        Set<PythonImport> imports = typeDef.union()
+                .entrySet()
+                .stream()
+                .flatMap(entry -> entry.getValue().type().visit(referencedTypeNameVisitor).stream())
+                .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
+                .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
+                .collect(Collectors.toSet());
 
         return PythonUnionTypeDefinition.builder()
                 .packageName(packageName.name())
                 .className(typeDef.typeName().name())
                 .docs(typeDef.docs())
                 .addAllOptions(options)
+                .addAllRequiredImports(imports)
                 .build();
     }
 
@@ -132,4 +148,26 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    private PythonAlias generateObject(
+            TypesDefinition types, PackageNameProcessor packageNameProcessor, AliasTypeDefinition typeDef) {
+        TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
+        ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
+                types, packageNameProcessor);
+        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+
+        Set<PythonImport> imports = typeDef.alias().visit(referencedTypeNameVisitor)
+                .stream()
+                .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
+                .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
+                .collect(Collectors.toSet());
+
+        return PythonAlias.builder()
+                .aliasName(typeDef.typeName().name())
+                .aliasTarget(mapper.getTypeName(typeDef.alias()))
+                .packageName(packageName.name())
+                .addAllRequiredImports(imports)
+                .build();
+    }
+
 }

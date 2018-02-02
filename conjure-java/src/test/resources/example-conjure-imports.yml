@@ -9,6 +9,19 @@ types:
         fields:
           string: string
           imported: importedTypes.StringExample
+      UnionWithImports:
+        union:
+          string: string
+          imported: importedTypes.AnyMapExample  # make sure this is unique to regression test imports from unions
+      AliasImportedObject:
+        alias: importedTypes.ManyFieldExample
+      AliasImportedPrimitiveAlias:
+        alias: importedTypes.StringAliasExample
+      AliasImportedReferenceAlias:
+        alias: importedTypes.ReferenceAliasExample
+      ImportedAliasInMaps:
+        fields:
+          aliases: map<importedTypes.RidAliasExample, importedTypes.DateTimeAliasExample>
 
 services:
   TestService:

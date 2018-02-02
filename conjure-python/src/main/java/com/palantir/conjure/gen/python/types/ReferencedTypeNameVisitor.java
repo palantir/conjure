@@ -71,6 +71,7 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     @Override
     public Set<PythonClassName> visitLocalReference(LocalReferenceType refType) {
         BaseObjectTypeDefinition type = typesByName.get(refType.type());
+
         if (type != null) {
             ConjurePackage packageName = packageNameProcessor.getPackageName(type.typeName().conjurePackage());
             // TODO(rfink): We do we generate with the package of the reference but the name of the referee?

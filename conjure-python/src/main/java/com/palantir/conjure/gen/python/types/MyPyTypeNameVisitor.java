@@ -81,6 +81,7 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
     public String visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
         BaseObjectTypeDefinition baseType = typesByName.get(type.type());
+
         if (baseType != null) {
             return type.type().name();
         } else {
