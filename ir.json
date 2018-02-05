@@ -729,6 +729,148 @@
       }
     },
     {
+      "type": "alias",
+      "alias": {
+        "typeName": {
+          "name": "ErrorNamespace",
+          "package": "com.palantir.conjure.spec"
+        },
+        "alias": {
+          "type": "primitive",
+          "primitive": "STRING"
+        },
+        "docs": "Should be in UpperCamelCase."
+      }
+    },
+    {
+      "type": "enum",
+      "enum": {
+        "typeName": {
+          "name": "ErrorCode",
+          "package": "com.palantir.conjure.spec",
+          "docs": "Must match the error codes defined in com.palantir.remoting.api.errors."
+        },
+        "values": [
+          {
+            "value": "PERMISSION_DENIED"
+          },
+          {
+            "value": "INVALID_ARGUMENT"
+          },
+          {
+            "value": "NOT_FOUND"
+          },
+          {
+            "value": "CONFLICT"
+          },
+          {
+            "value": "REQUEST_ENTITY_TOO_LARGE"
+          },
+          {
+            "value": "FAILED_PRECONDITION"
+          },
+          {
+            "value": "INTERNAL"
+          },
+          {
+            "value": "TIMEOUT"
+          },
+          {
+            "value": "CUSTOM_CLIENT"
+          },
+          {
+            "value": "CUSTOM_SERVER"
+          }
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "object": {
+        "typeName": {
+          "name": "ErrorDefinition",
+          "package": "com.palantir.conjure.spec"
+        },
+        "fields" : [
+          {
+            "fieldName": "typeName",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "TypeName",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
+          },
+          {
+            "fieldName": "docs",
+            "type": {
+              "type": "optional",
+              "optional": {
+                "itemType": {
+                  "type": "reference",
+                  "reference": {
+                    "name": "Documentation",
+                    "package": "com.palantir.conjure.spec"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "fieldName": "namespace",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "ErrorNamespace",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
+          },
+          {
+            "fieldName": "code",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "ErrorCode",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
+          },
+          {
+            "fieldName": "safeArgs",
+            "type": {
+              "type": "list",
+              "list": {
+                "itemType": {
+                  "type": "reference",
+                  "reference": {
+                    "name": "FieldDefinition",
+                    "package": "com.palantir.conjure.spec"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "fieldName": "unsafeArgs",
+            "type": {
+              "type": "list",
+              "list": {
+                "itemType": {
+                  "type": "reference",
+                  "reference": {
+                    "name": "FieldDefinition",
+                    "package": "com.palantir.conjure.spec"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "type": "object",
       "object": {
         "typeName": {

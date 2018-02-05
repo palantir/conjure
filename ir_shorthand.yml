@@ -4,6 +4,7 @@ types:
     objects:
       ConjureDefinition:
         fields:
+          errors: list<ErrorDefinition>
           types: list<TypeDefinition>
           services: list<ServiceDefinition>
       TypeName:
@@ -22,6 +23,30 @@ types:
               "com.palantir.foundry.build2". Disallowed packages: "Foo", "com.palantir.foundry.2build".
       Documentation:
         alias: string
+
+      # errors
+      ErrorNamespace:
+        alias: string
+      ErrorCode:
+        values:
+          - PERMISSION_DENIED
+          - INVALID_ARGUMENT
+          - NOT_FOUND
+          - CONFLICT
+          - REQUEST_ENTITY_TOO_LARGE
+          - FAILED_PRECONDITION
+          - INTERNAL
+          - TIMEOUT
+          - CUSTOM_CLIENT
+          - CUSTOM_SERVER
+      ErrorDefinition:
+        fields:
+          typeName: TypeName
+          docs: optional<Documentation>
+          namespace: ErrorNamespace
+          code: ErrorCode
+          safeArgs: list<FieldDefinition>
+          unsafeArgs: list<FieldDefinition>
 
       # types
       Type:

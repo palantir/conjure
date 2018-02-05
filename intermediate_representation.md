@@ -455,6 +455,21 @@ Example service definition:
 
 ### Errors
 
+The "errors" section is a list of error definitions. Each error definition must include the following keys:
+- "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorType codes defined in
+HTTP remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors/src/main/java/com/palantir/remoting/api/errors/ErrorType.java#L38).
+- "namespace": a string describing the namespace of the error and it must be in `UpperCamelCase`.
+- "typeName": a `TypeName` definition describing the package and name of the type.
+
+Each error definition may include the following keys:
+- "docs": a string documentation of the error.
+- "safeArgs": a list of safe arguments with a field definition as the list item type. See the [objects section](#objects) 
+for details on the field definition format.
+- "unsafeArgs": a list of unsafe arguments with a field definition as the list item type. See the [objects section](#objects) 
+for details on the field definition format.
+
+Note, the difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
+
 ### Self-describing definition
 
 See [ir.json](ir.json) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
