@@ -1,0 +1,6 @@
+fix:
+  description: Fix a conjure compiler bug that would manifest as a cyclic
+    conjure imports error when no cyclic imports are present.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/831
+type: fix

@@ -60,13 +60,24 @@ public final class ConjureParser {
         }
 
         ConjureDefinition parse(File file) {
+            // HashMap.computeIfAbsent does not work with recursion; the size of the map gets corrupted,
+            // and if the map gets resized during the recursion, some of the new nodes can be put in wrong
+            // buckets. Therefore don't use computeIfAbsent in parse/parseInternal
+            // See https://bugs.java.com/view_bug.do?bug_id=JDK-8071667
+            ConjureDefinition result = cache.get(file.getAbsolutePath());
+            if (result != null) {
+                return result;
+            }
+
             if (!currentDepthFirstPath.add(file.getAbsolutePath())) {
                 String cycle = currentDepthFirstPath.stream().reduce("", (left, right) -> left + " -> " + right)
                         + " -> " + file.getAbsolutePath();
                 throw new CyclicImportException(cycle);
             }
 
-            return cache.computeIfAbsent(file.getAbsolutePath(), path -> parseInternal(new File(path)));
+            result = parseInternal(file);
+            cache.put(file.getAbsolutePath(), result);
+            return result;
         }
 
         private ConjureDefinition parseInternal(File file) {
@@ -103,13 +114,12 @@ public final class ConjureParser {
             Map<Namespace, ConjureImports> parsedImports = Maps.newHashMap();
             for (Namespace namespace : declaredImports.keySet()) {
                 String importedFile = declaredImports.get(namespace).file();
-                ConjureDefinition importedConjure = cache.computeIfAbsent(
-                        baseDir.resolve(importedFile).toFile().getAbsolutePath(),
-                        absolutePath -> parse(new File(absolutePath)));
+                ConjureDefinition importedConjure = parse(baseDir.resolve(importedFile).toFile());
                 parsedImports.put(namespace, ConjureImports.withResolvedImports(importedFile, importedConjure));
             }
             return parsedImports;
         }
+
     }
 
     @VisibleForTesting
