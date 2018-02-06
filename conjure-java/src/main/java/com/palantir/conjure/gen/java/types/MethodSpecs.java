@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -81,7 +82,7 @@ public final class MethodSpecs {
 
     private static CodeBlock createAppendStatement(String fieldName) {
         return CodeBlock.builder()
-                .add(".append($S)", fieldName)
+                .add(".append($S)", JavaNameSanitizer.removeTrailingUnderscore(fieldName))
                 .add(".append(\": \")")
                 .add(".append($N)", fieldName)
                 .add("\n")

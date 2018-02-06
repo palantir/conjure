@@ -20,6 +20,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
+import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.palantir.conjure.gen.java.util.StableCollectors;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -121,9 +121,7 @@ public final class UnionGenerator {
             TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
             // memberName is guarded to be a valid Java identifier and not to end in an underscore, so this is safe
-            String factoryMethodName =
-                    SourceVersion.isName(memberName.name()) ? memberName.name() : memberName.name() + "_";
-            MethodSpec.Builder builder = MethodSpec.methodBuilder(factoryMethodName)
+            MethodSpec.Builder builder = MethodSpec.methodBuilder(JavaNameSanitizer.sanitize(memberName))
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                     .addParameter(memberType, variableName)
                     .addStatement("return new $T(new $T($L))",

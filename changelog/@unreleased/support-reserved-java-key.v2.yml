@@ -1,0 +1,6 @@
+feature:
+  description: Conjure java generator can now support keys with reserved names
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/828
+type: feature
+

@@ -14,6 +14,7 @@ export { IManyFieldExample } from "./manyFieldExample";
 export { IMapExample } from "./mapExample";
 export { IOptionalExample } from "./optionalExample";
 export { IPrimitiveOptionalsExample } from "./primitiveOptionalsExample";
+export { IReservedKeyExample } from "./reservedKeyExample";
 export { IRidExample } from "./ridExample";
 export { ISafeLongExample } from "./safeLongExample";
 export { ISetExample } from "./setExample";

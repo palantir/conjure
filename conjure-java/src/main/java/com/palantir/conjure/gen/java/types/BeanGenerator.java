@@ -19,6 +19,7 @@ import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
+import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -131,8 +132,9 @@ public final class BeanGenerator {
             TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
                 .map(e -> EnrichedField.of(e.getKey().name(), e.getValue(), FieldSpec.builder(
+                        // fields are guarded against using reserved keywords
                         typeMapper.getClassName(e.getValue().type()),
-                        e.getKey().toCase(FieldName.Case.LOWER_CAMEL_CASE).name(),
+                        JavaNameSanitizer.sanitize(e.getKey()),
                         Modifier.PRIVATE, Modifier.FINAL)
                         .build()))
                 .collect(Collectors.toList());
@@ -180,7 +182,7 @@ public final class BeanGenerator {
     }
 
     private static MethodSpec createGetter(EnrichedField field) {
-        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.poetSpec().name))
+        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.jsonKey()))
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
                         .addMember("value", "$S", field.jsonKey())

@@ -21,6 +21,7 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.BeanGenerator.EnrichedField;
+import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.palantir.conjure.lib.internal.ConjureCollections;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -74,7 +75,7 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                 .addFields(poetFields)
                 .addMethod(createConstructor())
-                .addMethod(createFromObject(poetFields))
+                .addMethod(createFromObject(enrichedFields))
                 .addMethods(createSetters(enrichedFields))
                 .addMethod(createBuild(poetFields));
 
@@ -97,12 +98,12 @@ public final class BeanBuilderGenerator {
         return MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE).build();
     }
 
-    private MethodSpec createFromObject(Collection<FieldSpec> poetFields) {
-        CodeBlock assignmentBlock = CodeBlocks.of(Iterables.transform(poetFields,
-                poetField -> CodeBlocks.statement(
+    private MethodSpec createFromObject(Collection<EnrichedField> enrichedFields) {
+        CodeBlock assignmentBlock = CodeBlocks.of(Iterables.transform(enrichedFields,
+                enrichedField -> CodeBlocks.statement(
                         "$1N(other.$2N())",
-                        poetField.name,
-                        BeanGenerator.generateGetterName(poetField.name))));
+                        enrichedField.poetSpec().name,
+                        BeanGenerator.generateGetterName(enrichedField.jsonKey()))));
 
         return MethodSpec.methodBuilder("from")
                 .addModifiers(Modifier.PUBLIC)
@@ -116,7 +117,7 @@ public final class BeanBuilderGenerator {
     private EnrichedField createField(FieldName fieldName, String jsonKey, FieldDefinition field) {
         FieldSpec.Builder spec = FieldSpec.builder(
                 typeMapper.getClassName(field.type()),
-                fieldName.toCase(FieldName.Case.LOWER_CAMEL_CASE).name(),
+                JavaNameSanitizer.sanitize(fieldName),
                 Modifier.PRIVATE);
 
         if (field.type() instanceof ListType) {

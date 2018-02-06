@@ -683,3 +683,31 @@ class AliasAsMapKeyExample(ConjureBeanType):
         # type: () -> Dict[UuidAliasExample, ManyFieldExample]
         return self._uuids
 
+class ReservedKeyExample(ConjureBeanType):
+
+    @classmethod
+    def _fields(cls):
+        # type: () -> Dict[str, ConjureFieldDefinition]
+        return {
+            'package': ConjureFieldDefinition('package', str),
+            'interface': ConjureFieldDefinition('interface', str)
+        }
+
+    _package = None # type: str
+    _interface = None # type: str
+
+    def __init__(self, package, interface):
+        # type: (str, str) -> None
+        self._package = package
+        self._interface = interface
+
+    @property
+    def package(self):
+        # type: () -> str
+        return self._package
+
+    @property
+    def interface(self):
+        # type: () -> str
+        return self._interface
+
