@@ -104,6 +104,7 @@ Base types in the system are:
    between `Number.MIN_SAFE_INTEGER` and `Number.MAX_SAFE_INTEGER`
  * `rid`: a [Resource Identifier](https://github.com/palantir/resource-identifier)
  * `bearertoken`: a [BearerToken](https://github.com/palantir/auth-tokens/#bearertoken)
+ * `uuid`: a [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier)
 
 ### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language
