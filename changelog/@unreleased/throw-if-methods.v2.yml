@@ -1,0 +1,6 @@
+feature:
+  description: Replace check*(condition) methods with throwIf*(!condition) methods
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/839
+type: feature
+

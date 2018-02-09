@@ -117,15 +117,17 @@ public final class ErrorGenerator {
         // Generate ServiceException factory check methods
         List<MethodSpec> checkMethodSpecs = errorTypeDefinitions.stream().map(entry -> {
             String exceptionMethodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
-            String methodName = "check" + entry.typeName().name();
+            String methodName = "throwIf" + entry.typeName().name();
+
+            String shouldThrowVar = "shouldThrow";
 
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(TypeName.BOOLEAN, "condition");
+                    .addParameter(TypeName.BOOLEAN, shouldThrowVar);
 
-            methodBuilder.addJavadoc("Throws a {@link ServiceException} with type $L when condition is false.\n",
-                    entry.typeName().name());
-            methodBuilder.addJavadoc("@param $L $L\n", "condition", "Cause the method to throw when false");
+            methodBuilder.addJavadoc("Throws a {@link ServiceException} of type $L when {@code $L} is true.\n",
+                    entry.typeName().name(), shouldThrowVar);
+            methodBuilder.addJavadoc("@param $L $L\n", shouldThrowVar, "Cause the method to throw when true");
             Streams.concat(
                     entry.safeArgs().entrySet().stream(),
                     entry.unsafeArgs().entrySet().stream()).forEach(arg -> {
@@ -134,7 +136,7 @@ public final class ErrorGenerator {
                                         StringUtils.appendIfMissing(arg.getValue().docs().orElse(""), "\n"));
                     });
 
-            methodBuilder.addCode("if (!condition) {");
+            methodBuilder.addCode("if ($L) {", shouldThrowVar);
             methodBuilder.addCode("throw $L;",
                     Expressions.localMethodCall(exceptionMethodName,
                             Streams.concat(

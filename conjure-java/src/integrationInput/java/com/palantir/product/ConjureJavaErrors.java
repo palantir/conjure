@@ -17,12 +17,13 @@ public final class ConjureJavaErrors {
     }
 
     /**
-     * Throws a {@link ServiceException} with type JavaCompilationFailed when condition is false.
+     * Throws a {@link ServiceException} of type JavaCompilationFailed when {@code shouldThrow} is
+     * true.
      *
-     * @param condition Cause the method to throw when false
+     * @param shouldThrow Cause the method to throw when true
      */
-    public static void checkJavaCompilationFailed(boolean condition) {
-        if (!condition) {
+    public static void throwIfJavaCompilationFailed(boolean shouldThrow) {
+        if (shouldThrow) {
             throw javaCompilationFailed();
         }
     }
