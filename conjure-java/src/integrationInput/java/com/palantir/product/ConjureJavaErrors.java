@@ -15,4 +15,15 @@ public final class ConjureJavaErrors {
     public static ServiceException javaCompilationFailed() {
         return new ServiceException(JAVA_COMPILATION_FAILED);
     }
+
+    /**
+     * Throws a {@link ServiceException} with type JavaCompilationFailed when condition is false.
+     *
+     * @param condition Cause the method to throw when false
+     */
+    public static void checkJavaCompilationFailed(boolean condition) {
+        if (!condition) {
+            throw javaCompilationFailed();
+        }
+    }
 }

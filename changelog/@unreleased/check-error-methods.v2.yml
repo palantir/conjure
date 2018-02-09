@@ -1,0 +1,6 @@
+feature:
+  description: Produce check* methods for error types in the Java generator
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/837
+type: feature
+

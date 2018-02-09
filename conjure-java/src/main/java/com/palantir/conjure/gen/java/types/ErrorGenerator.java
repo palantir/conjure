@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Streams;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -20,6 +21,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,11 +114,43 @@ public final class ErrorGenerator {
             return methodBuilder.build();
         }).collect(Collectors.toList());
 
+        // Generate ServiceException factory check methods
+        List<MethodSpec> checkMethodSpecs = errorTypeDefinitions.stream().map(entry -> {
+            String exceptionMethodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
+            String methodName = "check" + entry.typeName().name();
+
+            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addParameter(TypeName.BOOLEAN, "condition");
+
+            methodBuilder.addJavadoc("Throws a {@link ServiceException} with type $L when condition is false.\n",
+                    entry.typeName().name());
+            methodBuilder.addJavadoc("@param $L $L\n", "condition", "Cause the method to throw when false");
+            Streams.concat(
+                    entry.safeArgs().entrySet().stream(),
+                    entry.unsafeArgs().entrySet().stream()).forEach(arg -> {
+                        methodBuilder.addParameter(typeMapper.getClassName(arg.getValue().type()), arg.getKey().name());
+                        methodBuilder.addJavadoc("@param $L $L", arg.getKey().name(),
+                                        StringUtils.appendIfMissing(arg.getValue().docs().orElse(""), "\n"));
+                    });
+
+            methodBuilder.addCode("if (!condition) {");
+            methodBuilder.addCode("throw $L;",
+                    Expressions.localMethodCall(exceptionMethodName,
+                            Streams.concat(
+                                    entry.safeArgs().entrySet().stream(),
+                                    entry.unsafeArgs().entrySet().stream()).map(arg -> arg.getKey().name())
+                                    .collect(Collectors.toList())));
+            methodBuilder.addCode("}");
+            return methodBuilder.build();
+        }).collect(Collectors.toList());
+
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(className)
                 .addMethod(privateConstructor())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(fieldSpecs)
                 .addMethods(methodSpecs)
+                .addMethods(checkMethodSpecs)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(ErrorGenerator.class));
 
         return JavaFile.builder(conjurePackage.name(), typeBuilder.build())

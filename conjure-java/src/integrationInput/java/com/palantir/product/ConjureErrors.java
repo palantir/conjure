@@ -35,4 +35,32 @@ public final class ConjureErrors {
                 SafeArg.of("serviceName", serviceName),
                 UnsafeArg.of("serviceDef", serviceDef));
     }
+
+    /**
+     * Throws a {@link ServiceException} with type InvalidTypeDefinition when condition is false.
+     *
+     * @param condition Cause the method to throw when false
+     * @param typeName
+     * @param typeDef
+     */
+    public static void checkInvalidTypeDefinition(
+            boolean condition, String typeName, Object typeDef) {
+        if (!condition) {
+            throw invalidTypeDefinition(typeName, typeDef);
+        }
+    }
+
+    /**
+     * Throws a {@link ServiceException} with type InvalidServiceDefinition when condition is false.
+     *
+     * @param condition Cause the method to throw when false
+     * @param serviceName Name of the invalid service definition.
+     * @param serviceDef Details of the invalid service definition.
+     */
+    public static void checkInvalidServiceDefinition(
+            boolean condition, String serviceName, Object serviceDef) {
+        if (!condition) {
+            throw invalidServiceDefinition(serviceName, serviceDef);
+        }
+    }
 }

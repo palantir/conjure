@@ -15,4 +15,15 @@ public final class ConjureErrors {
     public static ServiceException differentPackage() {
         return new ServiceException(DIFFERENT_PACKAGE);
     }
+
+    /**
+     * Throws a {@link ServiceException} with type DifferentPackage when condition is false.
+     *
+     * @param condition Cause the method to throw when false
+     */
+    public static void checkDifferentPackage(boolean condition) {
+        if (!condition) {
+            throw differentPackage();
+        }
+    }
 }
