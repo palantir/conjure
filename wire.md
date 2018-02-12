@@ -13,6 +13,7 @@ The JSON format `json(o)` for a Conjure object `o` can be recursively defined as
   - Conjure `string` → JSON `string`
   - Conjure `rid` → JSON `string`
   - Conjure `bearertoken` → JSON `string`
+  - Conjure `uuid`  → JSON `string`, the canonical `8-4-4-4-12` textual UUID representation
   - Conjure `integer` → JSON `number`
   - Conjure `safelong` → JSON `number`
   - Conjure `double` → JSON `number` | JSON `string` literal "NaN"
