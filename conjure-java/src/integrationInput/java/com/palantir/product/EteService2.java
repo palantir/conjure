@@ -43,6 +43,9 @@ public interface EteService2 {
     @GET("base/optionalString")
     Call<Optional<String>> optionalString(@Header("Authorization") AuthHeader authHeader);
 
+    @GET("base/optionalEmpty")
+    Call<Optional<String>> optionalEmpty(@Header("Authorization") AuthHeader authHeader);
+
     @GET("base/datetime")
     Call<ZonedDateTime> datetime(@Header("Authorization") AuthHeader authHeader);
 

@@ -90,6 +90,12 @@ public class JerseyServiceEteTest extends TestBase {
     }
 
     @Test
+    public void jaxrs_client_can_retrieve_an_optional_empty_from_witchcraft() throws Exception {
+        assertThat(client.optionalEmpty(AuthHeader.valueOf("authHeader")))
+                .isEqualTo(Optional.empty());
+    }
+
+    @Test
     public void http_remoting_client_can_retrieve_a_date_time_from_witchcraft() throws Exception {
         assertThat(client.datetime(AuthHeader.valueOf("authHeader")))
                 .isEqualTo(ZonedDateTime.ofInstant(Instant.ofEpochMilli(1234), ZoneId.from(ZoneOffset.UTC)));

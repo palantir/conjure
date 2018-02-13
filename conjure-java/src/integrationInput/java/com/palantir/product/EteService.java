@@ -54,6 +54,10 @@ public interface EteService {
     Optional<String> optionalString(@HeaderParam("Authorization") AuthHeader authHeader);
 
     @GET
+    @Path("base/optionalEmpty")
+    Optional<String> optionalEmpty(@HeaderParam("Authorization") AuthHeader authHeader);
+
+    @GET
     @Path("base/datetime")
     ZonedDateTime datetime(@HeaderParam("Authorization") AuthHeader authHeader);
 

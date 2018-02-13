@@ -59,6 +59,11 @@ public final class EteResource implements EteService {
     }
 
     @Override
+    public Optional<String> optionalEmpty(AuthHeader authHeader) {
+        return Optional.empty();
+    }
+
+    @Override
     public ZonedDateTime datetime(AuthHeader authHeader) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(1234L), ZoneId.from(ZoneOffset.UTC));
     }

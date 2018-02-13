@@ -89,6 +89,13 @@ public class RetrofitServiceEteTest extends TestBase {
                 .isEqualTo(Optional.of("foo"));
     }
 
+    @Ignore // https://github.com/palantir/http-remoting/issues/668
+    @Test
+    public void retrofit2_client_can_retrieve_an_optional_empty_from_witchcraft() throws Exception {
+        assertThat(client.optionalEmpty(AuthHeader.valueOf("authHeader")).execute().body())
+                .isEqualTo(Optional.empty());
+    }
+
     @Test
     public void retrofit2_client_can_retrieve_a_date_time_from_witchcraft() throws Exception {
         assertThat(client.datetime(AuthHeader.valueOf("authHeader")).execute().body())

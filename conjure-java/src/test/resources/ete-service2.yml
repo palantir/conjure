@@ -38,6 +38,10 @@ services:
         http: GET /optionalString
         returns: optional<string>
 
+      optionalEmpty:
+        http: GET /optionalEmpty
+        returns: optional<string>
+
       datetime:
         http: GET /datetime
         returns: datetime
