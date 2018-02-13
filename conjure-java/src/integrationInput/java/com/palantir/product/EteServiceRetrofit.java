@@ -18,7 +18,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Streaming;
 
 @Generated("com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator")
-public interface EteService2 {
+public interface EteServiceRetrofit {
     @GET("base/string")
     Call<String> string(@Header("Authorization") AuthHeader authHeader);
 

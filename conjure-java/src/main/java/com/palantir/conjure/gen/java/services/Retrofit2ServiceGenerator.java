@@ -68,7 +68,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
     private JavaFile generateService(ServiceDefinition serviceDefinition,
             TypeMapper returnTypeMapper, TypeMapper methodTypeMapper) {
-        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceDefinition.serviceName().name())
+        TypeSpec.Builder serviceBuilder = TypeSpec.interfaceBuilder(serviceName(serviceDefinition))
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
 
@@ -87,6 +87,14 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return JavaFile.builder(serviceDefinition.serviceName().conjurePackage().name(), serviceBuilder.build())
                 .indent("    ")
                 .build();
+    }
+
+    private String serviceName(ServiceDefinition serviceDefinition) {
+        if (experimentalFeatures.contains(ExperimentalFeatures.DisambiguateRetrofitServices)) {
+            return serviceDefinition.serviceName().name() + "Retrofit";
+        } else {
+            return serviceDefinition.serviceName().name();
+        }
     }
 
     private ClassName getReturnType() {

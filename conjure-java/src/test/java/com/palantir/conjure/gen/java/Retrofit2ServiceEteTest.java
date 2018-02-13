@@ -6,11 +6,12 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.lib.SafeLong;
-import com.palantir.product.EteService2;
+import com.palantir.product.EteServiceRetrofit;
 import com.palantir.remoting3.retrofit2.Retrofit2Client;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.AuthHeader;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.BeforeClass;
@@ -33,18 +33,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class RetrofitServiceEteTest extends TestBase {
+public class Retrofit2ServiceEteTest extends TestBase {
 
     @ClassRule
     public static final TemporaryFolder folder = new TemporaryFolder();
 
     @Rule
     public final WitchcraftEteServer server = new WitchcraftEteServer();
-    private final EteService2 client;
+    private final EteServiceRetrofit client;
 
-    public RetrofitServiceEteTest() {
+    public Retrofit2ServiceEteTest() {
         this.client = Retrofit2Client.create(
-                EteService2.class,
+                EteServiceRetrofit.class,
                 server.clientUserAgent(),
                 server.clientConfiguration()
         );
@@ -110,8 +110,9 @@ public class RetrofitServiceEteTest extends TestBase {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/ete-service2.yml"));
-        List<Path> files = new Retrofit2ServiceGenerator(Collections.emptySet()).emit(def, folder.getRoot());
+        ConjureDefinition def = Conjure.parse(new File("src/test/resources/ete-service.yml"));
+        List<Path> files = new Retrofit2ServiceGenerator(
+                ImmutableSet.of(ExperimentalFeatures.DisambiguateRetrofitServices)).emit(def, folder.getRoot());
 
         for (Path file : files) {
             Path output = Paths.get("src/integrationInput/java/com/palantir/product/" + file.getFileName());

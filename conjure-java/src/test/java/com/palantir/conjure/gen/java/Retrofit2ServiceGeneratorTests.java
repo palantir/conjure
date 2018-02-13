@@ -31,13 +31,15 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
 
         List<Path> files = new Retrofit2ServiceGenerator(
-                ImmutableSet.of(ExperimentalFeatures.DangerousGothamMethodMarkers))
+                ImmutableSet.of(
+                        ExperimentalFeatures.DangerousGothamMethodMarkers,
+                        ExperimentalFeatures.DisambiguateRetrofitServices))
                 .emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
                 Path output = Paths.get("src/test/resources/test/api/" + file.getFileName() + ".retrofit");
-                Files.delete(output);
+                Files.deleteIfExists(output);
                 Files.copy(file, output);
             }
 
@@ -50,14 +52,16 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
         ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
 
         List<Path> files = new Retrofit2ServiceGenerator(
-                ImmutableSet.of(ExperimentalFeatures.RetrofitCompletableFutures))
+                ImmutableSet.of(
+                        ExperimentalFeatures.RetrofitCompletableFutures,
+                        ExperimentalFeatures.DisambiguateRetrofitServices))
                 .emit(def, folder.getRoot());
 
         for (Path file : files) {
             if (Boolean.valueOf(System.getProperty("recreate", "false"))) {
                 Path output = Paths.get("src/test/resources/test/api/"
                         + file.getFileName() + ".retrofit_completable_future");
-                Files.delete(output);
+                Files.deleteIfExists(output);
                 Files.copy(file, output);
             }
 

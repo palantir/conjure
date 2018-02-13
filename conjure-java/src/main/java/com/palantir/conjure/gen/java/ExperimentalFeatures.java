@@ -22,6 +22,12 @@ public enum ExperimentalFeatures {
     ErrorTypes,
 
     /**
+     * Ensures jaxrs and retrofit interfaces can co-exist on one classpath
+     * by appending 'Retrofit' to the interface name.
+     */
+    DisambiguateRetrofitServices,
+
+    /**
      * Allow markers on service methods. This feature exists for gotham to migrate to conjure and will be removed once
      * migration is complete.
      *

@@ -1,0 +1,8 @@
+type: improvement
+improvement:
+  description: >
+    Retrofit and Jax-rs services can now co-exit on one classpath. Add
+    `conjure { experimentalFeature DisambiguateRetrofitServices }` to your
+    `build.gradle` to generate "FooService" and "FooServiceRetrofit" classes.
+  links:
+  - https://github.palantir.build/foundry/conjure/issues/240
