@@ -1,0 +1,8 @@
+improvement:
+  description: >
+    Conjure python generator now appends `_` instead of prepending `_` to all public facing methods when keys with
+    reserved names are used. Note that the prefix `_` is still used for all private variables to adhere to Python's
+    naming convention.
+  links:
+    - https://github.palantir.build/foundry/conjure/pull/829
+type: improvement

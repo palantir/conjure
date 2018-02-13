@@ -13,6 +13,7 @@ import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonAlias;
@@ -21,7 +22,6 @@ import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonEnum;
 import com.palantir.conjure.gen.python.poet.PythonEnum.PythonEnumValue;
-import com.palantir.conjure.gen.python.poet.PythonIdentifierSanitizer;
 import com.palantir.conjure.gen.python.poet.PythonImport;
 import com.palantir.conjure.gen.python.poet.PythonUnionTypeDefinition;
 import java.util.List;
@@ -72,7 +72,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                     FieldDefinition unionMember = entry.getValue();
                     ConjureType conjureType = unionMember.type();
                     return PythonField.builder()
-                            .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))
+                            .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
                             .docs(unionMember.docs())
                             .jsonIdentifier(entry.getKey().name())
                             .myPyType(myPyMapper.getTypeName(conjureType))
@@ -139,7 +139,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                         .entrySet()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(PythonIdentifierSanitizer.sanitize(entry.getKey()))
+                                .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
                                 .jsonIdentifier(entry.getKey().name())
                                 .docs(entry.getValue().docs())
                                 .pythonType(mapper.getTypeName(entry.getValue().type()))

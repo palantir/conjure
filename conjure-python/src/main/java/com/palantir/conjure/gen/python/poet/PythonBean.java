@@ -59,7 +59,7 @@ public interface PythonBean extends PythonClass {
         for (int i = 0; i < fields().size(); i++) {
             PythonField field = fields().get(i);
             poetWriter.writeIndentedLine(String.format("'%s': ConjureFieldDefinition('%s', %s)%s",
-                    field.attributeName(),
+                    PythonIdentifierSanitizer.sanitize(field.attributeName()),
                     field.jsonIdentifier(),
                     field.pythonType(),
                     i == fields().size() - 1 ? "" : ","));
@@ -83,13 +83,15 @@ public interface PythonBean extends PythonClass {
         if (!fields().isEmpty()) {
             poetWriter.writeIndentedLine(String.format("def __init__(self, %s):",
                     Joiner.on(", ").join(
-                            fields().stream().map(PythonField::attributeName).collect(Collectors.toList()))));
+                            fields().stream().map(PythonField::attributeName)
+                                    .map(PythonIdentifierSanitizer::sanitize).collect(Collectors.toList()))));
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: (%s) -> None",
                     Joiner.on(", ").join(fields().stream().map(PythonField::myPyType).collect(Collectors.toList()))));
             fields().forEach(field -> {
                 poetWriter.writeIndentedLine(
-                        String.format("self._%s = %s", field.attributeName(), field.attributeName()));
+                        String.format("self._%s = %s", field.attributeName(),
+                                PythonIdentifierSanitizer.sanitize(field.attributeName())));
             });
             poetWriter.decreaseIndent();
         }
@@ -98,7 +100,8 @@ public interface PythonBean extends PythonClass {
         fields().forEach(field -> {
             poetWriter.writeLine();
             poetWriter.writeIndentedLine("@property");
-            poetWriter.writeIndentedLine(String.format("def %s(self):", field.attributeName()));
+            poetWriter.writeIndentedLine(String.format("def %s(self):",
+                    PythonIdentifierSanitizer.sanitize(field.attributeName())));
 
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: () -> %s", field.myPyType()));

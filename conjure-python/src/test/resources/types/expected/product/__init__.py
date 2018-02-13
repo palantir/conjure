@@ -526,7 +526,7 @@ class UnionTypeExample(ConjureUnionType):
     _set = None # type: List[str]
     _this_field_is_an_integer = None # type: int
     _also_an_integer = None # type: int
-    __if = None # type: int
+    _if = None # type: int
     _new = None # type: int
     _interface = None # type: int
 
@@ -538,13 +538,13 @@ class UnionTypeExample(ConjureUnionType):
             'set': ConjureFieldDefinition('set', ListType(str)),
             'this_field_is_an_integer': ConjureFieldDefinition('thisFieldIsAnInteger', int),
             'also_an_integer': ConjureFieldDefinition('alsoAnInteger', int),
-            '_if': ConjureFieldDefinition('if', int),
+            'if_': ConjureFieldDefinition('if', int),
             'new': ConjureFieldDefinition('new', int),
             'interface': ConjureFieldDefinition('interface', int)
         }
 
-    def __init__(self, string_example=None, set=None, this_field_is_an_integer=None, also_an_integer=None, _if=None, new=None, interface=None):
-        if (string_example is not None) + (set is not None) + (this_field_is_an_integer is not None) + (also_an_integer is not None) + (_if is not None) + (new is not None) + (interface is not None) != 1:
+    def __init__(self, string_example=None, set=None, this_field_is_an_integer=None, also_an_integer=None, if_=None, new=None, interface=None):
+        if (string_example is not None) + (set is not None) + (this_field_is_an_integer is not None) + (also_an_integer is not None) + (if_ is not None) + (new is not None) + (interface is not None) != 1:
             raise ValueError('a union must contain a single member')
 
         if string_example is not None:
@@ -559,8 +559,8 @@ class UnionTypeExample(ConjureUnionType):
         if also_an_integer is not None:
             self._also_an_integer = also_an_integer
             self._type = 'alsoAnInteger'
-        if _if is not None:
-            self.__if = _if
+        if if_ is not None:
+            self._if = if_
             self._type = 'if'
         if new is not None:
             self._new = new
@@ -591,9 +591,9 @@ class UnionTypeExample(ConjureUnionType):
         return self._also_an_integer
 
     @property
-    def _if(self):
+    def if_(self):
         # type: () -> int
-        return self.__if
+        return self._if
 
     @property
     def new(self):

@@ -5,8 +5,6 @@
 package com.palantir.conjure.gen.python.poet;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.FieldName.Case;
 
 public final class PythonIdentifierSanitizer {
 
@@ -48,18 +46,9 @@ public final class PythonIdentifierSanitizer {
      * <p>
      * Does no case conversion.
      */
-    private static String sanitize(String identifier) {
-        return isKeyword(identifier) ? "_" + identifier : identifier;
+    public static String sanitize(String identifier) {
+        return isKeyword(identifier) ? identifier + "_" : identifier;
     }
-
-    /**
-     * Sanitizes the given {@link FieldName} for use as a python identifier.
-     */
-    public static String sanitize(FieldName fieldName) {
-        String identifier = fieldName.toCase(Case.SNAKE_CASE).name();
-        return sanitize(identifier);
-    }
-
 
     public static boolean isKeyword(String identifier) {
         return pythonKeywords.contains(identifier);

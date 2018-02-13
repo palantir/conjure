@@ -69,7 +69,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
         for (int i = 0; i < options().size(); i++) {
             PythonField option = options().get(i);
             poetWriter.writeIndentedLine("'%s': ConjureFieldDefinition('%s', %s)%s",
-                    option.attributeName(),
+                    PythonIdentifierSanitizer.sanitize(option.attributeName()),
                     option.jsonIdentifier(),
                     option.pythonType(),
                     i == options().size() - 1 ? "" : ",");
@@ -85,6 +85,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
                 Joiner.on(", ").join(
                         options().stream()
                             .map(PythonField::attributeName)
+                            .map(PythonIdentifierSanitizer::sanitize)
                             .map(attributeName -> String.format("%s=None", attributeName))
                             .collect(Collectors.toList()))));
         poetWriter.increaseIndent();
@@ -92,7 +93,8 @@ public interface PythonUnionTypeDefinition extends PythonClass {
         poetWriter.writeIndentedLine("if %s != 1:",
                 Joiner.on(" + ").join(
                     options().stream()
-                        .map(option -> String.format("(%s is not None)", option.attributeName()))
+                        .map(option -> String.format("(%s is not None)",
+                                PythonIdentifierSanitizer.sanitize(option.attributeName())))
                         .collect(Collectors.toList())));
         poetWriter.increaseIndent();
         poetWriter.writeIndentedLine("raise ValueError('a union must contain a single member')");
@@ -101,9 +103,11 @@ public interface PythonUnionTypeDefinition extends PythonClass {
         poetWriter.writeLine();
         // save off
         options().forEach(option -> {
-            poetWriter.writeIndentedLine("if %s is not None:", option.attributeName());
+            poetWriter.writeIndentedLine("if %s is not None:",
+                    PythonIdentifierSanitizer.sanitize(option.attributeName()));
             poetWriter.increaseIndent();
-            poetWriter.writeIndentedLine("self._%s = %s", option.attributeName(), option.attributeName());
+            poetWriter.writeIndentedLine("self._%s = %s", option.attributeName(),
+                    PythonIdentifierSanitizer.sanitize(option.attributeName()));
             poetWriter.writeIndentedLine("self._type = '%s'", option.jsonIdentifier());
             poetWriter.decreaseIndent();
         });
@@ -113,7 +117,8 @@ public interface PythonUnionTypeDefinition extends PythonClass {
         options().forEach(option -> {
             poetWriter.writeLine();
             poetWriter.writeIndentedLine("@property");
-            poetWriter.writeIndentedLine(String.format("def %s(self):", option.attributeName()));
+            poetWriter.writeIndentedLine(String.format("def %s(self):",
+                    PythonIdentifierSanitizer.sanitize(option.attributeName())));
 
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: () -> %s", option.myPyType()));
