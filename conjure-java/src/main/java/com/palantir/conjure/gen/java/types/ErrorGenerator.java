@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
@@ -96,23 +98,14 @@ public final class ErrorGenerator {
         }).collect(Collectors.toList());
 
         // Generate ServiceException factory methods
-        List<MethodSpec> methodSpecs = errorTypeDefinitions.stream().map(entry -> {
-            String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
-            String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.typeName().name());
-
-            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(ClassName.get(ServiceException.class));
-
-            methodBuilder.addCode("return new $T($L", ServiceException.class, typeName);
-            entry.safeArgs().entrySet().stream().forEach(arg ->
-                    processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), true));
-            entry.unsafeArgs().entrySet().stream().forEach(arg ->
-                    processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), false));
-            methodBuilder.addCode(");");
-
-            return methodBuilder.build();
-        }).collect(Collectors.toList());
+        List<MethodSpec> methodSpecs = errorTypeDefinitions.stream()
+                .map(entry -> {
+                    MethodSpec withoutCause = generateExceptionFactory(typeMapper, entry, false);
+                    MethodSpec withCause = generateExceptionFactory(typeMapper, entry, true);
+                    return Stream.of(withoutCause, withCause);
+                })
+                .flatMap(Function.identity())
+                .collect(Collectors.toList());
 
         // Generate ServiceException factory check methods
         List<MethodSpec> checkMethodSpecs = errorTypeDefinitions.stream().map(entry -> {
@@ -159,6 +152,31 @@ public final class ErrorGenerator {
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
+    }
+
+    private static MethodSpec generateExceptionFactory(
+            TypeMapper typeMapper, ErrorTypeDefinition entry, boolean withCause) {
+        String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
+        String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.typeName().name());
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(ClassName.get(ServiceException.class));
+
+        methodBuilder.addCode("return new $T($L", ServiceException.class, typeName);
+
+        if (withCause) {
+            methodBuilder.addParameter(Throwable.class, "cause");
+            methodBuilder.addCode(", cause");
+        }
+
+        entry.safeArgs().entrySet().stream().forEach(arg ->
+                processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), true));
+        entry.unsafeArgs().entrySet().stream().forEach(arg ->
+                processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), false));
+        methodBuilder.addCode(");");
+
+        return methodBuilder.build();
     }
 
     private static void processArg(TypeMapper typeMapper, MethodSpec.Builder methodBuilder,

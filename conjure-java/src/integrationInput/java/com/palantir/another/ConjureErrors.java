@@ -16,6 +16,10 @@ public final class ConjureErrors {
         return new ServiceException(DIFFERENT_PACKAGE);
     }
 
+    public static ServiceException differentPackage(Throwable cause) {
+        return new ServiceException(DIFFERENT_PACKAGE, cause);
+    }
+
     /**
      * Throws a {@link ServiceException} of type DifferentPackage when {@code shouldThrow} is true.
      *

@@ -16,6 +16,10 @@ public final class ConjureJavaErrors {
         return new ServiceException(JAVA_COMPILATION_FAILED);
     }
 
+    public static ServiceException javaCompilationFailed(Throwable cause) {
+        return new ServiceException(JAVA_COMPILATION_FAILED, cause);
+    }
+
     /**
      * Throws a {@link ServiceException} of type JavaCompilationFailed when {@code shouldThrow} is
      * true.
