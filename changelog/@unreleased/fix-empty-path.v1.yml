@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: >
+    Conjure Java will no longer generate the annotation `@Path("")` which
+    would cause Jersey services to fail to startup.
+  link: https://github.palantir.build/foundry/conjure/issues/846

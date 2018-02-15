@@ -10,6 +10,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.product.EmptyPathService;
 import com.palantir.product.EteService;
 import com.palantir.remoting3.jaxrs.JaxRsClient;
 import com.palantir.ri.ResourceIdentifier;
@@ -49,6 +50,16 @@ public class JerseyServiceEteTest extends TestBase {
                 server.clientConfiguration());
 
         server.witchcraft().api(new EteResource());
+        server.witchcraft().api(new EmptyPathResource());
+    }
+
+    @Test
+    public void jaxrs_client_can_make_a_call_to_an_empty_path() throws Exception {
+        EmptyPathService emptyPathClient = JaxRsClient.create(
+                EmptyPathService.class,
+                server.clientUserAgent(),
+                server.clientConfiguration());
+        assertThat(emptyPathClient.emptyPath()).isEqualTo(true);
     }
 
     @Ignore // https://github.palantir.build/foundry/conjure/issues/182

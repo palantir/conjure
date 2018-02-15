@@ -1,4 +1,15 @@
 services:
+  EmptyPathService:
+    name: EmptyPathService
+    package: com.palantir.product
+    default-auth: none
+    base-path: /
+
+    endpoints:
+      emptyPath:
+        http: GET /
+        returns: boolean
+
   EteService:
     name: Ete Service
     package: com.palantir.product

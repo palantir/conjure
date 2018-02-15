@@ -19,37 +19,37 @@ import retrofit2.http.Streaming;
 
 @Generated("com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator")
 public interface EteServiceRetrofit {
-    @GET("base/string")
+    @GET("./base/string")
     Call<String> string(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/integer")
+    @GET("./base/integer")
     Call<Integer> integer(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/double")
+    @GET("./base/double")
     Call<Double> double_(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/boolean")
+    @GET("./base/boolean")
     Call<Boolean> boolean_(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/safelong")
+    @GET("./base/safelong")
     Call<SafeLong> safelong(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/rid")
+    @GET("./base/rid")
     Call<ResourceIdentifier> rid(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/bearertoken")
+    @GET("./base/bearertoken")
     Call<BearerToken> bearertoken(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/optionalString")
+    @GET("./base/optionalString")
     Call<Optional<String>> optionalString(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/optionalEmpty")
+    @GET("./base/optionalEmpty")
     Call<Optional<String>> optionalEmpty(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/datetime")
+    @GET("./base/datetime")
     Call<ZonedDateTime> datetime(@Header("Authorization") AuthHeader authHeader);
 
-    @GET("base/binary")
+    @GET("./base/binary")
     @Streaming
     Call<ResponseBody> binary(@Header("Authorization") AuthHeader authHeader);
 }

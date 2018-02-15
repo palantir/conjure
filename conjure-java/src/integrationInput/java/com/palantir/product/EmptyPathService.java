@@ -1,6 +1,5 @@
-package test.api;
+package com.palantir.product;
 
-import java.io.InputStream;
 import javax.annotation.Generated;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -12,8 +11,7 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/")
 @Generated("com.palantir.conjure.gen.java.services.JerseyServiceGenerator")
-public interface TestService {
+public interface EmptyPathService {
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    InputStream getBinary();
+    boolean emptyPath();
 }

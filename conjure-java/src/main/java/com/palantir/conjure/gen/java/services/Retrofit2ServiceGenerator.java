@@ -115,7 +115,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
-                        .addMember("value", "$S", endpointPathWithoutRegex.withoutLeadingSlash())
+                        .addMember("value", "$S", "." + endpointPathWithoutRegex)
                         .build());
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {

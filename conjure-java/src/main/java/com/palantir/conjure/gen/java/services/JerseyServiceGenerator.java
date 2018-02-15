@@ -92,10 +92,14 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
-                .addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", endpointDef.http().path().withoutLeadingSlash())
-                        .build())
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
+
+        // @Path("") is invalid in Feign JaxRs and equivalent to absent on an endpoint method
+        if (!endpointDef.http().path().withoutLeadingSlash().isEmpty()) {
+            methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
+                        .addMember("value", "$S", endpointDef.http().path().withoutLeadingSlash())
+                        .build());
+        }
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {
             methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.markers()));

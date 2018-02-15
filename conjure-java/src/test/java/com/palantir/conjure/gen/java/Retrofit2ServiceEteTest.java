@@ -11,6 +11,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.product.EmptyPathServiceRetrofit;
 import com.palantir.product.EteServiceRetrofit;
 import com.palantir.remoting3.retrofit2.Retrofit2Client;
 import com.palantir.ri.ResourceIdentifier;
@@ -49,6 +50,16 @@ public class Retrofit2ServiceEteTest extends TestBase {
                 server.clientConfiguration()
         );
         server.witchcraft().api(new EteResource());
+        server.witchcraft().api(new EmptyPathResource());
+    }
+
+    @Test
+    public void retrofit2_can_make_a_call_to_an_empty_path() throws Exception {
+        EmptyPathServiceRetrofit emptyPathClient = Retrofit2Client.create(
+                EmptyPathServiceRetrofit.class,
+                server.clientUserAgent(),
+                server.clientConfiguration());
+        assertThat(emptyPathClient.emptyPath().execute().body()).isEqualTo(true);
     }
 
     @Ignore // https://github.palantir.build/foundry/conjure/issues/182
