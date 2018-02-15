@@ -145,3 +145,5 @@ types:
             type: string
           interface:
             type: string
+          field-name-with-dashes:
+            type: string

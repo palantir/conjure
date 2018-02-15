@@ -131,7 +131,7 @@ public final class BeanGenerator {
     private static Collection<EnrichedField> createFields(
             TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                .map(e -> EnrichedField.of(e.getKey().name(), e.getValue(), FieldSpec.builder(
+                .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
                         // fields are guarded against using reserved keywords
                         typeMapper.getClassName(e.getValue().type()),
                         JavaNameSanitizer.sanitize(e.getKey()),
@@ -177,15 +177,15 @@ public final class BeanGenerator {
 
     private static Collection<MethodSpec> createGetters(Collection<EnrichedField> fields) {
         return fields.stream()
-                .map(f -> createGetter(f))
+                .map(BeanGenerator::createGetter)
                 .collect(Collectors.toList());
     }
 
     private static MethodSpec createGetter(EnrichedField field) {
-        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(generateGetterName(field.jsonKey()))
+        MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(field.getterName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                        .addMember("value", "$S", field.jsonKey())
+                        .addMember("value", "$S", field.fieldName().name())
                         .build())
                 .returns(field.poetSpec().type);
 
@@ -276,10 +276,6 @@ public final class BeanGenerator {
                 .build();
     }
 
-    public static String generateGetterName(String fieldName) {
-        return "get" + StringUtils.capitalize(fieldName);
-    }
-
     private static com.squareup.javapoet.TypeName getTypeNameWithoutOptional(FieldSpec spec) {
         if (!isOptional(spec)) {
             return spec.type;
@@ -295,10 +291,18 @@ public final class BeanGenerator {
         return ((ParameterizedTypeName) spec.type).rawType.simpleName().equals("Optional");
     }
 
+    /**
+     * Note, this is an implementation detail shared between {@link BeanBuilderGenerator} and {@link BeanGenerator}.
+     */
     @Value.Immutable
     interface EnrichedField {
         @Value.Parameter
-        String jsonKey();
+        FieldName fieldName();
+
+        @Value.Derived
+        default String getterName() {
+            return "get" + fieldName().toCase(FieldName.Case.LOWER_CAMEL_CASE).capitalize();
+        }
 
         @Value.Parameter
         FieldDefinition conjureDef();
@@ -306,8 +310,8 @@ public final class BeanGenerator {
         @Value.Parameter
         FieldSpec poetSpec();
 
-        static EnrichedField of(String jsonKey, FieldDefinition conjureDef, FieldSpec poetSpec) {
-            return ImmutableEnrichedField.of(jsonKey, conjureDef, poetSpec);
+        static EnrichedField of(FieldName fieldName, FieldDefinition conjureDef, FieldSpec poetSpec) {
+            return ImmutableEnrichedField.of(fieldName, conjureDef, poetSpec);
         }
 
         static Collection<FieldSpec> toPoetSpecs(Collection<EnrichedField> fields) {

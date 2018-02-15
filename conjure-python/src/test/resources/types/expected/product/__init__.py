@@ -690,16 +690,19 @@ class ReservedKeyExample(ConjureBeanType):
         # type: () -> Dict[str, ConjureFieldDefinition]
         return {
             'package': ConjureFieldDefinition('package', str),
-            'interface': ConjureFieldDefinition('interface', str)
+            'interface': ConjureFieldDefinition('interface', str),
+            'field_name_with_dashes': ConjureFieldDefinition('field-name-with-dashes', str)
         }
 
     _package = None # type: str
     _interface = None # type: str
+    _field_name_with_dashes = None # type: str
 
-    def __init__(self, package, interface):
-        # type: (str, str) -> None
+    def __init__(self, package, interface, field_name_with_dashes):
+        # type: (str, str, str) -> None
         self._package = package
         self._interface = interface
+        self._field_name_with_dashes = field_name_with_dashes
 
     @property
     def package(self):
@@ -710,4 +713,9 @@ class ReservedKeyExample(ConjureBeanType):
     def interface(self):
         # type: () -> str
         return self._interface
+
+    @property
+    def field_name_with_dashes(self):
+        # type: () -> str
+        return self._field_name_with_dashes
 

@@ -90,7 +90,7 @@ public final class BeanBuilderGenerator {
 
     private Collection<EnrichedField> enrichFields(Map<FieldName, FieldDefinition> fields) {
         return fields.entrySet().stream()
-                .map(e -> createField(e.getKey(), e.getKey().name(), e.getValue()))
+                .map(e -> createField(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -103,7 +103,7 @@ public final class BeanBuilderGenerator {
                 enrichedField -> CodeBlocks.statement(
                         "$1N(other.$2N())",
                         enrichedField.poetSpec().name,
-                        BeanGenerator.generateGetterName(enrichedField.jsonKey()))));
+                        enrichedField.getterName())));
 
         return MethodSpec.methodBuilder("from")
                 .addModifiers(Modifier.PUBLIC)
@@ -114,7 +114,7 @@ public final class BeanBuilderGenerator {
                 .build();
     }
 
-    private EnrichedField createField(FieldName fieldName, String jsonKey, FieldDefinition field) {
+    private EnrichedField createField(FieldName fieldName, FieldDefinition field) {
         FieldSpec.Builder spec = FieldSpec.builder(
                 typeMapper.getClassName(field.type()),
                 JavaNameSanitizer.sanitize(fieldName),
@@ -131,7 +131,7 @@ public final class BeanBuilderGenerator {
         }
         // else no initializer
 
-        return EnrichedField.of(jsonKey, field, spec.build());
+        return EnrichedField.of(fieldName, field, spec.build());
     }
 
     private Iterable<MethodSpec> createSetters(Collection<EnrichedField> fields) {
@@ -147,7 +147,7 @@ public final class BeanBuilderGenerator {
         FieldSpec field = enriched.poetSpec();
         ConjureType type = enriched.conjureDef().type();
         AnnotationSpec jsonSetterAnnotation = AnnotationSpec.builder(JsonSetter.class)
-                .addMember("value", "$S", enriched.jsonKey())
+                .addMember("value", "$S", enriched.fieldName().name())
                 .build();
         boolean shouldClearFirst = true;
         return publicSetter(enriched)

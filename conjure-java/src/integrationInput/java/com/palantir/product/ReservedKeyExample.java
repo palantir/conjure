@@ -19,10 +19,13 @@ public final class ReservedKeyExample implements Serializable {
 
     private final String interface_;
 
-    private ReservedKeyExample(String package_, String interface_) {
-        validateFields(package_, interface_);
+    private final String fieldNameWithDashes;
+
+    private ReservedKeyExample(String package_, String interface_, String fieldNameWithDashes) {
+        validateFields(package_, interface_, fieldNameWithDashes);
         this.package_ = package_;
         this.interface_ = interface_;
+        this.fieldNameWithDashes = fieldNameWithDashes;
     }
 
     @JsonProperty("package")
@@ -35,6 +38,11 @@ public final class ReservedKeyExample implements Serializable {
         return this.interface_;
     }
 
+    @JsonProperty("field-name-with-dashes")
+    public String getFieldNameWithDashes() {
+        return this.fieldNameWithDashes;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -42,12 +50,14 @@ public final class ReservedKeyExample implements Serializable {
     }
 
     private boolean equalTo(ReservedKeyExample other) {
-        return this.package_.equals(other.package_) && this.interface_.equals(other.interface_);
+        return this.package_.equals(other.package_)
+                && this.interface_.equals(other.interface_)
+                && this.fieldNameWithDashes.equals(other.fieldNameWithDashes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(package_, interface_);
+        return Objects.hash(package_, interface_, fieldNameWithDashes);
     }
 
     @Override
@@ -61,18 +71,30 @@ public final class ReservedKeyExample implements Serializable {
                 .append("interface")
                 .append(": ")
                 .append(interface_)
+                .append(", ")
+                .append("fieldNameWithDashes")
+                .append(": ")
+                .append(fieldNameWithDashes)
                 .append("}")
                 .toString();
     }
 
-    public static ReservedKeyExample of(String package_, String interface_) {
-        return builder().package_(package_).interface_(interface_).build();
+    public static ReservedKeyExample of(
+            String package_, String interface_, String fieldNameWithDashes) {
+        return builder()
+                .package_(package_)
+                .interface_(interface_)
+                .fieldNameWithDashes(fieldNameWithDashes)
+                .build();
     }
 
-    private static void validateFields(String package_, String interface_) {
+    private static void validateFields(
+            String package_, String interface_, String fieldNameWithDashes) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, package_, "package_");
         missingFields = addFieldIfMissing(missingFields, interface_, "interface_");
+        missingFields =
+                addFieldIfMissing(missingFields, fieldNameWithDashes, "fieldNameWithDashes");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -84,7 +106,7 @@ public final class ReservedKeyExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(2);
+                missingFields = new ArrayList<>(3);
             }
             missingFields.add(fieldName);
         }
@@ -102,11 +124,14 @@ public final class ReservedKeyExample implements Serializable {
 
         private String interface_;
 
+        private String fieldNameWithDashes;
+
         private Builder() {}
 
         public Builder from(ReservedKeyExample other) {
             package_(other.getPackage());
             interface_(other.getInterface());
+            fieldNameWithDashes(other.getFieldNameWithDashes());
             return this;
         }
 
@@ -122,8 +147,16 @@ public final class ReservedKeyExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("field-name-with-dashes")
+        public Builder fieldNameWithDashes(String fieldNameWithDashes) {
+            this.fieldNameWithDashes =
+                    Objects.requireNonNull(
+                            fieldNameWithDashes, "fieldNameWithDashes cannot be null");
+            return this;
+        }
+
         public ReservedKeyExample build() {
-            return new ReservedKeyExample(package_, interface_);
+            return new ReservedKeyExample(package_, interface_, fieldNameWithDashes);
         }
     }
 }
