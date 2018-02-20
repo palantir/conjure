@@ -37,7 +37,7 @@ public final class WitchcraftEteServer extends ExternalResource {
             .port(8080)
             .contextPath("/witchcraft-example")
             .keystore(KeyStoreConfiguration.builder()
-                    .keyAlias("witchcraft-example.palantir.dev-cert")
+                    .keyAlias("witchcraft-example.palantir.pt-cert")
                     .password("keystore")
                     .path("var/security/keystore.jks")
                     .build())
