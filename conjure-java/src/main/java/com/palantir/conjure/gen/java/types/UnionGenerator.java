@@ -80,7 +80,10 @@ public final class UnionGenerator {
                 .addMethod(generateEquals(unionClass, memberTypes))
                 .addMethod(MethodSpecs.createEqualTo(unionClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
-                .addMethod(MethodSpecs.createToString(unionClass.simpleName(), fields));
+                .addMethod(MethodSpecs.createToString(unionClass.simpleName(),
+                        fields.stream().map(
+                                fieldSpec -> FieldName.of(fieldSpec.name))
+                                .collect(Collectors.toList())));
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
             SerializableSupport.enable(typeBuilder);
@@ -277,7 +280,10 @@ public final class UnionGenerator {
                     .addMethod(MethodSpecs.createEquals(wrapperClass))
                     .addMethod(MethodSpecs.createEqualTo(wrapperClass, fields))
                     .addMethod(MethodSpecs.createHashCode(fields))
-                    .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields));
+                    .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(),
+                            fields.stream().map(
+                                    fieldSpec -> FieldName.of(fieldSpec.name))
+                                    .collect(Collectors.toList())));
 
             if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
                 SerializableSupport.enable(typeBuilder);
@@ -348,7 +354,10 @@ public final class UnionGenerator {
                 .addMethod(MethodSpecs.createEquals(wrapperClass))
                 .addMethod(MethodSpecs.createEqualTo(wrapperClass, fields))
                 .addMethod(MethodSpecs.createHashCode(fields))
-                .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(), fields));
+                .addMethod(MethodSpecs.createToString(wrapperClass.simpleName(),
+                        fields.stream().map(
+                                fieldSpec -> FieldName.of(fieldSpec.name))
+                                .collect(Collectors.toList())));
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
             SerializableSupport.enable(typeBuilder);
         }

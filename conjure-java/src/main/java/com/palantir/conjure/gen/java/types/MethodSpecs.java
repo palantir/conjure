@@ -4,6 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
+import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -57,13 +58,12 @@ public final class MethodSpecs {
                 .build();
     }
 
-    public static MethodSpec createToString(String thisClassName, Collection<FieldSpec> fields) {
+    public static MethodSpec createToString(String thisClassName, Collection<FieldName> fieldNames) {
         CodeBlock returnStatement = CodeBlock.builder()
                 .add("return new $T($S).append(\"{\")\n", StringBuilder.class, thisClassName)
                 .indent()
                 .indent()
-                .add(CodeBlocks.of(fields.stream()
-                        .map(f -> f.name)
+                .add(CodeBlocks.of(fieldNames.stream()
                         .map(MethodSpecs::createAppendStatement)
                         .collect(joining(CodeBlock.of(".append(\", \")")))))
                 .unindent()
@@ -80,11 +80,11 @@ public final class MethodSpecs {
                 .build();
     }
 
-    private static CodeBlock createAppendStatement(String fieldName) {
+    private static CodeBlock createAppendStatement(FieldName fieldName) {
         return CodeBlock.builder()
-                .add(".append($S)", JavaNameSanitizer.removeTrailingUnderscore(fieldName))
+                .add(".append($S)", fieldName.name())
                 .add(".append(\": \")")
-                .add(".append($N)", fieldName)
+                .add(".append($N)", JavaNameSanitizer.sanitize(fieldName))
                 .add("\n")
                 .build();
     }

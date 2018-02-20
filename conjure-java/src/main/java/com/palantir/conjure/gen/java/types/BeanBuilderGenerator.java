@@ -152,7 +152,7 @@ public final class BeanBuilderGenerator {
         boolean shouldClearFirst = true;
         return publicSetter(enriched)
                 .addParameter(widenToIterableIfPossible(field.type, type), field.name)
-                .addCode(typeAwareAssignment(field, type, shouldClearFirst))
+                .addCode(typeAwareAssignment(enriched, type, shouldClearFirst))
                 .addStatement("return this")
                 .addAnnotation(jsonSetterAnnotation)
                 .build();
@@ -167,7 +167,7 @@ public final class BeanBuilderGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderClass)
                 .addParameter(widenToIterableIfPossible(field.type, type), field.name)
-                .addCode(typeAwareAssignment(field, type, shouldClearFirst))
+                .addCode(typeAwareAssignment(enriched, type, shouldClearFirst))
                 .addStatement("return this")
                 .build();
     }
@@ -186,24 +186,26 @@ public final class BeanBuilderGenerator {
         return current;
     }
 
-    private static CodeBlock typeAwareAssignment(FieldSpec spec, ConjureType type, boolean shouldClearFirst) {
+    private static CodeBlock typeAwareAssignment(EnrichedField enriched, ConjureType type, boolean shouldClearFirst) {
+        FieldSpec spec = enriched.poetSpec();
         if (type instanceof ListType || type instanceof SetType) {
             CodeBlock addStatement = CodeBlocks.statement(
                     "$1T.addAll(this.$2N, $3L)",
                     ConjureCollections.class,
                     spec.name,
-                    Expressions.requireNonNull(spec.name, spec.name + " cannot be null"));
+                    Expressions.requireNonNull(spec.name, enriched.fieldName().name() + " cannot be null"));
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
         } else if (type instanceof MapType) {
             CodeBlock addStatement = CodeBlocks.statement(
                     "this.$1N.putAll($2L)", spec.name,
-                    Expressions.requireNonNull(spec.name, spec.name + " cannot be null"));
+                    Expressions.requireNonNull(spec.name, enriched.fieldName().name() + " cannot be null"));
             return shouldClearFirst ? CodeBlocks.of(CodeBlocks.statement("this.$1N.clear()", spec.name), addStatement)
                     : addStatement;
         } else if (type instanceof BinaryType) {
             return CodeBlock.builder()
-                    .addStatement("$L", Expressions.requireNonNull(spec.name, spec.name + " cannot be null"))
+                    .addStatement("$L", Expressions.requireNonNull(
+                            spec.name, enriched.fieldName().name() + " cannot be null"))
                     .addStatement("this.$1N = $2T.allocate($1N.remaining()).put($1N.duplicate())",
                             spec.name,
                             ByteBuffer.class)
@@ -212,7 +214,7 @@ public final class BeanBuilderGenerator {
         } else {
             CodeBlock nullCheckedValue = spec.type.isPrimitive()
                     ? CodeBlock.of("$N", spec.name) // primitive types can't be null, so no need for requireNonNull!
-                    : Expressions.requireNonNull(spec.name, spec.name + " cannot be null");
+                    : Expressions.requireNonNull(spec.name, enriched.fieldName().name() + " cannot be null");
             return CodeBlocks.statement("this.$1L = $2L", spec.name, nullCheckedValue);
         }
     }
@@ -251,19 +253,20 @@ public final class BeanBuilderGenerator {
         OptionalType type = (OptionalType) enriched.conjureDef().type();
         return publicSetter(enriched)
                 .addParameter(typeMapper.getClassName(type.itemType()), field.name)
-                .addCode(optionalAssignmentStatement(field, type))
+                .addCode(optionalAssignmentStatement(enriched, type))
                 .addStatement("return this")
                 .build();
     }
 
-    private CodeBlock optionalAssignmentStatement(FieldSpec field, OptionalType type) {
+    private CodeBlock optionalAssignmentStatement(EnrichedField enriched, OptionalType type) {
+        FieldSpec spec = enriched.poetSpec();
         if (type.itemType() instanceof PrimitiveType) {
             switch ((PrimitiveType) type.itemType()) {
                 case INTEGER:
                 case DOUBLE:
                 case BOOLEAN:
                     return CodeBlocks.statement("this.$1N = $2T.of($1N)",
-                            field.name, asRawType(typeMapper.getClassName(type)));
+                            enriched.poetSpec().name, asRawType(typeMapper.getClassName(type)));
                 case SAFELONG:
                 case STRING:
                 case RID:
@@ -274,7 +277,8 @@ public final class BeanBuilderGenerator {
             }
         }
         return CodeBlocks.statement("this.$1N = $2T.of($3L)",
-                field.name, Optional.class, Expressions.requireNonNull(field.name, field.name + " cannot be null"));
+                spec.name, Optional.class, Expressions.requireNonNull(
+                        spec.name, enriched.fieldName().name() + " cannot be null"));
     }
 
     private MethodSpec createItemSetter(EnrichedField enriched, ConjureType itemType) {

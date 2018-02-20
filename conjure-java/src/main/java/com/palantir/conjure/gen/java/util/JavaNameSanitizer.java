@@ -8,14 +8,6 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import javax.lang.model.SourceVersion;
 
 public final class JavaNameSanitizer {
-
-    /**
-     * Convenient method to remove the trailing underscore from sanitized {@link FieldName}s.
-     */
-    public static String removeTrailingUnderscore(String specifier) {
-        return specifier.endsWith("_") ? specifier.substring(0, specifier.length() - 1) : specifier;
-    }
-
     /**
      * Sanitizes the given {@link FieldName} for use as a java specifier.
      */

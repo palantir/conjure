@@ -72,7 +72,7 @@ public final class ReservedKeyExample implements Serializable {
                 .append(": ")
                 .append(interface_)
                 .append(", ")
-                .append("fieldNameWithDashes")
+                .append("field-name-with-dashes")
                 .append(": ")
                 .append(fieldNameWithDashes)
                 .append("}")
@@ -91,10 +91,10 @@ public final class ReservedKeyExample implements Serializable {
     private static void validateFields(
             String package_, String interface_, String fieldNameWithDashes) {
         List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, package_, "package_");
-        missingFields = addFieldIfMissing(missingFields, interface_, "interface_");
+        missingFields = addFieldIfMissing(missingFields, package_, "package");
+        missingFields = addFieldIfMissing(missingFields, interface_, "interface");
         missingFields =
-                addFieldIfMissing(missingFields, fieldNameWithDashes, "fieldNameWithDashes");
+                addFieldIfMissing(missingFields, fieldNameWithDashes, "field-name-with-dashes");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -137,13 +137,13 @@ public final class ReservedKeyExample implements Serializable {
 
         @JsonSetter("package")
         public Builder package_(String package_) {
-            this.package_ = Objects.requireNonNull(package_, "package_ cannot be null");
+            this.package_ = Objects.requireNonNull(package_, "package cannot be null");
             return this;
         }
 
         @JsonSetter("interface")
         public Builder interface_(String interface_) {
-            this.interface_ = Objects.requireNonNull(interface_, "interface_ cannot be null");
+            this.interface_ = Objects.requireNonNull(interface_, "interface cannot be null");
             return this;
         }
 
@@ -151,7 +151,7 @@ public final class ReservedKeyExample implements Serializable {
         public Builder fieldNameWithDashes(String fieldNameWithDashes) {
             this.fieldNameWithDashes =
                     Objects.requireNonNull(
-                            fieldNameWithDashes, "fieldNameWithDashes cannot be null");
+                            fieldNameWithDashes, "field-name-with-dashes cannot be null");
             return this;
         }
 

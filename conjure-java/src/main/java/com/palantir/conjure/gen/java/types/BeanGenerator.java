@@ -62,12 +62,14 @@ public final class BeanGenerator {
 
         Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
-        Collection<FieldSpec> nonPrimitivePoetFields = Collections2.filter(poetFields, f -> !f.type.isPrimitive());
+        Collection<EnrichedField> nonPrimitiveEnrichedFields = fields.stream()
+                .filter(f -> !f.poetSpec().type.isPrimitive())
+                .collect(Collectors.toList());
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.typeName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(poetFields)
-                .addMethod(createConstructor(fields, nonPrimitivePoetFields))
+                .addMethod(createConstructor(fields, poetFields))
                 .addMethods(createGetters(fields));
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
@@ -81,17 +83,16 @@ public final class BeanGenerator {
                     .addMethod(MethodSpecs.createHashCode(poetFields));
         }
 
-        typeBuilder
-                .addMethod(MethodSpecs.createToString(typeDef.typeName().name(), poetFields));
+        typeBuilder.addMethod(MethodSpecs.createToString(typeDef.typeName().name(), typeDef.fields().keySet()));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
         }
 
-        if (!nonPrimitivePoetFields.isEmpty()) {
+        if (!nonPrimitiveEnrichedFields.isEmpty()) {
             typeBuilder
-                    .addMethod(createValidateFields(nonPrimitivePoetFields))
-                    .addMethod(createAddFieldIfMissing(nonPrimitivePoetFields.size()));
+                    .addMethod(createValidateFields(nonPrimitiveEnrichedFields))
+                    .addMethod(createAddFieldIfMissing(nonPrimitiveEnrichedFields.size()));
         }
 
         if (poetFields.isEmpty()) {
@@ -140,12 +141,11 @@ public final class BeanGenerator {
                 .collect(Collectors.toList());
     }
 
-    private static MethodSpec createConstructor(
-            Collection<EnrichedField> fields,
-            Collection<FieldSpec> nonPrimitivePoetFields) {
+    private static MethodSpec createConstructor(Collection<EnrichedField> fields, Collection<FieldSpec> poetFields) {
         MethodSpec.Builder builder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE);
 
+        Collection<FieldSpec> nonPrimitivePoetFields = Collections2.filter(poetFields, f -> !f.type.isPrimitive());
         if (!nonPrimitivePoetFields.isEmpty()) {
             builder.addStatement("$L", Expressions.localMethodCall("validateFields", nonPrimitivePoetFields));
         }
@@ -201,14 +201,16 @@ public final class BeanGenerator {
         return getterBuilder.build();
     }
 
-    private static MethodSpec createValidateFields(Collection<FieldSpec> fields) {
+    private static MethodSpec createValidateFields(Collection<EnrichedField> fields) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("validateFields")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC);
 
         builder.addStatement("$T missingFields = null", ParameterizedTypeName.get(List.class, String.class));
-        for (FieldSpec spec : fields) {
+        for (EnrichedField field : fields) {
+            FieldSpec spec = field.poetSpec();
             builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
-            builder.addStatement("missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, spec.name);
+            builder.addStatement(
+                    "missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, field.fieldName().name());
         }
 
         builder
