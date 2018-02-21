@@ -6,11 +6,11 @@ export interface IManyFieldExample {
     /** docs for integer field */
     'integer': number;
     /** docs for items field */
-    'items': string[];
+    'items': Array<string>;
     /** docs for map field */
     'map': { [key: string]: string };
     /** docs for set field */
-    'set': string[];
+    'set': Array<string>;
     /** docs for string field */
     'string': string;
     /** docs for optionalItem field */

@@ -34,9 +34,11 @@ types:
         fields:
           items: list<string>
           primitiveItems: list<integer>
+          doubleItems: list<double>
       SetExample:
         fields:
           items: set<string>
+          doubleItems: set<double>
       MapExample:
         fields:
           items: map<string, string>

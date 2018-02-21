@@ -39,8 +39,8 @@ export class TestService {
 
     public getBranches(
         datasetRid: string
-    ): Promise<string[]> {
-        return this.bridge.callEndpoint<string[]>({
+    ): Promise<Array<string>> {
+        return this.bridge.callEndpoint<Array<string>>({
             data: undefined,
             endpointName: "getBranches",
             endpointPath: "/catalog/datasets/{datasetRid}/branches",
@@ -62,8 +62,8 @@ export class TestService {
 
     public getBranchesDeprecated(
         datasetRid: string
-    ): Promise<string[]> {
-        return this.bridge.callEndpoint<string[]>({
+    ): Promise<Array<string>> {
+        return this.bridge.callEndpoint<Array<string>>({
             data: undefined,
             endpointName: "getBranchesDeprecated",
             endpointPath: "/catalog/datasets/{datasetRid}/branchesDeprecated",

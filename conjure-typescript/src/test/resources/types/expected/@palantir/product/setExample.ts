@@ -1,3 +1,4 @@
 export interface ISetExample {
-    'items': string[];
+    'doubleItems': Array<number | "NaN">;
+    'items': Array<string>;
 }

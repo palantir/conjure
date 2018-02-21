@@ -21,14 +21,22 @@ public final class SetExample implements Serializable {
 
     private final Set<String> items;
 
-    private SetExample(Set<String> items) {
-        validateFields(items);
+    private final Set<Double> doubleItems;
+
+    private SetExample(Set<String> items, Set<Double> doubleItems) {
+        validateFields(items, doubleItems);
         this.items = Collections.unmodifiableSet(items);
+        this.doubleItems = Collections.unmodifiableSet(doubleItems);
     }
 
     @JsonProperty("items")
     public Set<String> getItems() {
         return this.items;
+    }
+
+    @JsonProperty("doubleItems")
+    public Set<Double> getDoubleItems() {
+        return this.doubleItems;
     }
 
     @Override
@@ -37,12 +45,12 @@ public final class SetExample implements Serializable {
     }
 
     private boolean equalTo(SetExample other) {
-        return this.items.equals(other.items);
+        return this.items.equals(other.items) && this.doubleItems.equals(other.doubleItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(items);
+        return Objects.hash(items, doubleItems);
     }
 
     @Override
@@ -52,17 +60,22 @@ public final class SetExample implements Serializable {
                 .append("items")
                 .append(": ")
                 .append(items)
+                .append(", ")
+                .append("doubleItems")
+                .append(": ")
+                .append(doubleItems)
                 .append("}")
                 .toString();
     }
 
-    public static SetExample of(Set<String> items) {
-        return builder().items(items).build();
+    public static SetExample of(Set<String> items, Set<Double> doubleItems) {
+        return builder().items(items).doubleItems(doubleItems).build();
     }
 
-    private static void validateFields(Set<String> items) {
+    private static void validateFields(Set<String> items, Set<Double> doubleItems) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
+        missingFields = addFieldIfMissing(missingFields, doubleItems, "doubleItems");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -74,7 +87,7 @@ public final class SetExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(1);
+                missingFields = new ArrayList<>(2);
             }
             missingFields.add(fieldName);
         }
@@ -90,10 +103,13 @@ public final class SetExample implements Serializable {
     public static final class Builder {
         private Set<String> items = new LinkedHashSet<>();
 
+        private Set<Double> doubleItems = new LinkedHashSet<>();
+
         private Builder() {}
 
         public Builder from(SetExample other) {
             items(other.getItems());
+            doubleItems(other.getDoubleItems());
             return this;
         }
 
@@ -116,8 +132,29 @@ public final class SetExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("doubleItems")
+        public Builder doubleItems(Iterable<Double> doubleItems) {
+            this.doubleItems.clear();
+            ConjureCollections.addAll(
+                    this.doubleItems,
+                    Objects.requireNonNull(doubleItems, "doubleItems cannot be null"));
+            return this;
+        }
+
+        public Builder addAllDoubleItems(Iterable<Double> doubleItems) {
+            ConjureCollections.addAll(
+                    this.doubleItems,
+                    Objects.requireNonNull(doubleItems, "doubleItems cannot be null"));
+            return this;
+        }
+
+        public Builder doubleItems(double doubleItems) {
+            this.doubleItems.add(doubleItems);
+            return this;
+        }
+
         public SetExample build() {
-            return new SetExample(items);
+            return new SetExample(items, doubleItems);
         }
     }
 }

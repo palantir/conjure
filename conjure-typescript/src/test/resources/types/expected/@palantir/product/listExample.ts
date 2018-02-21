@@ -1,4 +1,5 @@
 export interface IListExample {
-    'items': string[];
-    'primitiveItems': number[];
+    'doubleItems': Array<number | "NaN">;
+    'items': Array<string>;
+    'primitiveItems': Array<number>;
 }

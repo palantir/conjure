@@ -6,7 +6,7 @@ export interface IUnionTypeExample_StringExample {
     'type': "stringExample";
 }
 export interface IUnionTypeExample_Set {
-    'set': string[];
+    'set': Array<string>;
     'type': "set";
 }
 export interface IUnionTypeExample_ThisFieldIsAnInteger {
@@ -74,7 +74,7 @@ function stringExample(
     };
 }
 function set_(
-    set_: string[]
+    set_: Array<string>
 ): IUnionTypeExample_Set {
     return {
         set: set_,
@@ -126,7 +126,7 @@ export interface IUnionTypeExampleVisitor<T> {
     'if': (obj: number) => T;
     'interface': (obj: number) => T;
     'new': (obj: number) => T;
-    'set': (obj: string[]) => T;
+    'set': (obj: Array<string>) => T;
     'stringExample': (obj: IStringExample) => T;
     'thisFieldIsAnInteger': (obj: number) => T;
     'unknown': (obj: IUnionTypeExample) => T;

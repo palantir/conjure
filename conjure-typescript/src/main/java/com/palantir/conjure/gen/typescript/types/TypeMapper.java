@@ -163,7 +163,7 @@ public final class TypeMapper {
 
         @Override
         public String visitList(ListType type) {
-            return getTypeNameFromConjureType(type.itemType()) + "[]";
+            return "Array<" + getTypeNameFromConjureType(type.itemType()) + ">";
         }
 
         @Override
@@ -212,7 +212,7 @@ public final class TypeMapper {
 
         @Override
         public String visitSet(SetType type) {
-            return getTypeNameFromConjureType(type.itemType()) + "[]";
+            return "Array<" + getTypeNameFromConjureType(type.itemType()) + ">";
         }
 
         @Override

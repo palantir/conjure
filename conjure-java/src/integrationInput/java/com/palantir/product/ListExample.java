@@ -21,10 +21,14 @@ public final class ListExample implements Serializable {
 
     private final List<Integer> primitiveItems;
 
-    private ListExample(List<String> items, List<Integer> primitiveItems) {
-        validateFields(items, primitiveItems);
+    private final List<Double> doubleItems;
+
+    private ListExample(
+            List<String> items, List<Integer> primitiveItems, List<Double> doubleItems) {
+        validateFields(items, primitiveItems, doubleItems);
         this.items = Collections.unmodifiableList(items);
         this.primitiveItems = Collections.unmodifiableList(primitiveItems);
+        this.doubleItems = Collections.unmodifiableList(doubleItems);
     }
 
     @JsonProperty("items")
@@ -37,18 +41,25 @@ public final class ListExample implements Serializable {
         return this.primitiveItems;
     }
 
+    @JsonProperty("doubleItems")
+    public List<Double> getDoubleItems() {
+        return this.doubleItems;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other || (other instanceof ListExample && equalTo((ListExample) other));
     }
 
     private boolean equalTo(ListExample other) {
-        return this.items.equals(other.items) && this.primitiveItems.equals(other.primitiveItems);
+        return this.items.equals(other.items)
+                && this.primitiveItems.equals(other.primitiveItems)
+                && this.doubleItems.equals(other.doubleItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, primitiveItems);
+        return Objects.hash(items, primitiveItems, doubleItems);
     }
 
     @Override
@@ -62,18 +73,29 @@ public final class ListExample implements Serializable {
                 .append("primitiveItems")
                 .append(": ")
                 .append(primitiveItems)
+                .append(", ")
+                .append("doubleItems")
+                .append(": ")
+                .append(doubleItems)
                 .append("}")
                 .toString();
     }
 
-    public static ListExample of(List<String> items, List<Integer> primitiveItems) {
-        return builder().items(items).primitiveItems(primitiveItems).build();
+    public static ListExample of(
+            List<String> items, List<Integer> primitiveItems, List<Double> doubleItems) {
+        return builder()
+                .items(items)
+                .primitiveItems(primitiveItems)
+                .doubleItems(doubleItems)
+                .build();
     }
 
-    private static void validateFields(List<String> items, List<Integer> primitiveItems) {
+    private static void validateFields(
+            List<String> items, List<Integer> primitiveItems, List<Double> doubleItems) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, items, "items");
         missingFields = addFieldIfMissing(missingFields, primitiveItems, "primitiveItems");
+        missingFields = addFieldIfMissing(missingFields, doubleItems, "doubleItems");
         if (missingFields != null) {
             throw new IllegalArgumentException(
                     "Some required fields have not been set: " + missingFields);
@@ -85,7 +107,7 @@ public final class ListExample implements Serializable {
         List<String> missingFields = prev;
         if (fieldValue == null) {
             if (missingFields == null) {
-                missingFields = new ArrayList<>(2);
+                missingFields = new ArrayList<>(3);
             }
             missingFields.add(fieldName);
         }
@@ -103,11 +125,14 @@ public final class ListExample implements Serializable {
 
         private List<Integer> primitiveItems = new ArrayList<>();
 
+        private List<Double> doubleItems = new ArrayList<>();
+
         private Builder() {}
 
         public Builder from(ListExample other) {
             items(other.getItems());
             primitiveItems(other.getPrimitiveItems());
+            doubleItems(other.getDoubleItems());
             return this;
         }
 
@@ -151,8 +176,29 @@ public final class ListExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("doubleItems")
+        public Builder doubleItems(Iterable<Double> doubleItems) {
+            this.doubleItems.clear();
+            ConjureCollections.addAll(
+                    this.doubleItems,
+                    Objects.requireNonNull(doubleItems, "doubleItems cannot be null"));
+            return this;
+        }
+
+        public Builder addAllDoubleItems(Iterable<Double> doubleItems) {
+            ConjureCollections.addAll(
+                    this.doubleItems,
+                    Objects.requireNonNull(doubleItems, "doubleItems cannot be null"));
+            return this;
+        }
+
+        public Builder doubleItems(double doubleItems) {
+            this.doubleItems.add(doubleItems);
+            return this;
+        }
+
         public ListExample build() {
-            return new ListExample(items, primitiveItems);
+            return new ListExample(items, primitiveItems, doubleItems);
         }
     }
 }

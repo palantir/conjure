@@ -10,12 +10,12 @@ export interface ITestService {
 
     getBranches(
         datasetRid: string
-    ): Promise<string[]>;
+    ): Promise<Array<string>>;
 
     /** Gets all branches of this dataset. */
     getBranchesDeprecated(
         datasetRid: string
-    ): Promise<string[]>;
+    ): Promise<Array<string>>;
 
     getDataset(
         datasetRid: string
