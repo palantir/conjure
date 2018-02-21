@@ -11,6 +11,7 @@
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\](java|groovy)[/\\]" checks="Javadoc*" />
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\](java|groovy)[/\\]" checks="VariableDeclarationUsageDistance" />
     <suppress files="[/\\]src[/\\].*[Tt]est[/\\](java|groovy)[/\\]" checks="VisibilityModifier" />
+    <suppress files="[/\\]src[/\\].*[Tt]est[/\\](java|groovy)[/\\]" checks="AvoidStaticImport" />
 
     <!-- JavadocStyle enforces existence of package-info.java package-level Javadoc; we consider this a bug. -->
     <suppress files="package-info.java" checks="JavadocStyle" />
