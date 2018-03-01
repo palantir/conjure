@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: >
+    The generated python client will extract httpremoting metadata from HTTPErrors to improve the printed message.
+  links:
+    - https://github.palantir.build/foundry/conjure/pull/873

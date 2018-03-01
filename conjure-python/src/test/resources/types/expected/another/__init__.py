@@ -4,6 +4,7 @@ from httpremoting import Service
 from product import CreateDatasetRequest
 from product.datasets import BackingFileSystem
 from product.datasets import Dataset
+from remoting.exceptions import HTTPError
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -40,7 +41,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), DictType(str, BackingFileSystem))
@@ -73,7 +78,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), Dataset)
@@ -106,7 +115,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(Dataset))
@@ -140,7 +153,11 @@ class TestService(Service):
             stream=True,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _raw = _response.raw
         _raw.decode_content = True
@@ -174,7 +191,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(BinaryType()))
@@ -206,7 +227,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         return
 
@@ -238,7 +263,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), ListType(str))
@@ -271,7 +300,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), ListType(str))
@@ -305,7 +338,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(str))
@@ -338,7 +375,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), OptionalType(str))
@@ -372,7 +413,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), int)
@@ -404,7 +449,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), bool)
@@ -436,7 +485,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), float)
@@ -468,7 +521,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), int)

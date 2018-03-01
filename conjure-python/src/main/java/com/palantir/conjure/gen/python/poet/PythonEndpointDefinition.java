@@ -151,7 +151,18 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.decreaseIndent();
 
             poetWriter.writeLine();
+            poetWriter.writeIndentedLine("try:");
+            poetWriter.increaseIndent();
             poetWriter.writeIndentedLine("_response.raise_for_status()");
+            poetWriter.decreaseIndent();
+            poetWriter.writeIndentedLine("except HTTPError as e:");
+            poetWriter.increaseIndent();
+            poetWriter.writeIndentedLine("detail = e.response.json() if e.response else {}");
+            poetWriter.writeIndentedLine("raise HTTPError('{}. Error Name: {}. Message: {}'.format("
+                    + "e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), "
+                    + "response=_response)");
+            poetWriter.decreaseIndent();
+
 
             poetWriter.writeLine();
             if (isBinary()) {

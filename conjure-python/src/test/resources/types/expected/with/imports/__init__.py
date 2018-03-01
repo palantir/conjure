@@ -9,6 +9,7 @@ from product import RidAliasExample
 from product import StringAliasExample
 from product import StringExample
 from product.datasets import BackingFileSystem
+from remoting.exceptions import HTTPError
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -131,7 +132,11 @@ class TestService(Service):
             headers=_headers,
             json=_json)
 
-        _response.raise_for_status()
+        try:
+            _response.raise_for_status()
+        except HTTPError as e:
+            detail = e.response.json() if e.response else {}
+            raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()
         return _decoder.decode(_response.json(), BackingFileSystem)

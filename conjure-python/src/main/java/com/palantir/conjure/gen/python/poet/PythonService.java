@@ -23,7 +23,9 @@ public interface PythonService extends PythonClass {
             PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Tuple"), Optional.empty()),
             PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Optional"), Optional.empty()),
             PythonImport.of(PythonClassName.of(ConjurePackage.of("httpremoting"), "Service"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("conjure"), "*"), Optional.empty()));
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("conjure"), "*"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(ConjurePackage.of("remoting.exceptions"), "HTTPError"),
+                    Optional.empty()));
 
     @Override
     String packageName();
