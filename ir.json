@@ -37,6 +37,21 @@
                 }
               }
             }
+          },
+          {
+            "fieldName": "errors",
+            "type": {
+              "type": "list",
+              "list": {
+                "itemType": {
+                  "type": "reference",
+                  "reference": {
+                    "name": "ErrorDefinition",
+                    "package": "com.palantir.conjure.spec"
+                  }
+                }
+              }
+            }
           }
         ]
       }
