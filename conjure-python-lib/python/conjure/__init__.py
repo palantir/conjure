@@ -152,9 +152,20 @@ class ConjureEncoder(json.JSONEncoder):
         encoded = {}  # type: Dict[str, Any]
         encoded['type'] = obj.type
 
-        defined_field_definition = obj._options()[obj.type]
+        attribute = None
+        for attr, field_definition in obj._options().items():
+            if field_definition.identifier == obj.type:
+                attribute = attr
+
+        if attribute is None:
+            raise ValueError(
+                'could not find attribute for union ' +
+                'member {0} of type {1}'.format(
+                    obj.type, obj.__class__))
+
+        defined_field_definition = obj._options()[attribute]
         encoded[defined_field_definition.identifier] = cls.do_encode(
-            getattr(obj, obj.type))
+            getattr(obj, attribute))
 
         return encoded
 
@@ -227,7 +238,19 @@ class ConjureDecoder(object):
         '''
 
         type_of_union = obj['type']  # type: str
-        conjure_field_definition = conjure_type._options()[type_of_union]
+
+        attribute = None
+        conjure_field_definition = None
+
+        for attr, conjure_field in conjure_type._options().items():
+            if conjure_field.identifier == type_of_union:
+                attribute = attr
+                conjure_field_definition = conjure_field
+
+        if attribute is None:
+            raise ValueError(
+                'unknown union type {0} for {1}'.format(
+                    type_of_union, conjure_type))
 
         deserialized = {}  # type: Dict[str, Any]
 
@@ -236,11 +259,11 @@ class ConjureDecoder(object):
                 raise Exception('field {0} not found in object {1}'.format(
                     type_of_union, obj))
             else:
-                deserialized[type_of_union] = None
+                deserialized[attribute] = None
         else:
             value = obj[type_of_union]
             field_type = conjure_field_definition.field_type
-            deserialized[type_of_union] = cls.do_decode(value, field_type)
+            deserialized[attribute] = cls.do_decode(value, field_type)
         return conjure_type(**deserialized)
 
     @classmethod

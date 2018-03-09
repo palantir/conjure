@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Fix python union type serde.
+  link: https://github.palantir.build/foundry/conjure/pull/884
