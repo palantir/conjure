@@ -4,10 +4,10 @@
 
 package com.palantir.conjure.gradle.publish;
 
+import com.google.common.net.HttpHeaders;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import javax.ws.rs.core.HttpHeaders;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

@@ -1,1 +1,0 @@
-export { IStringExample } from "./stringExample";

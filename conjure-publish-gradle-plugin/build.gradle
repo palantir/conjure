@@ -3,7 +3,7 @@ apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 
 dependencies {
-    compile project(':conjure-typescript')
+    compile 'com.google.guava:guava'
     compile 'com.squareup.okhttp3:okhttp'
     compile 'commons-io:commons-io'
 

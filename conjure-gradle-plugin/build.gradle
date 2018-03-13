@@ -5,7 +5,7 @@ apply plugin: 'java-gradle-plugin'
 dependencies {
     compile project(':conjure-java')
     compile project(':conjure-python')
-    compile project(':conjure-typescript')
+    compile 'com.palantir.conjure.typescript:conjure-typescript'
 
     testCompile gradleTestKit()
     testCompile 'com.netflix.nebula:nebula-test'

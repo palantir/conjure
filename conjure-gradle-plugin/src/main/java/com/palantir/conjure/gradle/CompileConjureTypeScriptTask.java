@@ -6,13 +6,13 @@ package com.palantir.conjure.gradle;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.typescript.ConjureTypeScriptClientGenerator;
 import com.palantir.conjure.gen.typescript.ExperimentalFeatures;
 import com.palantir.conjure.gen.typescript.errors.ErrorGenerator;
 import com.palantir.conjure.gen.typescript.services.ServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.TypeGenerator;
+import com.palantir.conjure.typescript.defs.Conjure;
+import com.palantir.conjure.typescript.defs.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;

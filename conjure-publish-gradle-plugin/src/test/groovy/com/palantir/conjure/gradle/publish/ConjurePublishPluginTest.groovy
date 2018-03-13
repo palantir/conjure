@@ -5,8 +5,8 @@
 package com.palantir.conjure.gradle.publish
 
 import com.google.common.io.Resources
+import com.google.common.net.HttpHeaders
 import java.nio.charset.Charset
-import javax.ws.rs.core.HttpHeaders
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
 import okhttp3.mockwebserver.MockWebServer
