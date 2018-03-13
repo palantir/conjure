@@ -6,7 +6,6 @@ package com.palantir.conjure.gen.python.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -40,30 +39,27 @@ public final class ClientGenerator {
         Builder<PythonClassName> referencedTypesBuilder = ImmutableSet.builder();
 
         List<PythonEndpointDefinition> endpoints = serviceDefinition.endpoints()
-                .entrySet()
                 .stream()
-                .map(entry -> {
-                    EndpointDefinition ed = entry.getValue();
-
+                .map(ed -> {
                     ed.returns()
                             .ifPresent(returnType -> referencedTypesBuilder.addAll(returnType.visit(
                                     referencedTypeNameVisitor)));
-                    ed.args().values().forEach(arg -> referencedTypesBuilder.addAll(arg.type().visit(
+                    ed.args().forEach(arg -> referencedTypesBuilder.addAll(arg.type().visit(
                             referencedTypeNameVisitor)));
 
-                    List<PythonEndpointParam> params = ed.args().entrySet()
+                    List<PythonEndpointParam> params = ed.args()
                             .stream()
                             .map(argEntry -> PythonEndpointParam
                                     .builder()
-                                    .paramName(argEntry.getKey().name())
-                                    .paramId(argEntry.getValue().paramId().name())
-                                    .paramType(argEntry.getValue().paramType())
-                                    .myPyType(myPyMapper.getTypeName(argEntry.getValue().type()))
+                                    .paramName(argEntry.argName().name())
+                                    .paramId(argEntry.paramId())
+                                    .paramType(argEntry.paramType())
+                                    .myPyType(myPyMapper.getTypeName(argEntry.type()))
                                     .build())
                             .collect(Collectors.toList());
 
                     return PythonEndpointDefinition.builder()
-                            .methodName(entry.getKey())
+                            .methodName(ed.endpointName())
                             .http(ed.http())
                             .authDefinition(ed.auth())
                             .params(params)

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
 /**
- * Represents the name of a conjure {@link ObjectsDefinition#objects() object} by a name and its conjure package.
+ * Represents the name of a conjure {@link ObjectsDefinition#types() type} by a name and its conjure package.
  */
 @com.google.errorprone.annotations.Immutable
 @SuppressWarnings("Immutable")

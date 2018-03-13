@@ -24,12 +24,12 @@ public interface TypesDefinition {
     /** The object and error definitions local to a particular ConjureDefinition. */
     ObjectsDefinition definitions();
 
-    /** The unions of {@link #definitions() locally defined} and {@link #imports() imported} objects and errors . */
+    /** The unions of {@link #definitions() locally defined} and {@link #imports() imported} types and errors . */
     @Value.Derived
     default ObjectsDefinition definitionsAndImports() {
         return ObjectsDefinition.builder()
-                .addAllObjects(imports().objects())
-                .addAllObjects(definitions().objects())
+                .addAllTypes(imports().types())
+                .addAllTypes(definitions().types())
                 .addAllErrors(imports().errors())
                 .addAllErrors(definitions().errors())
                 .build();

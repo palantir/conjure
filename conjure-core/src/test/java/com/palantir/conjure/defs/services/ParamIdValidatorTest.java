@@ -7,7 +7,6 @@ package com.palantir.conjure.defs.services;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import java.util.List;
@@ -15,7 +14,7 @@ import javax.ws.rs.HttpMethod;
 import org.junit.Test;
 
 public final class ParamIdValidatorTest {
-    private static final ParameterName PARAMETER_NAME = ParameterName.of("arg");
+    private static final ArgumentName PARAMETER_NAME = ArgumentName.of("arg");
 
     @Test
     @SuppressWarnings("CheckReturnValue")
@@ -52,7 +51,7 @@ public final class ParamIdValidatorTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter ids with type %s must match pattern %s: %s",
                             ArgumentDefinition.ParamType.BODY,
-                            ParameterName.ANCHORED_PATTERN,
+                            ArgumentName.ANCHORED_PATTERN,
                             paramId);
         }
     }
@@ -67,7 +66,7 @@ public final class ParamIdValidatorTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter ids with type %s must match pattern %s: %s",
                             ArgumentDefinition.ParamType.HEADER,
-                            ParameterName.HEADER_PATTERN,
+                            ParameterId.HEADER_PATTERN,
                             paramId);
         }
     }
@@ -76,13 +75,15 @@ public final class ParamIdValidatorTest {
             ArgumentDefinition.ParamType paramType,
             String paramId) {
         ArgumentDefinition arg = ArgumentDefinition.builder()
+                .argName(PARAMETER_NAME)
                 .paramType(paramType)
-                .paramId(ParameterName.of(paramId))
+                .paramId(ParameterId.of(paramId))
                 .type(AnyType.of())
                 .build();
         return EndpointDefinition.builder()
                 .auth(AuthDefinition.none())
                 .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
-                .args(ImmutableMap.of(PARAMETER_NAME, arg));
+                .addArgs(arg)
+                .endpointName(EndpointName.of("test"));
     }
 }

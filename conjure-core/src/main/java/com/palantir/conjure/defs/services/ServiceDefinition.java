@@ -5,8 +5,9 @@
 package com.palantir.conjure.defs.services;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.TypeName;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import org.immutables.value.Value;
 
@@ -16,9 +17,9 @@ public interface ServiceDefinition {
 
     TypeName serviceName();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
-    Map<String, EndpointDefinition> endpoints();
+    List<EndpointDefinition> endpoints();
 
     @Value.Check
     default void check() {

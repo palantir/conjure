@@ -6,7 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
@@ -90,9 +90,7 @@ public final class AliasGenerator {
                 .addStatement("return new $T(value)", thisClass)
                 .build());
 
-        if (typeDef.docs().isPresent()) {
-            spec.addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
-        }
+        typeDef.docs().ifPresent(docs -> spec.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
 
         return JavaFile.builder(typePackage.name(), spec.build())
                 .skipJavaLangImports(true)
@@ -101,7 +99,7 @@ public final class AliasGenerator {
     }
 
     private static Optional<CodeBlock> valueOfFactoryMethod(
-            ConjureType conjureType,
+            Type conjureType,
             ClassName thisClass,
             TypeName aliasTypeName) {
         if (conjureType instanceof PrimitiveType) {

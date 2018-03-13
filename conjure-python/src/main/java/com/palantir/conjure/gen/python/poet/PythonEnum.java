@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public interface PythonEnum extends PythonClass {
 
     String className();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
     List<PythonEnumValue> values();
 
@@ -36,7 +37,7 @@ public interface PythonEnum extends PythonClass {
         poetWriter.maintainingIndent(() -> {
             poetWriter.writeIndentedLine(String.format("class %s(ConjureEnumType):", className()));
             poetWriter.increaseIndent();
-            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
+            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
 
             poetWriter.writeLine();
 
@@ -67,9 +68,9 @@ public interface PythonEnum extends PythonClass {
 
         String name();
 
-        Optional<String> docs();
+        Optional<Documentation> docs();
 
-        static PythonEnumValue of(String name, Optional<String> docs) {
+        static PythonEnumValue of(String name, Optional<Documentation> docs) {
             return ImmutablePythonEnumValue.builder().name(name).docs(docs).build();
         }
 

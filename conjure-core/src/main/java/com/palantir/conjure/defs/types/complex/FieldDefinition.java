@@ -5,7 +5,9 @@
 package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Documentation;
+import com.palantir.conjure.defs.types.Type;
+import com.palantir.conjure.defs.types.names.FieldName;
 import java.util.Optional;
 import org.immutables.value.Value;
 
@@ -13,11 +15,13 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface FieldDefinition {
 
-    ConjureType type();
+    FieldName fieldName();
 
-    Optional<String> docs();
+    Type type();
 
-    static FieldDefinition of(ConjureType type, Optional<String> docs) {
-        return ImmutableFieldDefinition.builder().type(type).docs(docs).build();
+    Optional<Documentation> docs();
+
+    static FieldDefinition of(FieldName fieldName, Type type, Optional<Documentation> docs) {
+        return ImmutableFieldDefinition.builder().fieldName(fieldName).type(type).docs(docs).build();
     }
 }

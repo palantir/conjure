@@ -43,8 +43,8 @@ public final class EnumGenerator {
         } else {
             spec = createEnum(thisClass, typeDef.values(), false);
             if (typeDef.docs().isPresent()) {
-                spec = spec.toBuilder()
-                        .addJavadoc("$L", StringUtils.appendIfMissing(typeDef.docs().get(), "\n")).build();
+                spec = spec.toBuilder().addJavadoc("$L",
+                        StringUtils.appendIfMissing(typeDef.docs().get().value(), "\n")).build();
             }
         }
 
@@ -92,9 +92,8 @@ public final class EnumGenerator {
                     .returns(Object.class)
                     .build());
         }
-        if (typeDef.docs().isPresent()) {
-            wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(typeDef.docs().get(), "\n"));
-        }
+        typeDef.docs().ifPresent(
+                docs -> wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(docs.value(), "\n")));
 
         wrapper.addJavadoc(
                 "This class is used instead of a native enum to support unknown values.\n"
@@ -120,9 +119,8 @@ public final class EnumGenerator {
                     FieldSpec.Builder fieldSpec = FieldSpec.builder(thisClass, v.value(),
                             Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                             .initializer(CodeBlock.of("new $1T($2T.$3N)", thisClass, enumClass, v.value()));
-                    if (v.docs().isPresent()) {
-                        fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(v.docs().get(), "\n"));
-                    }
+                    v.docs().ifPresent(
+                            docs -> fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
                     return fieldSpec.build();
                 });
     }
@@ -133,9 +131,8 @@ public final class EnumGenerator {
                 .addModifiers(Modifier.PUBLIC);
         for (EnumValueDefinition value : values) {
             TypeSpec.Builder anonymousClassBuilder = TypeSpec.anonymousClassBuilder("");
-            if (value.docs().isPresent()) {
-                anonymousClassBuilder.addJavadoc("$L", StringUtils.appendIfMissing(value.docs().get(), "\n"));
-            }
+            value.docs().ifPresent(docs ->
+                    anonymousClassBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
             enumBuilder.addEnumConstant(value.value(), anonymousClassBuilder.build());
         }
         if (withUnknown) {

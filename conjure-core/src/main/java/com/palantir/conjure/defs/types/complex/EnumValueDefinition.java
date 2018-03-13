@@ -6,6 +6,7 @@ package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.defs.types.Documentation;
 import java.util.Optional;
 import org.immutables.value.Value;
 
@@ -15,7 +16,7 @@ public interface EnumValueDefinition {
 
     String value();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
     @Value.Check
     default void check() {

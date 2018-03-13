@@ -58,10 +58,10 @@ public final class UnionGenerator {
         ClassName unionClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
-        Map<FieldName, TypeName> memberTypes = typeDef.union().entrySet().stream()
+        Map<FieldName, TypeName> memberTypes = typeDef.union().stream()
                 .collect(StableCollectors.toLinkedMap(
-                        Map.Entry::getKey,
-                        entry -> typeMapper.getClassName(entry.getValue().type())));
+                        FieldDefinition::fieldName,
+                        entry -> typeMapper.getClassName(entry.type())));
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
@@ -89,7 +89,7 @@ public final class UnionGenerator {
             SerializableSupport.enable(typeBuilder);
         }
 
-        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
+        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
 
         return JavaFile.builder(typePackage.name(), typeBuilder.build())
                 .skipJavaLangImports(true)
@@ -117,10 +117,9 @@ public final class UnionGenerator {
     }
 
     private static List<MethodSpec> generateStaticFactories(
-            TypeMapper typeMapper, ClassName unionClass, Map<FieldName, FieldDefinition> memberTypeDefs) {
-        return memberTypeDefs.entrySet().stream().map(entry -> {
-            FieldName memberName = entry.getKey();
-            FieldDefinition memberTypeDef = entry.getValue();
+            TypeMapper typeMapper, ClassName unionClass, List<FieldDefinition> memberTypeDefs) {
+        return memberTypeDefs.stream().map(memberTypeDef -> {
+            FieldName memberName = memberTypeDef.fieldName();
             TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             String variableName = variableName();
             // memberName is guarded to be a valid Java identifier and not to end in an underscore, so this is safe
@@ -130,7 +129,8 @@ public final class UnionGenerator {
                     .addStatement("return new $T(new $T($L))",
                             unionClass, wrapperClass(unionClass, memberName), variableName)
                     .returns(unionClass);
-            memberTypeDef.docs().ifPresent(docs -> builder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
+            memberTypeDef.docs()
+                    .ifPresent(docs -> builder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
             return builder.build();
         }).collect(Collectors.toList());
     }
@@ -242,11 +242,11 @@ public final class UnionGenerator {
     private static List<TypeSpec> generateWrapperClasses(
             TypeMapper typeMapper,
             ClassName baseClass,
-            Map<FieldName, FieldDefinition> memberTypeDefs,
+            List<FieldDefinition> memberTypeDefs,
             Set<ExperimentalFeatures> experimentalFeatures) {
-        return memberTypeDefs.entrySet().stream().map(entry -> {
-            FieldName memberName = entry.getKey();
-            TypeName memberType = typeMapper.getClassName(entry.getValue().type());
+        return memberTypeDefs.stream().map(memberTypeDef -> {
+            FieldName memberName = memberTypeDef.fieldName();
+            TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
             ClassName wrapperClass = peerWrapperClass(baseClass, memberName);
 
             AnnotationSpec jsonPropertyAnnotation = AnnotationSpec.builder(JsonProperty.class)

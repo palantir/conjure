@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.python.poet;
 
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public interface PythonService extends PythonClass {
 
     String className();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
     List<PythonEndpointDefinition> endpointDefinitions();
 
@@ -47,7 +48,7 @@ public interface PythonService extends PythonClass {
         poetWriter.maintainingIndent(() -> {
             poetWriter.writeIndentedLine(String.format("class %s(Service):", className()));
             poetWriter.increaseIndent();
-            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.trim())));
+            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value().trim())));
 
             endpointDefinitions().forEach(endpointDefinition -> {
                 poetWriter.writeLine();

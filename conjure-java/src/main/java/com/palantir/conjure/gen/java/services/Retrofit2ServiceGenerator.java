@@ -11,12 +11,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
+import com.palantir.conjure.defs.services.ArgumentName;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.ParameterName;
+import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -72,16 +73,12 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
 
-        if (serviceDefinition.docs().isPresent()) {
-            serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(serviceDefinition.docs().get(), "\n"));
-        }
+        serviceDefinition.docs().ifPresent(docs -> {
+            serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n"));
+        });
 
-        serviceBuilder.addMethods(serviceDefinition.endpoints().entrySet().stream()
-                .map(endpoint -> generateServiceMethod(
-                        endpoint.getKey(),
-                        endpoint.getValue(),
-                        returnTypeMapper,
-                        methodTypeMapper))
+        serviceBuilder.addMethods(serviceDefinition.endpoints().stream()
+                .map(endpoint -> generateServiceMethod(endpoint, returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.serviceName().conjurePackage().name(), serviceBuilder.build())
@@ -106,13 +103,12 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     }
 
     private MethodSpec generateServiceMethod(
-            String endpointName,
             EndpointDefinition endpointDef,
             TypeMapper returnTypeMapper,
             TypeMapper methodTypeMapper) {
-        Set<ParameterName> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
+        Set<ArgumentName> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
         PathDefinition endpointPathWithoutRegex = replaceEncodedPathArgs(endpointDef.http().path());
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
                         .addMember("value", "$S", "." + endpointPathWithoutRegex)
@@ -141,23 +137,22 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
         getAuthParameter(endpointDef.auth()).ifPresent(methodBuilder::addParameter);
 
-        methodBuilder.addParameters(endpointDef.args().entrySet().stream()
-                .map(arg -> createEndpointParameter(
-                        methodTypeMapper, encodedPathArgs, arg.getKey(), arg.getValue()))
+        methodBuilder.addParameters(endpointDef.args().stream()
+                .map(arg -> createEndpointParameter(methodTypeMapper, encodedPathArgs, arg))
                 .collect(Collectors.toList()));
 
         return methodBuilder.build();
     }
 
-    private Set<ParameterName> extractEncodedPathArgs(PathDefinition path) {
+    private Set<ArgumentName> extractEncodedPathArgs(PathDefinition path) {
         Pattern pathArg = Pattern.compile("\\{([^\\}]+)\\}");
         Matcher matcher = pathArg.matcher(path.toString());
-        ImmutableSet.Builder<ParameterName> encodedArgs = ImmutableSet.builder();
+        ImmutableSet.Builder<ArgumentName> encodedArgs = ImmutableSet.builder();
         while (matcher.find()) {
             String arg = matcher.group(1);
             if (arg.contains(":")) {
                 // Strip everything after first colon
-                encodedArgs.add(ParameterName.of(arg.substring(0, arg.indexOf(':'))));
+                encodedArgs.add(ArgumentName.of(arg.substring(0, arg.indexOf(':'))));
             }
         }
         return encodedArgs.build();
@@ -179,31 +174,31 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
 
     private ParameterSpec createEndpointParameter(
             TypeMapper methodTypeMapper,
-            Set<ParameterName> encodedPathArgs,
-            ParameterName paramKey,
+            Set<ArgumentName> encodedPathArgs,
             ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
                 methodTypeMapper.getClassName(def.type()),
-                paramKey.name());
+                def.argName().name());
 
         switch (def.paramType()) {
             case PATH:
-                ParameterName pathParamKey = def.paramId();
                 AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                        .addMember("value", "$S", pathParamKey.name());
-                if (encodedPathArgs.contains(pathParamKey)) {
+                        .addMember("value", "$S", def.argName().name());
+                if (encodedPathArgs.contains(def.argName())) {
                     builder.addMember("encoded", "$L", true);
                 }
                 param.addAnnotation(builder.build());
                 break;
             case QUERY:
                 param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))
-                        .addMember("value", "$S", def.paramId())
+                        .addMember("value", "$S",
+                                def.paramId().map(ParameterId::name).orElse(def.argName().name()))
                         .build());
                 break;
             case HEADER:
                 param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                        .addMember("value", "$S", def.paramId())
+                        .addMember("value", "$S",
+                                def.paramId().map(ParameterId::name).orElse(def.argName().name()))
                         .build());
                 break;
             case BODY:
@@ -237,7 +232,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return Optional.empty();
     }
 
-    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, Set<ConjureType> markers) {
+    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<Type> markers) {
         checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
                 "Markers must refer to reference types.");
         return markers.stream()

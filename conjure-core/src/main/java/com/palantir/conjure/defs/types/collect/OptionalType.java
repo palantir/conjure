@@ -5,22 +5,22 @@
 package com.palantir.conjure.defs.types.collect;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.Type;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface OptionalType extends ConjureType {
+public interface OptionalType extends Type {
 
-    ConjureType itemType();
+    Type itemType();
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
         return visitor.visitOptional(this);
     }
 
-    static OptionalType of(ConjureType itemType) {
+    static OptionalType of(Type itemType) {
         return ImmutableOptionalType.builder().itemType(itemType).build();
     }
 

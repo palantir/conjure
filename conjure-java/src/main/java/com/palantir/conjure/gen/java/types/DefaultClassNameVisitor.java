@@ -44,7 +44,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     private final Map<com.palantir.conjure.defs.types.names.TypeName, ExternalTypeDefinition> importsByName;
 
     DefaultClassNameVisitor(TypesDefinition types) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().objects(), t -> t.typeName());
+        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
         this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
     }
 

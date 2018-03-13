@@ -6,14 +6,14 @@ package com.palantir.conjure.defs.types.reference;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
 
-    ConjureType alias();
+    Type alias();
 
     static Builder builder() {
         return new Builder();

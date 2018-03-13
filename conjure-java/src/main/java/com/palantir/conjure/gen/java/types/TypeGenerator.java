@@ -26,7 +26,7 @@ public interface TypeGenerator {
         Set<JavaFile> files = Sets.newLinkedHashSet();
 
         // Generate java files for object definitions
-        objectsDefinition.objects().stream().map(
+        objectsDefinition.types().stream().map(
                 type -> generateObjectType(types, type))
                 .forEach(files::add);
 

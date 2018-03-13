@@ -5,6 +5,7 @@
 package com.palantir.conjure.defs.types.complex;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.palantir.conjure.defs.ConjureValidator;
 
 @com.google.errorprone.annotations.Immutable
@@ -29,9 +30,10 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
 
         @Override
         public void validate(UnionTypeDefinition definition) {
-            definition.union().keySet().forEach(key -> {
-                Preconditions.checkArgument(!key.name().endsWith("_"),
-                        "Union member key must not end with an underscore: %s", key);
+            definition.union().stream().forEach(fieldDef -> {
+                Preconditions.checkArgument(!fieldDef.fieldName().name().endsWith("_"),
+                        "Union member key must not end with an underscore: %s",
+                        fieldDef.fieldName().name());
             });
         }
 
@@ -54,10 +56,12 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
 
         @Override
         public void validate(UnionTypeDefinition definition) {
-            definition.union().keySet().forEach(key -> {
-                        Preconditions.checkArgument(!key.name().isEmpty(), "Union member key must not be empty");
-                        Preconditions.checkArgument(isValidJavaIdentifier(key.name()),
-                                "Union member key must be a valid Java identifier: %s", key);
+            definition.union().stream().forEach(fieldDef -> {
+                        Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.fieldName().name()),
+                                "Union member key must not be empty");
+                        Preconditions.checkArgument(isValidJavaIdentifier(fieldDef.fieldName().name()),
+                                "Union member key must be a valid Java identifier: %s",
+                                fieldDef.fieldName().name());
                     }
             );
         }

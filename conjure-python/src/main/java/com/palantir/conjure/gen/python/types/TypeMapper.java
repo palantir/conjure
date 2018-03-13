@@ -4,8 +4,8 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.Type;
 
 public final class TypeMapper {
 
@@ -15,7 +15,7 @@ public final class TypeMapper {
         this.typeNameVisitor = typeNameVisitor;
     }
 
-    public String getTypeName(ConjureType type) {
+    public String getTypeName(Type type) {
         return type.visit(typeNameVisitor);
     }
 }

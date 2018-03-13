@@ -35,7 +35,7 @@ public final class ConjureMetrics {
             metrics.counter(MetricRegistry.name(ObjectsDefinition.class, "services"))
                     .inc(definition.services().size());
 
-            metrics.counter(MetricRegistry.name(ObjectsDefinition.class, "objects"))
+            metrics.counter(MetricRegistry.name(ObjectsDefinition.class, "types"))
                     .inc(definition.types().definitions().objects().size());
 
             metrics.counter(MetricRegistry.name(ObjectsDefinition.class, "empty-default-conjure-package"))

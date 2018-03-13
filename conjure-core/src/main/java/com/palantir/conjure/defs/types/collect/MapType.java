@@ -5,24 +5,24 @@
 package com.palantir.conjure.defs.types.collect;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.Type;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface MapType extends ConjureType {
+public interface MapType extends Type {
 
-    ConjureType keyType();
+    Type keyType();
 
-    ConjureType valueType();
+    Type valueType();
 
     @Override
     default <T> T visit(ConjureTypeVisitor<T> visitor) {
         return visitor.visitMap(this);
     }
 
-    static MapType of(ConjureType keyType, ConjureType valueType) {
+    static MapType of(Type keyType, Type valueType) {
         return ImmutableMapType.builder().keyType(keyType).valueType(valueType).build();
     }
 }

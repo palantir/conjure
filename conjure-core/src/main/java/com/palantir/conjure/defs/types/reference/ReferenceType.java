@@ -4,9 +4,9 @@
 
 package com.palantir.conjure.defs.types.reference;
 
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.names.TypeName;
 
-public interface ReferenceType extends ConjureType {
+public interface ReferenceType extends Type {
     TypeName type();
 }

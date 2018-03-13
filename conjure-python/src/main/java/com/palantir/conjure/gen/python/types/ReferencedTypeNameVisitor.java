@@ -35,7 +35,7 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     private final PackageNameProcessor packageNameProcessor;
 
     public ReferencedTypeNameVisitor(TypesDefinition types, PackageNameProcessor packageNameProcessor) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().objects(), t -> t.typeName());
+        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
         this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
         this.packageNameProcessor = packageNameProcessor;
     }

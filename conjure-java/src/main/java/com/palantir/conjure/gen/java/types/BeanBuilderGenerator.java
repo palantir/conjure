@@ -9,7 +9,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Documentation;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
@@ -37,7 +38,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -88,9 +88,9 @@ public final class BeanBuilderGenerator {
         return builder.build();
     }
 
-    private Collection<EnrichedField> enrichFields(Map<FieldName, FieldDefinition> fields) {
-        return fields.entrySet().stream()
-                .map(e -> createField(e.getKey(), e.getValue()))
+    private Collection<EnrichedField> enrichFields(List<FieldDefinition> fields) {
+        return fields.stream()
+                .map(e -> createField(e.fieldName(), e))
                 .collect(Collectors.toList());
     }
 
@@ -145,7 +145,7 @@ public final class BeanBuilderGenerator {
 
     private MethodSpec createSetter(EnrichedField enriched) {
         FieldSpec field = enriched.poetSpec();
-        ConjureType type = enriched.conjureDef().type();
+        Type type = enriched.conjureDef().type();
         AnnotationSpec jsonSetterAnnotation = AnnotationSpec.builder(JsonSetter.class)
                 .addMember("value", "$S", enriched.fieldName().name())
                 .build();
@@ -160,10 +160,10 @@ public final class BeanBuilderGenerator {
 
     private MethodSpec createCollectionSetter(String prefix, EnrichedField enriched) {
         FieldSpec field = enriched.poetSpec();
-        ConjureType type = enriched.conjureDef().type();
+        Type type = enriched.conjureDef().type();
         boolean shouldClearFirst = false;
         return MethodSpec.methodBuilder(prefix + StringUtils.capitalize(field.name))
-                .addJavadoc(enriched.conjureDef().docs().orElse(""))
+                .addJavadoc(enriched.conjureDef().docs().map(Documentation::value).orElse(""))
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderClass)
                 .addParameter(widenToIterableIfPossible(field.type, type), field.name)
@@ -172,7 +172,7 @@ public final class BeanBuilderGenerator {
                 .build();
     }
 
-    private TypeName widenToIterableIfPossible(TypeName current, ConjureType type) {
+    private TypeName widenToIterableIfPossible(TypeName current, Type type) {
         if (type instanceof ListType) {
             TypeName typeName = typeMapper.getClassName(((ListType) type).itemType()).box();
             return ParameterizedTypeName.get(ClassName.get(Iterable.class), typeName);
@@ -186,7 +186,7 @@ public final class BeanBuilderGenerator {
         return current;
     }
 
-    private static CodeBlock typeAwareAssignment(EnrichedField enriched, ConjureType type, boolean shouldClearFirst) {
+    private static CodeBlock typeAwareAssignment(EnrichedField enriched, Type type, boolean shouldClearFirst) {
         FieldSpec spec = enriched.poetSpec();
         if (type instanceof ListType || type instanceof SetType) {
             CodeBlock addStatement = CodeBlocks.statement(
@@ -220,7 +220,7 @@ public final class BeanBuilderGenerator {
     }
 
     private List<MethodSpec> createAuxiliarySetters(EnrichedField enriched) {
-        ConjureType type = enriched.conjureDef().type();
+        Type type = enriched.conjureDef().type();
 
         if (type instanceof ListType) {
             return ImmutableList.of(
@@ -281,7 +281,7 @@ public final class BeanBuilderGenerator {
                         spec.name, enriched.fieldName().name() + " cannot be null"));
     }
 
-    private MethodSpec createItemSetter(EnrichedField enriched, ConjureType itemType) {
+    private MethodSpec createItemSetter(EnrichedField enriched, Type itemType) {
         FieldSpec field = enriched.poetSpec();
         return publicSetter(enriched)
                 .addParameter(typeMapper.getClassName(itemType), field.name)
@@ -302,7 +302,7 @@ public final class BeanBuilderGenerator {
 
     private MethodSpec.Builder publicSetter(EnrichedField enriched) {
         return MethodSpec.methodBuilder(enriched.poetSpec().name)
-                .addJavadoc(enriched.conjureDef().docs().orElse(""))
+                .addJavadoc(enriched.conjureDef().docs().map(Documentation::value).orElse(""))
                 .addModifiers(Modifier.PUBLIC)
                 .returns(builderClass);
     }

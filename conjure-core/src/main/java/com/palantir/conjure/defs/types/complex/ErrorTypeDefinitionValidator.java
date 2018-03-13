@@ -4,15 +4,17 @@
 
 package com.palantir.conjure.defs.types.complex;
 
-import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureValidator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @com.google.errorprone.annotations.Immutable
 public enum ErrorTypeDefinitionValidator implements ConjureValidator<ErrorTypeDefinition> {
     UNIQUE_ARG_NAMES(definition -> {
         UniqueFieldNamesValidator uniqueFieldNamesValidator = new UniqueFieldNamesValidator(ErrorTypeDefinition.class);
         uniqueFieldNamesValidator.validate(
-                Sets.union(definition.safeArgs().keySet(), definition.unsafeArgs().keySet()));
+                Stream.concat(definition.safeArgs().stream(), definition.unsafeArgs().stream())
+                        .map(FieldDefinition::fieldName).collect(Collectors.toSet()));
     });
 
     private final ConjureValidator<ErrorTypeDefinition> validator;

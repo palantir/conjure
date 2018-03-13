@@ -8,8 +8,7 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.ErrorCode;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
-import com.palantir.conjure.defs.types.names.FieldName;
-import java.util.Map;
+import java.util.List;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -20,9 +19,9 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
 
     ErrorCode code();
 
-    Map<FieldName, FieldDefinition> safeArgs();
+    List<FieldDefinition> safeArgs();
 
-    Map<FieldName, FieldDefinition> unsafeArgs();
+    List<FieldDefinition> unsafeArgs();
 
     @Value.Check
     default void check() {

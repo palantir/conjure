@@ -13,16 +13,15 @@ import org.immutables.value.Value;
  */
 @Value.Immutable
 @ConjureImmutablesStyle
-public abstract class ParameterName {
+public abstract class ArgumentName {
 
     public static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
     public static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
-    public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
 
     public abstract String name();
 
-    public static ParameterName of(String name) {
-        return ImmutableParameterName.builder().name(name).build();
+    public static ArgumentName of(String name) {
+        return ImmutableArgumentName.builder().name(name).build();
     }
 
     @Override

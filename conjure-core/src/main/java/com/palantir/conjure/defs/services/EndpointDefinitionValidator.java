@@ -10,12 +10,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureValidator;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,10 +45,10 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
 
     @com.google.errorprone.annotations.Immutable
     private static final class NonBodyArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
-        private static final ImmutableSet<Class<? extends ConjureType>> ILLEGAL_NON_BODY_ARG_TYPES
+        private static final ImmutableSet<Class<? extends Type>> ILLEGAL_NON_BODY_ARG_TYPES
                 = ImmutableSet.of(BinaryType.class);
 
-        private static boolean isIllegal(ConjureType type) {
+        private static boolean isIllegal(Type type) {
             return ILLEGAL_NON_BODY_ARG_TYPES.stream()
                     .filter(illegalClass -> illegalClass.isAssignableFrom(type.getClass()))
                     .count() > 0;
@@ -58,7 +57,6 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         @Override
         public void validate(EndpointDefinition definition) {
             definition.args()
-                    .values()
                     .stream()
                     .filter(arg -> !arg.paramType().equals(ArgumentDefinition.ParamType.BODY))
                     .map(ArgumentDefinition::type)
@@ -73,14 +71,14 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class SingleBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            List<Map.Entry<ParameterName, ArgumentDefinition>> bodyParams = definition.args().entrySet()
+            List<ArgumentDefinition> bodyParams = definition.args()
                     .stream()
-                    .filter(entry -> entry.getValue().paramType().equals(ArgumentDefinition.ParamType.BODY))
+                    .filter(entry -> entry.paramType().equals(ArgumentDefinition.ParamType.BODY))
                     .collect(Collectors.toList());
 
             Preconditions.checkState(bodyParams.size() <= 1,
                     "Endpoint cannot have multiple body parameters: %s",
-                    bodyParams.stream().map(e -> e.getKey()).collect(Collectors.toList()));
+                    bodyParams.stream().map(e -> e.argName()).collect(Collectors.toList()));
         }
     }
 
@@ -90,9 +88,9 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         public void validate(EndpointDefinition definition) {
             String method = definition.http().method();
             if (method.equals(HttpMethod.GET)) {
-                boolean hasBody = definition.args().entrySet()
+                boolean hasBody = definition.args()
                         .stream()
-                        .anyMatch(entry -> entry.getValue().paramType().equals(ArgumentDefinition.ParamType.BODY));
+                        .anyMatch(entry -> entry.paramType().equals(ArgumentDefinition.ParamType.BODY));
 
                 Preconditions.checkState(!hasBody, "Endpoint cannot be a GET and contain a body: %s",
                         definition.http());
@@ -104,22 +102,21 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            Set<ParameterName> pathParamIds = new HashSet<>();
-            definition.args().entrySet().stream()
-                    .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+            Set<ArgumentName> pathParamIds = new HashSet<>();
+            definition.args().stream()
+                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
                     .forEach(entry -> {
-                        ParameterName paramId = entry.getValue().paramId();
-                        boolean added = pathParamIds.add(paramId);
+                        boolean added = pathParamIds.add(entry.argName());
                         Preconditions.checkState(added,
                                 "Path parameter with identifier \"%s\" is defined multiple times for endpoint",
-                                paramId.name());
+                                entry.argName().name());
                     });
 
-            Set<ParameterName> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
+            Set<ArgumentName> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
             Preconditions.checkState(extraParams.isEmpty(),
                     "Path parameters defined in endpoint but not present in path template: %s", extraParams);
 
-            Set<ParameterName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
+            Set<ArgumentName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
                     "Path parameters defined path template but not present in endpoint: %s", missingParams);
         }
@@ -129,15 +126,15 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class NoComplexPathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            definition.args().entrySet().stream()
-                    .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+            definition.args().stream()
+                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
                     .forEach(entry -> {
-                        ConjureType conjureType = entry.getValue().type();
+                        Type conjureType = entry.type();
 
                         Boolean isValid = conjureType.visit(IsPrimitiveOrReferenceType.INSTANCE);
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
-                                entry.getKey());
+                                entry.argName());
                     });
         }
     }
@@ -146,15 +143,15 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class NoBearerTokenPathParams implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            definition.args().entrySet().stream()
-                    .filter(entry -> entry.getValue().paramType() == ArgumentDefinition.ParamType.PATH)
+            definition.args().stream()
+                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
                     .forEach(entry -> {
-                        ConjureType conjureType = entry.getValue().type();
+                        Type conjureType = entry.type();
 
                         Preconditions.checkState(!conjureType.equals(PrimitiveType.BEARERTOKEN),
                                 "Path parameters of type 'bearertoken' are not allowed as this "
                                         + "would introduce a security vulnerability: \"%s\"",
-                                entry.getKey());
+                                entry.argName());
                     });
         }
     }
@@ -163,12 +160,12 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class ParameterNameValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            definition.args().keySet().forEach(name -> {
-                Matcher matcher = ParameterName.ANCHORED_PATTERN.matcher(name.name());
+            definition.args().forEach(arg -> {
+                Matcher matcher = ArgumentName.ANCHORED_PATTERN.matcher(arg.argName().name());
                 Preconditions.checkState(matcher.matches(),
                         "Parameter names in endpoint paths and service definitions must match pattern %s: %s",
-                        ParameterName.ANCHORED_PATTERN,
-                        name);
+                        ArgumentName.ANCHORED_PATTERN,
+                        arg.argName().name());
             });
         }
     }
@@ -177,23 +174,26 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            definition.args().forEach((name, arg) -> {
+            definition.args().forEach(arg -> {
                 final Pattern pattern;
                 switch (arg.paramType()) {
                     case BODY:
                     case PATH:
                     case QUERY:
-                        pattern = ParameterName.ANCHORED_PATTERN;
+                        pattern = ArgumentName.ANCHORED_PATTERN;
                         break;
                     case HEADER:
-                        pattern = ParameterName.HEADER_PATTERN;
+                        pattern = ParameterId.HEADER_PATTERN;
                         break;
                     default:
                         throw new IllegalStateException("Validation for paramType does not exist: " + arg.paramType());
                 }
-                Preconditions.checkState(pattern.matcher(arg.paramId().name()).matches(),
-                        "Parameter ids with type %s must match pattern %s: %s",
-                        arg.paramType(), pattern, arg.paramId().name());
+
+                if (arg.paramId().isPresent()) {
+                    Preconditions.checkState(pattern.matcher(arg.paramId().get().name()).matches(),
+                            "Parameter ids with type %s must match pattern %s: %s",
+                            arg.paramType(), pattern, arg.paramId().get().name());
+                }
             });
         }
     }

@@ -1,7 +1,7 @@
-test-case-name: "unique-objects-names"
+test-case-name: "unique-types-names"
 negative:
   duplicateObjectAndErrorNamesNotAllowed:
-    expected-error: 'Type and error names must be unique across locally defined and imported objects'
+    expected-error: 'Type and error names must be unique across locally defined and imported types'
     conjure:
       types:
         definitions:

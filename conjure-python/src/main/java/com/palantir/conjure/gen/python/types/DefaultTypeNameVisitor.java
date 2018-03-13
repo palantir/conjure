@@ -29,7 +29,7 @@ public final class DefaultTypeNameVisitor implements ConjureTypeVisitor<String> 
     private final Map<TypeName, ExternalTypeDefinition> importsByName;
 
     public DefaultTypeNameVisitor(TypesDefinition types) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().objects(), t -> t.typeName());
+        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
         this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
     }
 

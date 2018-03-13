@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -47,7 +46,7 @@ public final class BeanGenerator {
     /** The maximum number of parameters for which a static factory method is generated in addition to the builder. */
     private static final int MAX_NUM_PARAMS_FOR_FACTORY = 3;
 
-    /** The name of the singleton instance field generated for empty objects. */
+    /** The name of the singleton instance field generated for empty types. */
     private static final String SINGLETON_INSTANCE_NAME = "INSTANCE";
 
     public static JavaFile generateBeanType(
@@ -83,7 +82,8 @@ public final class BeanGenerator {
                     .addMethod(MethodSpecs.createHashCode(poetFields));
         }
 
-        typeBuilder.addMethod(MethodSpecs.createToString(typeDef.typeName().name(), typeDef.fields().keySet()));
+        typeBuilder.addMethod(MethodSpecs.createToString(typeDef.typeName().name(),
+                fields.stream().map(EnrichedField::fieldName).collect(Collectors.toList())));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
             typeBuilder.addMethod(createStaticFactoryMethod(poetFields, objectClass));
@@ -114,7 +114,7 @@ public final class BeanGenerator {
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 
-        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
+        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
 
         return JavaFile.builder(typePackage.name(), typeBuilder.build())
                 .skipJavaLangImports(true)
@@ -130,12 +130,12 @@ public final class BeanGenerator {
     }
 
     private static Collection<EnrichedField> createFields(
-            TypeMapper typeMapper, Map<FieldName, FieldDefinition> fields) {
-        return fields.entrySet().stream()
-                .map(e -> EnrichedField.of(e.getKey(), e.getValue(), FieldSpec.builder(
+            TypeMapper typeMapper, List<FieldDefinition> fields) {
+        return fields.stream()
+                .map(e -> EnrichedField.of(e.fieldName(), e, FieldSpec.builder(
                         // fields are guarded against using reserved keywords
-                        typeMapper.getClassName(e.getValue().type()),
-                        JavaNameSanitizer.sanitize(e.getKey()),
+                        typeMapper.getClassName(e.type()),
+                        JavaNameSanitizer.sanitize(e.fieldName()),
                         Modifier.PRIVATE, Modifier.FINAL)
                         .build()))
                 .collect(Collectors.toList());
@@ -195,9 +195,8 @@ public final class BeanGenerator {
             getterBuilder.addStatement("return this.$N", field.poetSpec().name);
         }
 
-        if (field.conjureDef().docs().isPresent()) {
-            getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(field.conjureDef().docs().get(), "\n"));
-        }
+        field.conjureDef().docs().ifPresent(docs ->
+                getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
         return getterBuilder.build();
     }
 

@@ -26,10 +26,10 @@ public abstract class PathDefinition {
     public abstract Path path();
 
     private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_-]*$");
-    private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + ParameterName.PATTERN + "}$");
+    private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + ArgumentName.PATTERN + "}$");
     private static final Pattern PARAM_REGEX_SEGMENT_PATTERN =
             Pattern.compile(
-                    "^\\{" + ParameterName.PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
+                    "^\\{" + ArgumentName.PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
                             + "}$");
 
     /** Creates a new instance if the syntax is correct. */

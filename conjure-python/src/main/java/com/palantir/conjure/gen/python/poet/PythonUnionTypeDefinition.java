@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
 import java.util.List;
@@ -39,7 +40,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
 
     String className();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
     /**
      * The options in the union.
@@ -50,7 +51,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.writeIndentedLine(String.format("class %s(ConjureUnionType):", className()));
         poetWriter.increaseIndent();
-        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
+        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
 
         poetWriter.writeLine();
 
@@ -122,7 +123,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
 
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: () -> %s", option.myPyType()));
-            option.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
+            option.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
             poetWriter.writeIndentedLine(String.format("return self._%s", option.attributeName()));
             poetWriter.decreaseIndent();
         });

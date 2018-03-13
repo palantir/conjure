@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.java.types;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -93,7 +94,7 @@ public final class ErrorGenerator {
                     CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, errorDef.typeName().name()),
                     Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(initializer);
-            errorDef.docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs));
+            errorDef.docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs.value()));
             return fieldSpecBuilder.build();
         }).collect(Collectors.toList());
 
@@ -122,19 +123,20 @@ public final class ErrorGenerator {
                     entry.typeName().name(), shouldThrowVar);
             methodBuilder.addJavadoc("@param $L $L\n", shouldThrowVar, "Cause the method to throw when true");
             Streams.concat(
-                    entry.safeArgs().entrySet().stream(),
-                    entry.unsafeArgs().entrySet().stream()).forEach(arg -> {
-                        methodBuilder.addParameter(typeMapper.getClassName(arg.getValue().type()), arg.getKey().name());
-                        methodBuilder.addJavadoc("@param $L $L", arg.getKey().name(),
-                                        StringUtils.appendIfMissing(arg.getValue().docs().orElse(""), "\n"));
+                    entry.safeArgs().stream(),
+                    entry.unsafeArgs().stream()).forEach(arg -> {
+                        methodBuilder.addParameter(typeMapper.getClassName(arg.type()), arg.fieldName().name());
+                        methodBuilder.addJavadoc("@param $L $L", arg.fieldName().name(),
+                                        StringUtils.appendIfMissing(
+                                                arg.docs().map(Documentation::value).orElse(""), "\n"));
                     });
 
             methodBuilder.addCode("if ($L) {", shouldThrowVar);
             methodBuilder.addCode("throw $L;",
                     Expressions.localMethodCall(exceptionMethodName,
                             Streams.concat(
-                                    entry.safeArgs().entrySet().stream(),
-                                    entry.unsafeArgs().entrySet().stream()).map(arg -> arg.getKey().name())
+                                    entry.safeArgs().stream(),
+                                    entry.unsafeArgs().stream()).map(arg -> arg.fieldName().name())
                                     .collect(Collectors.toList())));
             methodBuilder.addCode("}");
             return methodBuilder.build();
@@ -170,23 +172,26 @@ public final class ErrorGenerator {
             methodBuilder.addCode(", cause");
         }
 
-        entry.safeArgs().entrySet().stream().forEach(arg ->
-                processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), true));
-        entry.unsafeArgs().entrySet().stream().forEach(arg ->
-                processArg(typeMapper, methodBuilder, arg.getKey().name(), arg.getValue(), false));
+        entry.safeArgs().stream().forEach(arg ->
+                processArg(typeMapper, methodBuilder, arg, true));
+
+        entry.unsafeArgs().stream().forEach(arg ->
+                processArg(typeMapper, methodBuilder, arg, false));
         methodBuilder.addCode(");");
 
         return methodBuilder.build();
     }
 
-    private static void processArg(TypeMapper typeMapper, MethodSpec.Builder methodBuilder,
-            String argName, FieldDefinition argDefinition, boolean isSafe) {
+    private static void processArg(
+            TypeMapper typeMapper, MethodSpec.Builder methodBuilder, FieldDefinition argDefinition, boolean isSafe) {
+
+        String argName = argDefinition.fieldName().name();
         com.squareup.javapoet.TypeName argType = typeMapper.getClassName(argDefinition.type());
         methodBuilder.addParameter(argType, argName);
         Class<?> clazz = isSafe ? SafeArg.class : UnsafeArg.class;
         methodBuilder.addCode(",\n    $T.of($S, $L)", clazz, argName, argName);
         argDefinition.docs().ifPresent(docs ->
-                methodBuilder.addJavadoc("@param $L $L", argName, StringUtils.appendIfMissing(docs, "\n")));
+                methodBuilder.addJavadoc("@param $L $L", argName, StringUtils.appendIfMissing(docs.value(), "\n")));
     }
 
     private static ClassName errorTypesClassName(ConjurePackage conjurePackage, ErrorNamespace namespace) {

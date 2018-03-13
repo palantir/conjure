@@ -9,7 +9,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -31,16 +30,16 @@ public final class ObjectsDefinitionTest {
     private static final ConjurePackage PACKAGE = ConjurePackage.of("package");
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);
-    private static final Optional<String> DOCS = Optional.of("docs");
+    private static final Optional<Documentation> DOCS = Optional.of(Documentation.of("docs"));
 
     @Test
     public void testNoSelfRecursiveType() throws Exception {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.objects()).thenReturn(
+        when(imports.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(FOO)
-                                .putFields(FieldName.of("self"), FieldDefinition.of(LocalReferenceType.of(FOO), DOCS))
+                                .addFields(FieldDefinition.of(FieldName.of("self"), LocalReferenceType.of(FOO), DOCS))
                                 .build()
                 )
         );
@@ -53,20 +52,19 @@ public final class ObjectsDefinitionTest {
     @Test
     public void testRecursiveTypeOkInReference() throws Exception {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.objects()).thenReturn(
+        when(imports.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(TypeName.of("Foo", ConjurePackage.of("bar")))
-                                .putAllFields(ImmutableMap.of(
-                                        FieldName.of("selfOptional"),
-                                        FieldDefinition.of(OptionalType.of(LocalReferenceType.of(FOO)), DOCS),
-                                        FieldName.of("selfMap"),
-                                        FieldDefinition.of(MapType.of(LocalReferenceType.of(FOO),
-                                                LocalReferenceType.of(FOO)), DOCS),
-                                        FieldName.of("selfSet"),
-                                        FieldDefinition.of(SetType.of(LocalReferenceType.of(FOO)), DOCS),
-                                        FieldName.of("selfList"),
-                                        FieldDefinition.of(ListType.of(LocalReferenceType.of(FOO)), DOCS)
+                                .addAllFields(ImmutableList.of(
+                                        FieldDefinition.of(FieldName.of("selfOptional"),
+                                                OptionalType.of(LocalReferenceType.of(FOO)), DOCS),
+                                        FieldDefinition.of(FieldName.of("selfMap"), MapType.of(
+                                                LocalReferenceType.of(FOO), LocalReferenceType.of(FOO)), DOCS),
+                                        FieldDefinition.of(FieldName.of("selfSet"),
+                                                SetType.of(LocalReferenceType.of(FOO)), DOCS),
+                                        FieldDefinition.of(FieldName.of("selfList"),
+                                                ListType.of(LocalReferenceType.of(FOO)), DOCS)
                                 )).build()
                 )
         );
@@ -77,15 +75,15 @@ public final class ObjectsDefinitionTest {
     @Test
     public void testNoRecursiveCycleType() throws Exception {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.objects()).thenReturn(
+        when(imports.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(FOO)
-                                .putFields(FieldName.of("bar"), field("Bar"))
+                                .addFields(field(FieldName.of("bar"), "Bar"))
                                 .build(),
                         ObjectTypeDefinition.builder()
                                 .typeName(BAR)
-                                .putFields(FieldName.of("foo"), field("Foo"))
+                                .addFields(field(FieldName.of("foo"), "Foo"))
                                 .build()
                 )
         );
@@ -99,14 +97,14 @@ public final class ObjectsDefinitionTest {
     public void testNoComplexKeysInMaps() throws Exception {
         ObjectsDefinition imports = mock(ObjectsDefinition.class);
         String illegalFieldName = "asdf";
-        ConjureType complexKeyType = ListType.of(PrimitiveType.STRING);
+        Type complexKeyType = ListType.of(PrimitiveType.STRING);
         List<BaseObjectTypeDefinition> objects = ImmutableList.of(
                 ObjectTypeDefinition.builder()
                         .typeName(FOO)
-                        .putFields(FieldName.of(illegalFieldName),
-                                FieldDefinition.of(MapType.of(complexKeyType, PrimitiveType.STRING), DOCS))
+                        .addFields(FieldDefinition.of(FieldName.of(illegalFieldName),
+                                MapType.of(complexKeyType, PrimitiveType.STRING), DOCS))
                         .build());
-        when(imports.objects()).thenReturn(objects);
+        when(imports.types()).thenReturn(objects);
 
         assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_COMPLEX_KEYS.validate(imports))
                 .isInstanceOf(IllegalStateException.class)
@@ -114,7 +112,7 @@ public final class ObjectsDefinitionTest {
                 .hasMessageContaining(complexKeyType.toString());
     }
 
-    private FieldDefinition field(String type) throws ParseException {
-        return FieldDefinition.of(LocalReferenceType.of(TypeName.of(type, PACKAGE)), DOCS);
+    private FieldDefinition field(FieldName name, String type) throws ParseException {
+        return FieldDefinition.of(name, LocalReferenceType.of(TypeName.of(type, PACKAGE)), DOCS);
     }
 }

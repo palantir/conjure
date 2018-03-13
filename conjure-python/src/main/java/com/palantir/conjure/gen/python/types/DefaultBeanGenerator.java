@@ -6,10 +6,9 @@ package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.TypesDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
@@ -66,15 +65,13 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
         ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
         List<PythonField> options = typeDef.union()
-                .entrySet()
                 .stream()
-                .map(entry -> {
-                    FieldDefinition unionMember = entry.getValue();
-                    ConjureType conjureType = unionMember.type();
+                .map(unionMember -> {
+                    Type conjureType = unionMember.type();
                     return PythonField.builder()
-                            .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
+                            .attributeName(unionMember.fieldName().toCase(FieldName.Case.SNAKE_CASE).name())
                             .docs(unionMember.docs())
-                            .jsonIdentifier(entry.getKey().name())
+                            .jsonIdentifier(unionMember.fieldName().name())
                             .myPyType(myPyMapper.getTypeName(conjureType))
                             .pythonType(mapper.getTypeName(conjureType))
                             .build();
@@ -82,9 +79,8 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .collect(Collectors.toList());
 
         Set<PythonImport> imports = typeDef.union()
-                .entrySet()
                 .stream()
-                .flatMap(entry -> entry.getValue().type().visit(referencedTypeNameVisitor).stream())
+                .flatMap(entry -> entry.type().visit(referencedTypeNameVisitor).stream())
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
@@ -122,9 +118,9 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
 
         ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
 
-        Set<PythonImport> imports = typeDef.fields().entrySet()
+        Set<PythonImport> imports = typeDef.fields()
                 .stream()
-                .flatMap(entry -> entry.getValue().type().visit(referencedTypeNameVisitor).stream())
+                .flatMap(entry -> entry.type().visit(referencedTypeNameVisitor).stream())
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
@@ -136,14 +132,13 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .className(typeDef.typeName().name())
                 .docs(typeDef.docs())
                 .fields(typeDef.fields()
-                        .entrySet()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(entry.getKey().toCase(FieldName.Case.SNAKE_CASE).name())
-                                .jsonIdentifier(entry.getKey().name())
-                                .docs(entry.getValue().docs())
-                                .pythonType(mapper.getTypeName(entry.getValue().type()))
-                                .myPyType(myPyMapper.getTypeName(entry.getValue().type()))
+                                .attributeName(entry.fieldName().toCase(FieldName.Case.SNAKE_CASE).name())
+                                .jsonIdentifier(entry.fieldName().name())
+                                .docs(entry.docs())
+                                .pythonType(mapper.getTypeName(entry.type()))
+                                .myPyType(myPyMapper.getTypeName(entry.type()))
                                 .build())
                         .collect(Collectors.toList()))
                 .build();

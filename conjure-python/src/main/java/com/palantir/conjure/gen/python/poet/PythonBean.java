@@ -7,6 +7,7 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public interface PythonBean extends PythonClass {
 
     String className();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
     List<PythonField> fields();
 
@@ -45,7 +46,7 @@ public interface PythonBean extends PythonClass {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.writeIndentedLine(String.format("class %s(ConjureBeanType):", className()));
         poetWriter.increaseIndent();
-        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
+        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
 
         poetWriter.writeLine();
 
@@ -105,7 +106,7 @@ public interface PythonBean extends PythonClass {
 
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: () -> %s", field.myPyType()));
-            field.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs)));
+            field.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
             poetWriter.writeIndentedLine(String.format("return self._%s", field.attributeName()));
             poetWriter.decreaseIndent();
         });
@@ -139,7 +140,7 @@ public interface PythonBean extends PythonClass {
          */
         String myPyType();
 
-        Optional<String> docs();
+        Optional<Documentation> docs();
 
         class Builder extends ImmutablePythonField.Builder {}
 

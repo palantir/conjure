@@ -10,7 +10,7 @@ import java.io.Serializable;
 import javax.lang.model.element.Modifier;
 
 /**
- * {@link SerializableSupport} utility to make generated objects implement {@link Serializable}
+ * {@link SerializableSupport} utility to make generated types implement {@link Serializable}
  * with <pre>serialVersionUID</pre> hard coded to <pre>1L</pre>.
  *
  * @see <a href="https://github.palantir.build/foundry/conjure/pull/705">705</a>

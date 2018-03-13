@@ -5,29 +5,33 @@
 package com.palantir.conjure.defs.services;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureType;
-import java.util.Map;
+import com.palantir.conjure.defs.types.Documentation;
+import com.palantir.conjure.defs.types.Type;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EndpointDefinition {
 
+    EndpointName endpointName();
+
+    // TODO(qchen): split this into method and path?
     RequestLineDefinition http();
 
+    // TODO(qchen): optional union type
     AuthDefinition auth();
 
-    Map<ParameterName, ArgumentDefinition> args();
+    List<ArgumentDefinition> args();
 
-    Set<ConjureType> markers();
+    List<Type> markers();
 
-    Optional<ConjureType> returns();
+    Optional<Type> returns();
 
-    Optional<String> docs();
+    Optional<Documentation> docs();
 
-    Optional<String> deprecated();
+    Optional<Documentation> deprecated();
 
     @Value.Check
     default void check() {

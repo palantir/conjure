@@ -39,7 +39,7 @@ public interface ServiceGenerator {
                 .map(v -> StringUtils.appendIfMissing("@deprecated " + v, "\n"));
 
         Optional<String> docs = endpointDef.docs()
-                .map(v -> StringUtils.appendIfMissing(v, "\n"));
+                .map(v -> StringUtils.appendIfMissing(v.value(), "\n"));
 
         StringBuilder sb = new StringBuilder();
         docs.ifPresent(sb::append);

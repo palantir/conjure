@@ -13,8 +13,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ObjectsDefinition {
 
-    // TODO(rfink): Rename to "types".
-    List<BaseObjectTypeDefinition> objects();
+    List<BaseObjectTypeDefinition> types();
 
     List<ErrorTypeDefinition> errors();
 

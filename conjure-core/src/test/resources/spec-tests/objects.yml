@@ -1,4 +1,4 @@
-test-case-name: "objects"
+test-case-name: "types"
 positive:
   emptyOK:
     conjure:

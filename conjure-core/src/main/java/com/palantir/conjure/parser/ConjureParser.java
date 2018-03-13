@@ -82,7 +82,7 @@ public final class ConjureParser {
 
         private ConjureDefinition parseInternal(File file) {
             // Note(rfink): The mechanism of parsing the ConjureDefinition and the imports separately isn't pretty,
-            // but it's better than the previous implementation where ConjureImports objects were passed around all
+            // but it's better than the previous implementation where ConjureImports types were passed around all
             // over the place. Main obstacle to simpler parsing is that Jackson parsers don't have context, i.e., it's
             // impossible to know the base-path w.r.t. which the imported file is declared.
             if (!Files.exists(file.toPath())) {

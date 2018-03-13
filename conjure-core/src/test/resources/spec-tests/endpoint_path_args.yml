@@ -108,22 +108,6 @@ negative:
               http: GET /path/{arg:[0-9]+}
               args:
                 arg: string
-  keyAndParamIdClash:
-    expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
-    conjure:
-      services:
-        TestService:
-          name: Test Service
-          package: test.a
-          endpoints:
-            testEndpoint:
-              http: GET /path/{arg}
-              args:
-                # invalid: cannot have multiple arguments with the same name and param-id if it will cause a collision
-                arg: string
-                uniquename:
-                  param-id: arg
-                  type: string
   samePathParamMultipleTimes:
     expected-error: 'Path parameter arg appears more than once in path /path/{arg}/{arg}'
     conjure:
@@ -173,24 +157,6 @@ negative:
               args:
                 other: string
                 other2: string
-  paramIdsClash:
-    expected-error: 'Path parameter with identifier "arg" is defined multiple times for endpoint'
-    conjure:
-      services:
-        TestService:
-          name: Test Service
-          package: test.a
-          endpoints:
-            testEndpoint:
-              http: GET /path/{arg}
-              args:
-                # invalid: cannot have multiple arguments with the same param-id if it will cause a collision
-                argName:
-                  param-id: arg
-                  type: string
-                uniqueName:
-                  param-id: arg
-                  type: string
   pathTemplateParamMissing:
     expected-error: "Path parameters defined path template but not present in endpoint: [arg]"
     conjure:

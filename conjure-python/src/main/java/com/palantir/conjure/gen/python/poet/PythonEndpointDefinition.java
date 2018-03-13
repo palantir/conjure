@@ -12,6 +12,8 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition.AuthType;
+import com.palantir.conjure.defs.services.EndpointName;
+import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.RequestLineDefinition;
 import java.util.List;
@@ -24,7 +26,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface PythonEndpointDefinition extends Emittable {
 
-    String methodName();
+    EndpointName methodName();
 
     RequestLineDefinition http();
 
@@ -52,7 +54,7 @@ public interface PythonEndpointDefinition extends Emittable {
                     ? ImmutableList.<PythonEndpointParam>builder()
                     .add(PythonEndpointParam.builder()
                             .paramName("authHeader")
-                            .paramId("Authorization")
+                            .paramId(ParameterId.of("Authorization"))
                             .myPyType("str")
                             .paramType(ArgumentDefinition.ParamType.HEADER)
                             .build())
@@ -61,7 +63,7 @@ public interface PythonEndpointDefinition extends Emittable {
             paramsWithHeader = paramsWithHeader.stream().collect(Collectors.toList());
 
             poetWriter.writeIndentedLine("def %s(self, %s):",
-                    methodName(),
+                    methodName().name(),
                     Joiner.on(", ").join(
                             paramsWithHeader.stream()
                                     .map(PythonEndpointParam::paramName)
@@ -85,7 +87,7 @@ public interface PythonEndpointDefinition extends Emittable {
                     .filter(param -> param.paramType() == ArgumentDefinition.ParamType.HEADER)
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                param.paramId().orElse(param.paramName()), param.paramName());
+                                param.paramId().map(ParameterId::name).orElse(param.paramName()), param.paramName());
                     });
             poetWriter.decreaseIndent();
             poetWriter.writeIndentedLine("} # type: Dict[str, Any]");
@@ -97,7 +99,8 @@ public interface PythonEndpointDefinition extends Emittable {
             paramsWithHeader.stream()
                     .filter(param -> param.paramType() == ArgumentDefinition.ParamType.QUERY)
                     .forEach(param -> {
-                        poetWriter.writeIndentedLine("'%s': %s,", param.paramId().orElse(param.paramName()),
+                        poetWriter.writeIndentedLine("'%s': %s,",
+                                param.paramId().map(ParameterId::name).orElse(param.paramName()),
                                 param.paramName());
                     });
             poetWriter.decreaseIndent();
@@ -110,7 +113,8 @@ public interface PythonEndpointDefinition extends Emittable {
             paramsWithHeader.stream()
                     .filter(param -> param.paramType() == ArgumentDefinition.ParamType.PATH)
                     .forEach(param -> {
-                        poetWriter.writeIndentedLine("'%s': %s,", param.paramId().orElse(param.paramName()),
+                        poetWriter.writeIndentedLine("'%s': %s,",
+                                param.paramId().map(ParameterId::name).orElse(param.paramName()),
                                 param.paramName());
                     });
             poetWriter.decreaseIndent();
@@ -196,7 +200,7 @@ public interface PythonEndpointDefinition extends Emittable {
          * An identifier to use as a parameter value (e.g. if this is a header parameter, param-id defines the header
          * key); by default the argument name is used as the param-id
          */
-        Optional<String> paramId();
+        Optional<ParameterId> paramId();
 
         String myPyType();
 

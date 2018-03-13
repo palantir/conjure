@@ -6,6 +6,7 @@ package com.palantir.conjure.defs.types.complex;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.ErrorCode;
@@ -16,16 +17,21 @@ import org.junit.Test;
 
 public class ErrorTypeDefinitionTest {
 
-    private static final FieldDefinition FIELD = mock(FieldDefinition.class);
-
     @Test
-    public void testUniqueArgNamesValidator() throws Exception {
+    public void testUniqueArgNamesValidator() {
+        FieldDefinition mockField = mock(FieldDefinition.class);
+        when(mockField.fieldName())
+                .thenReturn(FieldName.of("fooBar"))
+                .thenReturn(FieldName.of("foo-bar"))
+                .thenReturn(FieldName.of("foo-bar"))
+                .thenReturn(FieldName.of("foo_bar"));
+
         ErrorTypeDefinition.Builder definition = ErrorTypeDefinition.builder()
                 .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
-                .putSafeArgs(FieldName.of("fooBar"), FIELD)
-                .putUnsafeArgs(FieldName.of("foo-bar"), FIELD);
+                .addSafeArgs(mockField)
+                .addUnsafeArgs(mockField);
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -36,8 +42,8 @@ public class ErrorTypeDefinitionTest {
                 .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
-                .putSafeArgs(FieldName.of("foo-bar"), FIELD)
-                .putUnsafeArgs(FieldName.of("foo_bar"), FIELD);
+                .addSafeArgs(mockField)
+                .addUnsafeArgs(mockField);
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalArgumentException.class)

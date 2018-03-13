@@ -22,7 +22,7 @@ import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import org.junit.Test;
 
-public final class ConjureTypeParserTests {
+public final class TypeParserTests {
 
     @Test
     public void testParser_stringType() throws ParseException {

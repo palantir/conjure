@@ -19,11 +19,11 @@ public interface RequestLineDefinition {
     PathDefinition path();
 
     @Value.Derived
-    default Set<ParameterName> pathArgs() {
+    default Set<ArgumentName> pathArgs() {
         UriTemplate uriTemplate = new UriTemplate(path().path().toString());
         return uriTemplate.getTemplateVariables()
                 .stream()
-                .map(ParameterName::of)
+                .map(ArgumentName::of)
                 .collect(Collectors.toSet());
     }
 

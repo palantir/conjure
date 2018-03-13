@@ -61,7 +61,7 @@ public interface BaseObjectTypeDefinition {
                 return ErrorTypeDefinition.fromJson(parser, tree);
             } else {
                 throw new IllegalArgumentException(
-                        "Unrecognized definition, objects must have either fields, values or an alias defined.");
+                        "Unrecognized definition, types must have either fields, values or an alias defined.");
             }
         }
     }

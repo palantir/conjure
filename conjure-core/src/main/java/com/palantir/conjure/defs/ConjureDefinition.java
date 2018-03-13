@@ -13,6 +13,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ConjureDefinition {
 
+    // TODO(qchen): change to List<TypeDefinition>
     TypesDefinition types();
 
     List<ServiceDefinition> services();

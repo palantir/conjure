@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface BaseObjectTypeDefinition {
     // TODO(rfink): Rename to "name"?
     TypeName typeName();
-    Optional<String> docs();
+    Optional<Documentation> docs();
 }

@@ -26,7 +26,7 @@ import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import java.util.Optional;
 
 /** The core translator between parsed/raw types and the "defs" representation exposed to compilers. */
-public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<ConjureType> {
+public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> {
 
     public interface TypeNameResolver {
         TypeName resolve(LocalReferenceType reference);
@@ -85,54 +85,54 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Conjur
     }
 
     @Override
-    public ConjureType visitAny(AnyType type) {
+    public Type visitAny(AnyType type) {
         return com.palantir.conjure.defs.types.builtin.AnyType.of();
     }
 
     @Override
-    public ConjureType visitList(ListType type) {
+    public Type visitList(ListType type) {
         return com.palantir.conjure.defs.types.collect.ListType.of(type.itemType().visit(this));
     }
 
     @Override
-    public ConjureType visitMap(MapType type) {
+    public Type visitMap(MapType type) {
         return com.palantir.conjure.defs.types.collect.MapType.of(
                 type.keyType().visit(this), type.valueType().visit(this));
     }
 
     @Override
-    public ConjureType visitOptional(OptionalType type) {
+    public Type visitOptional(OptionalType type) {
         return com.palantir.conjure.defs.types.collect.OptionalType.of(type.itemType().visit(this));
     }
 
     @Override
-    public ConjureType visitPrimitive(PrimitiveType type) {
+    public Type visitPrimitive(PrimitiveType type) {
         return ConjureParserUtils.parsePrimitiveType(type);
     }
 
     @Override
-    public ConjureType visitLocalReference(LocalReferenceType type) {
+    public Type visitLocalReference(LocalReferenceType type) {
         return com.palantir.conjure.defs.types.reference.LocalReferenceType.of(nameResolver.resolve(type));
     }
 
     @Override
-    public ConjureType visitForeignReference(ForeignReferenceType type) {
+    public Type visitForeignReference(ForeignReferenceType type) {
         // Converts foreign references to local ones since we're inlining all imports at parse-time.
         return com.palantir.conjure.defs.types.reference.LocalReferenceType.of(nameResolver.resolve(type));
     }
 
     @Override
-    public ConjureType visitSet(SetType type) {
+    public Type visitSet(SetType type) {
         return com.palantir.conjure.defs.types.collect.SetType.of(type.itemType().visit(this));
     }
 
     @Override
-    public ConjureType visitBinary(BinaryType type) {
+    public Type visitBinary(BinaryType type) {
         return com.palantir.conjure.defs.types.builtin.BinaryType.of();
     }
 
     @Override
-    public ConjureType visitDateTime(DateTimeType type) {
+    public Type visitDateTime(DateTimeType type) {
         return com.palantir.conjure.defs.types.builtin.DateTimeType.of();
     }
 }

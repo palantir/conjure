@@ -10,6 +10,7 @@ import static org.junit.Assume.assumeTrue;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.ConjureParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,9 @@ public class AllSpellbookDefinitionsTest {
     private static final Logger log = LoggerFactory.getLogger(AllSpellbookDefinitionsTest.class);
     private static final Path spellbookDirectory = Paths.get("../build/spellbook");
     private final Path conjureYml;
+
+    private static final ImmutableList<String> WHITE_LISTED_DEFS = ImmutableList.of(
+            "tileserver-api.yml", "compass-api-organization-and-project.yml");
 
     public AllSpellbookDefinitionsTest(Path conjureYml) {
         this.conjureYml = conjureYml;
@@ -62,6 +66,8 @@ public class AllSpellbookDefinitionsTest {
     public void verify_conjure_yml_deserializes() throws Exception {
         String contents = new String(Files.readAllBytes(conjureYml), StandardCharsets.UTF_8);
         assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
+        assumeTrue("file using deprecated conjure paramId for path or body param",
+                !WHITE_LISTED_DEFS.stream().filter(f -> conjureYml.toString().contains(f)).findAny().isPresent());
 
         try {
             Conjure.parse(conjureYml.toFile());

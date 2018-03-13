@@ -7,12 +7,11 @@ package com.palantir.conjure.defs.services;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import javax.ws.rs.HttpMethod;
 import org.junit.Test;
 
-public final class ParameterNameValidatorTest {
+public final class ArgumentNameValidatorTest {
 
     @Test
     @SuppressWarnings("CheckReturnValue")
@@ -31,20 +30,21 @@ public final class ParameterNameValidatorTest {
             assertThatThrownBy(endpoint::build)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter names in endpoint paths and service definitions must match pattern %s: %s",
-                            ParameterName.ANCHORED_PATTERN,
+                            ArgumentName.ANCHORED_PATTERN,
                             paramName);
         }
     }
 
     private EndpointDefinition.Builder createEndpoint(String paramName) {
         ArgumentDefinition arg = ArgumentDefinition.builder()
-                .paramId(ParameterName.of("foo"))
-                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramType(ArgumentDefinition.ParamType.BODY)
                 .type(PrimitiveType.STRING)
+                .argName(ArgumentName.of(paramName))
                 .build();
         return EndpointDefinition.builder()
                 .auth(AuthDefinition.none())
-                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path/{foo}")))
-                .args(ImmutableMap.of(ParameterName.of(paramName), arg));
+                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
+                .args(ImmutableList.of(arg))
+                .endpointName(EndpointName.of("test"));
     }
 }

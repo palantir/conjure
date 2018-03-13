@@ -34,13 +34,13 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         @Override
         public void validate(ServiceDefinition definition) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
-            definition.endpoints().entrySet().stream().forEach(entry -> {
-                String methodPath = entry.getValue().http().method() + " " + entry.getValue().http().path().toString();
+            definition.endpoints().stream().forEach(entry -> {
+                String methodPath = entry.http().method() + " " + entry.http().path().toString();
                 // normalize all path parameter variables and regular expressions because all path args are treated
                 // as identical for comparisons (paths cannot differ only in the name/regular expression of a path
                 // variable)
                 methodPath = PATHVAR_PATTERN.matcher(methodPath).replaceAll("{arg}");
-                pathToEndpoints.put(methodPath, entry.getKey());
+                pathToEndpoints.put(methodPath, entry.endpointName().name());
             });
 
             pathToEndpoints.keySet().stream().sorted().forEachOrdered(key -> {

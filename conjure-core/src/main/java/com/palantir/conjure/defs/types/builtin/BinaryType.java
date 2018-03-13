@@ -5,13 +5,13 @@
 package com.palantir.conjure.defs.types.builtin;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ConjureType;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.Type;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface BinaryType extends ConjureType {
+public interface BinaryType extends Type {
 
     // marker interface
 

@@ -11,9 +11,9 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthDefinition;
 import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.ParameterName;
+import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.ConjureType;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
@@ -70,13 +70,10 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(JerseyServiceGenerator.class));
 
         serviceDefinition.docs().ifPresent(docs ->
-                serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs, "\n")));
+                serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
 
-        serviceBuilder.addMethods(serviceDefinition.endpoints().entrySet().stream()
-                .map(endpoint -> generateServiceMethod(
-                        endpoint.getKey(),
-                        endpoint.getValue(),
-                        returnTypeMapper, methodTypeMapper))
+        serviceBuilder.addMethods(serviceDefinition.endpoints().stream()
+                .map(endpoint -> generateServiceMethod(endpoint, returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toList()));
 
         return JavaFile.builder(serviceDefinition.serviceName().conjurePackage().name(), serviceBuilder.build())
@@ -85,11 +82,10 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     }
 
     private MethodSpec generateServiceMethod(
-            String endpointName,
             EndpointDefinition endpointDef,
             TypeMapper returnTypeMapper,
             TypeMapper methodTypeMapper) {
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointName)
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
@@ -110,7 +106,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                     .build());
         }
 
-        boolean consumesTypeIsBinary = endpointDef.args().values().stream()
+        boolean consumesTypeIsBinary = endpointDef.args().stream()
                 .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
                         ArgumentDefinition.ParamType.BODY));
 
@@ -139,18 +135,15 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         AuthDefinition auth = endpointDef.auth();
         createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
-        endpointDef.args().forEach((name, def) -> {
-            parameterSpecs.add(createServiceMethodParameterArg(typeMapper, name, def));
+        endpointDef.args().forEach(def -> {
+            parameterSpecs.add(createServiceMethodParameterArg(typeMapper, def));
         });
         return ImmutableList.copyOf(parameterSpecs);
     }
 
-    private static ParameterSpec createServiceMethodParameterArg(
-            TypeMapper typeMapper,
-            ParameterName argumentName,
-            ArgumentDefinition def) {
-        ParameterSpec.Builder param = ParameterSpec.builder(typeMapper.getClassName(def.type()), argumentName.name());
-        getParamTypeAnnotation(argumentName, def).ifPresent(param::addAnnotation);
+    private static ParameterSpec createServiceMethodParameterArg(TypeMapper typeMapper, ArgumentDefinition def) {
+        ParameterSpec.Builder param = ParameterSpec.builder(typeMapper.getClassName(def.type()), def.argName().name());
+        getParamTypeAnnotation(def).ifPresent(param::addAnnotation);
 
         param.addAnnotations(createMarkers(typeMapper, def.markers()));
         return param.build();
@@ -182,19 +175,22 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                         .build());
     }
 
-    private static Optional<AnnotationSpec> getParamTypeAnnotation(
-            ParameterName argName,
-            ArgumentDefinition def) {
-        final String annotationType;
+    private static Optional<AnnotationSpec> getParamTypeAnnotation(ArgumentDefinition def) {
+        AnnotationSpec.Builder annotationSpecBuilder;
         switch (def.paramType()) {
             case PATH:
-                annotationType = "PathParam";
+                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "PathParam"))
+                        .addMember("value", "$S", def.argName().name());
                 break;
             case QUERY:
-                annotationType = "QueryParam";
+                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "QueryParam"))
+                        .addMember("value", "$S",
+                                def.paramId().map(ParameterId::name).orElse(def.argName().name()));
                 break;
             case HEADER:
-                annotationType = "HeaderParam";
+                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
+                        .addMember("value", "$S",
+                                def.paramId().map(ParameterId::name).orElse(def.argName().name()));
                 break;
             case BODY:
                 /* no annotations for body parameters */
@@ -202,12 +198,11 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             default:
                 throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
         }
-        return Optional.of(AnnotationSpec.builder(ClassName.get("javax.ws.rs", annotationType))
-                .addMember("value", "$S", def.paramId())
-                .build());
+
+        return Optional.of(annotationSpecBuilder.build());
     }
 
-    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, Set<ConjureType> markers) {
+    private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<Type> markers) {
         checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
                 "Markers must refer to reference types.");
         return markers.stream()

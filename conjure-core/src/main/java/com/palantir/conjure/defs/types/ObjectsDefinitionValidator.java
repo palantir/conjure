@@ -14,14 +14,12 @@ import com.palantir.conjure.defs.services.IsPrimitiveOrReferenceType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @com.google.errorprone.annotations.Immutable
@@ -47,14 +45,14 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         public void validate(ObjectsDefinition definition) {
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
-            for (BaseObjectTypeDefinition typeDef : definition.objects()) {
+            for (BaseObjectTypeDefinition typeDef : definition.types()) {
                 if (typeDef instanceof ObjectTypeDefinition) {
                     ObjectTypeDefinition objectDef = (ObjectTypeDefinition) typeDef;
-                    for (Map.Entry<FieldName, FieldDefinition> currField : objectDef.fields().entrySet()) {
-                        if (currField.getValue().type() instanceof ReferenceType) {
+                    for (FieldDefinition currField : objectDef.fields()) {
+                        if (currField.type() instanceof ReferenceType) {
                             typeToRefFields.put(
                                     typeDef.typeName(),
-                                    ((ReferenceType) currField.getValue().type()).type()
+                                    ((ReferenceType) currField.type()).type()
                             );
                         }
                     }
@@ -94,17 +92,16 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
     private static final class NoComplexKeysValidator implements ConjureValidator<ObjectsDefinition> {
         @Override
         public void validate(ObjectsDefinition definition) {
-            definition.objects().stream().forEach(typeDef -> {
+            definition.types().stream().forEach(typeDef -> {
                 if (typeDef instanceof ObjectTypeDefinition) {
                     ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) typeDef;
-                    objectTypeDefinition.fields().entrySet().stream().forEach(entry -> {
-                        FieldDefinition fieldDefinition = entry.getValue();
+                    objectTypeDefinition.fields().stream().forEach(fieldDefinition -> {
                         if (fieldDefinition.type() instanceof MapType) {
                             MapType mapType = (MapType) fieldDefinition.type();
                             if (!mapType.keyType().visit(IsPrimitiveOrReferenceType.INSTANCE)) {
                                 throw new IllegalStateException(
                                         String.format("Complex type '%s' not allowed in map key: %s.",
-                                                mapType.keyType(), entry.getKey().name()));
+                                                mapType.keyType(), fieldDefinition.fieldName()));
                             }
                         }
                     });
@@ -118,14 +115,14 @@ public enum ObjectsDefinitionValidator implements ConjureValidator<ObjectsDefini
         @Override
         public void validate(ObjectsDefinition definition) {
             Set<String> seenNames = new HashSet<>();
-            definition.objects().forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.typeName().name()));
+            definition.types().forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.typeName().name()));
             definition.errors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.typeName().name()));
         }
 
         private static void verifyNameIsUnique(Set<String> seenNames, String name) {
             boolean isNewName = seenNames.add(name);
             Verify.verify(isNewName,
-                    "Type and error names must be unique across locally defined and imported objects: %s", name);
+                    "Type and error names must be unique across locally defined and imported types: %s", name);
         }
     }
 }

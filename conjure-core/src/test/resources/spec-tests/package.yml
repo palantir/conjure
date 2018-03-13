@@ -13,7 +13,7 @@ positive:
     conjure:
       types:
         definitions:
-          # valid: "default-package" property is optional if package is specified for individual objects
+          # valid: "default-package" property is optional if package is specified for individual types
           objects:
             SimpleObject:
               package: test.api
