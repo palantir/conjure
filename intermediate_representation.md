@@ -355,11 +355,11 @@ If the value is "cookie", the object must also have a "cookie" key referring to 
 auth definition must have a key "cookieName" with a string value that is the required cookie name.
 - "args": a list of argument definitions. Each argument definition must have the keys "argName" (a string name for the
 argument), "type" (a [representation](#representation-of-conjure-types) of the argument type) and "paramType", which
-may be one of the values "PATH", "QUERY", "HEADER", or "BODY". Argument definitions with type "HEADER" or "QUERY" must
-also have a key "paramId", which specifies the header name or the query parameter name. Each argument definition may
-have a "docs" key containing string documentation for the service. Each argument definition may also have a "markers"
-key, consisting of a list of [types](#representation-of-conjure-types) that serve as additional metadata for the
-argument.
+may be one of the types "PathParameterType", "QueryParameterType", "HeaderParameterType", or "BodyParameterType".
+"HeaderParameterType" and "QueryParameterType" have a key "paramId" that specifies the corresponding header name or the query
+parameter name. Each argument definition may have a "docs" key containing string documentation for the service.
+Each argument definition may also have a "markers" key, consisting of a list of [types](#representation-of-conjure-types)
+that serve as additional metadata for the argument.
 - "returns": a [representation](#representation-of-conjure-types) of the return type of the endpoint
 - "docs": string documentation for the endpoint
 - "deprecated": a string explanation indicating the endpoint is deprecated and why
@@ -428,8 +428,12 @@ Example service definition:
                 "type": "primitive",
                 "primitive": "DATETIME"
               },
-              "paramType": "QUERY",
-              "paramId": "createdAfter"
+              "paramType": {
+                "type": "query",
+                "query": {
+                    "paramId": "createdAfter"
+                }
+              }
             }
           ],
           "returns": {

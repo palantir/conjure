@@ -1150,19 +1150,6 @@
             }
           },
           {
-            "fieldName": "paramId",
-            "type": {
-              "type": "optional",
-              "optional": {
-                "itemType": {
-                  "type": "reference",
-                  "reference": "com.palantir.conjure.spec.ParameterId"
-                }
-              }
-            },
-            "docs": "Required for arguments with 'paramType' of HEADER or QUERY. This value is used as the header name or as the query parameter name.\n"
-          },
-          {
             "fieldName": "docs",
             "type": {
               "type": "optional",
@@ -1210,24 +1197,116 @@
       }
     },
     {
-      "type": "enum",
-      "enum": {
+      "type": "object",
+      "object": {
+        "typeName": {
+          "name": "BodyParameterType",
+          "package": "com.palantir.conjure.spec"
+        },
+        "fields": [
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "object": {
+        "typeName": {
+          "name": "PathParameterType",
+          "package": "com.palantir.conjure.spec"
+        },
+        "fields": [
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "object": {
+        "typeName": {
+          "name": "QueryParameterType",
+          "package": "com.palantir.conjure.spec"
+        },
+        "fields": [
+          {
+            "fieldName": "paramId",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "ParameterId",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "object": {
+        "typeName": {
+          "name": "HeaderParameterType",
+          "package": "com.palantir.conjure.spec"
+        },
+        "fields": [
+          {
+            "fieldName": "paramId",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "ParameterId",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "union",
+      "union": {
         "typeName": {
           "name": "ParameterType",
           "package": "com.palantir.conjure.spec"
         },
-        "values": [
+        "union": [
           {
-            "value": "PATH"
+            "fieldName": "body",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "BodyParameterType",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
           },
           {
-            "value": "QUERY"
+            "fieldName": "header",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "HeaderParameterType",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
           },
           {
-            "value": "HEADER"
+            "fieldName": "path",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "PathParameterType",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
           },
           {
-            "value": "BODY"
+            "fieldName": "query",
+            "type": {
+              "type": "reference",
+              "reference": {
+                "name": "QueryParameterType",
+                "package": "com.palantir.conjure.spec"
+              }
+            }
           }
         ]
       }

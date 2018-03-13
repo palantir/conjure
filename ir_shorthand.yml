@@ -178,11 +178,6 @@ types:
           argName: ArgumentName
           type: Type
           paramType: ParameterType
-          paramId:
-            type: optional<ParameterId>
-            docs: >
-              Required for arguments with 'paramType' of HEADER or QUERY. This value is used as the header name or as
-              the query parameter name.
           docs: optional<Documentation>
           markers: list<Type>
       ArgumentName:
@@ -191,11 +186,21 @@ types:
           Must be in lowerCamelCase. Numbers are permitted, but not at the beginning of a word. Allowed argument names:
           "fooBar", "build2Request". Disallowed names: "FooBar", "2BuildRequest".
       ParameterType:
-        values:
-          - PATH
-          - QUERY
-          - HEADER
-          - BODY
+        union:
+          body: BodyParameterType
+          header: HeaderParameterType
+          path: PathParameterType
+          query: QueryParameterType
+      BodyParameterType:
+        fields: {}
+      HeaderParameterType:
+        fields:
+          paramId: ParameterId
+      PathParameterType:
+        fields: {}
+      QueryParameterType:
+        fields:
+          paramId: ParameterId
       ParameterId:
         alias: string
         docs: >
