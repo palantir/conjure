@@ -419,7 +419,7 @@ a class named `[YourNamespace]Errors`, along with the generated objects and fact
 for other error definitions with the same namespace. Instead of having each error definition
 define its own package, the default package name is used for all error definitions.
 
-The type alias and namespace should be in `UpperCamelCase`, whereas error code should be
+The type alias and namespace are required to be in `UpperCamelCase`, whereas error code is required to be
 in `UPPER_UNDERSCORE_CASE`.
 
 Error definition could optionally have two argument lists, `safe-args` and `unsafe-args`.
