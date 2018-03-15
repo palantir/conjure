@@ -5,22 +5,18 @@
 package com.palantir.conjure.defs.services;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
-import javax.ws.rs.HttpMethod;
 import org.junit.Test;
 
 public final class EndpointDefinitionTest {
 
     private static final EndpointName ENDPOINT_NAME = EndpointName.of("test");
-    private static final RequestLineDefinition GET_REQUEST =
-            RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
     private static final ArgumentDefinition.Builder BODY_ARG_BUILDER = ArgumentDefinition.builder()
             .type(AnyType.of())
-            .paramType(ArgumentDefinition.ParamType.BODY);
+            .paramType(BodyParameterType.body());
 
     @Test
     public void testArgumentTypeValidator() {
@@ -28,11 +24,11 @@ public final class EndpointDefinitionTest {
                 .args(ImmutableList.of(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("testArg"))
                         .type(BinaryType.of())
-                        .paramId(ParameterId.of("testArg"))
-                        .paramType(ArgumentDefinition.ParamType.HEADER)
+                        .paramType(HeaderParameterType.header("testArg"))
                         .build()))
                 .endpointName(ENDPOINT_NAME)
-                .http(mock(RequestLineDefinition.class));
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -46,10 +42,11 @@ public final class EndpointDefinitionTest {
                 .args(ImmutableList.of(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("testArg"))
                         .type(BinaryType.of())
-                        .paramType(ArgumentDefinition.ParamType.BODY)
+                        .paramType(BodyParameterType.body())
                         .build()))
                 .endpointName(ENDPOINT_NAME)
-                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")));
+                .httpMethod(EndpointDefinition.HttpMethod.POST)
+                .httpPath(HttpPath.of("/a/path"));
 
         // Should not throw exception
         definition.build();
@@ -61,7 +58,8 @@ public final class EndpointDefinitionTest {
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg1")).build())
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg2")).build())
                 .endpointName(ENDPOINT_NAME)
-                .http(GET_REQUEST);
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalStateException.class)
@@ -73,19 +71,20 @@ public final class EndpointDefinitionTest {
         ArgumentDefinition paramDefinition1 = ArgumentDefinition.builder()
                 .argName(ArgumentName.of("paramName"))
                 .type(AnyType.of())
-                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramType(PathParameterType.path())
                 .build();
         ArgumentDefinition paramDefinition2 = ArgumentDefinition.builder()
                 .argName(ArgumentName.of("paramName"))
                 .type(AnyType.of())
-                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramType(PathParameterType.path())
                 .build();
 
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ImmutableList.of(paramDefinition1, paramDefinition2))
                 .endpointName(ENDPOINT_NAME)
-                .http(GET_REQUEST);
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalStateException.class)
@@ -97,14 +96,14 @@ public final class EndpointDefinitionTest {
         ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
                 .type(AnyType.of())
                 .argName(ArgumentName.of("paramName"))
-                .paramType(ArgumentDefinition.ParamType.PATH)
+                .paramType(PathParameterType.path())
                 .build();
 
-        RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .addArgs(paramDefinition)
                 .endpointName(ENDPOINT_NAME)
-                .http(noParamRequest);
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalStateException.class)
@@ -113,11 +112,10 @@ public final class EndpointDefinitionTest {
 
     @Test
     public void testPathParamValidatorMissingParams() {
-        RequestLineDefinition requestWithPathParam =
-                RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path/{paramName}"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .endpointName(ENDPOINT_NAME)
-                .http(requestWithPathParam);
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path/{paramName}"));
 
         assertThatThrownBy(definition::build)
                 .isInstanceOf(IllegalStateException.class)
@@ -129,11 +127,15 @@ public final class EndpointDefinitionTest {
         EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg")).build())
                 .endpointName(ENDPOINT_NAME)
-                .http(GET_REQUEST);
+                .httpMethod(EndpointDefinition.HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
 
         assertThatThrownBy(endpoint::build)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Endpoint cannot be a GET and contain a body: " + GET_REQUEST);
+                .hasMessage(String.format(
+                        "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
+                        EndpointDefinition.HttpMethod.GET,
+                        "/a/path"));
     }
 
 }

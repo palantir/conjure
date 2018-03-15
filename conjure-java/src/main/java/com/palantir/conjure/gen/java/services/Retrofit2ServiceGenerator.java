@@ -13,11 +13,16 @@ import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.ArgumentName;
 import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.BodyParameterType;
 import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.HeaderAuthType;
+import com.palantir.conjure.defs.services.HeaderParameterType;
+import com.palantir.conjure.defs.services.HttpPath;
 import com.palantir.conjure.defs.services.ParameterId;
-import com.palantir.conjure.defs.services.PathDefinition;
+import com.palantir.conjure.defs.services.ParameterType;
+import com.palantir.conjure.defs.services.PathParameterType;
+import com.palantir.conjure.defs.services.QueryParameterType;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -109,11 +114,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             EndpointDefinition endpointDef,
             TypeMapper returnTypeMapper,
             TypeMapper methodTypeMapper) {
-        Set<ArgumentName> encodedPathArgs = extractEncodedPathArgs(endpointDef.http().path());
-        PathDefinition endpointPathWithoutRegex = replaceEncodedPathArgs(endpointDef.http().path());
+        Set<ArgumentName> encodedPathArgs = extractEncodedPathArgs(endpointDef.httpPath());
+        HttpPath endpointPathWithoutRegex = replaceEncodedPathArgs(endpointDef.httpPath());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.http().method()))
+                .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.httpMethod().name()))
                         .addMember("value", "$S", "." + endpointPathWithoutRegex)
                         .build());
 
@@ -147,7 +152,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return methodBuilder.build();
     }
 
-    private Set<ArgumentName> extractEncodedPathArgs(PathDefinition path) {
+    private Set<ArgumentName> extractEncodedPathArgs(HttpPath path) {
         Pattern pathArg = Pattern.compile("\\{([^\\}]+)\\}");
         Matcher matcher = pathArg.matcher(path.toString());
         ImmutableSet.Builder<ArgumentName> encodedArgs = ImmutableSet.builder();
@@ -161,7 +166,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return encodedArgs.build();
     }
 
-    private PathDefinition replaceEncodedPathArgs(PathDefinition path) {
+    private HttpPath replaceEncodedPathArgs(HttpPath path) {
         List<String> newSegments = Lists.newArrayList();
         Pattern pattern = Pattern.compile("\\{([^:]+):(.*)}");
         for (String segment : path.path().getSegments()) {
@@ -172,7 +177,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 newSegments.add(segment);
             }
         }
-        return PathDefinition.of("/" + Joiner.on("/").join(newSegments));
+        return HttpPath.of("/" + Joiner.on("/").join(newSegments));
     }
 
     private ParameterSpec createEndpointParameter(
@@ -182,34 +187,30 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         ParameterSpec.Builder param = ParameterSpec.builder(
                 methodTypeMapper.getClassName(def.type()),
                 def.argName().name());
-
-        switch (def.paramType()) {
-            case PATH:
-                AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                        .addMember("value", "$S", def.argName().name());
-                if (encodedPathArgs.contains(def.argName())) {
-                    builder.addMember("encoded", "$L", true);
-                }
-                param.addAnnotation(builder.build());
-                break;
-            case QUERY:
-                param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))
-                        .addMember("value", "$S",
-                                def.paramId().map(ParameterId::name).orElse(def.argName().name()))
-                        .build());
-                break;
-            case HEADER:
-                param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                        .addMember("value", "$S",
-                                def.paramId().map(ParameterId::name).orElse(def.argName().name()))
-                        .build());
-                break;
-            case BODY:
-                param.addAnnotation(ClassName.get("retrofit2.http", "Body"));
-                break;
-            default:
-                throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
+        ParameterType paramType = def.paramType();
+        if (paramType instanceof PathParameterType) {
+            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
+                    .addMember("value", "$S", def.argName().name());
+            if (encodedPathArgs.contains(def.argName())) {
+                builder.addMember("encoded", "$L", true);
+            }
+            param.addAnnotation(builder.build());
+        } else if (paramType instanceof QueryParameterType) {
+            ParameterId paramId = ((QueryParameterType) paramType).paramId();
+            param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))
+                    .addMember("value", "$S", paramId.name())
+                    .build());
+        } else if (paramType instanceof HeaderParameterType) {
+            ParameterId paramId = ((HeaderParameterType) paramType).paramId();
+            param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
+                    .addMember("value", "$S", paramId.name())
+                    .build());
+        } else if (paramType instanceof BodyParameterType) {
+            param.addAnnotation(ClassName.get("retrofit2.http", "Body"));
+        } else {
+            throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
         }
+
         return param.build();
     }
 

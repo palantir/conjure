@@ -10,10 +10,15 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.BodyParameterType;
 import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.HeaderAuthType;
+import com.palantir.conjure.defs.services.HeaderParameterType;
 import com.palantir.conjure.defs.services.ParameterId;
+import com.palantir.conjure.defs.services.ParameterType;
+import com.palantir.conjure.defs.services.PathParameterType;
+import com.palantir.conjure.defs.services.QueryParameterType;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
@@ -90,13 +95,13 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             TypeMapper methodTypeMapper) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addAnnotation(httpMethodToClassName(endpointDef.http().method()))
+                .addAnnotation(httpMethodToClassName(endpointDef.httpMethod().name()))
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
 
         // @Path("") is invalid in Feign JaxRs and equivalent to absent on an endpoint method
-        if (!endpointDef.http().path().withoutLeadingSlash().isEmpty()) {
+        if (!endpointDef.httpPath().withoutLeadingSlash().isEmpty()) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
-                        .addMember("value", "$S", endpointDef.http().path().withoutLeadingSlash())
+                        .addMember("value", "$S", endpointDef.httpPath().withoutLeadingSlash())
                         .build());
         }
 
@@ -110,8 +115,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         }
 
         boolean consumesTypeIsBinary = endpointDef.args().stream()
-                .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType().equals(
-                        ArgumentDefinition.ParamType.BODY));
+                .anyMatch(arg -> arg.type() instanceof BinaryType && arg.paramType() instanceof BodyParameterType);
 
         if (consumesTypeIsBinary) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Consumes"))
@@ -181,26 +185,23 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
 
     private static Optional<AnnotationSpec> getParamTypeAnnotation(ArgumentDefinition def) {
         AnnotationSpec.Builder annotationSpecBuilder;
-        switch (def.paramType()) {
-            case PATH:
-                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "PathParam"))
-                        .addMember("value", "$S", def.argName().name());
-                break;
-            case QUERY:
-                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "QueryParam"))
-                        .addMember("value", "$S",
-                                def.paramId().map(ParameterId::name).orElse(def.argName().name()));
-                break;
-            case HEADER:
-                annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
-                        .addMember("value", "$S",
-                                def.paramId().map(ParameterId::name).orElse(def.argName().name()));
-                break;
-            case BODY:
-                /* no annotations for body parameters */
-                return Optional.empty();
-            default:
-                throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
+        ParameterType paramType = def.paramType();
+        if (paramType instanceof PathParameterType) {
+            annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "PathParam"))
+                    .addMember("value", "$S", def.argName().name());
+        } else if (paramType instanceof QueryParameterType) {
+            ParameterId paramId = ((QueryParameterType) paramType).paramId();
+            annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "QueryParam"))
+                    .addMember("value", "$S", paramId.name());
+        } else if (paramType instanceof HeaderParameterType) {
+            ParameterId paramId = ((HeaderParameterType) paramType).paramId();
+            annotationSpecBuilder = AnnotationSpec.builder(ClassName.get("javax.ws.rs", "HeaderParam"))
+                    .addMember("value", "$S", paramId.name());
+        } else if (paramType instanceof BodyParameterType) {
+            /* no annotations for body parameters */
+            return Optional.empty();
+        } else {
+            throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
         }
 
         return Optional.of(annotationSpecBuilder.build());

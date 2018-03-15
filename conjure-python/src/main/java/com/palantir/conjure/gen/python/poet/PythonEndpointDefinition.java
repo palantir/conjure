@@ -9,13 +9,16 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.BodyParameterType;
+import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.EndpointName;
 import com.palantir.conjure.defs.services.HeaderAuthType;
-import com.palantir.conjure.defs.services.ParameterId;
-import com.palantir.conjure.defs.services.PathDefinition;
-import com.palantir.conjure.defs.services.RequestLineDefinition;
+import com.palantir.conjure.defs.services.HeaderParameterType;
+import com.palantir.conjure.defs.services.HttpPath;
+import com.palantir.conjure.defs.services.ParameterType;
+import com.palantir.conjure.defs.services.PathParameterType;
+import com.palantir.conjure.defs.services.QueryParameterType;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,7 +31,9 @@ public interface PythonEndpointDefinition extends Emittable {
 
     EndpointName methodName();
 
-    RequestLineDefinition http();
+    EndpointDefinition.HttpMethod httpMethod();
+
+    HttpPath httpPath();
 
     Optional<AuthType> auth();
 
@@ -55,9 +60,8 @@ public interface PythonEndpointDefinition extends Emittable {
                     ? ImmutableList.<PythonEndpointParam>builder()
                     .add(PythonEndpointParam.builder()
                             .paramName("authHeader")
-                            .paramId(ParameterId.of("Authorization"))
                             .myPyType("str")
-                            .paramType(ArgumentDefinition.ParamType.HEADER)
+                            .paramType(HeaderParameterType.header("Authorization"))
                             .build())
                     .addAll(params())
                     .build() : params();
@@ -85,10 +89,10 @@ public interface PythonEndpointDefinition extends Emittable {
                     isBinary() ? MediaType.APPLICATION_OCTET_STREAM : MediaType.APPLICATION_JSON);
             poetWriter.writeIndentedLine("'Content-Type': 'application/json',");
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() == ArgumentDefinition.ParamType.HEADER)
+                    .filter(param -> param.paramType() instanceof HeaderParameterType)
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                param.paramId().map(ParameterId::name).orElse(param.paramName()), param.paramName());
+                                ((HeaderParameterType) param.paramType()).paramId().name(), param.paramName());
                     });
             poetWriter.decreaseIndent();
             poetWriter.writeIndentedLine("} # type: Dict[str, Any]");
@@ -98,10 +102,10 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.writeIndentedLine("_params = {");
             poetWriter.increaseIndent();
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() == ArgumentDefinition.ParamType.QUERY)
+                    .filter(param -> param.paramType() instanceof QueryParameterType)
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                param.paramId().map(ParameterId::name).orElse(param.paramName()),
+                                ((QueryParameterType) param.paramType()).paramId().name(),
                                 param.paramName());
                     });
             poetWriter.decreaseIndent();
@@ -111,11 +115,12 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.writeLine();
             poetWriter.writeIndentedLine("_path_params = {");
             poetWriter.increaseIndent();
+            // TODO(qchen): no need for param name twice?
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() == ArgumentDefinition.ParamType.PATH)
+                    .filter(param -> param.paramType() instanceof PathParameterType)
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                param.paramId().map(ParameterId::name).orElse(param.paramName()),
+                                param.paramName(),
                                 param.paramName());
                     });
             poetWriter.decreaseIndent();
@@ -123,7 +128,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
             // body
             Optional<PythonEndpointParam> bodyParam = paramsWithHeader.stream()
-                    .filter(param -> param.paramType() == ArgumentDefinition.ParamType.BODY)
+                    .filter(param -> param.paramType() instanceof BodyParameterType)
                     .findAny();
             if (bodyParam.isPresent()) {
                 poetWriter.writeLine();
@@ -137,7 +142,7 @@ public interface PythonEndpointDefinition extends Emittable {
             // fix the path, add path params
             poetWriter.writeLine();
 
-            PathDefinition fullPath = http().path();
+            HttpPath fullPath = httpPath();
             String fixedPath = fullPath.toString().replaceAll("\\{(.*):[^}]*\\}", "{$1}");
             poetWriter.writeIndentedLine("_path = '%s'", fixedPath);
             poetWriter.writeIndentedLine("_path = _path.format(**_path_params)");
@@ -145,7 +150,7 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.writeLine();
             poetWriter.writeIndentedLine("_response = self._requests_session.request( # type: ignore");
             poetWriter.increaseIndent();
-            poetWriter.writeIndentedLine("'%s',", http().method());
+            poetWriter.writeIndentedLine("'%s',", httpMethod());
             poetWriter.writeIndentedLine("self._uri + _path,");
             poetWriter.writeIndentedLine("params=_params,");
             poetWriter.writeIndentedLine("headers=_headers,");
@@ -197,15 +202,9 @@ public interface PythonEndpointDefinition extends Emittable {
 
         String paramName();
 
-        /**
-         * An identifier to use as a parameter value (e.g. if this is a header parameter, param-id defines the header
-         * key); by default the argument name is used as the param-id
-         */
-        Optional<ParameterId> paramId();
-
         String myPyType();
 
-        ArgumentDefinition.ParamType paramType();
+        ParameterType paramType();
 
         class Builder extends ImmutablePythonEndpointParam.Builder {}
 

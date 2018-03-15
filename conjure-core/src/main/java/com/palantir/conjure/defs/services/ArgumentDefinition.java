@@ -21,31 +21,11 @@ public interface ArgumentDefinition {
 
     Optional<ParameterId> paramId();
 
-    // TODO(qchen): union parameter type
-    ParamType paramType();
+    ParameterType paramType();
 
     Optional<Documentation> docs();
 
     List<Type> markers();
-
-    enum ParamType {
-        /**
-         * Treat as a PathParam.
-         */
-        PATH,
-        /**
-         * Treat as a QueryParam.
-         */
-        QUERY,
-        /**
-         * Treat as a HeaderParam.
-         */
-        HEADER,
-        /**
-         * Treat as the message body.
-         */
-        BODY
-    }
 
     static Builder builder() {
         return new Builder();

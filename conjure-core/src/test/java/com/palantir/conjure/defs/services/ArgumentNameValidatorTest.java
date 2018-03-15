@@ -8,7 +8,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import javax.ws.rs.HttpMethod;
 import org.junit.Test;
 
 public final class ArgumentNameValidatorTest {
@@ -37,12 +36,13 @@ public final class ArgumentNameValidatorTest {
 
     private EndpointDefinition.Builder createEndpoint(String paramName) {
         ArgumentDefinition arg = ArgumentDefinition.builder()
-                .paramType(ArgumentDefinition.ParamType.BODY)
+                .paramType(BodyParameterType.body())
                 .type(PrimitiveType.STRING)
                 .argName(ArgumentName.of(paramName))
                 .build();
         return EndpointDefinition.builder()
-                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
+                .httpMethod(EndpointDefinition.HttpMethod.POST)
+                .httpPath(HttpPath.of("/a/path"))
                 .args(ImmutableList.of(arg))
                 .endpointName(EndpointName.of("test"));
     }

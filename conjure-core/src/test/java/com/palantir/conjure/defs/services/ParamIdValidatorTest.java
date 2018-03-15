@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.net.HttpHeaders;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import java.util.List;
-import javax.ws.rs.HttpMethod;
 import org.junit.Test;
 
 public final class ParamIdValidatorTest {
@@ -20,7 +19,8 @@ public final class ParamIdValidatorTest {
     @SuppressWarnings("CheckReturnValue")
     public void testValidNonHeader() {
         for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234")) {
-            EndpointDefinition.Builder endpoint = createEndpoint(ArgumentDefinition.ParamType.BODY, paramId);
+            EndpointDefinition.Builder endpoint = createEndpoint(
+                    QueryParameterType.query(paramId));
             // Passes validation
             endpoint.build();
         }
@@ -36,7 +36,7 @@ public final class ParamIdValidatorTest {
                 HttpHeaders.SET_COOKIE2);
         for (String paramId : paramIds) {
             EndpointDefinition.Builder endpoint =
-                    createEndpoint(ArgumentDefinition.ParamType.HEADER, paramId);
+                    createEndpoint(HeaderParameterType.header(paramId));
             // Passes validation
             endpoint.build();
         }
@@ -45,12 +45,12 @@ public final class ParamIdValidatorTest {
     @Test
     public void testInvalidNonHeader() {
         for (String paramId : ImmutableList.of("AB", "123", "foo_bar", "foo-bar", "foo.bar")) {
-            EndpointDefinition.Builder endpoint =
-                    createEndpoint(ArgumentDefinition.ParamType.BODY, paramId);
+            ParameterType parameterType = QueryParameterType.query(paramId);
+            EndpointDefinition.Builder endpoint = createEndpoint(parameterType);
             assertThatThrownBy(endpoint::build)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter ids with type %s must match pattern %s: %s",
-                            ArgumentDefinition.ParamType.BODY,
+                            parameterType,
                             ArgumentName.ANCHORED_PATTERN,
                             paramId);
         }
@@ -59,29 +59,27 @@ public final class ParamIdValidatorTest {
     @Test
     public void testInvalidHeader() {
         for (String paramId : ImmutableList.of("authorization", "123", "Foo_Bar", "Foo.Bar")) {
-            EndpointDefinition.Builder endpoint =
-                    createEndpoint(ArgumentDefinition.ParamType.HEADER, paramId);
+            ParameterType parameterType = HeaderParameterType.header(paramId);
+            EndpointDefinition.Builder endpoint = createEndpoint(parameterType);
 
             assertThatThrownBy(endpoint::build)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter ids with type %s must match pattern %s: %s",
-                            ArgumentDefinition.ParamType.HEADER,
+                            parameterType,
                             ParameterId.HEADER_PATTERN,
                             paramId);
         }
     }
 
-    private EndpointDefinition.Builder createEndpoint(
-            ArgumentDefinition.ParamType paramType,
-            String paramId) {
+    private EndpointDefinition.Builder createEndpoint(ParameterType paramType) {
         ArgumentDefinition arg = ArgumentDefinition.builder()
                 .argName(PARAMETER_NAME)
                 .paramType(paramType)
-                .paramId(ParameterId.of(paramId))
                 .type(AnyType.of())
                 .build();
         return EndpointDefinition.builder()
-                .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
+                .httpMethod(EndpointDefinition.HttpMethod.POST)
+                .httpPath(HttpPath.of("/a/path"))
                 .addArgs(arg)
                 .endpointName(EndpointName.of("test"));
     }

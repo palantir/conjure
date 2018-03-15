@@ -17,8 +17,9 @@ public interface EndpointDefinition {
 
     EndpointName endpointName();
 
-    // TODO(qchen): split this into method and path?
-    RequestLineDefinition http();
+    HttpMethod httpMethod();
+
+    HttpPath httpPath();
 
     Optional<AuthType> auth();
 
@@ -44,5 +45,12 @@ public interface EndpointDefinition {
     }
 
     class Builder extends ImmutableEndpointDefinition.Builder {}
+
+    enum HttpMethod {
+        GET,
+        POST,
+        PUT,
+        DELETE
+    }
 
 }

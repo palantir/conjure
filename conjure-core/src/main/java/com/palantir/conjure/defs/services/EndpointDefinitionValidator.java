@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.ws.rs.HttpMethod;
 
 @com.google.errorprone.annotations.Immutable
 public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefinition> {
@@ -58,7 +57,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         public void validate(EndpointDefinition definition) {
             definition.args()
                     .stream()
-                    .filter(arg -> !arg.paramType().equals(ArgumentDefinition.ParamType.BODY))
+                    .filter(arg -> !(arg.paramType() instanceof BodyParameterType))
                     .map(ArgumentDefinition::type)
                     .forEach(type -> checkArgument(
                             !isIllegal(type),
@@ -73,7 +72,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         public void validate(EndpointDefinition definition) {
             List<ArgumentDefinition> bodyParams = definition.args()
                     .stream()
-                    .filter(entry -> entry.paramType().equals(ArgumentDefinition.ParamType.BODY))
+                    .filter(entry -> entry.paramType() instanceof BodyParameterType)
                     .collect(Collectors.toList());
 
             Preconditions.checkState(bodyParams.size() <= 1,
@@ -86,14 +85,16 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     private static final class NoGetBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            String method = definition.http().method();
-            if (method.equals(HttpMethod.GET)) {
+            EndpointDefinition.HttpMethod method = definition.httpMethod();
+            if (method.equals(EndpointDefinition.HttpMethod.GET)) {
                 boolean hasBody = definition.args()
                         .stream()
-                        .anyMatch(entry -> entry.paramType().equals(ArgumentDefinition.ParamType.BODY));
+                        .anyMatch(entry -> entry.paramType() instanceof BodyParameterType);
 
-                Preconditions.checkState(!hasBody, "Endpoint cannot be a GET and contain a body: %s",
-                        definition.http());
+                Preconditions.checkState(!hasBody,
+                        "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
+                        definition.httpMethod(),
+                        definition.httpPath());
             }
         }
     }
@@ -104,7 +105,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         public void validate(EndpointDefinition definition) {
             Set<ArgumentName> pathParamIds = new HashSet<>();
             definition.args().stream()
-                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
+                    .filter(entry -> entry.paramType() instanceof PathParameterType)
                     .forEach(entry -> {
                         boolean added = pathParamIds.add(entry.argName());
                         Preconditions.checkState(added,
@@ -112,11 +113,11 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                                 entry.argName().name());
                     });
 
-            Set<ArgumentName> extraParams = Sets.difference(pathParamIds, definition.http().pathArgs());
+            Set<ArgumentName> extraParams = Sets.difference(pathParamIds, definition.httpPath().pathArgs());
             Preconditions.checkState(extraParams.isEmpty(),
                     "Path parameters defined in endpoint but not present in path template: %s", extraParams);
 
-            Set<ArgumentName> missingParams = Sets.difference(definition.http().pathArgs(), pathParamIds);
+            Set<ArgumentName> missingParams = Sets.difference(definition.httpPath().pathArgs(), pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
                     "Path parameters defined path template but not present in endpoint: %s", missingParams);
         }
@@ -127,7 +128,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         @Override
         public void validate(EndpointDefinition definition) {
             definition.args().stream()
-                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
+                    .filter(entry -> entry.paramType() instanceof PathParameterType)
                     .forEach(entry -> {
                         Type conjureType = entry.type();
 
@@ -144,7 +145,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         @Override
         public void validate(EndpointDefinition definition) {
             definition.args().stream()
-                    .filter(entry -> entry.paramType() == ArgumentDefinition.ParamType.PATH)
+                    .filter(entry -> entry.paramType() instanceof PathParameterType)
                     .forEach(entry -> {
                         Type conjureType = entry.type();
 
@@ -176,23 +177,27 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
         public void validate(EndpointDefinition definition) {
             definition.args().forEach(arg -> {
                 final Pattern pattern;
-                switch (arg.paramType()) {
-                    case BODY:
-                    case PATH:
-                    case QUERY:
-                        pattern = ArgumentName.ANCHORED_PATTERN;
-                        break;
-                    case HEADER:
-                        pattern = ParameterId.HEADER_PATTERN;
-                        break;
-                    default:
-                        throw new IllegalStateException("Validation for paramType does not exist: " + arg.paramType());
+                ParameterType paramType = arg.paramType();
+                if (paramType instanceof BodyParameterType
+                        || paramType instanceof PathParameterType
+                        || paramType instanceof QueryParameterType) {
+                    pattern = ArgumentName.ANCHORED_PATTERN;
+                } else if (paramType instanceof HeaderParameterType) {
+                    pattern = ParameterId.HEADER_PATTERN;
+                } else {
+                    throw new IllegalStateException("Validation for paramType does not exist: " + arg.paramType());
                 }
 
-                if (arg.paramId().isPresent()) {
-                    Preconditions.checkState(pattern.matcher(arg.paramId().get().name()).matches(),
+                if (paramType instanceof QueryParameterType) {
+                    ParameterId paramId = ((QueryParameterType) paramType).paramId();
+                    Preconditions.checkState(pattern.matcher(paramId.name()).matches(),
                             "Parameter ids with type %s must match pattern %s: %s",
-                            arg.paramType(), pattern, arg.paramId().get().name());
+                            arg.paramType(), pattern, paramId.name());
+                } else if (paramType instanceof HeaderParameterType) {
+                    ParameterId paramId = ((HeaderParameterType) paramType).paramId();
+                    Preconditions.checkState(pattern.matcher(paramId.name()).matches(),
+                            "Parameter ids with type %s must match pattern %s: %s",
+                            arg.paramType(), pattern, paramId.name());
                 }
             });
         }

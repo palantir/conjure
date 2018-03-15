@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.regex.Pattern;
 import org.junit.Test;
 
-public final class PathDefinitionTest {
+public final class HttpPathTest {
 
     @Test
-    public void testPathsMustBeAbsolute() throws Exception {
+    public void testPathsMustBeAbsolute() {
         assertThatThrownBy(() -> path("abc"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Conjure paths must be absolute, i.e., start with '/': abc");
@@ -30,7 +30,7 @@ public final class PathDefinitionTest {
     }
 
     @Test
-    public void testPathSegmentsMustObeySyntax() throws Exception {
+    public void testPathSegmentsMustObeySyntax() {
         for (PathSegmentTestCase currCase : new PathSegmentTestCase[] {
                 new PathSegmentTestCase("/123", "123"),
                 new PathSegmentTestCase("/abc/$%^", "$%^"),
@@ -49,14 +49,14 @@ public final class PathDefinitionTest {
     }
 
     @Test
-    public void testNonEmptyPathsMustNotEndWithSlash() throws Exception {
+    public void testNonEmptyPathsMustNotEndWithSlash() {
         assertThatThrownBy(() -> path("/abc/"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Conjure paths must not end with a '/': /abc/");
     }
 
     @Test
-    public void testValidPaths() throws Exception {
+    public void testValidPaths() {
         path("/");
         path("/a/b/c");
         path("/abc");
@@ -66,7 +66,7 @@ public final class PathDefinitionTest {
     }
 
     @Test
-    public void testResolvePaths() throws Exception {
+    public void testResolvePaths() {
         assertThat(path("/").resolve(path("/"))).isEqualTo(path("/"));
         assertThat(path("/abc").resolve(path("/"))).isEqualTo(path("/abc"));
         assertThat(path("/abc").resolve(path("/def"))).isEqualTo(path("/abc/def"));
@@ -75,16 +75,16 @@ public final class PathDefinitionTest {
     }
 
     @Test
-    public void without_leading_slash_should_strip_only_the_first_slash() throws Exception {
+    public void without_leading_slash_should_strip_only_the_first_slash() {
         assertThat(path("/leave/other/slashes").withoutLeadingSlash()).isEqualTo("leave/other/slashes");
     }
 
     @Test
-    public void without_leading_slash_should_return_empty_string_if_appropriate() throws Exception {
+    public void without_leading_slash_should_return_empty_string_if_appropriate() {
         assertThat(path("/").withoutLeadingSlash()).isEqualTo("");
     }
 
-    private static PathDefinition path(String path) {
-        return PathDefinition.of(path);
+    private static HttpPath path(String path) {
+        return HttpPath.of(path);
     }
 }

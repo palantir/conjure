@@ -8,12 +8,16 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.ArgumentName;
 import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.BodyParameterType;
 import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.EndpointName;
 import com.palantir.conjure.defs.services.HeaderAuthType;
-import com.palantir.conjure.defs.services.ParameterId;
-import com.palantir.conjure.defs.services.RequestLineDefinition;
+import com.palantir.conjure.defs.services.HeaderParameterType;
+import com.palantir.conjure.defs.services.HttpPath;
+import com.palantir.conjure.defs.services.ParameterType;
+import com.palantir.conjure.defs.services.PathParameterType;
+import com.palantir.conjure.defs.services.QueryParameterType;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
 import com.palantir.conjure.defs.types.Documentation;
@@ -261,13 +265,14 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.PathDefinition basePath,
             Optional<AuthType> defaultAuth,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
-        RequestLineDefinition requestDef = parseRequestLine(basePath, def.http());
 
+        HttpPath path = HttpPath.of(basePath.resolve(def.http().path()).toString());
         return EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
-                .http(requestDef)
+                .httpMethod(EndpointDefinition.HttpMethod.valueOf(def.http().method()))
+                .httpPath(path)
                 .auth(def.auth().map(ConjureParserUtils::parseAuthType).orElse(defaultAuth))
-                .args(parseArgs(def.args(), requestDef, typeResolver))
+                .args(parseArgs(def.args(), path, typeResolver))
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .docs(def.docs().map(Documentation::of))
@@ -290,46 +295,56 @@ public final class ConjureParserUtils {
         }
     }
 
-    private static RequestLineDefinition parseRequestLine(com.palantir.conjure.parser.services.PathDefinition basePath,
-            com.palantir.conjure.parser.services.RequestLineDefinition def) {
-        return RequestLineDefinition.of(def.method(),
-                com.palantir.conjure.defs.services.PathDefinition.of(basePath.resolve(def.path()).toString()));
-    }
-
     private static List<ArgumentDefinition> parseArgs(
             Map<com.palantir.conjure.parser.services.ParameterName,
                     com.palantir.conjure.parser.services.ArgumentDefinition> args,
-            RequestLineDefinition requestDef,
+            HttpPath httpPath,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         ImmutableList.Builder<ArgumentDefinition> resultBuilder = ImmutableList.builder();
         for (Map.Entry<com.palantir.conjure.parser.services.ParameterName,
                 com.palantir.conjure.parser.services.ArgumentDefinition> entry : args.entrySet()) {
             com.palantir.conjure.parser.services.ArgumentDefinition original = entry.getValue();
             ArgumentName argName = ArgumentName.of(entry.getKey().name());
-            ParameterId paramId =
-                    ParameterId.of(original.paramId().map(id -> id.name()).orElse(entry.getKey().name()));
+            ParameterType paramType = parseParameterType(original, argName, httpPath);
             ArgumentDefinition.Builder builder = ArgumentDefinition.builder()
                     .argName(argName)
                     .type(original.type().visit(new ConjureTypeParserVisitor(typeResolver)))
-                    .paramId(paramId)
+                    .paramType(paramType)
                     .docs(original.docs().map(Documentation::of))
                     .markers(parseMarkers(original.markers(), typeResolver));
-
-            if (original.paramType() != com.palantir.conjure.parser.services.ArgumentDefinition.ParamType.AUTO) {
-                builder.paramType(ArgumentDefinition.ParamType.valueOf(original.paramType().name()));
-            } else {
-                // AUTO type
-                if (requestDef.pathArgs().contains(argName)) {
-                    // argument exists in request line -- it is a path arg
-                    builder.paramType(ArgumentDefinition.ParamType.PATH);
-                } else {
-                    // argument does not exist in request line -- it is a body arg
-                    builder.paramType(ArgumentDefinition.ParamType.BODY);
-                }
-            }
             resultBuilder.add(builder.build());
         }
         return resultBuilder.build();
+    }
+
+    private static ParameterType parseParameterType(
+            com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
+            ArgumentName argName,
+            HttpPath httpPath) {
+
+        switch (argumentDef.paramType()) {
+            case AUTO:
+                // AUTO type
+                if (httpPath.pathArgs().contains(argName)) {
+                    // argument exists in request line -- it is a path arg
+                    return PathParameterType.path();
+                } else {
+                    // argument does not exist in request line -- it is a body arg
+                    return BodyParameterType.body();
+                }
+            case HEADER:
+                String headerParamId = argumentDef.paramId().map(id -> id.name()).orElse(argName.name());
+                return HeaderParameterType.header(headerParamId);
+            case PATH:
+                return PathParameterType.path();
+            case BODY:
+                return BodyParameterType.body();
+            case QUERY:
+                String queryParamId = argumentDef.paramId().map(id -> id.name()).orElse(argName.name());
+                return QueryParameterType.query(queryParamId);
+            default:
+                throw new IllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());
+        }
     }
 
     private static Set<Type> parseMarkers(

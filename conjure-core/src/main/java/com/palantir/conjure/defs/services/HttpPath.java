@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.glassfish.jersey.uri.internal.UriTemplateParser;
 import org.immutables.value.Value;
@@ -20,7 +21,7 @@ import org.immutables.value.Value;
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
 @Value.Immutable
 @ConjureImmutablesStyle
-public abstract class PathDefinition {
+public abstract class HttpPath {
 
     /** Returns the well-formed path associated with this path definition. */
     public abstract Path path();
@@ -31,6 +32,18 @@ public abstract class PathDefinition {
             Pattern.compile(
                     "^\\{" + ArgumentName.PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
                             + "}$");
+
+    /**
+     * returns path arguments of the http path.
+     */
+    @Value.Lazy
+    public Set<ArgumentName> pathArgs() {
+        UriTemplate uriTemplate = new UriTemplate(path().toString());
+        return uriTemplate.getTemplateVariables()
+                .stream()
+                .map(ArgumentName::of)
+                .collect(Collectors.toSet());
+    }
 
     /** Creates a new instance if the syntax is correct. */
     @Value.Check
@@ -57,7 +70,7 @@ public abstract class PathDefinition {
                     "Path parameter %s appears more than once in path %s", var, path());
             templateVars.add(var);
         });
-        ConjureMetrics.histogram(templateVars.size(), PathDefinition.class, "template-vars");
+        ConjureMetrics.histogram(templateVars.size(), HttpPath.class, "template-vars");
 
         UriTemplateParser uriTemplateParser = new UriTemplateParser(path().toString());
         Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();
@@ -91,7 +104,7 @@ public abstract class PathDefinition {
      * Returns this path "concatenated" with the given other path. For example, {@code "/abc".resolve("/def")} is the
      * path {@code /abc/def}.
      */
-    public PathDefinition resolve(PathDefinition other) {
+    public HttpPath resolve(HttpPath other) {
         final Path newPath;
         if (other.path().equals(Path.ROOT_PATH)) {
             // special-case since Path#relativize() only works on proper prefixes
@@ -99,13 +112,13 @@ public abstract class PathDefinition {
         } else {
             newPath = path().resolve(Path.ROOT_PATH.relativize(other.path()));
         }
-        return ImmutablePathDefinition.builder().path(newPath).build();
+        return ImmutableHttpPath.builder().path(newPath).build();
     }
 
-    /** Creates a new {@link PathDefinition} from the given string, or throws an exception if it fails to validate. */
-    public static PathDefinition of(String path) {
+    /** Creates a new {@link HttpPath} from the given string, or throws an exception if it fails to validate. */
+    public static HttpPath of(String path) {
         Path parsed = Paths.get(path);
-        return ImmutablePathDefinition.builder().path(parsed).build();
+        return ImmutableHttpPath.builder().path(parsed).build();
     }
 
     @Override

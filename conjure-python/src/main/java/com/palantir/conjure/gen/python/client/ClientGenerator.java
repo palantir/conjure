@@ -52,7 +52,6 @@ public final class ClientGenerator {
                             .map(argEntry -> PythonEndpointParam
                                     .builder()
                                     .paramName(argEntry.argName().name())
-                                    .paramId(argEntry.paramId())
                                     .paramType(argEntry.paramType())
                                     .myPyType(myPyMapper.getTypeName(argEntry.type()))
                                     .build())
@@ -60,7 +59,8 @@ public final class ClientGenerator {
 
                     return PythonEndpointDefinition.builder()
                             .methodName(ed.endpointName())
-                            .http(ed.http())
+                            .httpMethod(ed.httpMethod())
+                            .httpPath(ed.httpPath())
                             .auth(ed.auth())
                             .params(params)
                             .pythonReturnType(ed.returns().map(mapper::getTypeName))
