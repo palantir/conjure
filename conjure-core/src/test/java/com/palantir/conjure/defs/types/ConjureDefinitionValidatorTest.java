@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
 package com.palantir.conjure.defs.types;
@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.defs.ConjureDefinition;
+import com.palantir.conjure.defs.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.types.collect.ListType;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
@@ -20,22 +22,20 @@ import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
-import com.palantir.parsec.ParseException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
 
-public final class ObjectsDefinitionTest {
-
+public class ConjureDefinitionValidatorTest {
     private static final ConjurePackage PACKAGE = ConjurePackage.of("package");
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);
     private static final Optional<Documentation> DOCS = Optional.of(Documentation.of("docs"));
 
     @Test
-    public void testNoSelfRecursiveType() throws Exception {
-        ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.types()).thenReturn(
+    public void testNoSelfRecursiveType() {
+        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
+        when(conjureDef.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(FOO)
@@ -44,15 +44,15 @@ public final class ObjectsDefinitionTest {
                 )
         );
 
-        assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Illegal recursive data type: Foo -> Foo");
     }
 
     @Test
     public void testRecursiveTypeOkInReference() throws Exception {
-        ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.types()).thenReturn(
+        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
+        when(conjureDef.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(TypeName.of("Foo", ConjurePackage.of("bar")))
@@ -69,13 +69,13 @@ public final class ObjectsDefinitionTest {
                 )
         );
 
-        ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports);
+        ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef);
     }
 
     @Test
     public void testNoRecursiveCycleType() throws Exception {
-        ObjectsDefinition imports = mock(ObjectsDefinition.class);
-        when(imports.types()).thenReturn(
+        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
+        when(conjureDef.types()).thenReturn(
                 ImmutableList.of(
                         ObjectTypeDefinition.builder()
                                 .typeName(FOO)
@@ -88,31 +88,31 @@ public final class ObjectsDefinitionTest {
                 )
         );
 
-        assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_RECURSIVE_TYPES.validate(imports))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal recursive data type: ");
     }
 
     @Test
-    public void testNoComplexKeysInMaps() throws Exception {
-        ObjectsDefinition imports = mock(ObjectsDefinition.class);
+    public void testNoComplexKeysInMaps() {
+        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
         String illegalFieldName = "asdf";
         Type complexKeyType = ListType.of(PrimitiveType.STRING);
-        List<BaseObjectTypeDefinition> objects = ImmutableList.of(
+        List<TypeDefinition> objects = ImmutableList.of(
                 ObjectTypeDefinition.builder()
                         .typeName(FOO)
                         .addFields(FieldDefinition.of(FieldName.of(illegalFieldName),
                                 MapType.of(complexKeyType, PrimitiveType.STRING), DOCS))
                         .build());
-        when(imports.types()).thenReturn(objects);
+        when(conjureDef.types()).thenReturn(objects);
 
-        assertThatThrownBy(() -> ObjectsDefinitionValidator.NO_COMPLEX_KEYS.validate(imports))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_COMPLEX_KEYS.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(illegalFieldName)
                 .hasMessageContaining(complexKeyType.toString());
     }
 
-    private FieldDefinition field(FieldName name, String type) throws ParseException {
+    private FieldDefinition field(FieldName name, String type) {
         return FieldDefinition.of(name, LocalReferenceType.of(TypeName.of(type, PACKAGE)), DOCS);
     }
 }

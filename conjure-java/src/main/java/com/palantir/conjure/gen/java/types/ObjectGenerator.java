@@ -6,19 +6,18 @@ package com.palantir.conjure.gen.java.types;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
+import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
-import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.squareup.javapoet.JavaFile;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class ObjectGenerator implements TypeGenerator {
 
@@ -35,37 +34,40 @@ public final class ObjectGenerator implements TypeGenerator {
     }
 
     @Override
-    public JavaFile generateObjectType(TypesDefinition types, BaseObjectTypeDefinition typeDef) {
+    public Set<JavaFile> generateTypes(List<TypeDefinition> types) {
         TypeMapper typeMapper = new TypeMapper(types);
-        if (typeDef instanceof ObjectTypeDefinition) {
-            return BeanGenerator.generateBeanType(typeMapper,
-                    (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
-                    enabledExperimentalFeatures);
-        } else if (typeDef instanceof UnionTypeDefinition) {
-            return UnionGenerator.generateUnionType(
-                    typeMapper, (UnionTypeDefinition) typeDef,
-                    enabledExperimentalFeatures);
-        } else if (typeDef instanceof EnumTypeDefinition) {
-            return EnumGenerator.generateEnumType(
-                    (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
-                    enabledExperimentalFeatures);
-        } else if (typeDef instanceof AliasTypeDefinition) {
-            return AliasGenerator.generateAliasType(
-                    typeMapper, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
-        }
-        throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
+
+        return types.stream().map(typeDef -> {
+            if (typeDef instanceof ObjectTypeDefinition) {
+                return BeanGenerator.generateBeanType(typeMapper,
+                        (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
+                        enabledExperimentalFeatures);
+            } else if (typeDef instanceof UnionTypeDefinition) {
+                return UnionGenerator.generateUnionType(
+                        typeMapper, (UnionTypeDefinition) typeDef,
+                        enabledExperimentalFeatures);
+            } else if (typeDef instanceof EnumTypeDefinition) {
+                return EnumGenerator.generateEnumType(
+                        (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
+                        enabledExperimentalFeatures);
+            } else if (typeDef instanceof AliasTypeDefinition) {
+                return AliasGenerator.generateAliasType(
+                        typeMapper, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
+            } else {
+                throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
+            }
+        }).collect(Collectors.toSet());
     }
 
     @Override
-    public Set<JavaFile> generateErrorTypes(TypesDefinition allTypes, List<ErrorTypeDefinition> errorTypeNameToDef) {
-        if (errorTypeNameToDef.isEmpty()) {
-            return Collections.emptySet();
+    public Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorTypeDefinition> errors) {
+        if (errors.isEmpty()) {
+            return ImmutableSet.of();
         }
-
         requireExperimentalFeature(ExperimentalFeatures.ErrorTypes);
 
-        TypeMapper typeMapper = new TypeMapper(allTypes);
-        return ErrorGenerator.generateErrorTypes(typeMapper, errorTypeNameToDef);
+        TypeMapper typeMapper = new TypeMapper(types);
+        return ErrorGenerator.generateErrorTypes(typeMapper, errors);
     }
 
     private void requireExperimentalFeature(ExperimentalFeatures feature) {

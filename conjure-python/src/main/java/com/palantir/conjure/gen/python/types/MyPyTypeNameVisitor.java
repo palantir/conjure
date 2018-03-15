@@ -4,12 +4,9 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -19,8 +16,9 @@ import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,12 +26,10 @@ import java.util.Map;
  */
 public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
 
-    private final Map<TypeName, BaseObjectTypeDefinition> typesByName;
-    private final Map<TypeName, ExternalTypeDefinition> importsByName;
+    private final Map<TypeName, TypeDefinition> typesByName;
 
-    public MyPyTypeNameVisitor(TypesDefinition types) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
-        this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
+    public MyPyTypeNameVisitor(List<TypeDefinition> types) {
+        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
     }
 
 
@@ -80,15 +76,18 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
     @Override
     public String visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
-        BaseObjectTypeDefinition baseType = typesByName.get(type.type());
+        TypeDefinition baseType = typesByName.get(type.type());
 
         if (baseType != null) {
             return type.type().name();
         } else {
-            ExternalTypeDefinition depType = importsByName.get(type.type());
-            checkNotNull(depType, "Unable to resolve type %s", type.type());
-            return visitPrimitive(depType.baseType());
+            throw new IllegalArgumentException("unknown type: " + type);
         }
+    }
+
+    @Override
+    public String visitExternal(ExternalType externalType) {
+        return visitPrimitive(externalType.fallback());
     }
 
     @Override

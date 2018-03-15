@@ -5,32 +5,28 @@
 package com.palantir.conjure.defs.types.reference;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.defs.types.ConjureTypeVisitor;
+import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import java.util.Map;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface ExternalTypeDefinition {
+public interface ExternalType extends Type {
 
-    TypeName typeName();
-
-    Map<String, String> external();
-
-    PrimitiveType baseType();
-
-    static ExternalTypeDefinition javaType(String external) {
-        return new Builder()
-                .baseType(PrimitiveType.STRING)
-                .putExternal("java", external)
-                .build();
+    @Override
+    default <T> T visit(ConjureTypeVisitor<T> visitor) {
+        return visitor.visitExternal(this);
     }
+
+    TypeName externalReference();
+
+    PrimitiveType fallback();
 
     static Builder builder() {
         return new Builder();
     }
 
-    class Builder extends ImmutableExternalTypeDefinition.Builder {}
-
+    class Builder extends ImmutableExternalType.Builder {}
 }

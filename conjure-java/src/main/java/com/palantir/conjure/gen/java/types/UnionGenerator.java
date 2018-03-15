@@ -54,6 +54,7 @@ public final class UnionGenerator {
             TypeMapper typeMapper,
             UnionTypeDefinition typeDef,
             Set<ExperimentalFeatures> experimentalFeatures) {
+
         ConjurePackage typePackage = typeDef.typeName().conjurePackage();
         ClassName unionClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");

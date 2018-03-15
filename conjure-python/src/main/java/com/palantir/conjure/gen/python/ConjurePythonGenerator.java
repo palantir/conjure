@@ -5,7 +5,7 @@
 package com.palantir.conjure.gen.python;
 
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonFile;
@@ -30,11 +30,10 @@ public final class ConjurePythonGenerator {
     }
 
     public List<PythonFile> generate(ConjureDefinition conjureDefinition) {
-        TypesDefinition types = conjureDefinition.types();
+        List<TypeDefinition> types = conjureDefinition.types();
 
         PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor();
-        List<PythonClass> beanClasses = types.definitions()
-                .types()
+        List<PythonClass> beanClasses = types
                 .stream()
                 .map(objectDefinition -> beanGenerator.generateObject(types, packageNameProcessor, objectDefinition))
                 .collect(Collectors.toList());

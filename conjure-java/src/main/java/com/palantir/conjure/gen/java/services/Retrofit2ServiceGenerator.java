@@ -12,13 +12,16 @@ import com.google.common.collect.Lists;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.ArgumentName;
-import com.palantir.conjure.defs.services.AuthDefinition;
+import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.HeaderAuthType;
 import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
@@ -210,30 +213,29 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return param.build();
     }
 
-    private Optional<ParameterSpec> getAuthParameter(AuthDefinition auth) {
-        switch (auth.type()) {
-            case HEADER:
-                return Optional.of(
-                        ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
-                                .addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                                        .addMember("value", "$S", auth.id())
-                                        .build())
-                                .build());
-            case COOKIE:
-                // TODO(melliot): generate required retrofit logic to support this
-                log.error("Retrofit does not support Cookie arguments");
-                break;
-            case NONE:
-                /* do nothing */
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown authorization type: " + auth.type());
+    private Optional<ParameterSpec> getAuthParameter(Optional<AuthType> auth) {
+        if (!auth.isPresent()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        AuthType authType = auth.get();
+        if (authType instanceof HeaderAuthType) {
+            return Optional.of(
+                    ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
+                            .addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
+                                    .addMember("value", "$S", HeaderAuthType.HEADER_NAME)
+                                    .build())
+                            .build());
+        } else if (authType instanceof CookieAuthType) {
+            // TODO(melliot): generate required retrofit logic to support this
+            log.error("Retrofit does not support Cookie arguments");
+        }
+
+        throw new IllegalStateException("Unrecognized auth type: " + auth.get());
     }
 
     private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<Type> markers) {
-        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
+        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType || type instanceof ExternalType),
                 "Markers must refer to reference types.");
         return markers.stream()
                 .map(typeMapper::getClassName)

@@ -5,7 +5,8 @@
 package com.palantir.conjure.defs;
 
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import java.util.List;
 import org.immutables.value.Value;
 
@@ -13,8 +14,9 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ConjureDefinition {
 
-    // TODO(qchen): change to List<TypeDefinition>
-    TypesDefinition types();
+    List<TypeDefinition> types();
+
+    List<ErrorTypeDefinition> errors();
 
     List<ServiceDefinition> services();
 

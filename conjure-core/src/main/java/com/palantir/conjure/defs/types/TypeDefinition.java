@@ -7,8 +7,9 @@ package com.palantir.conjure.defs.types;
 import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.Optional;
 
-public interface BaseObjectTypeDefinition {
-    // TODO(rfink): Rename to "name"?
+public interface TypeDefinition {
+
     TypeName typeName();
+
     Optional<Documentation> docs();
 }

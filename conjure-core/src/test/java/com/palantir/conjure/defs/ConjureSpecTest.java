@@ -54,7 +54,7 @@ public final class ConjureSpecTest {
     }
 
     @Test
-    public void testConjureSpec() throws IOException {
+    public void testConjureSpec() {
         // test positive cases
         testCaseDef.positive().orElse(new TreeMap<>()).entrySet().stream().forEach(entry -> {
             String testName = String.format("positive case %s", entry.getKey());

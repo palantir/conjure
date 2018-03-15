@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.parser.types.ObjectTypeDefVisitor;
+import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.names.FieldName;
 import java.io.IOException;
 import java.util.Map;
@@ -23,7 +23,7 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
     Map<FieldName, FieldDefinition> union();
 
     @Override
-    default <T> T visit(ObjectTypeDefVisitor<T> visitor) {
+    default <T> T visit(TypeDefinitionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 

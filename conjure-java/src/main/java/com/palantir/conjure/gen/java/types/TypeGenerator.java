@@ -7,9 +7,7 @@ package com.palantir.conjure.gen.java.types;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.ObjectsDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.gen.java.util.Goethe;
 import com.squareup.javapoet.JavaFile;
@@ -21,18 +19,13 @@ import java.util.Set;
 public interface TypeGenerator {
 
     default Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypesDefinition types = conjureDefinition.types();
-        ObjectsDefinition objectsDefinition = types.definitions();
         Set<JavaFile> files = Sets.newLinkedHashSet();
 
-        // Generate java files for object definitions
-        objectsDefinition.types().stream().map(
-                type -> generateObjectType(types, type))
-                .forEach(files::add);
+        // Generate java files for type definitions
+        generateTypes(conjureDefinition.types()).forEach(files::add);
 
         // Generate java files for error definitions
-        generateErrorTypes(types, objectsDefinition.errors())
-                .forEach(files::add);
+        generateErrors(conjureDefinition.types(), conjureDefinition.errors()).forEach(files::add);
 
         return files;
     }
@@ -50,11 +43,7 @@ public interface TypeGenerator {
         return emittedPaths;
     }
 
-    JavaFile generateObjectType(
-            TypesDefinition allTypes,
-            BaseObjectTypeDefinition typeDef);
+    Set<JavaFile> generateTypes(List<TypeDefinition> types);
 
-    Set<JavaFile> generateErrorTypes(
-            TypesDefinition allTypes,
-            List<ErrorTypeDefinition> errorTypeNameToDef);
+    Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorTypeDefinition> errors);
 }

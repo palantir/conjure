@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.parser.types.ObjectTypeDefVisitor;
+import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.names.ErrorCode;
 import com.palantir.conjure.parser.types.names.ErrorNamespace;
 import com.palantir.conjure.parser.types.names.FieldName;
@@ -34,7 +34,7 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
     Map<FieldName, FieldDefinition> unsafeArgs();
 
     @Override
-    default <T> T visit(ObjectTypeDefVisitor<T> visitor) {
+    default <T> T visit(TypeDefinitionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 

@@ -7,19 +7,20 @@ package com.palantir.conjure.defs;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
 import com.palantir.conjure.defs.services.ArgumentName;
-import com.palantir.conjure.defs.services.AuthDefinition;
+import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
 import com.palantir.conjure.defs.services.EndpointName;
+import com.palantir.conjure.defs.services.HeaderAuthType;
 import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.RequestLineDefinition;
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeParserVisitor;
 import com.palantir.conjure.defs.types.Documentation;
-import com.palantir.conjure.defs.types.ObjectTypeDefParserVisitor;
-import com.palantir.conjure.defs.types.ObjectsDefinition;
 import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
+import com.palantir.conjure.defs.types.TypeDefinitionParserVisitor;
+import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
 import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
@@ -32,10 +33,7 @@ import com.palantir.conjure.defs.types.names.ErrorNamespace;
 import com.palantir.conjure.defs.types.names.FieldName;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,7 +66,7 @@ public final class ConjureParserUtils {
     public static ErrorTypeDefinition parseErrorType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.ErrorTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return ErrorTypeDefinition.builder()
                 .typeName(name)
                 .namespace(ErrorNamespace.of(def.namespace().name()))
@@ -79,7 +77,7 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    public static BaseObjectTypeDefinition parseEnumType(
+    public static TypeDefinition parseEnumType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
         return EnumTypeDefinition.builder()
@@ -89,10 +87,10 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    public static BaseObjectTypeDefinition parseUnionType(
+    public static TypeDefinition parseUnionType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return UnionTypeDefinition.builder()
                 .typeName(name)
                 .union(parseField(def.union(), typeResolver))
@@ -100,10 +98,10 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    public static BaseObjectTypeDefinition parseObjectType(
+    public static TypeDefinition parseObjectType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.ObjectTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return ObjectTypeDefinition.builder()
                 .typeName(name)
                 .fields(parseField(def.fields(), typeResolver))
@@ -111,10 +109,10 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    public static BaseObjectTypeDefinition parseAliasType(
+    public static TypeDefinition parseAliasType(
             TypeName name,
             com.palantir.conjure.parser.types.reference.AliasTypeDefinition def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return AliasTypeDefinition.builder()
                 .typeName(name)
                 .alias(def.alias().visit(new ConjureTypeParserVisitor(typeResolver)))
@@ -136,7 +134,7 @@ public final class ConjureParserUtils {
 
     static ConjureDefinition parseConjureDef(com.palantir.conjure.parser.ConjureDefinition parsed) {
         List<ServiceDefinition> services = new ArrayList<>();
-        ConjureTypeParserVisitor.TypeNameResolver typeResolver =
+        ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
                 new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
         parsed.services().forEach((serviceName, service) -> {
             services.add(parseSevice(
@@ -146,7 +144,8 @@ public final class ConjureParserUtils {
         });
 
         return ConjureDefinition.builder()
-                .types(parseTypes(parsed.types(), typeResolver))
+                .types(parseAllTypes(parsed.types(), typeResolver))
+                .errors(parseAllErrors(parsed.types(), typeResolver))
                 .services(services)
                 .build();
     }
@@ -154,11 +153,11 @@ public final class ConjureParserUtils {
     static ServiceDefinition parseSevice(
             com.palantir.conjure.parser.services.ServiceDefinition parsed,
             TypeName serviceName,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         List<EndpointDefinition> endpoints = new ArrayList<>();
         parsed.endpoints().forEach((name, def) -> endpoints.add(
                 ConjureParserUtils.parseEndpoint(
-                        name, def, parsed.basePath(), AuthDefinition.parseFrom(parsed.defaultAuth()), typeResolver)));
+                        name, def, parsed.basePath(), parseAuthType(parsed.defaultAuth()), typeResolver)));
         return ServiceDefinition.builder()
                 .serviceName(serviceName)
                 .docs(parsed.docs().map(Documentation::of))
@@ -166,24 +165,32 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    static ObjectsDefinition parseObjects(
-            com.palantir.conjure.parser.types.ObjectsDefinition defs,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
-        Optional<ConjurePackage> defaultPackage = defs.defaultConjurePackage().map(p -> ConjurePackage.of(p.name()));
+    static List<TypeDefinition> parseObjects(
+            com.palantir.conjure.parser.types.TypesDefinition parsed,
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+        Optional<ConjurePackage> defaultPackage =
+                parsed.definitions().defaultConjurePackage().map(p -> ConjurePackage.of(p.name()));
 
-        List<BaseObjectTypeDefinition> objects = new ArrayList<>();
-        defs.objects().forEach((name, def) ->
-                objects.add(def.visit(new ObjectTypeDefParserVisitor(name.name(), defaultPackage, typeResolver))));
-        List<ErrorTypeDefinition> errors = new ArrayList<>();
-        defs.errors().forEach((name, def) -> {
+        ImmutableList.Builder<TypeDefinition> objectsBuilder = ImmutableList.builder();
+        objectsBuilder.addAll(
+                parsed.definitions().objects().entrySet().stream()
+                        .map(entry -> entry.getValue().visit(
+                                new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
+                .collect(Collectors.toList()));
+        return objectsBuilder.build();
+    }
+
+    static List<ErrorTypeDefinition> parseErrors(
+            com.palantir.conjure.parser.types.ObjectsDefinition defs,
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+        Optional<ConjurePackage> defaultPackage = defs.defaultConjurePackage().map(p -> ConjurePackage.of(p.name()));
+        ImmutableList.Builder<ErrorTypeDefinition> errorsBuidler = ImmutableList.builder();
+        errorsBuidler.addAll(defs.errors().entrySet().stream().map(entry -> {
             TypeName typeName = TypeName.of(
-                    name.name(), parsePackageOrElseThrow(def.conjurePackage(), defaultPackage));
-            errors.add(parseErrorType(typeName, def, typeResolver));
-        });
-        return ObjectsDefinition.builder()
-                .types(objects)
-                .errors(errors)
-                .build();
+                    entry.getKey().name(), parsePackageOrElseThrow(entry.getValue().conjurePackage(), defaultPackage));
+            return parseErrorType(typeName, entry.getValue(), typeResolver);
+        }).collect(Collectors.toList()));
+        return errorsBuidler.build();
     }
 
     private static EnumValueDefinition parseEnumValue(
@@ -194,37 +201,51 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    private static TypesDefinition parseTypes(
+    private static List<TypeDefinition> parseAllTypes(
             com.palantir.conjure.parser.types.TypesDefinition parsed,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
 
-        // Collect all imported object and error definitions.
-        ObjectsDefinition directDefinitions = parseObjects(parsed.definitions(), typeResolver);
-        ObjectsDefinition.Builder imports = ObjectsDefinition.builder();
+        ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
+        typesBuilder.addAll(parseObjects(parsed, typeResolver));
+
+        for (com.palantir.conjure.parser.types.reference.ConjureImports imported : parsed.conjureImports().values()) {
+            // Since we don't support transitive imports, the type resolver for the imported types consist of
+            // its direct objects and external imports only.
+            ConjureTypeParserVisitor.ReferenceTypeResolver importResolver =
+                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(imported.conjure().types());
+            List<TypeDefinition> importedObjects = parseObjects(imported.conjure().types(), importResolver);
+
+            typesBuilder.addAll(importedObjects);
+        }
+        return typesBuilder.build();
+    }
+
+    // similar to parseAllTypes but for specific ErrorTypeDefinitions
+    private static List<ErrorTypeDefinition> parseAllErrors(
+            com.palantir.conjure.parser.types.TypesDefinition parsed,
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+
+        // Collect all imported object.
+        ImmutableList.Builder<ErrorTypeDefinition> errorsBuilder = ImmutableList.builder();
+        errorsBuilder.addAll(parseErrors(parsed.definitions(), typeResolver));
+
         for (com.palantir.conjure.parser.types.reference.ConjureImports imported : parsed.conjureImports().values()) {
             // Since we don't support transitive imports, the type resolver for the imported types consist of
             // its direct types and external imports only.
-            ConjureTypeParserVisitor.TypeNameResolver importResolver =
+            ConjureTypeParserVisitor.ReferenceTypeResolver importResolver =
                     new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(imported.conjure().types());
-            ObjectsDefinition importedObjects =
-                    parseObjects(imported.conjure().types().definitions(), importResolver);
-            imports.addAllTypes(importedObjects.types());
-            imports.addAllErrors(importedObjects.errors());
+            List<ErrorTypeDefinition> importedErrors =
+                    parseErrors(imported.conjure().types().definitions(), importResolver);
+            errorsBuilder.addAll(importedErrors);
         }
 
-        return TypesDefinition.builder()
-                .externalImports(parseImports(parsed.imports()))
-                .imports(imports.build())
-                .definitions(ObjectsDefinition.builder()
-                        .addAllTypes(directDefinitions.types())
-                        .addAllErrors(directDefinitions.errors()).build())
-                .build();
+        return errorsBuilder.build();
     }
 
     static List<FieldDefinition> parseField(
             Map<com.palantir.conjure.parser.types.names.FieldName,
                     com.palantir.conjure.parser.types.complex.FieldDefinition> def,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
 
         return def.entrySet().stream().map(entry ->
                 FieldDefinition.of(
@@ -238,16 +259,14 @@ public final class ConjureParserUtils {
             String name,
             com.palantir.conjure.parser.services.EndpointDefinition def,
             com.palantir.conjure.parser.services.PathDefinition basePath,
-            AuthDefinition defaultAuth,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            Optional<AuthType> defaultAuth,
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         RequestLineDefinition requestDef = parseRequestLine(basePath, def.http());
 
         return EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
                 .http(requestDef)
-                .auth(def.auth()
-                        .map(AuthDefinition::parseFrom)
-                        .orElse(defaultAuth))
+                .auth(def.auth().map(ConjureParserUtils::parseAuthType).orElse(defaultAuth))
                 .args(parseArgs(def.args(), requestDef, typeResolver))
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
@@ -256,13 +275,19 @@ public final class ConjureParserUtils {
                 .build();
     }
 
-    private static ExternalTypeDefinition parseExternalType(
-            TypeName name, com.palantir.conjure.parser.types.reference.ExternalTypeDefinition def) {
-        return ExternalTypeDefinition.builder()
-                .typeName(name)
-                .baseType(parsePrimitiveType(def.baseType()))
-                .putAllExternal(def.external())
-                .build();
+    private static Optional<AuthType> parseAuthType(
+            com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
+
+        switch (authDefinition.type())  {
+            case HEADER:
+                return Optional.of(HeaderAuthType.header());
+            case COOKIE:
+                return Optional.of(CookieAuthType.cookie(authDefinition.id()));
+            case NONE:
+                return Optional.empty();
+            default:
+                throw new IllegalArgumentException("Unrecognized auth type.");
+        }
     }
 
     private static RequestLineDefinition parseRequestLine(com.palantir.conjure.parser.services.PathDefinition basePath,
@@ -275,7 +300,7 @@ public final class ConjureParserUtils {
             Map<com.palantir.conjure.parser.services.ParameterName,
                     com.palantir.conjure.parser.services.ArgumentDefinition> args,
             RequestLineDefinition requestDef,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         ImmutableList.Builder<ArgumentDefinition> resultBuilder = ImmutableList.builder();
         for (Map.Entry<com.palantir.conjure.parser.services.ParameterName,
                 com.palantir.conjure.parser.services.ArgumentDefinition> entry : args.entrySet()) {
@@ -309,18 +334,10 @@ public final class ConjureParserUtils {
 
     private static Set<Type> parseMarkers(
             Set<com.palantir.conjure.parser.types.ConjureType> markers,
-            ConjureTypeParserVisitor.TypeNameResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return markers.stream()
                 .map(m -> m.visit(new ConjureTypeParserVisitor(typeResolver)))
                 .collect(Collectors.toSet());
     }
 
-    private static Collection<ExternalTypeDefinition> parseImports(
-            Map<com.palantir.conjure.parser.types.names.TypeName,
-                    com.palantir.conjure.parser.types.reference.ExternalTypeDefinition> parsed) {
-        List<ExternalTypeDefinition> imports = new ArrayList<>();
-        parsed.forEach((name, def) -> imports.add(parseExternalType(
-                TypeName.of(name.name(), ConjurePackage.EXTERNAL_IMPORT), def)));
-        return imports;
-    }
 }

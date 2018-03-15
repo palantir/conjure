@@ -42,7 +42,6 @@ public final class ArgumentNameValidatorTest {
                 .argName(ArgumentName.of(paramName))
                 .build();
         return EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
                 .args(ImmutableList.of(arg))
                 .endpointName(EndpointName.of("test"));

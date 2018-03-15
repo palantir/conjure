@@ -20,8 +20,7 @@ public interface EndpointDefinition {
     // TODO(qchen): split this into method and path?
     RequestLineDefinition http();
 
-    // TODO(qchen): optional union type
-    AuthDefinition auth();
+    Optional<AuthType> auth();
 
     List<ArgumentDefinition> args();
 

@@ -1,17 +1,17 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  */
 
-package com.palantir.conjure.defs.types.reference;
+package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.Type;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
+public interface AliasTypeDefinition extends TypeDefinition {
 
     Type alias();
 

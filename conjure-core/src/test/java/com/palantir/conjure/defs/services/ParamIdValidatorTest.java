@@ -81,7 +81,6 @@ public final class ParamIdValidatorTest {
                 .type(AnyType.of())
                 .build();
         return EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .http(RequestLineDefinition.of(HttpMethod.POST, PathDefinition.of("/a/path")))
                 .addArgs(arg)
                 .endpointName(EndpointName.of("test"));

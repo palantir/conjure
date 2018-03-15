@@ -9,12 +9,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
-import com.palantir.conjure.defs.services.AuthDefinition;
+import com.palantir.conjure.defs.services.AuthType;
+import com.palantir.conjure.defs.services.CookieAuthType;
 import com.palantir.conjure.defs.services.EndpointDefinition;
+import com.palantir.conjure.defs.services.HeaderAuthType;
 import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.ServiceDefinition;
 import com.palantir.conjure.defs.types.Type;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.ReferenceType;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
@@ -132,7 +135,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
             TypeMapper typeMapper) {
         List<ParameterSpec> parameterSpecs = new ArrayList<>();
 
-        AuthDefinition auth = endpointDef.auth();
+        Optional<AuthType> auth = endpointDef.auth();
         createAuthParameter(auth).ifPresent(parameterSpecs::add);
 
         endpointDef.args().forEach(def -> {
@@ -149,29 +152,30 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
         return param.build();
     }
 
-    private static Optional<ParameterSpec> createAuthParameter(AuthDefinition auth) {
+    private static Optional<ParameterSpec> createAuthParameter(Optional<AuthType> auth) {
         ClassName annotationClassName;
         ClassName tokenClassName;
         String paramName;
-        switch (auth.type()) {
-            case HEADER:
-                annotationClassName = ClassName.get("javax.ws.rs", "HeaderParam");
-                tokenClassName = ClassName.get("com.palantir.tokens.auth", "AuthHeader");
-                paramName = "authHeader";
-                break;
-            case COOKIE:
-                annotationClassName = ClassName.get("javax.ws.rs", "CookieParam");
-                tokenClassName = ClassName.get("com.palantir.tokens.auth", "BearerToken");
-                paramName = "token";
-                break;
-            case NONE:
-            default:
-                return Optional.empty();
+        String tokenName;
+        if (!auth.isPresent()) {
+            return Optional.empty();
+        } else if (auth.get() instanceof HeaderAuthType) {
+            annotationClassName = ClassName.get("javax.ws.rs", "HeaderParam");
+            tokenClassName = ClassName.get("com.palantir.tokens.auth", "AuthHeader");
+            paramName = "authHeader";
+            tokenName = HeaderAuthType.HEADER_NAME;
+        } else if (auth.get() instanceof CookieAuthType) {
+            annotationClassName = ClassName.get("javax.ws.rs", "CookieParam");
+            tokenClassName = ClassName.get("com.palantir.tokens.auth", "BearerToken");
+            paramName = "token";
+            tokenName = ((CookieAuthType) auth.get()).cookieName();
+        } else {
+            throw new IllegalStateException("Unrecognized auth type: " + auth.get());
         }
         return Optional.of(
                 ParameterSpec.builder(tokenClassName, paramName)
                         .addAnnotation(AnnotationSpec.builder(annotationClassName)
-                                .addMember("value", "$S", auth.id()).build())
+                                .addMember("value", "$S", tokenName).build())
                         .build());
     }
 
@@ -203,7 +207,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
     }
 
     private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<Type> markers) {
-        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
+        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType || type instanceof ExternalType),
                 "Markers must refer to reference types.");
         return markers.stream()
                 .map(typeMapper::getClassName)

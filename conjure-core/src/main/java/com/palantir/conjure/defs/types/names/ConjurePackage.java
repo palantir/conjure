@@ -28,9 +28,6 @@ public abstract class ConjurePackage {
     /** Primitive types have an empty package. */
     public static final ConjurePackage PRIMITIVE = ConjurePackage.of("");
 
-    /** External imports have an empty package. */
-    public static final ConjurePackage EXTERNAL_IMPORT = ConjurePackage.of("");
-
     @JsonValue
     public abstract String name();
 

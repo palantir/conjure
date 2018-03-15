@@ -21,6 +21,7 @@ public interface ArgumentDefinition {
 
     Optional<ParameterId> paramId();
 
+    // TODO(qchen): union parameter type
     ParamType paramType();
 
     Optional<Documentation> docs();

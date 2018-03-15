@@ -5,13 +5,14 @@
 package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import java.util.List;
 import org.immutables.value.Value;
 
+
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
+public interface UnionTypeDefinition extends TypeDefinition {
 
     List<FieldDefinition> union();
 

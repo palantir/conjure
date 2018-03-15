@@ -7,7 +7,7 @@ package com.palantir.conjure.gen.python.client;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public final class ClientGenerator {
 
     public PythonClass generateClient(
-            TypesDefinition types,
+            List<TypeDefinition> types,
             PackageNameProcessor packageNameProvider,
             ServiceDefinition serviceDefinition) {
 
@@ -61,7 +61,7 @@ public final class ClientGenerator {
                     return PythonEndpointDefinition.builder()
                             .methodName(ed.endpointName())
                             .http(ed.http())
-                            .authDefinition(ed.auth())
+                            .auth(ed.auth())
                             .params(params)
                             .pythonReturnType(ed.returns().map(mapper::getTypeName))
                             .myPyReturnType(ed.returns().map(myPyMapper::getTypeName))

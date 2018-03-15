@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -13,16 +13,18 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import java.io.InputStream;
+import java.util.List;
 
 public final class JerseyMethodTypeClassNameVisitor implements ClassNameVisitor {
 
     private final DefaultClassNameVisitor delegate;
 
-    public JerseyMethodTypeClassNameVisitor(TypesDefinition types) {
+    public JerseyMethodTypeClassNameVisitor(List<TypeDefinition> types) {
         this.delegate = new DefaultClassNameVisitor(types);
     }
 
@@ -54,6 +56,11 @@ public final class JerseyMethodTypeClassNameVisitor implements ClassNameVisitor 
     @Override
     public TypeName visitLocalReference(LocalReferenceType type) {
         return delegate.visitLocalReference(type);
+    }
+
+    @Override
+    public TypeName visitExternal(ExternalType type) {
+        return delegate.visitExternal(type);
     }
 
     @Override

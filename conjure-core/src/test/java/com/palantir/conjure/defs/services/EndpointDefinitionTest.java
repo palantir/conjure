@@ -25,7 +25,6 @@ public final class EndpointDefinitionTest {
     @Test
     public void testArgumentTypeValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .args(ImmutableList.of(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("testArg"))
                         .type(BinaryType.of())
@@ -44,7 +43,6 @@ public final class EndpointDefinitionTest {
     @SuppressWarnings("CheckReturnValue")
     public void testArgumentBodyTypeValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .args(ImmutableList.of(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("testArg"))
                         .type(BinaryType.of())
@@ -60,7 +58,6 @@ public final class EndpointDefinitionTest {
     @Test
     public void testSingleBodyParamValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg1")).build())
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg2")).build())
                 .endpointName(ENDPOINT_NAME)
@@ -86,7 +83,6 @@ public final class EndpointDefinitionTest {
 
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .args(ImmutableList.of(paramDefinition1, paramDefinition2))
                 .endpointName(ENDPOINT_NAME)
                 .http(GET_REQUEST);
@@ -106,7 +102,6 @@ public final class EndpointDefinitionTest {
 
         RequestLineDefinition noParamRequest = RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .addArgs(paramDefinition)
                 .endpointName(ENDPOINT_NAME)
                 .http(noParamRequest);
@@ -121,7 +116,6 @@ public final class EndpointDefinitionTest {
         RequestLineDefinition requestWithPathParam =
                 RequestLineDefinition.of(HttpMethod.GET, PathDefinition.of("/a/path/{paramName}"));
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .endpointName(ENDPOINT_NAME)
                 .http(requestWithPathParam);
 
@@ -133,7 +127,6 @@ public final class EndpointDefinitionTest {
     @Test
     public void testNoGetBodyValidator() {
         EndpointDefinition.Builder endpoint = EndpointDefinition.builder()
-                .auth(AuthDefinition.none())
                 .addArgs(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg")).build())
                 .endpointName(ENDPOINT_NAME)
                 .http(GET_REQUEST);

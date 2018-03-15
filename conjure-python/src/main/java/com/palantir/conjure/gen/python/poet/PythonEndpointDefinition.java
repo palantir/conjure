@@ -10,9 +10,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.defs.services.ArgumentDefinition;
-import com.palantir.conjure.defs.services.AuthDefinition;
-import com.palantir.conjure.defs.services.AuthDefinition.AuthType;
+import com.palantir.conjure.defs.services.AuthType;
 import com.palantir.conjure.defs.services.EndpointName;
+import com.palantir.conjure.defs.services.HeaderAuthType;
 import com.palantir.conjure.defs.services.ParameterId;
 import com.palantir.conjure.defs.services.PathDefinition;
 import com.palantir.conjure.defs.services.RequestLineDefinition;
@@ -30,7 +30,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
     RequestLineDefinition http();
 
-    AuthDefinition authDefinition();
+    Optional<AuthType> auth();
 
     List<PythonEndpointParam> params();
 
@@ -50,7 +50,8 @@ public interface PythonEndpointDefinition extends Emittable {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.maintainingIndent(() -> {
             // if auth type is header, insert it as a fake param
-            List<PythonEndpointParam> paramsWithHeader = authDefinition().type() == AuthType.HEADER
+            boolean isHeaderType = auth().isPresent() && (auth().get() instanceof HeaderAuthType);
+            List<PythonEndpointParam> paramsWithHeader = isHeaderType
                     ? ImmutableList.<PythonEndpointParam>builder()
                     .add(PythonEndpointParam.builder()
                             .paramName("authHeader")

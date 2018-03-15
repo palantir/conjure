@@ -4,7 +4,7 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -13,10 +13,12 @@ import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+import java.util.List;
 import java.util.Set;
 
 public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor {
@@ -24,7 +26,8 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
     private final DefaultClassNameVisitor delegate;
     private final Set<ExperimentalFeatures> experimentalFeatures;
 
-    public JerseyReturnTypeClassNameVisitor(TypesDefinition types, Set<ExperimentalFeatures> experimentalFeatures) {
+    public JerseyReturnTypeClassNameVisitor(
+            List<TypeDefinition> types, Set<ExperimentalFeatures> experimentalFeatures) {
         this.delegate = new DefaultClassNameVisitor(types);
         this.experimentalFeatures = experimentalFeatures;
     }
@@ -57,6 +60,11 @@ public final class JerseyReturnTypeClassNameVisitor implements ClassNameVisitor 
     @Override
     public TypeName visitLocalReference(LocalReferenceType type) {
         return delegate.visitLocalReference(type);
+    }
+
+    @Override
+    public TypeName visitExternal(ExternalType type) {
+        return delegate.visitExternal(type);
     }
 
     @Override

@@ -29,7 +29,7 @@ public interface BaseObjectTypeDefinition {
 
     Optional<String> docs();
 
-    <T> T visit(ObjectTypeDefVisitor<T> visitor);
+    <T> T visit(TypeDefinitionVisitor<T> visitor);
 
     class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
         @Override

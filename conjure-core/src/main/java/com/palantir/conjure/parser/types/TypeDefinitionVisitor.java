@@ -10,7 +10,7 @@ import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
 
-public interface ObjectTypeDefVisitor<T> {
+public interface TypeDefinitionVisitor<T> {
     T visit(AliasTypeDefinition def);
     T visit(EnumTypeDefinition def);
     T visit(ErrorTypeDefinition def);

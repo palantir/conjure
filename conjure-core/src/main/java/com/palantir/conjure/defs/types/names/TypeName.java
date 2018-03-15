@@ -7,12 +7,11 @@ package com.palantir.conjure.defs.types.names;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.ObjectsDefinition;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
 /**
- * Represents the name of a conjure {@link ObjectsDefinition#types() type} by a name and its conjure package.
+ * Represents the name of a conjure type by a name and its conjure package.
  */
 @com.google.errorprone.annotations.Immutable
 @SuppressWarnings("Immutable")

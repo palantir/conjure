@@ -5,15 +5,14 @@
 package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
+import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
 import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.reference.AliasTypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonAlias;
 import com.palantir.conjure.gen.python.poet.PythonBean;
@@ -30,6 +29,7 @@ import java.util.stream.Collectors;
 
 public final class DefaultBeanGenerator implements PythonBeanGenerator {
 
+    // TODO(qchen): remove?
     private final Set<ExperimentalFeatures> enabledExperimentalFeatures;
 
     public DefaultBeanGenerator(Set<ExperimentalFeatures> enabledExperimentalFeatures) {
@@ -37,9 +37,9 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     }
 
     @Override
-    public PythonClass generateObject(TypesDefinition types,
+    public PythonClass generateObject(List<TypeDefinition> types,
             PackageNameProcessor packageNameProcessor,
-            BaseObjectTypeDefinition typeDef) {
+            TypeDefinition typeDef) {
         if (typeDef instanceof ObjectTypeDefinition) {
             return generateObject(types, packageNameProcessor, (ObjectTypeDefinition) typeDef);
         } else if (typeDef instanceof EnumTypeDefinition) {
@@ -54,7 +54,9 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     }
 
     private PythonClass generateObject(
-            TypesDefinition types, PackageNameProcessor packageNameProcessor, UnionTypeDefinition typeDef) {
+            List<TypeDefinition> types,
+            PackageNameProcessor packageNameProcessor,
+            UnionTypeDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
@@ -109,7 +111,9 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     }
 
     private PythonBean generateObject(
-            TypesDefinition types, PackageNameProcessor packageNameProcessor, ObjectTypeDefinition typeDef) {
+            List<TypeDefinition> types,
+            PackageNameProcessor packageNameProcessor,
+            ObjectTypeDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
@@ -145,7 +149,9 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     }
 
     private PythonAlias generateObject(
-            TypesDefinition types, PackageNameProcessor packageNameProcessor, AliasTypeDefinition typeDef) {
+            List<TypeDefinition> types,
+            PackageNameProcessor packageNameProcessor,
+            AliasTypeDefinition typeDef) {
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProcessor);

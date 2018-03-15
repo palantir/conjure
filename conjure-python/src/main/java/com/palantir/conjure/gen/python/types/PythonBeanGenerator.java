@@ -4,18 +4,18 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
+import java.util.List;
 
 public interface PythonBeanGenerator {
 
     enum ExperimentalFeatures {}
 
     PythonClass generateObject(
-            TypesDefinition types,
+            List<TypeDefinition> types,
             PackageNameProcessor packageNameProvider,
-            BaseObjectTypeDefinition typeDef);
+            TypeDefinition typeDef);
 
 }

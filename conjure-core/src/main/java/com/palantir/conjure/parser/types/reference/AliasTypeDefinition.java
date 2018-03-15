@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ConjureType;
-import com.palantir.conjure.parser.types.ObjectTypeDefVisitor;
+import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import java.io.IOException;
 import org.immutables.value.Value;
 
@@ -22,7 +22,7 @@ public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
     ConjureType alias();
 
     @Override
-    default <T> T visit(ObjectTypeDefVisitor<T> visitor) {
+    default <T> T visit(TypeDefinitionVisitor<T> visitor) {
         return visitor.visit(this);
     }
 

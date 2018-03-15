@@ -86,6 +86,7 @@ public enum TypeParser implements Parser<ConjureType> {
         }
     }
 
+    // TODO(qchen): Change to ExternalType?
     private enum ForeignReferenceTypeParser implements Parser<ForeignReferenceType> {
         INSTANCE;
 

@@ -4,13 +4,10 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -21,22 +18,21 @@ import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.names.TypeName;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<PythonClassName>> {
 
-    private final Map<TypeName, BaseObjectTypeDefinition> typesByName;
-    private final Map<TypeName, ExternalTypeDefinition> importsByName;
+    private final Map<TypeName, TypeDefinition> typesByName;
     private final PackageNameProcessor packageNameProcessor;
 
-    public ReferencedTypeNameVisitor(TypesDefinition types, PackageNameProcessor packageNameProcessor) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
-        this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
+    public ReferencedTypeNameVisitor(List<TypeDefinition> types, PackageNameProcessor packageNameProcessor) {
+        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
         this.packageNameProcessor = packageNameProcessor;
     }
 
@@ -70,17 +66,20 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
 
     @Override
     public Set<PythonClassName> visitLocalReference(LocalReferenceType refType) {
-        BaseObjectTypeDefinition type = typesByName.get(refType.type());
+        TypeDefinition type = typesByName.get(refType.type());
 
         if (type != null) {
             ConjurePackage packageName = packageNameProcessor.getPackageName(type.typeName().conjurePackage());
             // TODO(rfink): We do we generate with the package of the reference but the name of the referee?
             return ImmutableSet.of(PythonClassName.of(packageName, refType.type().name()));
         } else {
-            ExternalTypeDefinition depType = importsByName.get(refType.type());
-            checkNotNull(depType, "Unable to resolve type %s", refType.type());
-            return visitPrimitive(depType.baseType());
+            return ImmutableSet.of();
         }
+    }
+
+    @Override
+    public Set<PythonClassName> visitExternal(ExternalType externalType) {
+        return visitPrimitive(externalType.fallback());
     }
 
     @Override

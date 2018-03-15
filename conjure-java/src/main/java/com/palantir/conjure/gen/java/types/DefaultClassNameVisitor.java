@@ -4,11 +4,8 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.defs.types.TypesDefinition;
+import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.builtin.AnyType;
 import com.palantir.conjure.defs.types.builtin.BinaryType;
 import com.palantir.conjure.defs.types.builtin.DateTimeType;
@@ -18,7 +15,7 @@ import com.palantir.conjure.defs.types.collect.OptionalType;
 import com.palantir.conjure.defs.types.collect.SetType;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalTypeDefinition;
+import com.palantir.conjure.defs.types.reference.ExternalType;
 import com.palantir.conjure.defs.types.reference.LocalReferenceType;
 import com.palantir.conjure.lib.SafeLong;
 import com.palantir.ri.ResourceIdentifier;
@@ -28,6 +25,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -40,12 +38,10 @@ import java.util.UUID;
  */
 public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
-    private final Map<com.palantir.conjure.defs.types.names.TypeName, BaseObjectTypeDefinition> typesByName;
-    private final Map<com.palantir.conjure.defs.types.names.TypeName, ExternalTypeDefinition> importsByName;
+    private final Map<com.palantir.conjure.defs.types.names.TypeName, TypeDefinition> typesByName;
 
-    DefaultClassNameVisitor(TypesDefinition types) {
-        this.typesByName = Maps.uniqueIndex(types.definitionsAndImports().types(), t -> t.typeName());
-        this.importsByName = Maps.uniqueIndex(types.externalImports(), t -> t.typeName());
+    DefaultClassNameVisitor(List<TypeDefinition> types) {
+        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
     }
 
     @Override
@@ -123,15 +119,19 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     @Override
     public TypeName visitLocalReference(LocalReferenceType type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
-        BaseObjectTypeDefinition baseType = typesByName.get(type.type());
+        TypeDefinition baseType = typesByName.get(type.type());
         if (baseType != null) {
             ConjurePackage conjurePackage = baseType.typeName().conjurePackage();
             return ClassName.get(conjurePackage.name(), type.type().name());
         } else {
-            ExternalTypeDefinition depType = importsByName.get(type.type());
-            checkNotNull(depType, "Unable to resolve type %s", type.type());
-            return ClassName.bestGuess(depType.external().get("java"));
+            throw new IllegalStateException("Unknown LocalReferenceType type: " + type);
         }
+    }
+
+    @Override
+    public TypeName visitExternal(ExternalType externalType) {
+        ConjurePackage conjurePackage = externalType.externalReference().conjurePackage();
+        return ClassName.get(conjurePackage.name(), externalType.externalReference().name());
     }
 
     @Override

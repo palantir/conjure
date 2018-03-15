@@ -402,7 +402,9 @@ class ConjurePluginTest extends IntegrationSpec {
         file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.external.ExternalImport;')
         fileExists('api/api-objects/src/generated/java/test/api/internal/InternalImport.java')
-        !fileExists('api/api-objects/src/generated/java/test/api/external/ExternalImport.java')
+
+        // TODO(qchen): need a way to distinguish local and conjure-import types
+        fileExists('api/api-objects/src/generated/java/test/api/external/ExternalImport.java')
         !fileExists('api/api-jersey/src/generated/java/test/api/external/ExternalService.java')
         !fileExists('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java')
 
@@ -411,7 +413,9 @@ class ConjurePluginTest extends IntegrationSpec {
                 'from internal import InternalImport')
         file('api/api-python/python/service/__init__.py').text.contains(
                 'from external import ExternalImport')
-        !fileExists('api/api-python/python/external')
+
+        // TODO(qchen): need a way to distinguish local and conjure-import types
+        fileExists('api/api-python/python/external')
 
         // typescript
         file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
