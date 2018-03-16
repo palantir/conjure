@@ -406,18 +406,13 @@ docs: optional docs
 ```
 
 #### Error Definitions
+
 Conjure offers first-class support for HTTP Remoting 3 [ServiceException](https://github.com/palantir/http-remoting#error-propagation)
 by providing the ability to define error types. An error definition consists of a type
 alias, a namespace, an error code, which should be one of
 [the codes defined in HTTP Remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors/src/main/java/com/palantir/remoting/api/errors/ErrorType.java#L38),
 optional documentation, and optional lists of safe and unsafe arguments. It lives in a different
-block from other object definitions, called `errors`.
-
-For each error definition, Conjure will generate an error type object and a factory method
-for creating `ServiceException`s associated with that error type. They will both be put in
-a class named `[YourNamespace]Errors`, along with the generated objects and factory methods
-for other error definitions with the same namespace. Instead of having each error definition
-define its own package, the default package name is used for all error definitions.
+block from other object definitions, called `errors`. See the example below for the definition.
 
 The type alias and namespace are required to be in `UpperCamelCase`, whereas error code is required to be
 in `UPPER_UNDERSCORE_CASE`.
@@ -426,6 +421,28 @@ Error definition could optionally have two argument lists, `safe-args` and `unsa
 Each takes a list of fields, defined in the same syntax as fields in object definitions.
 The difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
 Safe arguments come first in the generated factory methods.
+
+For each error definition, Conjure will generate the following:
+
+1. For creating and throwing errors, a Java error type object and a factory method is generated that
+can be used to create the `ServiceException`s associated with that error type. They will both be put 
+in a class named `[YourNamespace]Errors`, along with the generated objects and factory methods
+for other error definitions with the same namespace. Instead of having each error definition
+define its own package, the default package name is used for all error definitions. One can then throw
+an error as follows: 
+
+```java
+throw MyNamespaceErrors.exampleError("arg1", 12345);
+```
+
+2. For consuming errors on frontend services, a TypeScript method named `is[YourError]` is generated so that
+one can detect when a certain type of error occurs and get the error parameters:
+
+```typescript
+if (isExampleError(response.body)) {
+   return `Bad arg1 ${response.body.parameters.safeArgument} and arg2 ${response.body.parameters.unsafeArgument}`;
+}
+```
 
 #### Examples
 See also:
@@ -473,7 +490,7 @@ definitions:
 
   errors:
     ExampleError:
-      namespace: Conjure
+      namespace: MyNamespace
       code: INTERNAL
       docs: Optional Docs
       safe-args:
