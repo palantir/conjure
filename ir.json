@@ -808,7 +808,7 @@
         },
         "fields" : [
           {
-            "fieldName": "typeName",
+            "fieldName": "errorName",
             "type": {
               "type": "reference",
               "reference": {

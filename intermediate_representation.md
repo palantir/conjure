@@ -463,7 +463,7 @@ The "errors" section is a list of error definitions. Each error definition must 
 - "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorType codes defined in
 HTTP remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors/src/main/java/com/palantir/remoting/api/errors/ErrorType.java#L38).
 - "namespace": a string describing the namespace of the error and it must be in `UpperCamelCase`.
-- "typeName": a `TypeName` definition describing the package and name of the type.
+- "errorName": a `TypeName` definition describing the package and name of the error.
 
 Each error definition may include the following keys:
 - "docs": a string documentation of the error.

@@ -41,7 +41,7 @@ types:
           - CUSTOM_SERVER
       ErrorDefinition:
         fields:
-          typeName: TypeName
+          errorName: TypeName
           docs: optional<Documentation>
           namespace: ErrorNamespace
           code: ErrorCode
