@@ -424,14 +424,18 @@ Safe arguments come first in the generated factory methods.
 
 For each error definition, Conjure will generate the following:
 
-1. For creating and throwing errors, a Java error type object and a factory method is generated that
-can be used to create the `ServiceException`s associated with that error type. They will both be put 
+1. For creating and throwing errors, a Java error type object and factory methods are generated that
+can be used to create the `ServiceException`s associated with that error type. They will be put 
 in a class named `[YourNamespace]Errors`, along with the generated objects and factory methods
 for other error definitions with the same namespace. Instead of having each error definition
-define its own package, the default package name is used for all error definitions. One can then throw
-an error as follows: 
+define its own package, the default package name is used for all error definitions. One can use the following
+methods to throw errors: 
 
 ```java
+// Option 1 (preferred)
+MyNamespaceErrors.throwIfExampleError(<conditionToThrowOn>, "arg1", 12345);
+
+// Option 2
 throw MyNamespaceErrors.exampleError("arg1", 12345);
 ```
 
