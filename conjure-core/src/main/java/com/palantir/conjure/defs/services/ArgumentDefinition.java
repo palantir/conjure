@@ -19,8 +19,6 @@ public interface ArgumentDefinition {
 
     Type type();
 
-    Optional<ParameterId> paramId();
-
     ParameterType paramType();
 
     Optional<Documentation> docs();
