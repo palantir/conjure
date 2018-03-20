@@ -23,6 +23,8 @@ public final class SetExample implements Serializable {
 
     private final Set<Double> doubleItems;
 
+    private transient volatile int memoizedHashCode;
+
     private SetExample(Set<String> items, Set<Double> doubleItems) {
         validateFields(items, doubleItems);
         this.items = Collections.unmodifiableSet(items);
@@ -50,7 +52,10 @@ public final class SetExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, doubleItems);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(items, doubleItems);
+        }
+        return memoizedHashCode;
     }
 
     @Override

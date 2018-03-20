@@ -18,6 +18,8 @@ public final class UuidExample implements Serializable {
 
     private final UUID uuid;
 
+    private transient volatile int memoizedHashCode;
+
     private UuidExample(UUID uuid) {
         validateFields(uuid);
         this.uuid = uuid;
@@ -39,7 +41,10 @@ public final class UuidExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(uuid);
+        }
+        return memoizedHashCode;
     }
 
     @Override

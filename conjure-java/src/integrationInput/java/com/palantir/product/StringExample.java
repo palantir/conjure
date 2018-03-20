@@ -17,6 +17,8 @@ public final class StringExample implements Serializable {
 
     private final String string;
 
+    private transient volatile int memoizedHashCode;
+
     private StringExample(String string) {
         validateFields(string);
         this.string = string;
@@ -38,7 +40,10 @@ public final class StringExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(string);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(string);
+        }
+        return memoizedHashCode;
     }
 
     @Override

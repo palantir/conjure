@@ -20,6 +20,8 @@ public final class AnyMapExample implements Serializable {
 
     private final Map<String, Object> items;
 
+    private transient volatile int memoizedHashCode;
+
     private AnyMapExample(Map<String, Object> items) {
         validateFields(items);
         this.items = Collections.unmodifiableMap(items);
@@ -41,7 +43,10 @@ public final class AnyMapExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(items);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(items);
+        }
+        return memoizedHashCode;
     }
 
     @Override

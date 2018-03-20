@@ -15,6 +15,8 @@ public final class IntegerExample implements Serializable {
 
     private final int integer;
 
+    private transient volatile int memoizedHashCode;
+
     private IntegerExample(int integer) {
         this.integer = integer;
     }
@@ -36,7 +38,10 @@ public final class IntegerExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integer);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(integer);
+        }
+        return memoizedHashCode;
     }
 
     @Override

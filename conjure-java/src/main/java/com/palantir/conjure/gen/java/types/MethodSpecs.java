@@ -5,6 +5,7 @@
 package com.palantir.conjure.gen.java.types;
 
 import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -12,10 +13,12 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collector;
 import javax.lang.model.element.Modifier;
 
@@ -45,17 +48,40 @@ public final class MethodSpecs {
     }
 
     public static MethodSpec createHashCode(Collection<FieldSpec> fields) {
-        CodeBlock hashInput = CodeBlocks.of(
-                fields.stream()
-                        .map(MethodSpecs::createHashInput)
-                        .collect(joining(CodeBlock.of(", "))));
-
         return MethodSpec.methodBuilder("hashCode")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.INT)
-                .addStatement("return $1T.$2N($3L)", Objects.class, "hash", hashInput)
+                .addStatement("return $1T.$2N($3L)", Objects.class, "hash", getHashInput(fields))
                 .build();
+    }
+
+    public static void addCachedHashCode(TypeSpec.Builder typeBuilder,
+            Set<ExperimentalFeatures> experimentalFeatures,
+            Collection<FieldSpec> fields) {
+
+        FieldSpec.Builder hashFieldSpec = FieldSpec.builder(TypeName.INT, "memoizedHashCode",
+                Modifier.PRIVATE, Modifier.VOLATILE);
+        if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
+            hashFieldSpec.addModifiers(Modifier.TRANSIENT);
+        }
+        typeBuilder.addField(hashFieldSpec.build());
+
+        typeBuilder.addMethod(MethodSpec.methodBuilder("hashCode")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.INT)
+                .beginControlFlow("if (memoizedHashCode == 0)")
+                .addStatement("memoizedHashCode = $1T.$2N($3L)", Objects.class, "hash", getHashInput(fields))
+                .endControlFlow()
+                .addStatement("return memoizedHashCode")
+                .build());
+    }
+
+    private static CodeBlock getHashInput(Collection<FieldSpec> fields) {
+        return CodeBlocks.of(fields.stream()
+                .map(MethodSpecs::createHashInput)
+                .collect(joining(CodeBlock.of(", "))));
     }
 
     public static MethodSpec createToString(String thisClassName, Collection<FieldName> fieldNames) {

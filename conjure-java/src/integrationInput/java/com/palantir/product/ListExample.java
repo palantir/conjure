@@ -23,6 +23,8 @@ public final class ListExample implements Serializable {
 
     private final List<Double> doubleItems;
 
+    private transient volatile int memoizedHashCode;
+
     private ListExample(
             List<String> items, List<Integer> primitiveItems, List<Double> doubleItems) {
         validateFields(items, primitiveItems, doubleItems);
@@ -59,7 +61,10 @@ public final class ListExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(items, primitiveItems, doubleItems);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(items, primitiveItems, doubleItems);
+        }
+        return memoizedHashCode;
     }
 
     @Override

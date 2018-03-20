@@ -18,6 +18,8 @@ public final class BinaryExample implements Serializable {
 
     private final ByteBuffer binary;
 
+    private transient volatile int memoizedHashCode;
+
     private BinaryExample(ByteBuffer binary) {
         validateFields(binary);
         this.binary = binary;
@@ -39,7 +41,10 @@ public final class BinaryExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(binary);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(binary);
+        }
+        return memoizedHashCode;
     }
 
     @Override

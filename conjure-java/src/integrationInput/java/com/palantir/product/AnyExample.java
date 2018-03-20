@@ -17,6 +17,8 @@ public final class AnyExample implements Serializable {
 
     private final Object any;
 
+    private transient volatile int memoizedHashCode;
+
     private AnyExample(Object any) {
         validateFields(any);
         this.any = any;
@@ -38,7 +40,10 @@ public final class AnyExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(any);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(any);
+        }
+        return memoizedHashCode;
     }
 
     @Override

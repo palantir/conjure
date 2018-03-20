@@ -18,6 +18,8 @@ public final class RidExample implements Serializable {
 
     private final ResourceIdentifier ridValue;
 
+    private transient volatile int memoizedHashCode;
+
     private RidExample(ResourceIdentifier ridValue) {
         validateFields(ridValue);
         this.ridValue = ridValue;
@@ -39,7 +41,10 @@ public final class RidExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ridValue);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(ridValue);
+        }
+        return memoizedHashCode;
     }
 
     @Override

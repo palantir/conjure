@@ -15,6 +15,8 @@ public final class DoubleExample implements Serializable {
 
     private final double doubleValue;
 
+    private transient volatile int memoizedHashCode;
+
     private DoubleExample(double doubleValue) {
         this.doubleValue = doubleValue;
     }
@@ -35,7 +37,10 @@ public final class DoubleExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(doubleValue);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(doubleValue);
+        }
+        return memoizedHashCode;
     }
 
     @Override

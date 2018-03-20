@@ -18,6 +18,8 @@ public final class DateTimeExample implements Serializable {
 
     private final ZonedDateTime datetime;
 
+    private transient volatile int memoizedHashCode;
+
     private DateTimeExample(ZonedDateTime datetime) {
         validateFields(datetime);
         this.datetime = datetime;
@@ -40,7 +42,10 @@ public final class DateTimeExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(datetime.toInstant());
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(datetime.toInstant());
+        }
+        return memoizedHashCode;
     }
 
     @Override

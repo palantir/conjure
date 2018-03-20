@@ -78,8 +78,8 @@ public final class BeanGenerator {
         if (!poetFields.isEmpty()) {
             typeBuilder
                     .addMethod(MethodSpecs.createEquals(objectClass))
-                    .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields))
-                    .addMethod(MethodSpecs.createHashCode(poetFields));
+                    .addMethod(MethodSpecs.createEqualTo(objectClass, poetFields));
+            MethodSpecs.addCachedHashCode(typeBuilder, experimentalFeatures, poetFields);
         }
 
         typeBuilder.addMethod(MethodSpecs.createToString(typeDef.typeName().name(),

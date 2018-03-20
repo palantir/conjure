@@ -18,6 +18,8 @@ public final class SafeLongExample implements Serializable {
 
     private final SafeLong safeLongValue;
 
+    private transient volatile int memoizedHashCode;
+
     private SafeLongExample(SafeLong safeLongValue) {
         validateFields(safeLongValue);
         this.safeLongValue = safeLongValue;
@@ -40,7 +42,10 @@ public final class SafeLongExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(safeLongValue);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(safeLongValue);
+        }
+        return memoizedHashCode;
     }
 
     @Override

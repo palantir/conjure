@@ -15,6 +15,8 @@ public final class BooleanExample implements Serializable {
 
     private final boolean coin;
 
+    private transient volatile int memoizedHashCode;
+
     private BooleanExample(boolean coin) {
         this.coin = coin;
     }
@@ -36,7 +38,10 @@ public final class BooleanExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(coin);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(coin);
+        }
+        return memoizedHashCode;
     }
 
     @Override

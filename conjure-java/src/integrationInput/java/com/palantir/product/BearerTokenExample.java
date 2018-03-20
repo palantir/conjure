@@ -18,6 +18,8 @@ public final class BearerTokenExample implements Serializable {
 
     private final BearerToken bearerTokenValue;
 
+    private transient volatile int memoizedHashCode;
+
     private BearerTokenExample(BearerToken bearerTokenValue) {
         validateFields(bearerTokenValue);
         this.bearerTokenValue = bearerTokenValue;
@@ -40,7 +42,10 @@ public final class BearerTokenExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(bearerTokenValue);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(bearerTokenValue);
+        }
+        return memoizedHashCode;
     }
 
     @Override

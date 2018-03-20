@@ -149,3 +149,5 @@ types:
             type: string
           field-name-with-dashes:
             type: string
+          memoizedHashCode:
+            type: integer

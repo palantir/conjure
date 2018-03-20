@@ -20,6 +20,8 @@ public final class MapExample implements Serializable {
 
     private final Map<String, String> items;
 
+    private transient volatile int memoizedHashCode;
+
     private MapExample(Map<String, String> items) {
         validateFields(items);
         this.items = Collections.unmodifiableMap(items);
@@ -41,7 +43,10 @@ public final class MapExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(items);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(items);
+        }
+        return memoizedHashCode;
     }
 
     @Override

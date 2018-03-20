@@ -32,6 +32,8 @@ public final class AliasAsMapKeyExample implements Serializable {
 
     private final Map<UuidAliasExample, ManyFieldExample> uuids;
 
+    private transient volatile int memoizedHashCode;
+
     private AliasAsMapKeyExample(
             Map<StringAliasExample, ManyFieldExample> strings,
             Map<RidAliasExample, ManyFieldExample> rids,
@@ -103,7 +105,12 @@ public final class AliasAsMapKeyExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(strings, rids, bearertokens, integers, safelongs, datetimes, uuids);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode =
+                    Objects.hash(
+                            strings, rids, bearertokens, integers, safelongs, datetimes, uuids);
+        }
+        return memoizedHashCode;
     }
 
     @Override

@@ -18,6 +18,8 @@ public final class OptionalExample implements Serializable {
 
     private final Optional<String> item;
 
+    private transient volatile int memoizedHashCode;
+
     private OptionalExample(Optional<String> item) {
         validateFields(item);
         this.item = item;
@@ -40,7 +42,10 @@ public final class OptionalExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(item);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(item);
+        }
+        return memoizedHashCode;
     }
 
     @Override

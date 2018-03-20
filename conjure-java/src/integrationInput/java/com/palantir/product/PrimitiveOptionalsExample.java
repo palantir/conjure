@@ -36,6 +36,8 @@ public final class PrimitiveOptionalsExample implements Serializable {
 
     private final Optional<UUID> uuid;
 
+    private transient volatile int memoizedHashCode;
+
     private PrimitiveOptionalsExample(
             OptionalDouble num,
             Optional<Boolean> bool,
@@ -108,7 +110,10 @@ public final class PrimitiveOptionalsExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(num, bool, integer, safelong, rid, bearertoken, uuid);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode = Objects.hash(num, bool, integer, safelong, rid, bearertoken, uuid);
+        }
+        return memoizedHashCode;
     }
 
     @Override

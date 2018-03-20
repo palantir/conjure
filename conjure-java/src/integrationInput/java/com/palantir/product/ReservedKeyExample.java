@@ -21,11 +21,17 @@ public final class ReservedKeyExample implements Serializable {
 
     private final String fieldNameWithDashes;
 
-    private ReservedKeyExample(String package_, String interface_, String fieldNameWithDashes) {
+    private final int memoizedHashCode_;
+
+    private transient volatile int memoizedHashCode;
+
+    private ReservedKeyExample(
+            String package_, String interface_, String fieldNameWithDashes, int memoizedHashCode_) {
         validateFields(package_, interface_, fieldNameWithDashes);
         this.package_ = package_;
         this.interface_ = interface_;
         this.fieldNameWithDashes = fieldNameWithDashes;
+        this.memoizedHashCode_ = memoizedHashCode_;
     }
 
     @JsonProperty("package")
@@ -43,6 +49,11 @@ public final class ReservedKeyExample implements Serializable {
         return this.fieldNameWithDashes;
     }
 
+    @JsonProperty("memoizedHashCode")
+    public int getMemoizedHashCode() {
+        return this.memoizedHashCode_;
+    }
+
     @Override
     public boolean equals(Object other) {
         return this == other
@@ -52,12 +63,17 @@ public final class ReservedKeyExample implements Serializable {
     private boolean equalTo(ReservedKeyExample other) {
         return this.package_.equals(other.package_)
                 && this.interface_.equals(other.interface_)
-                && this.fieldNameWithDashes.equals(other.fieldNameWithDashes);
+                && this.fieldNameWithDashes.equals(other.fieldNameWithDashes)
+                && this.memoizedHashCode_ == other.memoizedHashCode_;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(package_, interface_, fieldNameWithDashes);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode =
+                    Objects.hash(package_, interface_, fieldNameWithDashes, memoizedHashCode_);
+        }
+        return memoizedHashCode;
     }
 
     @Override
@@ -75,17 +91,12 @@ public final class ReservedKeyExample implements Serializable {
                 .append("field-name-with-dashes")
                 .append(": ")
                 .append(fieldNameWithDashes)
+                .append(", ")
+                .append("memoizedHashCode")
+                .append(": ")
+                .append(memoizedHashCode_)
                 .append("}")
                 .toString();
-    }
-
-    public static ReservedKeyExample of(
-            String package_, String interface_, String fieldNameWithDashes) {
-        return builder()
-                .package_(package_)
-                .interface_(interface_)
-                .fieldNameWithDashes(fieldNameWithDashes)
-                .build();
     }
 
     private static void validateFields(
@@ -126,12 +137,15 @@ public final class ReservedKeyExample implements Serializable {
 
         private String fieldNameWithDashes;
 
+        private int memoizedHashCode_;
+
         private Builder() {}
 
         public Builder from(ReservedKeyExample other) {
             package_(other.getPackage());
             interface_(other.getInterface());
             fieldNameWithDashes(other.getFieldNameWithDashes());
+            memoizedHashCode_(other.getMemoizedHashCode());
             return this;
         }
 
@@ -155,8 +169,15 @@ public final class ReservedKeyExample implements Serializable {
             return this;
         }
 
+        @JsonSetter("memoizedHashCode")
+        public Builder memoizedHashCode_(int memoizedHashCode_) {
+            this.memoizedHashCode_ = memoizedHashCode_;
+            return this;
+        }
+
         public ReservedKeyExample build() {
-            return new ReservedKeyExample(package_, interface_, fieldNameWithDashes);
+            return new ReservedKeyExample(
+                    package_, interface_, fieldNameWithDashes, memoizedHashCode_);
         }
     }
 }

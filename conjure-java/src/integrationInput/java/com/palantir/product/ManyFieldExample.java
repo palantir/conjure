@@ -38,6 +38,8 @@ public final class ManyFieldExample implements Serializable {
 
     private final StringAliasExample alias;
 
+    private transient volatile int memoizedHashCode;
+
     private ManyFieldExample(
             String string,
             int integer,
@@ -125,7 +127,12 @@ public final class ManyFieldExample implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(string, integer, doubleValue, optionalItem, items, set, map, alias);
+        if (memoizedHashCode == 0) {
+            memoizedHashCode =
+                    Objects.hash(
+                            string, integer, doubleValue, optionalItem, items, set, map, alias);
+        }
+        return memoizedHashCode;
     }
 
     @Override
