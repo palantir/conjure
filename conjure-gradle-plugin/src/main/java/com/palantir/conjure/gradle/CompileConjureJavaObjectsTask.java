@@ -61,7 +61,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
                 .build();
 
         TypeGenerator generator = new ObjectGenerator(settings, experimentalFeatures.get());
-        compileFiles(generator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
+        compileFiles(generator, getSource().getFiles());
     }
 
     private void compileFiles(TypeGenerator generator, Collection<File> files) {

@@ -10,36 +10,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.gradle.api.Project;
-import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.FileCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConjureExtension {
     private static final Logger log = LoggerFactory.getLogger(ConjureExtension.class);
 
-    private final Project project;
-
-    private ConfigurableFileCollection conjureImports;
     private final Set<String> experimentalFeatures = Sets.newHashSet();
-
-    public ConjureExtension(Project project) {
-        this.project = project;
-        conjureImports = project.files();
-    }
-
-    public final void setConjureImports(FileCollection files) {
-        conjureImports = project.files(files);
-    }
-
-    public final void conjureImports(FileCollection files) {
-        conjureImports.from(files);
-    }
-
-    public final ConfigurableFileCollection getConjureImports() {
-        return conjureImports;
-    }
 
     public final void experimentalFeature(String feature) {
         experimentalFeatures.add(feature);

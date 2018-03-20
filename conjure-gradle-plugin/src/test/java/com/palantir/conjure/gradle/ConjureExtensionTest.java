@@ -5,15 +5,13 @@
 package com.palantir.conjure.gradle;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
-import org.gradle.api.Project;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ConjureExtensionTest {
-    private final ConjureExtension extension = new ConjureExtension(mock(Project.class));
+    private final ConjureExtension extension = new ConjureExtension();
 
     @Before
     public void before() {

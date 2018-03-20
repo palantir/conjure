@@ -118,11 +118,6 @@ class ConjurePluginTest extends IntegrationSpec {
         file('api/build.gradle').text = '''
         apply plugin: 'com.palantir.conjure'
 
-        conjure {
-            conjureImports files('external-import.yml')
-            experimentalFeature 'GradleExternalImports'
-        }
-
         tasks.getByName('compileConjurePython').enabled = true
         '''.stripIndent()
 
@@ -323,16 +318,11 @@ class ConjurePluginTest extends IntegrationSpec {
         file('api/build.gradle').text = '''
         apply plugin: 'com.palantir.conjure'
 
-        conjure {
-            conjureImports files('external-import.yml')
-            experimentalFeature 'GradleExternalImports'
-        }
         '''.stripIndent()
 
         createFile('api/src/main/conjure/conjure.yml') << '''
         types:
           conjure-imports:
-            externalImport: external-imports/external-import.yml
             internalImport: internal-import.yml
           definitions:
             default-package: test.api.default
@@ -347,7 +337,7 @@ class ConjurePluginTest extends IntegrationSpec {
               post:
                 http: POST /post
                 args:
-                  object: externalImport.ExternalImport
+                  object: internalImport.InternalImport
                 returns: internalImport.InternalImport
         '''.stripIndent()
 
@@ -361,24 +351,6 @@ class ConjurePluginTest extends IntegrationSpec {
                   stringField: string
         '''.stripIndent()
 
-        createFile('api/external-import.yml') << '''
-        types:
-          definitions:
-            default-package: test.api.external
-            objects:
-              ExternalImport:
-                fields:
-                  stringField: string
-        services:
-          ExternalService:
-            name: External Service
-            package: test.api.external
-            endpoints:
-              post:
-                http: POST /post
-                returns: ExternalImport
-        '''.stripIndent()
-
         when:
         ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
@@ -388,42 +360,23 @@ class ConjurePluginTest extends IntegrationSpec {
         result.wasExecuted(':api:compileConjureObjects')
         result.wasExecuted(':api:compileConjureRetrofit')
 
-        fileExists('api/build/conjure/external-imports/external-import.yml')
         fileExists('api/build/conjure/internal-import.yml')
         fileExists('api/build/conjure/conjure.yml')
 
         // java
         file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.internal.InternalImport;')
-        file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
-                'import test.api.external.ExternalImport;')
         file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
                 'import test.api.internal.InternalImport;')
-        file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
-                'import test.api.external.ExternalImport;')
         fileExists('api/api-objects/src/generated/java/test/api/internal/InternalImport.java')
-
-        // TODO(qchen): need a way to distinguish local and conjure-import types
-        fileExists('api/api-objects/src/generated/java/test/api/external/ExternalImport.java')
-        !fileExists('api/api-jersey/src/generated/java/test/api/external/ExternalService.java')
-        !fileExists('api/api-retrofit/src/generated/java/test/api/external/ExternalService.java')
 
         // python
         file('api/api-python/python/service/__init__.py').text.contains(
                 'from internal import InternalImport')
-        file('api/api-python/python/service/__init__.py').text.contains(
-                'from external import ExternalImport')
-
-        // TODO(qchen): need a way to distinguish local and conjure-import types
-        fileExists('api/api-python/python/external')
 
         // typescript
         file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
                 'import { IInternalImport } from "@api/internal"')
-        file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
-                'import { IExternalImport } from "@api/external"')
-        !fileExists('api/api-typescript/src/@api/external')
-        fileExists('api/api-typescript/build/node_modules/@api/external')
     }
 
     def 'omitting a project from settings is sufficient to disable'() {
@@ -525,48 +478,6 @@ class ConjurePluginTest extends IntegrationSpec {
 
         then:
         result.success
-    }
-
-    def 'descriptive error message for bad external-import'() {
-        file('api/build.gradle').text = '''
-        apply plugin: 'com.palantir.conjure'
-
-        conjure {
-            conjureImports files('external-import.yml')
-            experimentalFeature 'GradleExternalImports'
-        }
-        '''.stripIndent()
-
-        createFile('api/src/main/conjure/conjure.yml') << '''
-        types:
-          conjure-imports:
-            externalImport: external-imports/external-import.yml
-          definitions:
-            default-package: test.api.default
-
-        services: {}
-        '''.stripIndent()
-
-        createFile('api/external-import.yml') << '''
-        types:
-          definitions:
-            default-package: test.api.external
-            objects: {}
-        services:
-          ExternalService:
-            name: External Service
-            package: test.api.external
-            endpoints:
-              post:
-                http: POST/brokenhttpline
-        '''.stripIndent()
-
-        when:
-        ExecutionResult result = runTasksWithFailure(':api:compileConjure')
-
-        then:
-        result.getStandardError().contains(
-                "Request line must be of the form: [METHOD] [PATH], instead was 'POST/brokenhttpline'")
     }
 
     @Unroll

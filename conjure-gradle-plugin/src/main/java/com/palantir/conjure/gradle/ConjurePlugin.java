@@ -4,7 +4,6 @@
 
 package com.palantir.conjure.gradle;
 
-import com.google.common.base.Preconditions;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.gen.java.services.Retrofit2ServiceGenerator;
@@ -14,10 +13,8 @@ import com.palantir.conjure.gen.typescript.services.DefaultServiceGenerator;
 import com.palantir.conjure.gen.typescript.types.DefaultTypeGenerator;
 import java.io.File;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
@@ -35,7 +32,6 @@ import org.gradle.util.GFileUtils;
 
 public class ConjurePlugin implements Plugin<Project> {
 
-    private static final String EXTERNAL_IMPORTS_DIRNAME = "external-imports";
     private static final String JAVA_GENERATED_SOURCE_DIRNAME = "src/generated/java";
     private static final String JAVA_GITIGNORE_DIRNAME = "src";
     private static final String JAVA_GITIGNORE_CONTENTS = "/generated/**/*.java\n";
@@ -51,7 +47,7 @@ public class ConjurePlugin implements Plugin<Project> {
     @SuppressWarnings("checkstyle:methodlength")
     public final void apply(Project project) {
         project.getPlugins().apply(BasePlugin.class);
-        ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class, project);
+        ConjureExtension extension = project.getExtensions().create("conjure", ConjureExtension.class);
 
         // Conjure code source set
         SourceDirectorySet conjureSourceSet = sourceDirectorySetFactory.create("conjure");
@@ -64,16 +60,9 @@ public class ConjurePlugin implements Plugin<Project> {
         // Copy conjure sources into build directory
         Copy copyConjureSourcesTask = project.getTasks().create("copyConjureSourcesIntoBuild", Copy.class);
         copyConjureSourcesTask.into(project.file(buildDir))
-                .from(conjureSourceSet)
-                .from(extension.getConjureImports(), action -> action.into(new File(EXTERNAL_IMPORTS_DIRNAME)));
+                .from(conjureSourceSet);
 
         copyConjureSourcesTask.doFirst(task -> {
-            if (!extension.getConjureImports().getFiles().isEmpty()) {
-                Preconditions.checkState(
-                        extension.getExperimentalFeatures().contains("GradleExternalImports"),
-                        "Gradle-defined conjure imports are an experimental feature and must be enabled "
-                                + "with the experimentalFeature 'GradleExternalImports' feature flag.");
-            }
             GFileUtils.deleteDirectory(buildDir);
         });
 
@@ -242,12 +231,6 @@ public class ConjurePlugin implements Plugin<Project> {
                 cleanTask.dependsOn(project.getTasks().findByName("cleanCompileConjurePython"));
             });
         }
-    }
-
-    static Set<File> excludeExternalImports(Set<File> files) {
-        return files.stream()
-                .filter(f -> !Objects.equals(f.getParentFile().getName(), EXTERNAL_IMPORTS_DIRNAME))
-                .collect(Collectors.toSet());
     }
 
     private static void addGeneratedToMainSourceSet(Project subproj) {

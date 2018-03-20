@@ -83,7 +83,7 @@ public class CompileConjureTypeScriptTask extends SourceTask {
                 "Unable to make directory tree %s", nodeModulesOutputDirectory);
         GFileUtils.cleanDirectory(outputDirectory);
 
-        compileFiles(ConjurePlugin.excludeExternalImports(getSource().getFiles()), outputDirectory);
+        compileFiles(getSource().getFiles(), outputDirectory);
 
         // make all generated code available for later compilation
         compileFiles(getSource().getFiles(), nodeModulesOutputDirectory);

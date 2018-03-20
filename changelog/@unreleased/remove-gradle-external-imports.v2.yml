@@ -1,0 +1,7 @@
+type: break
+break:
+  description: >
+    `GradleExternalImports` feature is no longer available in conjure gradle plugin. Projects using this feature will
+    need to restructure their conjure definitions to migrate off of the `GradleExternalImports` setup.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/903

@@ -14,7 +14,6 @@ import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
@@ -57,14 +56,14 @@ public class CompileConjurePythonTask extends SourceTask {
     }
 
     @TaskAction
-    public final void compileFiles() throws IOException {
+    public final void compileFiles() {
         checkState(outputDirectory.exists() || outputDirectory.mkdirs(),
                 "Unable to make directory tree %s", outputDirectory);
         GFileUtils.cleanDirectory(outputDirectory);
 
         PythonBeanGenerator beanGenerator = new DefaultBeanGenerator(getExperimentalFeatures());
 
-        compileFiles(beanGenerator, ConjurePlugin.excludeExternalImports(getSource().getFiles()));
+        compileFiles(beanGenerator, getSource().getFiles());
     }
 
     private void compileFiles(PythonBeanGenerator beanGenerator, Collection<File> files) {
