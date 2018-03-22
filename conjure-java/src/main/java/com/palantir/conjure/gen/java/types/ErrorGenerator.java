@@ -62,7 +62,7 @@ public final class ErrorGenerator {
         Map<String, Map<ErrorNamespace, List<ErrorTypeDefinition>>> pkgToNamespacedErrorDefs =
                 Maps.newHashMap();
         errorTypeNameToDef.stream().forEach(errorDef -> {
-            ConjurePackage errorPkg = errorDef.typeName().conjurePackage();
+            ConjurePackage errorPkg = errorDef.errorName().conjurePackage();
             pkgToNamespacedErrorDefs.computeIfAbsent(errorPkg.name(), key -> Maps.newHashMap());
 
             Map<ErrorNamespace, List<ErrorTypeDefinition>> namespacedErrorDefs =
@@ -88,10 +88,10 @@ public final class ErrorGenerator {
             CodeBlock initializer = CodeBlock.of("ErrorType.create(ErrorType.Code.$L, \"$L:$L\")",
                     errorDef.code().name(),
                     namespace.name(),
-                    errorDef.typeName().name());
+                    errorDef.errorName().name());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(
                     ClassName.get(ErrorType.class),
-                    CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, errorDef.typeName().name()),
+                    CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, errorDef.errorName().name()),
                     Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(initializer);
             errorDef.docs().ifPresent(docs -> fieldSpecBuilder.addJavadoc(docs.value()));
@@ -110,8 +110,8 @@ public final class ErrorGenerator {
 
         // Generate ServiceException factory check methods
         List<MethodSpec> checkMethodSpecs = errorTypeDefinitions.stream().map(entry -> {
-            String exceptionMethodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
-            String methodName = "throwIf" + entry.typeName().name();
+            String exceptionMethodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.errorName().name());
+            String methodName = "throwIf" + entry.errorName().name();
 
             String shouldThrowVar = "shouldThrow";
 
@@ -120,7 +120,7 @@ public final class ErrorGenerator {
                     .addParameter(TypeName.BOOLEAN, shouldThrowVar);
 
             methodBuilder.addJavadoc("Throws a {@link ServiceException} of type $L when {@code $L} is true.\n",
-                    entry.typeName().name(), shouldThrowVar);
+                    entry.errorName().name(), shouldThrowVar);
             methodBuilder.addJavadoc("@param $L $L\n", shouldThrowVar, "Cause the method to throw when true");
             Streams.concat(
                     entry.safeArgs().stream(),
@@ -158,8 +158,8 @@ public final class ErrorGenerator {
 
     private static MethodSpec generateExceptionFactory(
             TypeMapper typeMapper, ErrorTypeDefinition entry, boolean withCause) {
-        String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.typeName().name());
-        String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.typeName().name());
+        String methodName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, entry.errorName().name());
+        String typeName = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, entry.errorName().name());
 
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)

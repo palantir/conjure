@@ -27,7 +27,7 @@ public class ErrorTypeDefinitionTest {
                 .thenReturn(FieldName.of("foo_bar"));
 
         ErrorTypeDefinition.Builder definition = ErrorTypeDefinition.builder()
-                .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
+                .errorName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
                 .addSafeArgs(mockField)
@@ -39,7 +39,7 @@ public class ErrorTypeDefinitionTest {
                         + "foo-bar vs fooBar");
 
         definition = ErrorTypeDefinition.builder()
-                .typeName(TypeName.of("Foo", ConjurePackage.of("package")))
+                .errorName(TypeName.of("Foo", ConjurePackage.of("package")))
                 .namespace(ErrorNamespace.of("Test"))
                 .code(ErrorCode.of("INVALID_ARGUMENT"))
                 .addSafeArgs(mockField)

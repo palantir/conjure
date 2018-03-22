@@ -8,7 +8,6 @@ import com.palantir.conjure.defs.ConjureParserUtils;
 import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
@@ -42,12 +41,6 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
     }
 
     @Override
-    public TypeDefinition visit(ErrorTypeDefinition def) {
-        return ConjureParserUtils.parseErrorType(
-                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver);
-    }
-
-    @Override
     public TypeDefinition visit(ObjectTypeDefinition def) {
         return ConjureParserUtils.parseObjectType(
                 ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver);
@@ -58,5 +51,4 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
         return ConjureParserUtils.parseUnionType(
                 ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver);
     }
-
 }

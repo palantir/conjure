@@ -5,20 +5,25 @@
 package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.TypeDefinition;
+import com.palantir.conjure.defs.types.Documentation;
 import com.palantir.conjure.defs.types.names.ErrorCode;
 import com.palantir.conjure.defs.types.names.ErrorNamespace;
+import com.palantir.conjure.defs.types.names.TypeName;
 import java.util.List;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
-// TODO(qchen): separate error type from TypeDefinition
-public interface ErrorTypeDefinition extends TypeDefinition {
+public interface ErrorTypeDefinition {
 
     ErrorNamespace namespace();
 
     ErrorCode code();
+
+    TypeName errorName();
+
+    Optional<Documentation> docs();
 
     List<FieldDefinition> safeArgs();
 

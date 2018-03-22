@@ -12,10 +12,12 @@ import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Streams;
 import com.palantir.conjure.defs.services.IsPrimitiveOrReferenceType;
 import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.defs.types.collect.MapType;
 import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
+import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.defs.types.complex.FieldDefinition;
 import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.defs.types.names.TypeName;
@@ -85,7 +87,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         public void validate(ConjureDefinition definition) {
             Set<String> seenNames = new HashSet<>();
             definition.types().forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.typeName().name()));
-            definition.errors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.typeName().name()));
+            definition.errors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.errorName().name()));
             definition.services().forEach(serviceDef -> verifyNameIsUnique(seenNames, serviceDef.serviceName().name()));
         }
 
@@ -103,22 +105,29 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             definition.types().stream().forEach(NoComplexKeysValidator::validateTypeDef);
-            definition.errors().stream().forEach(NoComplexKeysValidator::validateTypeDef);
+            definition.errors().stream().forEach(NoComplexKeysValidator::validateErrorDef);
         }
 
         private static void validateTypeDef(TypeDefinition typeDef) {
             if (typeDef instanceof ObjectTypeDefinition) {
                 ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) typeDef;
-                objectTypeDefinition.fields().stream().forEach(fieldDefinition -> {
-                    if (fieldDefinition.type() instanceof MapType) {
-                        MapType mapType = (MapType) fieldDefinition.type();
-                        if (!mapType.keyType().visit(IsPrimitiveOrReferenceType.INSTANCE)) {
-                            throw new IllegalStateException(
-                                    String.format("Complex type '%s' not allowed in map key: %s.",
-                                            mapType.keyType(), ((ObjectTypeDefinition) typeDef).fields()));
-                        }
-                    }
-                });
+                objectTypeDefinition.fields().stream().forEach(NoComplexKeysValidator::checkForComplexType);
+            }
+        }
+
+        private static void validateErrorDef(ErrorTypeDefinition errorDef) {
+            Streams.concat(errorDef.safeArgs().stream(), errorDef.unsafeArgs().stream())
+                    .forEach(NoComplexKeysValidator::checkForComplexType);
+        }
+
+        private static void checkForComplexType(FieldDefinition typeDef) {
+            if (typeDef.type() instanceof MapType) {
+                MapType mapType = (MapType) typeDef.type();
+                if (!mapType.keyType().visit(IsPrimitiveOrReferenceType.INSTANCE)) {
+                    throw new IllegalStateException(
+                            String.format("Complex type '%s' not allowed in map key: %s.",
+                                    mapType.keyType(), typeDef));
+                }
             }
         }
     }
@@ -129,8 +138,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         public void validate(ConjureDefinition definition) {
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
-            definition.errors().stream().forEach(error -> getReferenceType(error)
-                    .ifPresent(entry -> typeToRefFields.put(error.typeName(), entry)));
 
             definition.types().stream().forEach(type -> getReferenceType(type)
                     .ifPresent(entry -> typeToRefFields.put(type.typeName(), entry)));

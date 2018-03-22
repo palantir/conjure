@@ -35,7 +35,7 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
 
     @Override
     default <T> T visit(TypeDefinitionVisitor<T> visitor) {
-        return visitor.visit(this);
+        throw new UnsupportedOperationException();
     }
 
     static ErrorTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {

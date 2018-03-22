@@ -72,7 +72,7 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.types.complex.ErrorTypeDefinition def,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return ErrorTypeDefinition.builder()
-                .typeName(name)
+                .errorName(name)
                 .namespace(ErrorNamespace.of(def.namespace().name()))
                 .code(ErrorCode.of(def.code().name()))
                 .safeArgs(parseField(def.safeArgs(), typeResolver))
