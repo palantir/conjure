@@ -24,7 +24,7 @@ types:
           aliases: map<importedTypes.RidAliasExample, importedTypes.DateTimeAliasExample>
 
 services:
-  TestService:
+  ImportService:
     name: Test Service
     package: test.api.with.imports
     base-path: /catalog

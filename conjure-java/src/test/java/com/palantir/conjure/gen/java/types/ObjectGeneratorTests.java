@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -31,7 +32,8 @@ public final class ObjectGeneratorTests {
 
     @Test
     public void testObjectGenerator_allExamples() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-types.yml"));
+        ConjureDefinition def = Conjure.parse(
+                ImmutableList.of(new File("src/test/resources/example-types.yml")));
         List<Path> files = new ObjectGenerator(
                 Settings.builder().ignoreUnknownProperties(true).build(),
                 ImmutableSet.of(ExperimentalFeatures.DangerousGothamSerializableBeans))
@@ -53,7 +55,7 @@ public final class ObjectGeneratorTests {
                         + "          - ONE\n"
                         + "          - TWO\n");
 
-        ConjureDefinition def = Conjure.parse(conjureFile);
+        ConjureDefinition def = Conjure.parse(ImmutableList.of(conjureFile));
         List<Path> files = new ObjectGenerator(Settings.builder().supportUnknownEnumValues(false).build())
                 .emit(def, folder.getRoot());
 
@@ -62,7 +64,11 @@ public final class ObjectGeneratorTests {
 
     @Test
     public void testConjureImports() throws IOException {
-        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        ConjureDefinition conjure = Conjure.parse(
+                ImmutableList.of(
+                        new File("src/test/resources/example-conjure-imports.yml"),
+                        new File("src/test/resources/example-types.yml"),
+                        new File("src/test/resources/example-service.yml")));
         File src = folder.newFolder("src");
         Settings settings = Settings.standard();
         ObjectGenerator generator = new ObjectGenerator(settings);
@@ -80,7 +86,8 @@ public final class ObjectGeneratorTests {
 
     @Test
     public void testConjureErrors() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-errors.yml"));
+        ConjureDefinition def = Conjure.parse(
+                ImmutableList.of(new File("src/test/resources/example-errors.yml")));
         List<Path> files = new ObjectGenerator(Settings.standard(), ImmutableSet.of(ExperimentalFeatures.ErrorTypes))
                 .emit(def, folder.getRoot());
 

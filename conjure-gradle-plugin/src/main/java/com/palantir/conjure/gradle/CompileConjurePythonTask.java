@@ -14,10 +14,10 @@ import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -67,11 +67,7 @@ public class CompileConjurePythonTask extends SourceTask {
     }
 
     private void compileFiles(PythonBeanGenerator beanGenerator, Collection<File> files) {
-        files.forEach(f -> compileFile(beanGenerator, f.toPath()));
-    }
-
-    private void compileFile(PythonBeanGenerator beanGenerator, Path path) {
-        ConjureDefinition conjure = Conjure.parse(path.toFile());
+        ConjureDefinition conjure = Conjure.parse(files.stream().collect(Collectors.toList()));
         ConjurePythonGenerator generator = new ConjurePythonGenerator(beanGenerator, clientGenerator);
         generator.write(conjure, new DefaultPythonFileWriter(outputDirectory.toPath()));
     }

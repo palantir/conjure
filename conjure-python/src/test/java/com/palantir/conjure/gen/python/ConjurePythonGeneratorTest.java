@@ -12,6 +12,7 @@ import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,11 +31,10 @@ public final class ConjurePythonGeneratorTest {
     @ConjureSubfolderRunner.Test
     public void assertThatFilesRenderAsExpected(Path folder) throws IOException {
         Path expected = folder.resolve("expected");
-        List<ConjureDefinition> definitions = getInputDefinitions(folder);
-        maybeResetExpectedDirectory(expected, definitions);
+        ConjureDefinition definition = getInputDefinition(folder);
+        maybeResetExpectedDirectory(expected, definition);
 
-        definitions.forEach(definition ->
-                generator.write(definition, pythonFileWriter));
+        generator.write(definition, pythonFileWriter);
         assertFoldersEqual(expected);
     }
 
@@ -50,30 +50,29 @@ public final class ConjurePythonGeneratorTest {
         System.out.println(count + " files checked");
     }
 
-    private void maybeResetExpectedDirectory(Path expected, List<ConjureDefinition> definitions) throws IOException {
+    private void maybeResetExpectedDirectory(Path expected, ConjureDefinition definition) throws IOException {
         if (Boolean.valueOf(System.getProperty("recreate", "false"))
                 || !expected.toFile().isDirectory()) {
             Files.createDirectories(expected);
             Files.walk(expected).filter(path -> path.toFile().isFile()).forEach(path -> path.toFile().delete());
             Files.walk(expected).forEach(path -> path.toFile().delete());
             Files.createDirectories(expected);
-            definitions.forEach(definition ->
-                    generator.write(definition, new DefaultPythonFileWriter(expected)));
+            generator.write(definition, new DefaultPythonFileWriter(expected));
         }
     }
 
-    private List<ConjureDefinition> getInputDefinitions(Path folder) throws IOException {
+    private ConjureDefinition getInputDefinition(Path folder) throws IOException {
         Files.createDirectories(folder);
-        List<ConjureDefinition> definitions = java.nio.file.Files.walk(folder)
+        List<File> definitions = java.nio.file.Files.walk(folder)
                 .map(Path::toFile)
                 .filter(file -> file.toString().endsWith(".yml"))
-                .map(Conjure::parse)
                 .collect(Collectors.toList());
 
         if (definitions.isEmpty()) {
             throw new RuntimeException(
                     folder + " contains no conjure.yml files, please write one to set up a new test");
         }
-        return definitions;
+
+        return Conjure.parse(definitions);
     }
 }

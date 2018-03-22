@@ -12,11 +12,11 @@ import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -61,11 +61,7 @@ public class CompileConjureJavaServiceTask extends SourceTask {
     }
 
     private void compileFiles(Collection<File> files) {
-        files.forEach(f -> compileFile(f.toPath()));
-    }
-
-    private void compileFile(Path path) {
-        ConjureDefinition conjure = Conjure.parse(path.toFile());
+        ConjureDefinition conjure = Conjure.parse(files.stream().collect(Collectors.toList()));
         serviceGeneratorFactory.apply(experimentalFeatures.get()).emit(conjure, outputDirectory);
     }
 

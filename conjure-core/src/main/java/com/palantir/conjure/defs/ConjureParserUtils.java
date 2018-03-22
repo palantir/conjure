@@ -136,21 +136,28 @@ public final class ConjureParserUtils {
         return TypeName.of(name, parsePackageOrElseThrow(def.conjurePackage(), defaultPackage));
     }
 
-    static ConjureDefinition parseConjureDef(com.palantir.conjure.parser.ConjureDefinition parsed) {
-        List<ServiceDefinition> services = new ArrayList<>();
-        ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
-                new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
-        parsed.services().forEach((serviceName, service) -> {
-            services.add(parseSevice(
-                    service,
-                    TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                    typeResolver));
+    static ConjureDefinition parseConjureDef(List<com.palantir.conjure.parser.ConjureDefinition> parsedDefs) {
+        ImmutableList.Builder<ServiceDefinition> servicesBuilder = ImmutableList.builder();
+        ImmutableList.Builder<ErrorTypeDefinition> errorsBuilder = ImmutableList.builder();
+        ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
+
+        parsedDefs.forEach(parsed -> {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
+                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
+            parsed.services().forEach((serviceName, service) -> {
+                servicesBuilder.add(parseSevice(
+                        service,
+                        TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
+                        typeResolver));
+            });
+            typesBuilder.addAll(parseObjects(parsed.types(), typeResolver));
+            errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
         });
 
         return ConjureDefinition.builder()
-                .types(parseAllTypes(parsed.types(), typeResolver))
-                .errors(parseAllErrors(parsed.types(), typeResolver))
-                .services(services)
+                .types(typesBuilder.build())
+                .errors(errorsBuilder.build())
+                .services(servicesBuilder.build())
                 .build();
     }
 
@@ -203,47 +210,6 @@ public final class ConjureParserUtils {
                 .value(def.value())
                 .docs(def.docs().map(Documentation::of))
                 .build();
-    }
-
-    private static List<TypeDefinition> parseAllTypes(
-            com.palantir.conjure.parser.types.TypesDefinition parsed,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
-
-        ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
-        typesBuilder.addAll(parseObjects(parsed, typeResolver));
-
-        for (com.palantir.conjure.parser.types.reference.ConjureImports imported : parsed.conjureImports().values()) {
-            // Since we don't support transitive imports, the type resolver for the imported types consist of
-            // its direct objects and external imports only.
-            ConjureTypeParserVisitor.ReferenceTypeResolver importResolver =
-                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(imported.conjure().types());
-            List<TypeDefinition> importedObjects = parseObjects(imported.conjure().types(), importResolver);
-
-            typesBuilder.addAll(importedObjects);
-        }
-        return typesBuilder.build();
-    }
-
-    // similar to parseAllTypes but for specific ErrorTypeDefinitions
-    private static List<ErrorTypeDefinition> parseAllErrors(
-            com.palantir.conjure.parser.types.TypesDefinition parsed,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
-
-        // Collect all imported object.
-        ImmutableList.Builder<ErrorTypeDefinition> errorsBuilder = ImmutableList.builder();
-        errorsBuilder.addAll(parseErrors(parsed.definitions(), typeResolver));
-
-        for (com.palantir.conjure.parser.types.reference.ConjureImports imported : parsed.conjureImports().values()) {
-            // Since we don't support transitive imports, the type resolver for the imported types consist of
-            // its direct types and external imports only.
-            ConjureTypeParserVisitor.ReferenceTypeResolver importResolver =
-                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(imported.conjure().types());
-            List<ErrorTypeDefinition> importedErrors =
-                    parseErrors(imported.conjure().types().definitions(), importResolver);
-            errorsBuilder.addAll(importedErrors);
-        }
-
-        return errorsBuilder.build();
     }
 
     static List<FieldDefinition> parseField(

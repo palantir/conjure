@@ -4,17 +4,19 @@
 
 package com.palantir.conjure.defs;
 
+import com.google.common.collect.Lists;
 import com.palantir.conjure.parser.ConjureParser;
 import java.io.File;
+import java.util.List;
 
 public final class Conjure {
 
     private Conjure() {}
 
     /**
-     * Deserializes a {@link ConjureDefinition} from its YAML representation in the given file.
+     * Deserializes {@link ConjureDefinition}s from their YAML representations in the given files.
      */
-    public static ConjureDefinition parse(File file) {
-        return ConjureParserUtils.parseConjureDef(ConjureParser.parse(file));
+    public static ConjureDefinition parse(List<File> files) {
+        return ConjureParserUtils.parseConjureDef(Lists.transform(files, ConjureParser::parse));
     }
 }

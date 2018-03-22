@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -121,7 +122,8 @@ public class Retrofit2ServiceEteTest extends TestBase {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/ete-service.yml"));
+        ConjureDefinition def = Conjure.parse(
+                ImmutableList.of(new File("src/test/resources/ete-service.yml")));
         List<Path> files = new Retrofit2ServiceGenerator(
                 ImmutableSet.of(ExperimentalFeatures.DisambiguateRetrofitServices)).emit(def, folder.getRoot());
 

@@ -6,6 +6,7 @@ package com.palantir.conjure.gen.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureDefinition;
@@ -28,7 +29,8 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
 
     @Test
     public void testCompositionVanilla() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
+        ConjureDefinition def = Conjure.parse(
+                ImmutableList.of(new File("src/test/resources/example-service.yml")));
 
         List<Path> files = new Retrofit2ServiceGenerator(
                 ImmutableSet.of(
@@ -49,7 +51,8 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
 
     @Test
     public void testCompositionCompletableFuture() throws IOException {
-        ConjureDefinition def = Conjure.parse(new File("src/test/resources/example-service.yml"));
+        ConjureDefinition def = Conjure.parse(
+                ImmutableList.of(new File("src/test/resources/example-service.yml")));
 
         List<Path> files = new Retrofit2ServiceGenerator(
                 ImmutableSet.of(
@@ -72,13 +75,17 @@ public final class Retrofit2ServiceGeneratorTests extends TestBase {
 
     @Test
     public void testConjureImports() throws IOException {
-        ConjureDefinition conjure = Conjure.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        ConjureDefinition conjure = Conjure.parse(
+                ImmutableList.of(
+                        new File("src/test/resources/example-conjure-imports.yml"),
+                        new File("src/test/resources/example-types.yml"),
+                        new File("src/test/resources/example-service.yml")));
         File src = folder.newFolder("src");
         Retrofit2ServiceGenerator generator = new Retrofit2ServiceGenerator(ImmutableSet.of());
         generator.emit(conjure, src);
 
         // Generated files contain imports
-        assertThat(compiledFileContent(src, "test/api/with/imports/TestService.java"))
+        assertThat(compiledFileContent(src, "test/api/with/imports/ImportService.java"))
                 .contains("import com.palantir.product.StringExample;");
     }
 

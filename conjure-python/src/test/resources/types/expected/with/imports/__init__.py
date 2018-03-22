@@ -104,7 +104,7 @@ class ImportedAliasInMaps(ConjureBeanType):
         # type: () -> Dict[RidAliasExample, DateTimeAliasExample]
         return self._aliases
 
-class TestService(Service):
+class ImportService(Service):
 
     def testEndpoint(self, importedString):
         # type: (StringExample) -> BackingFileSystem

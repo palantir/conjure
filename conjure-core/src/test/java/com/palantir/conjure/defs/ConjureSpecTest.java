@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public final class ConjureSpecTest {
             String testName = String.format("positive case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                ConjureParserUtils.parseConjureDef(MAPPER.readValue(yml, ConjureDefinition.class));
+                ConjureParserUtils.parseConjureDef(ImmutableList.of(MAPPER.readValue(yml, ConjureDefinition.class)));
             } catch (Exception e) {
                 Assertions.fail("Conjure for case should be valid according to the spec: " + testName, e);
             }
@@ -71,7 +72,7 @@ public final class ConjureSpecTest {
             String testName = String.format("negative case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                ConjureParserUtils.parseConjureDef(MAPPER.readValue(yml, ConjureDefinition.class));
+                ConjureParserUtils.parseConjureDef(ImmutableList.of(MAPPER.readValue(yml, ConjureDefinition.class)));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
             } catch (Exception e) {
                 Assertions.assertThat(e).withFailMessage("Failure message for case did not match expectation: "

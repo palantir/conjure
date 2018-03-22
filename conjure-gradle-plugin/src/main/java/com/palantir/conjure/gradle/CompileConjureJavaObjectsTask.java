@@ -15,10 +15,10 @@ import com.palantir.conjure.gen.java.types.ObjectGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SourceTask;
@@ -65,11 +65,7 @@ public class CompileConjureJavaObjectsTask extends SourceTask {
     }
 
     private void compileFiles(TypeGenerator generator, Collection<File> files) {
-        files.forEach(f -> compileFile(generator, f.toPath()));
-    }
-
-    private void compileFile(TypeGenerator generator, Path path) {
-        ConjureDefinition conjure = Conjure.parse(path.toFile());
+        ConjureDefinition conjure = Conjure.parse(files.stream().collect(Collectors.toList()));
         try {
             generator.emit(conjure, outputDirectory);
         } catch (ExperimentalFeatureDisabledException e) {

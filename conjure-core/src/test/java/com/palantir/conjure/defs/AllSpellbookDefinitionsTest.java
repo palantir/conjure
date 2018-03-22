@@ -10,6 +10,7 @@ import static org.junit.Assume.assumeTrue;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SharedMetricRegistries;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.ConjureParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -64,7 +65,7 @@ public class AllSpellbookDefinitionsTest {
         assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
 
         try {
-            Conjure.parse(conjureYml.toFile());
+            Conjure.parse(ImmutableList.of(conjureYml.toFile()));
         } catch (ConjureParser.ImportNotFoundException e) {
             if (e.getMessage().contains("external-imports")) {
                 // OK: External imports are expected to not work.

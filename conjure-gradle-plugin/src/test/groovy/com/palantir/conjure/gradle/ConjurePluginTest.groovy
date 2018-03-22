@@ -329,7 +329,7 @@ class ConjurePluginTest extends IntegrationSpec {
             objects:
 
         services:
-          TestServiceFoo:
+          TestServiceFoo2:
             name: Test Service Foo
             package: test.api.service
 
@@ -364,9 +364,9 @@ class ConjurePluginTest extends IntegrationSpec {
         fileExists('api/build/conjure/conjure.yml')
 
         // java
-        file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+        file('api/api-jersey/src/generated/java/test/api/service/TestServiceFoo2.java').text.contains(
                 'import test.api.internal.InternalImport;')
-        file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo.java').text.contains(
+        file('api/api-retrofit/src/generated/java/test/api/service/TestServiceFoo2.java').text.contains(
                 'import test.api.internal.InternalImport;')
         fileExists('api/api-objects/src/generated/java/test/api/internal/InternalImport.java')
 
@@ -375,7 +375,7 @@ class ConjurePluginTest extends IntegrationSpec {
                 'from internal import InternalImport')
 
         // typescript
-        file('api/api-typescript/src/@api/service/testServiceFoo.ts').text.contains(
+        file('api/api-typescript/src/@api/service/testServiceFoo2.ts').text.contains(
                 'import { IInternalImport } from "@api/internal"')
     }
 
