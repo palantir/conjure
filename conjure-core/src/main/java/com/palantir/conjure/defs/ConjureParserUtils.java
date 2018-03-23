@@ -187,7 +187,7 @@ public final class ConjureParserUtils {
                 parsed.definitions().objects().entrySet().stream()
                         .map(entry -> entry.getValue().visit(
                                 new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
-                .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));
         return objectsBuilder.build();
     }
 
@@ -249,7 +249,7 @@ public final class ConjureParserUtils {
     private static Optional<AuthType> parseAuthType(
             com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
 
-        switch (authDefinition.type())  {
+        switch (authDefinition.type()) {
             case HEADER:
                 return Optional.of(HeaderAuthType.header());
             case COOKIE:

@@ -1,0 +1,42 @@
+apply plugin: 'com.palantir.publish-jar'
+
+sourceSets {
+    integration
+    test {
+        compileClasspath += integration.output
+        runtimeClasspath += integration.output
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.integration.java.srcDirs
+    }
+}
+
+tasks.checkstyleIntegration.enabled = false
+
+dependencies {
+    compile project(':conjure-core')
+    compile project(':conjure-java')
+    compile project(':conjure-java-lib')
+
+    compile 'com.palantir.dialogue:dialogue-api'
+    compile 'com.palantir.dialogue:dialogue-client'
+
+    testCompile 'com.palantir.remoting3:jackson-support'
+    testCompile 'junit:junit'
+    testCompile 'org.assertj:assertj-core'
+    testCompile 'org.mockito:mockito-core'
+    testCompile 'com.palantir.remoting3:jaxrs-clients'
+    testCompile 'com.palantir.remoting3:retrofit2-clients'
+    testCompile('com.palantir.witchcraft:witchcraft-core') {
+        exclude module: 'conjure-java-lib'
+    }
+
+    integrationCompile project(':conjure-java-lib')
+    integrationCompile 'com.palantir.dialogue:dialogue-client'
+    integrationCompile 'com.palantir.remoting3:jackson-support'
+
+    processor 'org.immutables:value'
+}

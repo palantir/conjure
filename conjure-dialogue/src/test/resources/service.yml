@@ -1,0 +1,65 @@
+types:
+  definitions:
+    default-package: test
+    objects:
+         Complex:
+           fields:
+             string: string
+             int: integer
+
+services:
+  TestService:
+    name: Test Service
+    package: test
+    default-auth: header
+    base-path: /base
+    docs: TestServiceDocs
+    endpoints:
+      string:
+        docs: stringDocs
+        http: GET /string
+        returns: string
+
+      stringEcho:
+        http: GET /stringEcho
+        args:
+          string:
+            param-id: Header-String
+            param-type: header
+            type: string
+        returns: string
+
+      integer:
+        http: GET /integer
+        returns: integer
+
+      integerEcho:
+        http: GET /integerEcho/{integer}
+        args:
+          integer: integer
+        returns: integer
+
+      queryEcho:
+        http: GET /queryEcho
+        args:
+          integer:
+            type: integer
+            param-type: query
+            param-id: queryParam
+        returns: string
+
+      complex:
+        http: GET /complex
+        returns: Complex
+
+      complexEcho:
+        http: POST /complexEcho
+        args:
+          complex: Complex
+        returns: Complex
+
+      binaryEcho:
+        http: POST /binaryEcho
+        args:
+          string: string
+        returns: binary

@@ -69,8 +69,8 @@ public final class JerseyServiceGeneratorTests extends TestBase {
                 Files.copy(file, output);
             }
 
-            assertThat(readFromFile(file))
-                    .isEqualTo(readFromResource("/test/api/" + file.getFileName() + ".jersey.binary"));
+            assertThat(readFromFile(file)).isEqualTo(
+                    readFromFile(Paths.get("src/test/resources/test/api/" + file.getFileName() + ".jersey.binary")));
         }
     }
 
@@ -87,7 +87,8 @@ public final class JerseyServiceGeneratorTests extends TestBase {
                 Files.copy(file, output);
             }
 
-            assertThat(readFromFile(file)).isEqualTo(readFromResource("/test/api/" + file.getFileName() + ".jersey"));
+            assertThat(readFromFile(file)).isEqualTo(
+                    readFromFile(Paths.get("src/test/resources/test/api/" + file.getFileName() + ".jersey")));
         }
     }
 
