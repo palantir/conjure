@@ -135,7 +135,7 @@ class ImportService(Service):
         try:
             _response.raise_for_status()
         except HTTPError as e:
-            detail = e.response.json() if e.response else {}
+            detail = e.response.json() if e.response is not None else {}
             raise HTTPError('{}. Error Name: {}. Message: {}'.format(e.message, detail.get('errorName', 'UnknownError'), detail.get('message', 'No Message')), response=_response)
 
         _decoder = ConjureDecoder()

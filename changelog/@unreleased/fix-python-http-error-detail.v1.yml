@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Actually extract error details from http failures in python services.
+  link: https://github.palantir.build/foundry/conjure/pull/917
