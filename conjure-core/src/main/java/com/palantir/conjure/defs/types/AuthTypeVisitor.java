@@ -18,7 +18,6 @@ public final class AuthTypeVisitor {
     public static final IsHeaderAuthTypeVisitor IS_HEADER = new IsHeaderAuthTypeVisitor();
     public static final IsCookieAuthTypeVisitor IS_COOKIE = new IsCookieAuthTypeVisitor();
 
-    public static final HeaderAuthTypeVisitor HEADER = new HeaderAuthTypeVisitor();
     public static final CookieAuthTypeVisitor COOKIE = new CookieAuthTypeVisitor();
 
     private static class DefaultAuthTypeVisitor<T> implements AuthType.Visitor<T> {
@@ -35,13 +34,6 @@ public final class AuthTypeVisitor {
         @Override
         public T visitUnknown(String unknownType) {
             throw new IllegalStateException("Unknown type: " + unknownType);
-        }
-    }
-
-    private static class HeaderAuthTypeVisitor extends DefaultAuthTypeVisitor<HeaderAuthType> {
-        @Override
-        public HeaderAuthType visitHeader(HeaderAuthType value) {
-            return value;
         }
     }
 

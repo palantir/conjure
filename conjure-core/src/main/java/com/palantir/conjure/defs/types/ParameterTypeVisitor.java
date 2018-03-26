@@ -17,10 +17,10 @@ public final class ParameterTypeVisitor {
     public static final BodyIsParameterType BODY = new BodyIsParameterType();
     public static final PathIsParameterType PATH = new PathIsParameterType();
 
-    public static final IsBodyIsParameterType IS_BODY = new IsBodyIsParameterType();
-    public static final IsPathIsParameterType IS_PATH = new IsPathIsParameterType();
-    public static final IsHeaderIsParameterType IS_HEADER = new IsHeaderIsParameterType();
-    public static final IsQueryIsParameterType IS_QUERY = new IsQueryIsParameterType();
+    public static final IsBodyParameterType IS_BODY = new IsBodyParameterType();
+    public static final IsPathParameterType IS_PATH = new IsPathParameterType();
+    public static final IsHeaderParameterType IS_HEADER = new IsHeaderParameterType();
+    public static final IsQueryParameterType IS_QUERY = new IsQueryParameterType();
 
     private ParameterTypeVisitor() {}
 
@@ -106,28 +106,28 @@ public final class ParameterTypeVisitor {
         }
     }
 
-    private static class IsBodyIsParameterType extends IsParameterTypeVisitor {
+    private static class IsBodyParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitBody(BodyParameterType value) {
             return true;
         }
     }
 
-    private static class IsPathIsParameterType extends IsParameterTypeVisitor {
+    private static class IsPathParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitPath(PathParameterType value) {
             return true;
         }
     }
 
-    private static class IsHeaderIsParameterType extends IsParameterTypeVisitor {
+    private static class IsHeaderParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitHeader(HeaderParameterType value) {
             return true;
         }
     }
 
-    private static class IsQueryIsParameterType extends IsParameterTypeVisitor {
+    private static class IsQueryParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitQuery(QueryParameterType value) {
             return true;
