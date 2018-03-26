@@ -7,9 +7,9 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.Documentation;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackageWrapper;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
+import com.palantir.conjure.spec.Documentation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,12 +21,18 @@ import org.immutables.value.Value;
 public interface PythonUnionTypeDefinition extends PythonClass {
 
     ImmutableSet<PythonImport> DEFAULT_IMPORTS = ImmutableSet.of(
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "List"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Set"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Dict"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Tuple"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("typing"), "Optional"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("conjure"), "*"), Optional.empty()));
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("typing"), "List"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("typing"), "Set"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("typing"), "Dict"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("typing"), "Tuple"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("typing"), "Optional"), Optional.empty()),
+            PythonImport.of(PythonClassName.of(
+                    ConjurePackageWrapper.conjurePackage("conjure"), "*"), Optional.empty()));
 
     @Override
     String packageName();
@@ -51,7 +57,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.writeIndentedLine(String.format("class %s(ConjureUnionType):", className()));
         poetWriter.increaseIndent();
-        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
+        docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.get())));
 
         poetWriter.writeLine();
 
@@ -123,7 +129,7 @@ public interface PythonUnionTypeDefinition extends PythonClass {
 
             poetWriter.increaseIndent();
             poetWriter.writeIndentedLine(String.format("# type: () -> %s", option.myPyType()));
-            option.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
+            option.docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.get())));
             poetWriter.writeIndentedLine(String.format("return self._%s", option.attributeName()));
             poetWriter.decreaseIndent();
         });

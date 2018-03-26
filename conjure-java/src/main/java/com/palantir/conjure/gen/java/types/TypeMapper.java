@@ -4,9 +4,9 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.gen.java.types.ClassNameVisitor.Factory;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.squareup.javapoet.TypeName;
 import java.util.List;
 
@@ -26,6 +26,6 @@ public final class TypeMapper {
     }
 
     public TypeName getClassName(Type type) {
-        return type.visit(classNameVisitorFactory.create(types));
+        return type.accept(classNameVisitorFactory.create(types));
     }
 }

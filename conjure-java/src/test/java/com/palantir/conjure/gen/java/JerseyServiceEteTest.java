@@ -8,9 +8,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.services.JerseyServiceGenerator;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.product.EmptyPathService;
 import com.palantir.product.EteService;
 import com.palantir.remoting3.jaxrs.JaxRsClient;

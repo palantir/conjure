@@ -6,6 +6,7 @@ package com.palantir.conjure.defs;
 
 import com.google.common.collect.Lists;
 import com.palantir.conjure.parser.ConjureParser;
+import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
 import java.util.List;
 

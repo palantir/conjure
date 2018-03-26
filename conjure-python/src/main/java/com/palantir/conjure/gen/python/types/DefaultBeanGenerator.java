@@ -5,14 +5,8 @@
 package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.types.names.FieldNameWrapper;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonAlias;
 import com.palantir.conjure.gen.python.poet.PythonBean;
@@ -22,6 +16,12 @@ import com.palantir.conjure.gen.python.poet.PythonEnum;
 import com.palantir.conjure.gen.python.poet.PythonEnum.PythonEnumValue;
 import com.palantir.conjure.gen.python.poet.PythonImport;
 import com.palantir.conjure.gen.python.poet.PythonUnionTypeDefinition;
+import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.UnionDefinition;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,14 +40,14 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     public PythonClass generateObject(List<TypeDefinition> types,
             PackageNameProcessor packageNameProcessor,
             TypeDefinition typeDef) {
-        if (typeDef instanceof ObjectTypeDefinition) {
-            return generateObject(types, packageNameProcessor, (ObjectTypeDefinition) typeDef);
-        } else if (typeDef instanceof EnumTypeDefinition) {
-            return generateObject(packageNameProcessor, (EnumTypeDefinition) typeDef);
-        } else if (typeDef instanceof UnionTypeDefinition) {
-            return generateObject(types, packageNameProcessor, (UnionTypeDefinition) typeDef);
-        } else if (typeDef instanceof AliasTypeDefinition) {
-            return generateObject(types, packageNameProcessor, (AliasTypeDefinition) typeDef);
+        if (typeDef.accept(TypeDefinitionVisitor.IS_OBJECT)) {
+            return generateObject(types, packageNameProcessor, typeDef.accept(TypeDefinitionVisitor.OBJECT));
+        } else if (typeDef.accept(TypeDefinitionVisitor.IS_ENUM)) {
+            return generateObject(packageNameProcessor, typeDef.accept(TypeDefinitionVisitor.ENUM));
+        } else if (typeDef.accept(TypeDefinitionVisitor.IS_UNION)) {
+            return generateObject(types, packageNameProcessor, typeDef.accept(TypeDefinitionVisitor.UNION));
+        } else if (typeDef.accept(TypeDefinitionVisitor.IS_ALIAS)) {
+            return generateObject(types, packageNameProcessor, typeDef.accept(TypeDefinitionVisitor.ALIAS));
         } else {
             throw new UnsupportedOperationException("cannot generate type for type def: " + typeDef);
         }
@@ -56,7 +56,7 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     private PythonClass generateObject(
             List<TypeDefinition> types,
             PackageNameProcessor packageNameProcessor,
-            UnionTypeDefinition typeDef) {
+            UnionDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
@@ -64,48 +64,49 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProcessor);
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+        String packageName = packageNameProcessor.getPackageName(typeDef.getTypeName().getPackage());
 
-        List<PythonField> options = typeDef.union()
+        List<PythonField> options = typeDef.getUnion()
                 .stream()
                 .map(unionMember -> {
-                    Type conjureType = unionMember.type();
+                    Type conjureType = unionMember.getType();
                     return PythonField.builder()
-                            .attributeName(unionMember.fieldName().toCase(FieldName.Case.SNAKE_CASE).name())
-                            .docs(unionMember.docs())
-                            .jsonIdentifier(unionMember.fieldName().name())
+                            .attributeName(FieldNameWrapper.toCase(
+                                    unionMember.getFieldName(), FieldNameWrapper.Case.SNAKE_CASE).get())
+                            .docs(unionMember.getDocs())
+                            .jsonIdentifier(unionMember.getFieldName().get())
                             .myPyType(myPyMapper.getTypeName(conjureType))
                             .pythonType(mapper.getTypeName(conjureType))
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        Set<PythonImport> imports = typeDef.union()
+        Set<PythonImport> imports = typeDef.getUnion()
                 .stream()
-                .flatMap(entry -> entry.type().visit(referencedTypeNameVisitor).stream())
+                .flatMap(entry -> entry.getType().accept(referencedTypeNameVisitor).stream())
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
 
         return PythonUnionTypeDefinition.builder()
-                .packageName(packageName.name())
-                .className(typeDef.typeName().name())
-                .docs(typeDef.docs())
+                .packageName(packageName)
+                .className(typeDef.getTypeName().getName())
+                .docs(typeDef.getDocs())
                 .addAllOptions(options)
                 .addAllRequiredImports(imports)
                 .build();
     }
 
-    private PythonEnum generateObject(PackageNameProcessor packageNameProcessor, EnumTypeDefinition typeDef) {
+    private PythonEnum generateObject(PackageNameProcessor packageNameProcessor, EnumDefinition typeDef) {
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+        String packageName = packageNameProcessor.getPackageName(typeDef.getTypeName().getPackage());
 
         return PythonEnum.builder()
-                .packageName(packageName.name())
-                .className(typeDef.typeName().name())
-                .docs(typeDef.docs())
-                .values(typeDef.values().stream()
-                        .map(value -> PythonEnumValue.of(value.value(), value.docs()))
+                .packageName(packageName)
+                .className(typeDef.getTypeName().getName())
+                .docs(typeDef.getDocs())
+                .values(typeDef.getValues().stream()
+                        .map(value -> PythonEnumValue.of(value.getValue(), value.getDocs()))
                         .collect(Collectors.toList()))
                 .build();
     }
@@ -113,36 +114,37 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     private PythonBean generateObject(
             List<TypeDefinition> types,
             PackageNameProcessor packageNameProcessor,
-            ObjectTypeDefinition typeDef) {
+            ObjectDefinition typeDef) {
 
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         TypeMapper myPyMapper = new TypeMapper(new MyPyTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProcessor);
 
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+        String packageName = packageNameProcessor.getPackageName(typeDef.getTypeName().getPackage());
 
-        Set<PythonImport> imports = typeDef.fields()
+        Set<PythonImport> imports = typeDef.getFields()
                 .stream()
-                .flatMap(entry -> entry.type().visit(referencedTypeNameVisitor).stream())
+                .flatMap(entry -> entry.getType().accept(referencedTypeNameVisitor).stream())
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
 
         return PythonBean.builder()
-                .packageName(packageName.name())
+                .packageName(packageName)
                 .addAllRequiredImports(PythonBean.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
-                .className(typeDef.typeName().name())
-                .docs(typeDef.docs())
-                .fields(typeDef.fields()
+                .className(typeDef.getTypeName().getName())
+                .docs(typeDef.getDocs())
+                .fields(typeDef.getFields()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(entry.fieldName().toCase(FieldName.Case.SNAKE_CASE).name())
-                                .jsonIdentifier(entry.fieldName().name())
-                                .docs(entry.docs())
-                                .pythonType(mapper.getTypeName(entry.type()))
-                                .myPyType(myPyMapper.getTypeName(entry.type()))
+                                .attributeName(FieldNameWrapper.toCase(
+                                        entry.getFieldName(), FieldNameWrapper.Case.SNAKE_CASE).get())
+                                .jsonIdentifier(entry.getFieldName().get())
+                                .docs(entry.getDocs())
+                                .pythonType(mapper.getTypeName(entry.getType()))
+                                .myPyType(myPyMapper.getTypeName(entry.getType()))
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
@@ -151,22 +153,22 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
     private PythonAlias generateObject(
             List<TypeDefinition> types,
             PackageNameProcessor packageNameProcessor,
-            AliasTypeDefinition typeDef) {
+            AliasDefinition typeDef) {
         TypeMapper mapper = new TypeMapper(new DefaultTypeNameVisitor(types));
         ReferencedTypeNameVisitor referencedTypeNameVisitor = new ReferencedTypeNameVisitor(
                 types, packageNameProcessor);
-        ConjurePackage packageName = packageNameProcessor.getPackageName(typeDef.typeName().conjurePackage());
+        String packageName = packageNameProcessor.getPackageName(typeDef.getTypeName().getPackage());
 
-        Set<PythonImport> imports = typeDef.alias().visit(referencedTypeNameVisitor)
+        Set<PythonImport> imports = typeDef.getAlias().accept(referencedTypeNameVisitor)
                 .stream()
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
                 .map(referencedClassName -> PythonImport.of(referencedClassName, Optional.empty()))
                 .collect(Collectors.toSet());
 
         return PythonAlias.builder()
-                .aliasName(typeDef.typeName().name())
-                .aliasTarget(mapper.getTypeName(typeDef.alias()))
-                .packageName(packageName.name())
+                .aliasName(typeDef.getTypeName().getName())
+                .aliasTarget(mapper.getTypeName(typeDef.getAlias()))
+                .packageName(packageName)
                 .addAllRequiredImports(imports)
                 .build();
     }

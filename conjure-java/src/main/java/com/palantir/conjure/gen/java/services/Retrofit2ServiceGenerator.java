@@ -9,30 +9,26 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.services.ArgumentDefinition;
-import com.palantir.conjure.defs.services.ArgumentName;
-import com.palantir.conjure.defs.services.AuthType;
-import com.palantir.conjure.defs.services.BodyParameterType;
-import com.palantir.conjure.defs.services.CookieAuthType;
-import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.HeaderAuthType;
-import com.palantir.conjure.defs.services.HeaderParameterType;
-import com.palantir.conjure.defs.services.HttpPath;
-import com.palantir.conjure.defs.services.ParameterId;
-import com.palantir.conjure.defs.services.ParameterType;
-import com.palantir.conjure.defs.services.PathParameterType;
-import com.palantir.conjure.defs.services.QueryParameterType;
-import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.reference.ExternalType;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.AuthTypeVisitor;
+import com.palantir.conjure.defs.types.ParameterTypeVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.Retrofit2MethodTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.Retrofit2ReturnTypeClassNameVisitor;
 import com.palantir.conjure.gen.java.types.TypeMapper;
+import com.palantir.conjure.spec.ArgumentDefinition;
+import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.AuthType;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ParameterId;
+import com.palantir.conjure.spec.ParameterType;
+import com.palantir.conjure.spec.ServiceDefinition;
+import com.palantir.conjure.spec.Type;
+import com.palantir.util.syntacticpath.Path;
+import com.palantir.util.syntacticpath.Paths;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -67,10 +63,10 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
         TypeMapper returnTypeMapper =
-                new TypeMapper(conjureDefinition.types(), Retrofit2ReturnTypeClassNameVisitor::new);
+                new TypeMapper(conjureDefinition.getTypes(), Retrofit2ReturnTypeClassNameVisitor::new);
         TypeMapper methodTypeMapper =
-                new TypeMapper(conjureDefinition.types(), Retrofit2MethodTypeClassNameVisitor::new);
-        return conjureDefinition.services().stream()
+                new TypeMapper(conjureDefinition.getTypes(), Retrofit2MethodTypeClassNameVisitor::new);
+        return conjureDefinition.getServices().stream()
                 .map(serviceDef -> generateService(serviceDef, returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toSet());
     }
@@ -81,24 +77,24 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(Retrofit2ServiceGenerator.class));
 
-        serviceDefinition.docs().ifPresent(docs -> {
-            serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n"));
+        serviceDefinition.getDocs().ifPresent(docs -> {
+            serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n"));
         });
 
-        serviceBuilder.addMethods(serviceDefinition.endpoints().stream()
+        serviceBuilder.addMethods(serviceDefinition.getEndpoints().stream()
                 .map(endpoint -> generateServiceMethod(endpoint, returnTypeMapper, methodTypeMapper))
                 .collect(Collectors.toList()));
 
-        return JavaFile.builder(serviceDefinition.serviceName().conjurePackage().name(), serviceBuilder.build())
+        return JavaFile.builder(serviceDefinition.getServiceName().getPackage(), serviceBuilder.build())
                 .indent("    ")
                 .build();
     }
 
     private String serviceName(ServiceDefinition serviceDefinition) {
         if (experimentalFeatures.contains(ExperimentalFeatures.DisambiguateRetrofitServices)) {
-            return serviceDefinition.serviceName().name() + "Retrofit";
+            return serviceDefinition.getServiceName().getName() + "Retrofit";
         } else {
-            return serviceDefinition.serviceName().name();
+            return serviceDefinition.getServiceName().getName();
         }
     }
 
@@ -114,38 +110,39 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             EndpointDefinition endpointDef,
             TypeMapper returnTypeMapper,
             TypeMapper methodTypeMapper) {
-        Set<ArgumentName> encodedPathArgs = extractEncodedPathArgs(endpointDef.httpPath());
-        HttpPath endpointPathWithoutRegex = replaceEncodedPathArgs(endpointDef.httpPath());
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
+        Set<ArgumentName> encodedPathArgs = extractEncodedPathArgs(endpointDef.getHttpPath());
+        HttpPath endpointPathWithoutRegex = replaceEncodedPathArgs(endpointDef.getHttpPath());
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.getEndpointName().get())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.httpMethod().name()))
+                .addAnnotation(AnnotationSpec.builder(httpMethodToClassName(endpointDef.getHttpMethod().get().name()))
                         .addMember("value", "$S", "." + endpointPathWithoutRegex)
                         .build());
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamMethodMarkers)) {
-            methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.markers()));
+            methodBuilder.addAnnotations(createMarkers(methodTypeMapper, endpointDef.getMarkers()));
         }
-        if (endpointDef.returns().map(type -> type instanceof BinaryType).orElse(false)) {
+
+        if (endpointDef.getReturns().map(type -> type.accept(TypeVisitor.IS_BINARY)).orElse(false)) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Streaming")).build());
         }
 
-        endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
+        endpointDef.getDeprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(
                 ClassName.get("java.lang", "Deprecated")));
 
         ServiceGenerator.getJavaDoc(endpointDef).ifPresent(
                 content -> methodBuilder.addJavadoc("$L", content));
 
-        if (endpointDef.returns().isPresent()) {
+        if (endpointDef.getReturns().isPresent()) {
             methodBuilder.returns(
                     ParameterizedTypeName.get(getReturnType(),
-                            returnTypeMapper.getClassName(endpointDef.returns().get()).box()));
+                            returnTypeMapper.getClassName(endpointDef.getReturns().get()).box()));
         } else {
             methodBuilder.returns(ParameterizedTypeName.get(getReturnType(), ClassName.get(Void.class)));
         }
 
-        getAuthParameter(endpointDef.auth()).ifPresent(methodBuilder::addParameter);
+        getAuthParameter(endpointDef.getAuth()).ifPresent(methodBuilder::addParameter);
 
-        methodBuilder.addParameters(endpointDef.args().stream()
+        methodBuilder.addParameters(endpointDef.getArgs().stream()
                 .map(arg -> createEndpointParameter(methodTypeMapper, encodedPathArgs, arg))
                 .collect(Collectors.toList()));
 
@@ -166,10 +163,11 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         return encodedArgs.build();
     }
 
-    private HttpPath replaceEncodedPathArgs(HttpPath path) {
+    private HttpPath replaceEncodedPathArgs(HttpPath httpPath) {
         List<String> newSegments = Lists.newArrayList();
         Pattern pattern = Pattern.compile("\\{([^:]+):(.*)}");
-        for (String segment : path.path().getSegments()) {
+        Path path = Paths.get(httpPath.get());
+        for (String segment : path.getSegments()) {
             Matcher matcher = pattern.matcher(segment);
             if (matcher.matches()) {
                 newSegments.add("{" + matcher.group(1) + "}");
@@ -185,30 +183,30 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
             Set<ArgumentName> encodedPathArgs,
             ArgumentDefinition def) {
         ParameterSpec.Builder param = ParameterSpec.builder(
-                methodTypeMapper.getClassName(def.type()),
-                def.argName().name());
-        ParameterType paramType = def.paramType();
-        if (paramType instanceof PathParameterType) {
+                methodTypeMapper.getClassName(def.getType()),
+                def.getArgName().get());
+        ParameterType paramType = def.getParamType();
+        if (paramType.accept(ParameterTypeVisitor.IS_PATH)) {
             AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.get("retrofit2.http", "Path"))
-                    .addMember("value", "$S", def.argName().name());
-            if (encodedPathArgs.contains(def.argName())) {
+                    .addMember("value", "$S", def.getArgName().get());
+            if (encodedPathArgs.contains(def.getArgName())) {
                 builder.addMember("encoded", "$L", true);
             }
             param.addAnnotation(builder.build());
-        } else if (paramType instanceof QueryParameterType) {
-            ParameterId paramId = ((QueryParameterType) paramType).paramId();
+        } else if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
+            ParameterId paramId = paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
             param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Query"))
-                    .addMember("value", "$S", paramId.name())
+                    .addMember("value", "$S", paramId.get())
                     .build());
-        } else if (paramType instanceof HeaderParameterType) {
-            ParameterId paramId = ((HeaderParameterType) paramType).paramId();
+        } else if (paramType.accept(ParameterTypeVisitor.IS_HEADER)) {
+            ParameterId paramId = paramType.accept(ParameterTypeVisitor.HEADER).getParamId();
             param.addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                    .addMember("value", "$S", paramId.name())
+                    .addMember("value", "$S", paramId.get())
                     .build());
-        } else if (paramType instanceof BodyParameterType) {
+        } else if (paramType.accept(ParameterTypeVisitor.IS_BODY)) {
             param.addAnnotation(ClassName.get("retrofit2.http", "Body"));
         } else {
-            throw new IllegalStateException("Unrecognized argument type: " + def.paramType());
+            throw new IllegalStateException("Unrecognized argument type: " + def.getParamType());
         }
 
         return param.build();
@@ -220,14 +218,14 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
         }
 
         AuthType authType = auth.get();
-        if (authType instanceof HeaderAuthType) {
+        if (authType.accept(AuthTypeVisitor.IS_HEADER)) {
             return Optional.of(
                     ParameterSpec.builder(ClassName.get("com.palantir.tokens.auth", "AuthHeader"), "authHeader")
                             .addAnnotation(AnnotationSpec.builder(ClassName.get("retrofit2.http", "Header"))
-                                    .addMember("value", "$S", HeaderAuthType.HEADER_NAME)
+                                    .addMember("value", "$S", AuthTypeVisitor.HEADER_NAME)
                                     .build())
                             .build());
-        } else if (authType instanceof CookieAuthType) {
+        } else if (authType.accept(AuthTypeVisitor.IS_COOKIE)) {
             // TODO(melliot): generate required retrofit logic to support this
             log.error("Retrofit does not support Cookie arguments");
         }
@@ -236,7 +234,7 @@ public final class Retrofit2ServiceGenerator implements ServiceGenerator {
     }
 
     private static Set<AnnotationSpec> createMarkers(TypeMapper typeMapper, List<Type> markers) {
-        checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType || type instanceof ExternalType),
+        checkArgument(markers.stream().allMatch(type -> type.accept(TypeVisitor.IS_REFERENCE)),
                 "Markers must refer to reference types.");
         return markers.stream()
                 .map(typeMapper::getClassName)

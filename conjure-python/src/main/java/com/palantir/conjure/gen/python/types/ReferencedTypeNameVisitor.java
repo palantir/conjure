@@ -5,58 +5,50 @@
 package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
+import com.palantir.conjure.spec.ExternalReference;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<PythonClassName>> {
+public final class ReferencedTypeNameVisitor implements Type.Visitor<Set<PythonClassName>> {
 
-    private final Map<TypeName, TypeDefinition> typesByName;
+    private final Set<TypeName> typesByName;
     private final PackageNameProcessor packageNameProcessor;
 
     public ReferencedTypeNameVisitor(List<TypeDefinition> types, PackageNameProcessor packageNameProcessor) {
-        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
+        this.typesByName = types.stream()
+                .map(type -> type.accept(TypeDefinitionVisitor.TYPE_NAME)).collect(Collectors.toSet());
         this.packageNameProcessor = packageNameProcessor;
     }
 
     @Override
-    public Set<PythonClassName> visitAny(AnyType type) {
-        return ImmutableSet.of();
-    }
-
-    @Override
     public Set<PythonClassName> visitList(ListType type) {
-        return type.itemType().visit(this);
+        return type.getItemType().accept(this);
     }
 
     @Override
     public Set<PythonClassName> visitMap(MapType type) {
         return ImmutableSet.<PythonClassName>builder()
-                .addAll(type.keyType().visit(this))
-                .addAll(type.valueType().visit(this))
+                .addAll(type.getKeyType().accept(this))
+                .addAll(type.getValueType().accept(this))
                 .build();
     }
 
     @Override
     public Set<PythonClassName> visitOptional(OptionalType type) {
-        return type.itemType().visit(this);
+        return type.getItemType().accept(this);
     }
 
     @Override
@@ -65,36 +57,32 @@ public final class ReferencedTypeNameVisitor implements ConjureTypeVisitor<Set<P
     }
 
     @Override
-    public Set<PythonClassName> visitLocalReference(LocalReferenceType refType) {
-        TypeDefinition type = typesByName.get(refType.type());
-
-        if (type != null) {
-            ConjurePackage packageName = packageNameProcessor.getPackageName(type.typeName().conjurePackage());
+    public Set<PythonClassName> visitReference(TypeName type) {
+        if (typesByName.contains(type)) {
+            String packageName = packageNameProcessor.getPackageName(type.getPackage());
             // TODO(rfink): We do we generate with the package of the reference but the name of the referee?
-            return ImmutableSet.of(PythonClassName.of(packageName, refType.type().name()));
+            return ImmutableSet.of(PythonClassName.of(packageName, type.getName()));
         } else {
             return ImmutableSet.of();
         }
     }
 
     @Override
-    public Set<PythonClassName> visitExternal(ExternalType externalType) {
-        return visitPrimitive(externalType.fallback());
+    public Set<PythonClassName> visitExternal(ExternalReference externalReference) {
+        if (externalReference.getFallback().accept(TypeVisitor.IS_PRIMITIVE)) {
+            return visitPrimitive(externalReference.getFallback().accept(TypeVisitor.PRIMITIVE));
+        } else {
+            return ImmutableSet.of();
+        }
+    }
+
+    @Override
+    public Set<PythonClassName> visitUnknown(String unknownType) {
+        return ImmutableSet.of();
     }
 
     @Override
     public Set<PythonClassName> visitSet(SetType type) {
-        return type.itemType().visit(this);
+        return type.getItemType().accept(this);
     }
-
-    @Override
-    public Set<PythonClassName> visitBinary(BinaryType type) {
-        return ImmutableSet.of();
-    }
-
-    @Override
-    public Set<PythonClassName> visitDateTime(DateTimeType type) {
-        return ImmutableSet.of();
-    }
-
 }

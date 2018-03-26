@@ -7,12 +7,12 @@ package com.palantir.conjure.gradle;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.python.ConjurePythonGenerator;
 import com.palantir.conjure.gen.python.DefaultPythonFileWriter;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
+import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
 import java.util.Collection;
 import java.util.Set;

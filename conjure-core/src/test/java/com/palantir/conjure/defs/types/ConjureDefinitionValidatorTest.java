@@ -5,44 +5,40 @@
 package com.palantir.conjure.defs.types;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.defs.ConjureDefinitionValidator;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.FieldName;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.Documentation;
+import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.FieldName;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import java.util.List;
-import java.util.Optional;
 import org.junit.Test;
 
 public class ConjureDefinitionValidatorTest {
-    private static final ConjurePackage PACKAGE = ConjurePackage.of("package");
+    private static final String PACKAGE = "package";
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);
-    private static final Optional<Documentation> DOCS = Optional.of(Documentation.of("docs"));
+    private static final Documentation DOCS = Documentation.of("docs");
 
     @Test
     public void testNoSelfRecursiveType() {
-        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
-        when(conjureDef.types()).thenReturn(
-                ImmutableList.of(
-                        ObjectTypeDefinition.builder()
+        ConjureDefinition conjureDef = ConjureDefinition.builder().types(
+                ImmutableList.of(TypeDefinition.object(
+                        ObjectDefinition.builder()
                                 .typeName(FOO)
-                                .addFields(FieldDefinition.of(FieldName.of("self"), LocalReferenceType.of(FOO), DOCS))
-                                .build()
-                )
-        );
+                                .fields(FieldDefinition.of(FieldName.of("self"), Type.reference(FOO), DOCS))
+                                .build())
+                )).build();
 
         assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
@@ -50,43 +46,42 @@ public class ConjureDefinitionValidatorTest {
     }
 
     @Test
-    public void testRecursiveTypeOkInReference() throws Exception {
-        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
-        when(conjureDef.types()).thenReturn(
-                ImmutableList.of(
-                        ObjectTypeDefinition.builder()
-                                .typeName(TypeName.of("Foo", ConjurePackage.of("bar")))
+    public void testRecursiveTypeOkInReference() {
+        Type referenceType = Type.reference(FOO);
+        ConjureDefinition conjureDef = ConjureDefinition.builder().types(
+                ImmutableList.of(TypeDefinition.object(
+                        ObjectDefinition.builder()
+                                .typeName(TypeName.of("Foo", "bar"))
                                 .addAllFields(ImmutableList.of(
                                         FieldDefinition.of(FieldName.of("selfOptional"),
-                                                OptionalType.of(LocalReferenceType.of(FOO)), DOCS),
-                                        FieldDefinition.of(FieldName.of("selfMap"), MapType.of(
-                                                LocalReferenceType.of(FOO), LocalReferenceType.of(FOO)), DOCS),
+                                                Type.optional(OptionalType.of(Type.reference(FOO))), DOCS),
+                                        FieldDefinition.of(FieldName.of("selfMap"),
+                                                Type.map(MapType.of(referenceType, referenceType)), DOCS),
                                         FieldDefinition.of(FieldName.of("selfSet"),
-                                                SetType.of(LocalReferenceType.of(FOO)), DOCS),
+                                                Type.set(SetType.of(referenceType)), DOCS),
                                         FieldDefinition.of(FieldName.of("selfList"),
-                                                ListType.of(LocalReferenceType.of(FOO)), DOCS)
-                                )).build()
-                )
-        );
+                                                Type.list(ListType.of(referenceType)), DOCS)
+                                )).build())
+                )).build();
 
         ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef);
     }
 
     @Test
-    public void testNoRecursiveCycleType() throws Exception {
-        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
-        when(conjureDef.types()).thenReturn(
+    public void testNoRecursiveCycleType() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder().types(
                 ImmutableList.of(
-                        ObjectTypeDefinition.builder()
-                                .typeName(FOO)
-                                .addFields(field(FieldName.of("bar"), "Bar"))
-                                .build(),
-                        ObjectTypeDefinition.builder()
-                                .typeName(BAR)
-                                .addFields(field(FieldName.of("foo"), "Foo"))
-                                .build()
-                )
-        );
+                        TypeDefinition.object(
+                                ObjectDefinition.builder()
+                                        .typeName(FOO)
+                                        .fields(field(FieldName.of("bar"), "Bar"))
+                                        .build()),
+                        TypeDefinition.object(
+                                ObjectDefinition.builder()
+                                        .typeName(BAR)
+                                        .fields(field(FieldName.of("foo"), "Foo"))
+                                        .build())
+                )).build();
 
         assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
@@ -95,16 +90,16 @@ public class ConjureDefinitionValidatorTest {
 
     @Test
     public void testNoComplexKeysInMaps() {
-        ConjureDefinition conjureDef = mock(ConjureDefinition.class);
         String illegalFieldName = "asdf";
-        Type complexKeyType = ListType.of(PrimitiveType.STRING);
-        List<TypeDefinition> objects = ImmutableList.of(
-                ObjectTypeDefinition.builder()
+        Type complexKeyType = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
+        List<TypeDefinition> types = ImmutableList.of(TypeDefinition.object(
+                ObjectDefinition.builder()
                         .typeName(FOO)
-                        .addFields(FieldDefinition.of(FieldName.of(illegalFieldName),
-                                MapType.of(complexKeyType, PrimitiveType.STRING), DOCS))
-                        .build());
-        when(conjureDef.types()).thenReturn(objects);
+                        .fields(FieldDefinition.of(FieldName.of(illegalFieldName),
+                                Type.map(MapType.of(
+                                        complexKeyType, Type.primitive(PrimitiveType.STRING))), DOCS))
+                        .build()));
+        ConjureDefinition conjureDef = ConjureDefinition.builder().types(types).build();
 
         assertThatThrownBy(() -> ConjureDefinitionValidator.NO_COMPLEX_KEYS.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
@@ -113,6 +108,6 @@ public class ConjureDefinitionValidatorTest {
     }
 
     private FieldDefinition field(FieldName name, String type) {
-        return FieldDefinition.of(name, LocalReferenceType.of(TypeName.of(type, PACKAGE)), DOCS);
+        return FieldDefinition.of(name, Type.reference(TypeName.of(type, PACKAGE)), DOCS);
     }
 }

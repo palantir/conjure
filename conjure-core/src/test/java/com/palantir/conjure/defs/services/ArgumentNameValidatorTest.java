@@ -7,7 +7,16 @@ package com.palantir.conjure.defs.services;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.spec.ArgumentDefinition;
+import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.BodyParameterType;
+import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ParameterType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.Type;
 import org.junit.Test;
 
 public final class ArgumentNameValidatorTest {
@@ -26,22 +35,22 @@ public final class ArgumentNameValidatorTest {
     public void testInvalid() {
         for (String paramName : ImmutableList.of("AB", "123", "foo_bar", "foo-bar", "foo.bar")) {
             EndpointDefinition.Builder endpoint = createEndpoint(paramName);
-            assertThatThrownBy(endpoint::build)
+            assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build()))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter names in endpoint paths and service definitions must match pattern %s: %s",
-                            ArgumentName.ANCHORED_PATTERN,
+                            EndpointDefinitionValidator.ANCHORED_PATTERN,
                             paramName);
         }
     }
 
     private EndpointDefinition.Builder createEndpoint(String paramName) {
         ArgumentDefinition arg = ArgumentDefinition.builder()
-                .paramType(BodyParameterType.body())
-                .type(PrimitiveType.STRING)
+                .paramType(ParameterType.body(BodyParameterType.of()))
+                .type(Type.primitive(PrimitiveType.STRING))
                 .argName(ArgumentName.of(paramName))
                 .build();
         return EndpointDefinition.builder()
-                .httpMethod(EndpointDefinition.HttpMethod.POST)
+                .httpMethod(HttpMethod.POST)
                 .httpPath(HttpPath.of("/a/path"))
                 .args(ImmutableList.of(arg))
                 .endpointName(EndpointName.of("test"));

@@ -7,11 +7,10 @@ package com.palantir.conjure.gen.java.types;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Iterables;
-import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.EnumValueDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
+import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.EnumValueDefinition;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -30,42 +29,42 @@ public final class EnumGenerator {
     private EnumGenerator() {}
 
     public static JavaFile generateEnumType(
-            EnumTypeDefinition typeDef,
+            EnumDefinition typeDef,
             boolean supportUnknownEnumValues,
             Set<ExperimentalFeatures> experimentalFeatures) {
-        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
-        ClassName thisClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
-        ClassName enumClass = ClassName.get(typePackage.name(), typeDef.typeName().name(), "Value");
+        String typePackage = typeDef.getTypeName().getPackage();
+        ClassName thisClass = ClassName.get(typePackage, typeDef.getTypeName().getName());
+        ClassName enumClass = ClassName.get(typePackage, typeDef.getTypeName().getName(), "Value");
 
         TypeSpec spec;
         if (supportUnknownEnumValues) {
             spec = createSafeEnum(typeDef, thisClass, enumClass, experimentalFeatures);
         } else {
-            spec = createEnum(thisClass, typeDef.values(), false);
-            if (typeDef.docs().isPresent()) {
+            spec = createEnum(thisClass, typeDef.getValues(), false);
+            if (typeDef.getDocs().isPresent()) {
                 spec = spec.toBuilder().addJavadoc("$L",
-                        StringUtils.appendIfMissing(typeDef.docs().get().value(), "\n")).build();
+                        StringUtils.appendIfMissing(typeDef.getDocs().get().get(), "\n")).build();
             }
         }
 
-        return JavaFile.builder(typePackage.name(), spec)
+        return JavaFile.builder(typePackage, spec)
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
     }
 
     private static TypeSpec createSafeEnum(
-            EnumTypeDefinition typeDef,
+            EnumDefinition typeDef,
             ClassName thisClass,
             ClassName enumClass,
             Set<ExperimentalFeatures> experimentalFeatures) {
-        TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeDef.typeName().name())
+        TypeSpec.Builder wrapper = TypeSpec.classBuilder(typeDef.getTypeName().getName())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(EnumGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addType(createEnum(enumClass, typeDef.values(), true))
+                .addType(createEnum(enumClass, typeDef.getValues(), true))
                 .addField(enumClass, "value", Modifier.PRIVATE, Modifier.FINAL)
                 .addField(ClassName.get(String.class), "string", Modifier.PRIVATE, Modifier.FINAL)
-                .addFields(createConstants(typeDef.values(), thisClass, enumClass))
+                .addFields(createConstants(typeDef.getValues(), thisClass, enumClass))
                 .addMethod(createValueConstructor(enumClass))
                 .addMethod(createStringConstructor(enumClass))
                 .addMethod(MethodSpec.methodBuilder("get")
@@ -82,7 +81,7 @@ public final class EnumGenerator {
                         .build())
                 .addMethod(createEquals(thisClass))
                 .addMethod(createHashCode())
-                .addMethod(createValueOf(thisClass, typeDef.values()));
+                .addMethod(createValueOf(thisClass, typeDef.getValues()));
 
         if (experimentalFeatures.contains(ExperimentalFeatures.DangerousGothamSerializableBeans)) {
             SerializableSupport.enable(wrapper);
@@ -92,8 +91,8 @@ public final class EnumGenerator {
                     .returns(Object.class)
                     .build());
         }
-        typeDef.docs().ifPresent(
-                docs -> wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(docs.value(), "\n")));
+        typeDef.getDocs().ifPresent(
+                docs -> wrapper.addJavadoc("$L<p>\n", StringUtils.appendIfMissing(docs.get(), "\n")));
 
         wrapper.addJavadoc(
                 "This class is used instead of a native enum to support unknown values.\n"
@@ -116,11 +115,11 @@ public final class EnumGenerator {
             ClassName thisClass, ClassName enumClass) {
         return Iterables.transform(values,
                 v -> {
-                    FieldSpec.Builder fieldSpec = FieldSpec.builder(thisClass, v.value(),
+                    FieldSpec.Builder fieldSpec = FieldSpec.builder(thisClass, v.getValue(),
                             Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                            .initializer(CodeBlock.of("new $1T($2T.$3N)", thisClass, enumClass, v.value()));
-                    v.docs().ifPresent(
-                            docs -> fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+                            .initializer(CodeBlock.of("new $1T($2T.$3N)", thisClass, enumClass, v.getValue()));
+                    v.getDocs().ifPresent(
+                            docs -> fieldSpec.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
                     return fieldSpec.build();
                 });
     }
@@ -131,9 +130,9 @@ public final class EnumGenerator {
                 .addModifiers(Modifier.PUBLIC);
         for (EnumValueDefinition value : values) {
             TypeSpec.Builder anonymousClassBuilder = TypeSpec.anonymousClassBuilder("");
-            value.docs().ifPresent(docs ->
-                    anonymousClassBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
-            enumBuilder.addEnumConstant(value.value(), anonymousClassBuilder.build());
+            value.getDocs().ifPresent(docs ->
+                    anonymousClassBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
+            enumBuilder.addEnumConstant(value.getValue(), anonymousClassBuilder.build());
         }
         if (withUnknown) {
             enumBuilder.addEnumConstant("UNKNOWN");
@@ -174,9 +173,9 @@ public final class EnumGenerator {
         CodeBlock.Builder parser = CodeBlock.builder()
                 .beginControlFlow("switch (upperCasedValue)");
         for (EnumValueDefinition value : values) {
-            parser.add("case $S:\n", value.value())
+            parser.add("case $S:\n", value.getValue())
                     .indent()
-                    .addStatement("return $L", value.value())
+                    .addStatement("return $L", value.getValue())
                     .unindent();
         }
         parser.add("default:\n")

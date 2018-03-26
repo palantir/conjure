@@ -4,17 +4,13 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.spec.ExternalReference;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import java.util.List;
@@ -27,11 +23,6 @@ public final class Retrofit2MethodTypeClassNameVisitor implements ClassNameVisit
 
     public Retrofit2MethodTypeClassNameVisitor(List<TypeDefinition> types) {
         this.delegate = new DefaultClassNameVisitor(types);
-    }
-
-    @Override
-    public TypeName visitAny(AnyType type) {
-        return delegate.visitAny(type);
     }
 
     @Override
@@ -51,32 +42,26 @@ public final class Retrofit2MethodTypeClassNameVisitor implements ClassNameVisit
 
     @Override
     public TypeName visitPrimitive(PrimitiveType type) {
-        return delegate.visitPrimitive(type);
+        if (type.get() == PrimitiveType.Value.BINARY) {
+            return REQUEST_BODY_TYPE;
+        } else {
+            return delegate.visitPrimitive(type);
+        }
     }
 
     @Override
-    public TypeName visitLocalReference(LocalReferenceType type) {
-        return delegate.visitLocalReference(type);
+    public TypeName visitReference(com.palantir.conjure.spec.TypeName type) {
+        return delegate.visitReference(type);
     }
 
     @Override
-    public TypeName visitExternal(ExternalType type) {
+    public TypeName visitExternal(ExternalReference type) {
         return delegate.visitExternal(type);
     }
 
     @Override
     public TypeName visitSet(SetType type) {
         return delegate.visitSet(type);
-    }
-
-    @Override
-    public TypeName visitBinary(BinaryType type) {
-        return REQUEST_BODY_TYPE;
-    }
-
-    @Override
-    public TypeName visitDateTime(DateTimeType type) {
-        return delegate.visitDateTime(type);
     }
 
 }

@@ -4,17 +4,17 @@
 
 package com.palantir.conjure.gen.python;
 
-import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.names.ConjurePackageWrapper;
 import java.util.List;
 
 public final class TwoComponentStrippingPackageNameProcessor implements PackageNameProcessor {
 
     @Override
-    public ConjurePackage getPackageName(ConjurePackage conjurePackage) {
-        List<String> components = conjurePackage.components();
+    public String getPackageName(String conjurePackage) {
+        List<String> components = ConjurePackageWrapper.components(conjurePackage);
 
         if (components.size() > 2) {
-            return ConjurePackage.of(components.subList(2, components.size()));
+            return ConjurePackageWrapper.conjurePackage(components.subList(2, components.size()));
         } else {
             return conjurePackage;
         }

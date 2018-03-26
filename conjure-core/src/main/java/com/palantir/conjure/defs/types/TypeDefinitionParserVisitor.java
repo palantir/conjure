@@ -5,23 +5,23 @@
 package com.palantir.conjure.defs.types;
 
 import com.palantir.conjure.defs.ConjureParserUtils;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import java.util.Optional;
 
 public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<TypeDefinition> {
 
     private final String name;
-    private final Optional<ConjurePackage> defaultPackage;
+    private final Optional<String> defaultPackage;
     private final ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver;
 
     public TypeDefinitionParserVisitor(
             String typeName,
-            Optional<ConjurePackage> defaultPackage,
+            Optional<String> defaultPackage,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         this.name = typeName;
         this.defaultPackage = defaultPackage;

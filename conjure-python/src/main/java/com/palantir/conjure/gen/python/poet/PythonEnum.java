@@ -7,8 +7,7 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.Documentation;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.spec.Documentation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +18,7 @@ import org.immutables.value.Value;
 public interface PythonEnum extends PythonClass {
 
     ImmutableSet<PythonImport> DEFAULT_IMPORTS = ImmutableSet.of(
-            PythonImport.of(PythonClassName.of(ConjurePackage.of("conjure"), "*"), Optional.empty()));
+            PythonImport.of(PythonClassName.of("conjure", "*"), Optional.empty()));
 
     @Override
     default Set<PythonImport> requiredImports() {
@@ -37,7 +36,7 @@ public interface PythonEnum extends PythonClass {
         poetWriter.maintainingIndent(() -> {
             poetWriter.writeIndentedLine(String.format("class %s(ConjureEnumType):", className()));
             poetWriter.increaseIndent();
-            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.value())));
+            docs().ifPresent(docs -> poetWriter.writeIndentedLine(String.format("'''%s'''", docs.get())));
 
             poetWriter.writeLine();
 

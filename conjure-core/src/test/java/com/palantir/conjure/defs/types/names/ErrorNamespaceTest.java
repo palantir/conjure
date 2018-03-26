@@ -12,9 +12,9 @@ public final class ErrorNamespaceTest {
 
     @Test
     public void testValidErrorNamespaces() throws Exception {
-        ErrorNamespace.of("Conjure");
-        ErrorNamespace.of("FoundryCatalog");
-        ErrorNamespace.of("FoundryFsClient");
+        ErrorNamespaceWrapper.errorNamespace("Conjure");
+        ErrorNamespaceWrapper.errorNamespace("FoundryCatalog");
+        ErrorNamespaceWrapper.errorNamespace("FoundryFsClient");
     }
 
     @Test
@@ -27,7 +27,7 @@ public final class ErrorNamespaceTest {
                 "foundry_catalog",
                 "FOUNDRY_CATALOG"
         }) {
-            assertThatThrownBy(() -> ErrorNamespace.of(invalid))
+            assertThatThrownBy(() -> ErrorNamespaceWrapper.errorNamespace(invalid))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Namespace for errors must match pattern")
                     .hasMessageContaining(invalid);

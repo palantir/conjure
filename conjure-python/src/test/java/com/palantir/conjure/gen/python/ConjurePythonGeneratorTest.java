@@ -9,9 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.ConjureSubfolderRunner;
 import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.types.DefaultBeanGenerator;
+import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +31,7 @@ public final class ConjurePythonGeneratorTest {
     @ConjureSubfolderRunner.Test
     public void assertThatFilesRenderAsExpected(Path folder) throws IOException {
         Path expected = folder.resolve("expected");
-        ConjureDefinition definition = getInputDefinition(folder);
+        ConjureDefinition definition = getInputDefinitions(folder);
         maybeResetExpectedDirectory(expected, definition);
 
         generator.write(definition, pythonFileWriter);
@@ -57,22 +57,23 @@ public final class ConjurePythonGeneratorTest {
             Files.walk(expected).filter(path -> path.toFile().isFile()).forEach(path -> path.toFile().delete());
             Files.walk(expected).forEach(path -> path.toFile().delete());
             Files.createDirectories(expected);
+
             generator.write(definition, new DefaultPythonFileWriter(expected));
         }
     }
 
-    private ConjureDefinition getInputDefinition(Path folder) throws IOException {
+    private ConjureDefinition getInputDefinitions(Path folder) throws IOException {
         Files.createDirectories(folder);
-        List<File> definitions = java.nio.file.Files.walk(folder)
+        List<File> files = java.nio.file.Files.walk(folder)
                 .map(Path::toFile)
                 .filter(file -> file.toString().endsWith(".yml"))
                 .collect(Collectors.toList());
 
-        if (definitions.isEmpty()) {
+        if (files.isEmpty()) {
             throw new RuntimeException(
                     folder + " contains no conjure.yml files, please write one to set up a new test");
         }
 
-        return Conjure.parse(definitions);
+        return Conjure.parse(files);
     }
 }

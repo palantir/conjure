@@ -5,24 +5,32 @@
 package com.palantir.conjure.defs.types.complex;
 
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.ObjectDefinition;
 import java.util.stream.Collectors;
 
 @com.google.errorprone.annotations.Immutable
-public enum ObjectTypeDefinitionValidator implements ConjureValidator<ObjectTypeDefinition> {
+public enum ObjectTypeDefinitionValidator implements ConjureValidator<ObjectDefinition> {
     UNIQUE_FIELD_NAMES(definition -> {
-        UniqueFieldNamesValidator uniqueFieldNamesValidator = new UniqueFieldNamesValidator(ObjectTypeDefinition.class);
-        uniqueFieldNamesValidator.validate(definition.fields().stream()
-                .map(FieldDefinition::fieldName).collect(Collectors.toSet()));
+        UniqueFieldNamesValidator uniqueFieldNamesValidator = new UniqueFieldNamesValidator(ObjectDefinition.class);
+        uniqueFieldNamesValidator.validate(definition.getFields().stream()
+                .map(FieldDefinition::getFieldName).collect(Collectors.toSet()));
     });
 
-    private final ConjureValidator<ObjectTypeDefinition> validator;
+    public static void validateAll(ObjectDefinition definition) {
+        for (ObjectTypeDefinitionValidator validator : ObjectTypeDefinitionValidator.values()) {
+            validator.validate(definition);
+        }
+    }
 
-    ObjectTypeDefinitionValidator(ConjureValidator<ObjectTypeDefinition> validator) {
+    private final ConjureValidator<ObjectDefinition> validator;
+
+    ObjectTypeDefinitionValidator(ConjureValidator<ObjectDefinition> validator) {
         this.validator = validator;
     }
 
     @Override
-    public void validate(ObjectTypeDefinition definition) {
+    public void validate(ObjectDefinition definition) {
         this.validator.validate(definition);
     }
 }

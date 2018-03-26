@@ -6,10 +6,7 @@ package com.palantir.conjure.gen.python.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
@@ -21,6 +18,9 @@ import com.palantir.conjure.gen.python.types.DefaultTypeNameVisitor;
 import com.palantir.conjure.gen.python.types.MyPyTypeNameVisitor;
 import com.palantir.conjure.gen.python.types.ReferencedTypeNameVisitor;
 import com.palantir.conjure.gen.python.types.TypeMapper;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.ServiceDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,40 +38,45 @@ public final class ClientGenerator {
 
         Builder<PythonClassName> referencedTypesBuilder = ImmutableSet.builder();
 
-        List<PythonEndpointDefinition> endpoints = serviceDefinition.endpoints()
+        List<PythonEndpointDefinition> endpoints = serviceDefinition.getEndpoints()
                 .stream()
                 .map(ed -> {
-                    ed.returns()
-                            .ifPresent(returnType -> referencedTypesBuilder.addAll(returnType.visit(
-                                    referencedTypeNameVisitor)));
-                    ed.args().forEach(arg -> referencedTypesBuilder.addAll(arg.type().visit(
-                            referencedTypeNameVisitor)));
+                    ed.getReturns()
+                            .ifPresent(returnType -> referencedTypesBuilder.addAll(
+                                    returnType.accept(referencedTypeNameVisitor)));
+                    ed.getArgs().forEach(arg -> referencedTypesBuilder.addAll(
+                            arg.getType().accept(referencedTypeNameVisitor)));
 
-                    List<PythonEndpointParam> params = ed.args()
+                    List<PythonEndpointParam> params = ed.getArgs()
                             .stream()
                             .map(argEntry -> PythonEndpointParam
                                     .builder()
-                                    .paramName(argEntry.argName().name())
-                                    .paramType(argEntry.paramType())
-                                    .myPyType(myPyMapper.getTypeName(argEntry.type()))
+                                    .paramName(argEntry.getArgName().get())
+                                    .paramType(argEntry.getParamType())
+                                    .myPyType(myPyMapper.getTypeName(argEntry.getType()))
                                     .build())
                             .collect(Collectors.toList());
 
                     return PythonEndpointDefinition.builder()
-                            .methodName(ed.endpointName())
-                            .httpMethod(ed.httpMethod())
-                            .httpPath(ed.httpPath())
-                            .auth(ed.auth())
+                            .methodName(ed.getEndpointName())
+                            .httpMethod(ed.getHttpMethod())
+                            .httpPath(ed.getHttpPath())
+                            .auth(ed.getAuth())
                             .params(params)
-                            .pythonReturnType(ed.returns().map(mapper::getTypeName))
-                            .myPyReturnType(ed.returns().map(myPyMapper::getTypeName))
-                            .isBinary(ed.returns().map(rt -> rt instanceof BinaryType).orElse(false))
+                            .pythonReturnType(ed.getReturns().map(mapper::getTypeName))
+                            .myPyReturnType(ed.getReturns().map(myPyMapper::getTypeName))
+                            .isBinary(ed.getReturns().map(rt -> {
+                                if (rt.accept(TypeVisitor.IS_PRIMITIVE)) {
+                                    return rt.accept(TypeVisitor.PRIMITIVE).get() == PrimitiveType.Value.BINARY;
+                                }
+                                return false;
+                            }).orElse(false))
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        ConjurePackage packageName =
-                packageNameProvider.getPackageName(serviceDefinition.serviceName().conjurePackage());
+        String packageName =
+                packageNameProvider.getPackageName(serviceDefinition.getServiceName().getPackage());
         List<PythonImport> imports = referencedTypesBuilder.build()
                 .stream()
                 .filter(entry -> !entry.conjurePackage().equals(packageName)) // don't need to import if in this file
@@ -79,11 +84,11 @@ public final class ClientGenerator {
                 .collect(Collectors.toList());
 
         return PythonService.builder()
-                .packageName(packageName.name())
+                .packageName(packageName)
                 .addAllRequiredImports(PythonService.DEFAULT_IMPORTS)
                 .addAllRequiredImports(imports)
-                .className(serviceDefinition.serviceName().name())
-                .docs(serviceDefinition.docs())
+                .className(serviceDefinition.getServiceName().getName())
+                .docs(serviceDefinition.getDocs())
                 .addAllEndpointDefinitions(endpoints)
                 .build();
     }

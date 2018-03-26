@@ -14,14 +14,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
-import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.names.FieldNameWrapper;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
 import com.palantir.conjure.gen.java.util.StableCollectors;
+import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.FieldName;
+import com.palantir.conjure.spec.UnionDefinition;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -52,31 +52,31 @@ public final class UnionGenerator {
 
     public static JavaFile generateUnionType(
             TypeMapper typeMapper,
-            UnionTypeDefinition typeDef,
+            UnionDefinition typeDef,
             Set<ExperimentalFeatures> experimentalFeatures) {
 
-        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
-        ClassName unionClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
+        String typePackage = typeDef.getTypeName().getPackage();
+        ClassName unionClass = ClassName.get(typePackage, typeDef.getTypeName().getName());
         ClassName baseClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Base");
         ClassName visitorClass = ClassName.get(unionClass.packageName(), unionClass.simpleName(), "Visitor");
-        Map<FieldName, TypeName> memberTypes = typeDef.union().stream()
+        Map<FieldName, TypeName> memberTypes = typeDef.getUnion().stream()
                 .collect(StableCollectors.toLinkedMap(
-                        FieldDefinition::fieldName,
-                        entry -> typeMapper.getClassName(entry.type())));
+                        FieldDefinition::getFieldName,
+                        entry -> typeMapper.getClassName(entry.getType())));
         List<FieldSpec> fields = ImmutableList.of(
                 FieldSpec.builder(baseClass, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.typeName().name())
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.getTypeName().getName())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(UnionGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(fields)
                 .addMethod(generateConstructor(baseClass))
                 .addMethod(generateGetValue(baseClass))
-                .addMethods(generateStaticFactories(typeMapper, unionClass, typeDef.union()))
+                .addMethods(generateStaticFactories(typeMapper, unionClass, typeDef.getUnion()))
                 .addMethod(generateAcceptVisitMethod(visitorClass, memberTypes.keySet()))
                 .addType(generateVisitor(visitorClass, memberTypes))
                 .addType(generateBase(baseClass, memberTypes))
-                .addTypes(generateWrapperClasses(typeMapper, baseClass, typeDef.union(), experimentalFeatures))
+                .addTypes(generateWrapperClasses(typeMapper, baseClass, typeDef.getUnion(), experimentalFeatures))
                 .addType(generateUnknownWrapper(baseClass, experimentalFeatures))
                 .addMethod(generateEquals(unionClass, memberTypes))
                 .addMethod(MethodSpecs.createEqualTo(unionClass, fields))
@@ -90,9 +90,10 @@ public final class UnionGenerator {
             SerializableSupport.enable(typeBuilder);
         }
 
-        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+        typeDef.getDocs().ifPresent(docs ->
+                typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
 
-        return JavaFile.builder(typePackage.name(), typeBuilder.build())
+        return JavaFile.builder(typePackage, typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
@@ -120,8 +121,8 @@ public final class UnionGenerator {
     private static List<MethodSpec> generateStaticFactories(
             TypeMapper typeMapper, ClassName unionClass, List<FieldDefinition> memberTypeDefs) {
         return memberTypeDefs.stream().map(memberTypeDef -> {
-            FieldName memberName = memberTypeDef.fieldName();
-            TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
+            FieldName memberName = memberTypeDef.getFieldName();
+            TypeName memberType = typeMapper.getClassName(memberTypeDef.getType());
             String variableName = variableName();
             // memberName is guarded to be a valid Java identifier and not to end in an underscore, so this is safe
             MethodSpec.Builder builder = MethodSpec.methodBuilder(JavaNameSanitizer.sanitize(memberName))
@@ -130,8 +131,8 @@ public final class UnionGenerator {
                     .addStatement("return new $T(new $T($L))",
                             unionClass, wrapperClass(unionClass, memberName), variableName)
                     .returns(unionClass);
-            memberTypeDef.docs()
-                    .ifPresent(docs -> builder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+            memberTypeDef.getDocs()
+                    .ifPresent(docs -> builder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
             return builder.build();
         }).collect(Collectors.toList());
     }
@@ -160,7 +161,7 @@ public final class UnionGenerator {
             codeBuilder.addStatement(
                     "return $1N.$2L((($3T) $4L).$4L)",
                     visitor,
-                    VISIT_METHOD_NAME + memberName.capitalize(),
+                    VISIT_METHOD_NAME + FieldNameWrapper.capitalize(memberName),
                     wrapperClass,
                     VALUE_FIELD_NAME);
         }
@@ -208,7 +209,7 @@ public final class UnionGenerator {
     private static List<MethodSpec> generateMemberVisitMethods(Map<FieldName, TypeName> memberTypes) {
         return memberTypes.entrySet().stream().map(entry -> {
             String variableName = variableName();
-            return MethodSpec.methodBuilder(VISIT_METHOD_NAME + entry.getKey().capitalize())
+            return MethodSpec.methodBuilder(VISIT_METHOD_NAME + FieldNameWrapper.capitalize(entry.getKey()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(entry.getValue(), variableName)
                     .returns(TYPE_VARIABLE)
@@ -246,12 +247,12 @@ public final class UnionGenerator {
             List<FieldDefinition> memberTypeDefs,
             Set<ExperimentalFeatures> experimentalFeatures) {
         return memberTypeDefs.stream().map(memberTypeDef -> {
-            FieldName memberName = memberTypeDef.fieldName();
-            TypeName memberType = typeMapper.getClassName(memberTypeDef.type());
+            FieldName memberName = memberTypeDef.getFieldName();
+            TypeName memberType = typeMapper.getClassName(memberTypeDef.getType());
             ClassName wrapperClass = peerWrapperClass(baseClass, memberName);
 
             AnnotationSpec jsonPropertyAnnotation = AnnotationSpec.builder(JsonProperty.class)
-                    .addMember("value", "$S", memberName.name()).build();
+                    .addMember("value", "$S", memberName.get()).build();
             List<FieldSpec> fields = ImmutableList.of(
                     FieldSpec.builder(memberType, VALUE_FIELD_NAME, Modifier.PRIVATE, Modifier.FINAL).build());
 
@@ -259,7 +260,7 @@ public final class UnionGenerator {
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
                     .addSuperinterface(baseClass)
                     .addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
-                            .addMember("value", "$S", memberName.name())
+                            .addMember("value", "$S", memberName.get())
                             .build())
                     .addFields(fields)
                     .addMethod(MethodSpec.constructorBuilder()
@@ -269,7 +270,7 @@ public final class UnionGenerator {
                                     .addAnnotation(jsonPropertyAnnotation)
                                     .build())
                             .addStatement("$L", Expressions.requireNonNull(VALUE_FIELD_NAME,
-                                    String.format("%s cannot be null", memberName.name())))
+                                    String.format("%s cannot be null", memberName.get())))
                             .addStatement("this.$1L = $1L", VALUE_FIELD_NAME)
                             .build())
                     .addMethod(MethodSpec.methodBuilder("getValue")
@@ -375,11 +376,11 @@ public final class UnionGenerator {
         return ClassName.get(
                 unionClass.packageName(),
                 unionClass.simpleName(),
-                memberTypeName.capitalize() + "Wrapper");
+                FieldNameWrapper.capitalize(memberTypeName) + "Wrapper");
     }
 
     private static ClassName peerWrapperClass(ClassName peerClass, FieldName memberTypeName) {
-        return peerClass.peerClass(memberTypeName.capitalize() + "Wrapper");
+        return peerClass.peerClass(FieldNameWrapper.capitalize(memberTypeName) + "Wrapper");
     }
 
     private static String variableName() {

@@ -4,12 +4,12 @@
 
 package com.palantir.conjure.gen.python;
 
-import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.gen.python.client.ClientGenerator;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonFile;
 import com.palantir.conjure.gen.python.types.PythonBeanGenerator;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public final class ConjurePythonGenerator {
     }
 
     public List<PythonFile> generate(ConjureDefinition conjureDefinition) {
-        List<TypeDefinition> types = conjureDefinition.types();
+        List<TypeDefinition> types = conjureDefinition.getTypes();
 
         PackageNameProcessor packageNameProcessor = new TwoComponentStrippingPackageNameProcessor();
         List<PythonClass> beanClasses = types
@@ -38,7 +38,7 @@ public final class ConjurePythonGenerator {
                 .map(objectDefinition -> beanGenerator.generateObject(types, packageNameProcessor, objectDefinition))
                 .collect(Collectors.toList());
 
-        List<PythonClass> serviceClasses = conjureDefinition.services()
+        List<PythonClass> serviceClasses = conjureDefinition.getServices()
                 .stream()
                 .map(serviceDef -> clientGenerator.generateClient(types, packageNameProcessor, serviceDef))
                 .collect(Collectors.toList());

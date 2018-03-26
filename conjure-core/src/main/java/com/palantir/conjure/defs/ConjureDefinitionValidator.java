@@ -13,15 +13,17 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Streams;
-import com.palantir.conjure.defs.services.IsPrimitiveOrReferenceType;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.ErrorDefinition;
+import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +39,12 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
     NO_COMPLEX_KEYS(new NoComplexKeysValidator()),
     UNIQUE_NAMES(new UniqueNamesValidator());
+
+    public static void validateAll(ConjureDefinition definition) {
+        for (ConjureDefinitionValidator validator : values()) {
+            validator.validate(definition);
+        }
+    }
 
     private final ConjureValidator<ConjureDefinition> validator;
 
@@ -54,10 +62,10 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             Set<String> seenNames = new HashSet<>();
-            definition.services().forEach(service -> {
-                boolean isNewName = seenNames.add(service.serviceName().name());
+            definition.getServices().forEach(service -> {
+                boolean isNewName = seenNames.add(service.getServiceName().getName());
                 Preconditions.checkState(isNewName,
-                        "Service names must be unique: %s", service.serviceName().name());
+                        "Service names must be unique: %s", service.getServiceName().getName());
             });
         }
     }
@@ -71,8 +79,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
         @Override
         public void validate(ConjureDefinition definition) {
-            List<String> violations = definition.services().stream()
-                    .map(def -> def.serviceName().name())
+            List<String> violations = definition.getServices().stream()
+                    .map(def -> def.getServiceName().getName())
                     .filter(name -> name.endsWith(RETROFIT_SUFFIX))
                     .collect(toList());
 
@@ -86,9 +94,12 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             Set<String> seenNames = new HashSet<>();
-            definition.types().forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.typeName().name()));
-            definition.errors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.errorName().name()));
-            definition.services().forEach(serviceDef -> verifyNameIsUnique(seenNames, serviceDef.serviceName().name()));
+            definition.getTypes().forEach(typeDef ->
+                    verifyNameIsUnique(seenNames, typeDef.accept(TypeDefinitionVisitor.TYPE_NAME).getName()));
+            definition.getErrors().forEach(errorDef ->
+                    verifyNameIsUnique(seenNames, errorDef.getErrorName().getName()));
+            definition.getServices().forEach(serviceDef ->
+                    verifyNameIsUnique(seenNames, serviceDef.getServiceName().getName()));
         }
 
         private static void verifyNameIsUnique(Set<String> seenNames, String name) {
@@ -104,29 +115,29 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     private static final class NoComplexKeysValidator implements ConjureValidator<ConjureDefinition> {
         @Override
         public void validate(ConjureDefinition definition) {
-            definition.types().stream().forEach(NoComplexKeysValidator::validateTypeDef);
-            definition.errors().stream().forEach(NoComplexKeysValidator::validateErrorDef);
+            definition.getTypes().stream().forEach(NoComplexKeysValidator::validateTypeDef);
+            definition.getErrors().stream().forEach(NoComplexKeysValidator::validateErrorDef);
         }
 
         private static void validateTypeDef(TypeDefinition typeDef) {
-            if (typeDef instanceof ObjectTypeDefinition) {
-                ObjectTypeDefinition objectTypeDefinition = (ObjectTypeDefinition) typeDef;
-                objectTypeDefinition.fields().stream().forEach(NoComplexKeysValidator::checkForComplexType);
+            if (typeDef.accept(TypeDefinitionVisitor.IS_OBJECT)) {
+                ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
+                objectDefinition.getFields().stream().forEach(NoComplexKeysValidator::checkForComplexType);
             }
         }
 
-        private static void validateErrorDef(ErrorTypeDefinition errorDef) {
-            Streams.concat(errorDef.safeArgs().stream(), errorDef.unsafeArgs().stream())
+        private static void validateErrorDef(ErrorDefinition errorDef) {
+            Streams.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
                     .forEach(NoComplexKeysValidator::checkForComplexType);
         }
 
         private static void checkForComplexType(FieldDefinition typeDef) {
-            if (typeDef.type() instanceof MapType) {
-                MapType mapType = (MapType) typeDef.type();
-                if (!mapType.keyType().visit(IsPrimitiveOrReferenceType.INSTANCE)) {
+            if (typeDef.getType().accept(TypeVisitor.IS_MAP)) {
+                MapType mapType = typeDef.getType().accept(TypeVisitor.MAP);
+                if (!mapType.getKeyType().accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)) {
                     throw new IllegalStateException(
                             String.format("Complex type '%s' not allowed in map key: %s.",
-                                    mapType.keyType(), typeDef));
+                                    mapType.getKeyType(), typeDef));
                 }
             }
         }
@@ -139,8 +150,10 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
-            definition.types().stream().forEach(type -> getReferenceType(type)
-                    .ifPresent(entry -> typeToRefFields.put(type.typeName(), entry)));
+            definition.getTypes().stream().forEach(type ->
+                    getReferenceType(type)
+                    .ifPresent(entry -> typeToRefFields.put(
+                            type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -148,18 +161,27 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
 
         private static Optional<TypeName> getReferenceType(TypeDefinition typeDef) {
-            if (typeDef instanceof ObjectTypeDefinition) {
-                ObjectTypeDefinition objectDef = (ObjectTypeDefinition) typeDef;
-                for (FieldDefinition currField : objectDef.fields()) {
-                    if (currField.type() instanceof ReferenceType) {
-                        return Optional.of(((ReferenceType) currField.type()).type());
+            if (typeDef.accept(TypeDefinitionVisitor.IS_OBJECT)) {
+                ObjectDefinition objectDef = typeDef.accept(TypeDefinitionVisitor.OBJECT);
+                for (FieldDefinition currField : objectDef.getFields()) {
+                    Optional<TypeName> referenceType = resolveReferenceType(currField.getType());
+                    if (referenceType.isPresent()) {
+                        return referenceType;
                     }
                 }
-            } else if (typeDef instanceof AliasTypeDefinition) {
-                AliasTypeDefinition aliasDef = (AliasTypeDefinition) typeDef;
-                if (aliasDef.alias() instanceof ReferenceType) {
-                    return Optional.of(((ReferenceType) aliasDef.alias()).type());
-                }
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_ALIAS)) {
+                AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
+                return resolveReferenceType(aliasDef.getAlias());
+            }
+            return Optional.empty();
+        }
+
+        private static Optional<TypeName> resolveReferenceType(Type type) {
+            if (type.accept(TypeVisitor.IS_REFERENCE)) {
+                return Optional.of(type.accept(TypeVisitor.REFERENCE));
+            } else if (type.accept(TypeVisitor.IS_PRIMITIVE)) {
+                return Optional.of(
+                        TypeName.of(type.accept(TypeVisitor.PRIMITIVE).get().name(), ""));
             }
             return Optional.empty();
         }
@@ -169,7 +191,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             if (path.contains(typeName)) {
                 path.add(typeName);
                 throw new IllegalStateException("Illegal recursive data type: "
-                        + Joiner.on(" -> ").join(Lists.transform(path, TypeName::name)));
+                        + Joiner.on(" -> ").join(Lists.transform(path, TypeName::getName)));
             }
 
             path.add(typeName);

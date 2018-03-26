@@ -6,14 +6,11 @@ package com.palantir.conjure.gen.java.types;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.complex.EnumTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
+import com.palantir.conjure.spec.ErrorDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.util.List;
 import java.util.Set;
@@ -38,21 +35,21 @@ public final class ObjectGenerator implements TypeGenerator {
         TypeMapper typeMapper = new TypeMapper(types);
 
         return types.stream().map(typeDef -> {
-            if (typeDef instanceof ObjectTypeDefinition) {
+            if (typeDef.accept(TypeDefinitionVisitor.IS_OBJECT)) {
                 return BeanGenerator.generateBeanType(typeMapper,
-                        (ObjectTypeDefinition) typeDef, settings.ignoreUnknownProperties(),
+                        typeDef.accept(TypeDefinitionVisitor.OBJECT), settings.ignoreUnknownProperties(),
                         enabledExperimentalFeatures);
-            } else if (typeDef instanceof UnionTypeDefinition) {
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_UNION)) {
                 return UnionGenerator.generateUnionType(
-                        typeMapper, (UnionTypeDefinition) typeDef,
+                        typeMapper, typeDef.accept(TypeDefinitionVisitor.UNION),
                         enabledExperimentalFeatures);
-            } else if (typeDef instanceof EnumTypeDefinition) {
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_ENUM)) {
                 return EnumGenerator.generateEnumType(
-                        (EnumTypeDefinition) typeDef, settings.supportUnknownEnumValues(),
+                        typeDef.accept(TypeDefinitionVisitor.ENUM), settings.supportUnknownEnumValues(),
                         enabledExperimentalFeatures);
-            } else if (typeDef instanceof AliasTypeDefinition) {
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_ALIAS)) {
                 return AliasGenerator.generateAliasType(
-                        typeMapper, (AliasTypeDefinition) typeDef, enabledExperimentalFeatures);
+                        typeMapper, typeDef.accept(TypeDefinitionVisitor.ALIAS), enabledExperimentalFeatures);
             } else {
                 throw new IllegalArgumentException("Unknown object definition type " + typeDef.getClass());
             }
@@ -60,7 +57,7 @@ public final class ObjectGenerator implements TypeGenerator {
     }
 
     @Override
-    public Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorTypeDefinition> errors) {
+    public Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorDefinition> errors) {
         if (errors.isEmpty()) {
             return ImmutableSet.of();
         }

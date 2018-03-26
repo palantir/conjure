@@ -6,12 +6,12 @@ package com.palantir.conjure.gen.java.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.complex.AliasTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
+import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.Type;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -30,14 +30,14 @@ public final class AliasGenerator {
 
     public static JavaFile generateAliasType(
             TypeMapper typeMapper,
-            AliasTypeDefinition typeDef,
+            AliasDefinition typeDef,
             Set<ExperimentalFeatures> experimentalFeatures) {
-        TypeName aliasTypeName = typeMapper.getClassName(typeDef.alias());
+        TypeName aliasTypeName = typeMapper.getClassName(typeDef.getAlias());
 
-        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
-        ClassName thisClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
+        String typePackage = typeDef.getTypeName().getPackage();
+        ClassName thisClass = ClassName.get(typePackage, typeDef.getTypeName().getName());
 
-        TypeSpec.Builder spec = TypeSpec.classBuilder(typeDef.typeName().name())
+        TypeSpec.Builder spec = TypeSpec.classBuilder(typeDef.getTypeName().getName())
                 .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(AliasGenerator.class))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(aliasTypeName, "value", Modifier.PRIVATE, Modifier.FINAL)
@@ -72,7 +72,8 @@ public final class AliasGenerator {
             SerializableSupport.enable(spec);
         }
 
-        Optional<CodeBlock> maybeValueOfFactoryMethod = valueOfFactoryMethod(typeDef.alias(), thisClass, aliasTypeName);
+        Optional<CodeBlock> maybeValueOfFactoryMethod = valueOfFactoryMethod(
+                typeDef.getAlias(), thisClass, aliasTypeName);
         if (maybeValueOfFactoryMethod.isPresent()) {
             spec.addMethod(MethodSpec.methodBuilder("valueOf")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -90,9 +91,9 @@ public final class AliasGenerator {
                 .addStatement("return new $T(value)", thisClass)
                 .build());
 
-        typeDef.docs().ifPresent(docs -> spec.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+        typeDef.getDocs().ifPresent(docs -> spec.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
 
-        return JavaFile.builder(typePackage.name(), spec.build())
+        return JavaFile.builder(typePackage, spec.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
@@ -102,18 +103,20 @@ public final class AliasGenerator {
             Type conjureType,
             ClassName thisClass,
             TypeName aliasTypeName) {
-        if (conjureType instanceof PrimitiveType) {
-            return Optional.of(valueOfFactoryMethodForPrimitive((PrimitiveType) conjureType, thisClass, aliasTypeName));
+        if (conjureType.accept(TypeVisitor.IS_PRIMITIVE)) {
+            return Optional.of(valueOfFactoryMethodForPrimitive(
+                    conjureType.accept(TypeVisitor.PRIMITIVE), thisClass, aliasTypeName));
         }
         // TODO(dholanda): delegate to aliased type's valueOf factory method if it exists
         return Optional.empty();
     }
 
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     private static CodeBlock valueOfFactoryMethodForPrimitive(
             PrimitiveType primitiveType,
             ClassName thisClass,
             TypeName aliasTypeName) {
-        switch (primitiveType) {
+        switch (primitiveType.get()) {
             case STRING:
                 return CodeBlock.builder().addStatement("return new $T(value)", thisClass).build();
             case DOUBLE:
@@ -133,6 +136,13 @@ public final class AliasGenerator {
             case UUID:
                 return CodeBlock.builder()
                         .addStatement("return new $T($T.fromString(value))", thisClass, aliasTypeName).build();
+            case DATETIME:
+                return CodeBlock.builder()
+                        .addStatement("return new $T($T.parse(value))", thisClass, aliasTypeName).build();
+            case ANY:
+            case BINARY:
+                throw new UnsupportedOperationException(
+                        "Unsupported alias type for factory method: " + primitiveType.get());
             default:
                 throw new IllegalStateException("Unknown primitive type: " + primitiveType);
         }

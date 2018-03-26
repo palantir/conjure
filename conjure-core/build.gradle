@@ -1,8 +1,10 @@
+apply plugin: 'com.palantir.conjure'
 apply plugin: 'com.palantir.publish-jar'
 
 dependencies {
     compile project(':parsec')
     compile project(':extras:immutables-style')
+    compile project(':conjure-core:conjure-core-objects')
 
     compile 'com.fasterxml.jackson.core:jackson-databind'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'

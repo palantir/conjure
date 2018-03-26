@@ -6,10 +6,10 @@ package com.palantir.conjure.gen.java.types;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.gen.java.util.Goethe;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.ErrorDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.squareup.javapoet.JavaFile;
 import java.io.File;
 import java.nio.file.Path;
@@ -22,10 +22,10 @@ public interface TypeGenerator {
         Set<JavaFile> files = Sets.newLinkedHashSet();
 
         // Generate java files for type definitions
-        generateTypes(conjureDefinition.types()).forEach(files::add);
+        generateTypes(conjureDefinition.getTypes()).forEach(files::add);
 
         // Generate java files for error definitions
-        generateErrors(conjureDefinition.types(), conjureDefinition.errors()).forEach(files::add);
+        generateErrors(conjureDefinition.getTypes(), conjureDefinition.getErrors()).forEach(files::add);
 
         return files;
     }
@@ -45,5 +45,5 @@ public interface TypeGenerator {
 
     Set<JavaFile> generateTypes(List<TypeDefinition> types);
 
-    Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorTypeDefinition> errors);
+    Set<JavaFile> generateErrors(List<TypeDefinition> types, List<ErrorDefinition> errors);
 }

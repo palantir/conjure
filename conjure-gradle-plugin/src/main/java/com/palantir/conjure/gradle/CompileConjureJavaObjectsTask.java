@@ -7,12 +7,12 @@ package com.palantir.conjure.gradle;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.palantir.conjure.defs.Conjure;
-import com.palantir.conjure.defs.ConjureDefinition;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.gen.java.types.ExperimentalFeatureDisabledException;
 import com.palantir.conjure.gen.java.types.ObjectGenerator;
 import com.palantir.conjure.gen.java.types.TypeGenerator;
+import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;

@@ -4,9 +4,9 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.palantir.conjure.defs.types.TypeDefinition;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
+import com.palantir.conjure.spec.TypeDefinition;
 import java.util.List;
 
 public interface PythonBeanGenerator {

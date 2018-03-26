@@ -6,12 +6,19 @@ package com.palantir.conjure.defs.types.complex;
 
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.spec.EnumValueDefinition;
 import java.util.regex.Pattern;
 
 @com.google.errorprone.annotations.Immutable
 public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDefinition> {
     UnknownValueNotUsed(new UnknownValueNotUsedValidator()),
     Format(new FormatValidator());
+
+    public static void validateAll(EnumValueDefinition definition) {
+        for (ConjureValidator<EnumValueDefinition> validator : values()) {
+            validator.validate(definition);
+        }
+    }
 
     private final ConjureValidator<EnumValueDefinition> validator;
 
@@ -29,7 +36,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
         @Override
         public void validate(EnumValueDefinition definition) {
-            Preconditions.checkArgument(!definition.value().equalsIgnoreCase("UNKNOWN"),
+            Preconditions.checkArgument(!definition.getValue().equalsIgnoreCase("UNKNOWN"),
                     "UNKNOWN is a reserved enumeration value and cannot be used in an %s",
                     EnumValueDefinition.class.getSimpleName());
         }
@@ -41,8 +48,8 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
         @Override
         public void validate(EnumValueDefinition definition) {
-            Preconditions.checkArgument(REQUIRED_FORMAT.matcher(definition.value()).matches(),
-                    "Enumeration values must match format %s: %s", REQUIRED_FORMAT, definition.value());
+            Preconditions.checkArgument(REQUIRED_FORMAT.matcher(definition.getValue()).matches(),
+                    "Enumeration values must match format %s: %s", REQUIRED_FORMAT, definition.getValue());
         }
     }
 }

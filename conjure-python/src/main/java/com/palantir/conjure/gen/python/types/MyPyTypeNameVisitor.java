@@ -4,62 +4,57 @@
 
 package com.palantir.conjure.gen.python.types;
 
-import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.ConjureTypeVisitor;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.names.TypeName;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.spec.ExternalReference;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The mypy type for the conjure type.
  */
-public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
+public final class MyPyTypeNameVisitor implements Type.Visitor<String> {
 
-    private final Map<TypeName, TypeDefinition> typesByName;
+    private final Set<TypeName> typesByName;
 
     public MyPyTypeNameVisitor(List<TypeDefinition> types) {
-        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
-    }
-
-
-    @Override
-    public String visitAny(AnyType type) {
-        return "Any";
+        this.typesByName = types.stream().map(type ->
+                type.accept(TypeDefinitionVisitor.TYPE_NAME)).collect(Collectors.toSet());
     }
 
     @Override
     public String visitList(ListType type) {
-        return "List[" + type.itemType().visit(this) + "]";
+        return "List[" + type.getItemType().accept(this) + "]";
     }
 
     @Override
     public String visitMap(MapType type) {
-        return "Dict[" + type.keyType().visit(this) + ", " + type.valueType().visit(this) + "]";
+        return "Dict[" + type.getKeyType().accept(this) + ", " + type.getValueType().accept(this) + "]";
     }
 
     @Override
     public String visitOptional(OptionalType type) {
-        return "Optional[" + type.itemType().visit(this) + "]";
+        return "Optional[" + type.getItemType().accept(this) + "]";
     }
 
     @Override
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public String visitPrimitive(PrimitiveType type) {
-        switch (type) {
+        switch (type.get()) {
             case STRING:
             case RID:
             case BEARERTOKEN:
             case UUID:
+            case DATETIME:
                 return "str";
             case BOOLEAN:
                 return "bool";
@@ -68,42 +63,42 @@ public final class MyPyTypeNameVisitor implements ConjureTypeVisitor<String> {
             case INTEGER:
             case SAFELONG:
                 return "int";
+            case ANY:
+            case BINARY:
+                return "Any";
             default:
                 throw new IllegalArgumentException("unknown type: " + type);
         }
     }
 
     @Override
-    public String visitLocalReference(LocalReferenceType type) {
+    public String visitReference(TypeName type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
-        TypeDefinition baseType = typesByName.get(type.type());
-
-        if (baseType != null) {
-            return type.type().name();
+        if (typesByName.contains(type)) {
+            return type.getName();
         } else {
             throw new IllegalArgumentException("unknown type: " + type);
         }
     }
 
     @Override
-    public String visitExternal(ExternalType externalType) {
-        return visitPrimitive(externalType.fallback());
+    public String visitExternal(ExternalReference externalReference) {
+        if (externalReference.getFallback().accept(TypeVisitor.IS_PRIMITIVE)) {
+            return visitPrimitive(externalReference.getFallback().accept(TypeVisitor.PRIMITIVE));
+        } else {
+            throw new IllegalArgumentException("unknown type: " + externalReference);
+        }
+    }
+
+    @Override
+    public String visitUnknown(String unknownType) {
+        throw new IllegalArgumentException("unknown type: " + unknownType);
     }
 
     @Override
     public String visitSet(SetType type) {
         // TODO (bduffield): real sets
-        return ListType.of(type.itemType()).visit(this);
-    }
-
-    @Override
-    public String visitBinary(BinaryType type) {
-        return "Any";
-    }
-
-    @Override
-    public String visitDateTime(DateTimeType type) {
-        return "str";
+        return Type.list(ListType.of(type.getItemType())).accept(this);
     }
 
 }

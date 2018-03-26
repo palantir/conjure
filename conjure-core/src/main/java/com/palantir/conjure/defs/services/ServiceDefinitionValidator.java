@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.spec.ServiceDefinition;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,12 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     UNIQUE_PATH_METHODS(new UniquePathMethodsValidator());
 
     private final ConjureValidator<ServiceDefinition> validator;
+
+    public static void validateAll(ServiceDefinition definition) {
+        for (ServiceDefinitionValidator validator : ServiceDefinitionValidator.values()) {
+            validator.validate(definition);
+        }
+    }
 
     ServiceDefinitionValidator(ConjureValidator<ServiceDefinition> validator) {
         this.validator = validator;
@@ -34,13 +41,13 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         @Override
         public void validate(ServiceDefinition definition) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
-            definition.endpoints().stream().forEach(entry -> {
-                String methodPath = entry.httpMethod() + " " + entry.httpPath().toString();
+            definition.getEndpoints().stream().forEach(entry -> {
+                String methodPath = entry.getHttpMethod().get() + " " + entry.getHttpPath().get();
                 // normalize all path parameter variables and regular expressions because all path args are treated
                 // as identical for comparisons (paths cannot differ only in the name/regular expression of a path
                 // variable)
                 methodPath = PATHVAR_PATTERN.matcher(methodPath).replaceAll("{arg}");
-                pathToEndpoints.put(methodPath, entry.endpointName().name());
+                pathToEndpoints.put(methodPath, entry.getEndpointName().get());
             });
 
             pathToEndpoints.keySet().stream().sorted().forEachOrdered(key -> {

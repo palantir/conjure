@@ -4,20 +4,16 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.google.common.collect.Maps;
-import com.palantir.conjure.defs.types.TypeDefinition;
-import com.palantir.conjure.defs.types.builtin.AnyType;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.builtin.DateTimeType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.OptionalType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.primitive.PrimitiveType;
-import com.palantir.conjure.defs.types.reference.ExternalType;
-import com.palantir.conjure.defs.types.reference.LocalReferenceType;
+import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.lib.SafeLong;
+import com.palantir.conjure.spec.ExternalReference;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.BearerToken;
 import com.squareup.javapoet.ClassName;
@@ -26,11 +22,12 @@ import com.squareup.javapoet.TypeName;
 import java.nio.ByteBuffer;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Maps the conjure type into the 'standard' java type i.e. the type one would use in beans/normal variables (as opposed
@@ -38,36 +35,34 @@ import java.util.UUID;
  */
 public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
-    private final Map<com.palantir.conjure.defs.types.names.TypeName, TypeDefinition> typesByName;
+    private final Set<com.palantir.conjure.spec.TypeName> typesByName;
 
-    public DefaultClassNameVisitor(List<TypeDefinition> types) {
-        this.typesByName = Maps.uniqueIndex(types, t -> t.typeName());
-    }
-
-    @Override
-    public TypeName visitAny(AnyType type) {
-        return ClassName.get(Object.class);
+    DefaultClassNameVisitor(List<TypeDefinition> types) {
+        this.typesByName = types.stream()
+                .map(type -> type.accept(TypeDefinitionVisitor.TYPE_NAME))
+                .collect(Collectors.toSet());
     }
 
     @Override
     public TypeName visitList(ListType type) {
-        TypeName itemType = type.itemType().visit(this).box();
+        TypeName itemType = type.getItemType().accept(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.List.class), itemType);
     }
 
     @Override
     public TypeName visitMap(MapType type) {
         return ParameterizedTypeName.get(ClassName.get(java.util.Map.class),
-                type.keyType().visit(this).box(),
-                type.valueType().visit(this).box());
+                type.getKeyType().accept(this).box(),
+                type.getValueType().accept(this).box());
     }
 
     @Override
     @SuppressWarnings("CyclomaticComplexity")
     public TypeName visitOptional(OptionalType type) {
-        if (type.itemType() instanceof PrimitiveType) {
+        if (type.getItemType().accept(TypeVisitor.IS_PRIMITIVE)) {
+            PrimitiveType primitiveType = type.getItemType().accept(TypeVisitor.PRIMITIVE);
             // special handling for primitive optionals with Java 8
-            switch ((PrimitiveType) type.itemType()) {
+            switch (primitiveType.get()) {
                 case DOUBLE:
                     return ClassName.get(OptionalDouble.class);
                 case INTEGER:
@@ -79,12 +74,14 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
                 case RID:
                 case BEARERTOKEN:
                 case UUID:
+                case DATETIME:
+                case BINARY:
                 default:
                     // treat normally
             }
         }
 
-        TypeName itemType = type.itemType().visit(this);
+        TypeName itemType = type.getItemType().accept(this);
         if (itemType.isPrimitive()) {
             // Safe for primitives (e.g. Booleans with Java 8)
             itemType = itemType.box();
@@ -93,61 +90,60 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public TypeName visitPrimitive(PrimitiveType type) {
-        switch (type) {
+        switch (type.get()) {
             case STRING:
                 return ClassName.get(String.class);
-            case DOUBLE:
-                return TypeName.DOUBLE;
+            case DATETIME:
+                return ClassName.get(ZonedDateTime.class);
             case INTEGER:
                 return TypeName.INT;
-            case BOOLEAN:
-                return TypeName.BOOLEAN;
+            case DOUBLE:
+                return TypeName.DOUBLE;
             case SAFELONG:
                 return ClassName.get(SafeLong.class);
+            case BINARY:
+                return ClassName.get(ByteBuffer.class);
+            case ANY:
+                return ClassName.get(Object.class);
+            case BOOLEAN:
+                return TypeName.BOOLEAN;
+            case UUID:
+                return ClassName.get(UUID.class);
             case RID:
                 return ClassName.get(ResourceIdentifier.class);
             case BEARERTOKEN:
                 return ClassName.get(BearerToken.class);
-            case UUID:
-                return ClassName.get(UUID.class);
             default:
                 throw new IllegalStateException("Unknown primitive type: " + type);
         }
     }
 
     @Override
-    public TypeName visitLocalReference(LocalReferenceType type) {
+    public TypeName visitReference(com.palantir.conjure.spec.TypeName type) {
         // Types without namespace are either defined locally in this conjure definition, or raw imports.
-        TypeDefinition baseType = typesByName.get(type.type());
-        if (baseType != null) {
-            ConjurePackage conjurePackage = baseType.typeName().conjurePackage();
-            return ClassName.get(conjurePackage.name(), type.type().name());
+        if (typesByName.contains(type)) {
+            return ClassName.get(type.getPackage(), type.getName());
         } else {
             throw new IllegalStateException("Unknown LocalReferenceType type: " + type);
         }
     }
 
     @Override
-    public TypeName visitExternal(ExternalType externalType) {
-        ConjurePackage conjurePackage = externalType.externalReference().conjurePackage();
-        return ClassName.get(conjurePackage.name(), externalType.externalReference().name());
+    public TypeName visitExternal(ExternalReference externalType) {
+        String conjurePackage = externalType.getExternalReference().getPackage();
+        return ClassName.get(conjurePackage, externalType.getExternalReference().getName());
     }
 
     @Override
     public TypeName visitSet(SetType type) {
-        TypeName itemType = type.itemType().visit(this).box();
+        TypeName itemType = type.getItemType().accept(this).box();
         return ParameterizedTypeName.get(ClassName.get(java.util.Set.class), itemType);
     }
 
     @Override
-    public TypeName visitBinary(BinaryType type) {
-        return ClassName.get(ByteBuffer.class);
+    public TypeName visitUnknown(String unknownType) {
+        throw new IllegalStateException("Unknown type: " + unknownType);
     }
-
-    @Override
-    public TypeName visitDateTime(DateTimeType type) {
-        return ClassName.get(ZonedDateTime.class);
-    }
-
 }

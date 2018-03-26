@@ -6,10 +6,7 @@
 .checkstyle
 .settings
 .node
-/build/
-*/build/
-examples/*/build/
-extras/*/build/
+**/build/
 bin
 .factorypath
 

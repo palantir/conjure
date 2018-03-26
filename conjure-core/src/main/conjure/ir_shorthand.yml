@@ -1,0 +1,209 @@
+types:
+  definitions:
+    default-package: com.palantir.conjure.spec
+    objects:
+      ConjureDefinition:
+        fields:
+          errors: list<ErrorDefinition>
+          types: list<TypeDefinition>
+          services: list<ServiceDefinition>
+      TypeName:
+        fields:
+          name:
+            type: string
+            docs: >
+              The name of the custom Conjure type or service. It must be in UpperCamelCase. Numbers are permitted, but
+              not at the beginning of a word. Allowed names: "FooBar", "XYCoordinate", "Build2Request". Disallowed names:
+              "fooBar", "2BuildRequest".
+          package:
+            type: string
+            docs: >
+              A period-delimited string of package names. The package names must be lowercase. Numbers are permitted, but
+              not at the beginning of a package name. Allowed packages: "foo", "com.palantir.bar",
+              "com.palantir.foundry.build2". Disallowed packages: "Foo", "com.palantir.foundry.2build".
+      Documentation:
+        alias: string
+
+      # errors
+      ErrorNamespace:
+        alias: string
+      ErrorCode:
+        values:
+          - PERMISSION_DENIED
+          - INVALID_ARGUMENT
+          - NOT_FOUND
+          - CONFLICT
+          - REQUEST_ENTITY_TOO_LARGE
+          - FAILED_PRECONDITION
+          - INTERNAL
+          - TIMEOUT
+          - CUSTOM_CLIENT
+          - CUSTOM_SERVER
+      ErrorDefinition:
+        fields:
+          errorName: TypeName
+          docs: optional<Documentation>
+          namespace: ErrorNamespace
+          code: ErrorCode
+          safeArgs: list<FieldDefinition>
+          unsafeArgs: list<FieldDefinition>
+
+      # types
+      Type:
+        union:
+          primitive: PrimitiveType
+          optional: OptionalType
+          list: ListType
+          set: SetType
+          map: MapType
+          reference:
+            type: TypeName
+            docs: The name and package of a custom Conjure type. The custom type must be defined in the "types" section.
+          external: ExternalReference
+      ExternalReference:
+        fields:
+          externalReference:
+            type: TypeName
+            docs: An identifier for a non-Conjure type which is already defined in a different language (e.g. Java).
+          fallback:
+            type: Type
+            docs: >
+              Other language generators may use the provided fallback if the non-Conjure type is not available.
+              The ANY PrimitiveType is permissible for all external types, but a more specific definition is preferrable.
+      PrimitiveType:
+        values:
+          - STRING
+          - DATETIME
+          - INTEGER
+          - DOUBLE
+          - SAFELONG
+          - BINARY
+          - ANY
+          - BOOLEAN
+          - UUID
+          - RID
+          - BEARERTOKEN
+      OptionalType:
+        fields:
+          itemType: Type
+      ListType:
+        fields:
+          itemType: Type
+      SetType:
+        fields:
+          itemType: Type
+      MapType:
+        fields:
+          keyType: Type
+          valueType: Type
+
+      # objects
+      TypeDefinition:
+        union:
+          alias: AliasDefinition
+          enum: EnumDefinition
+          object: ObjectDefinition
+          union: UnionDefinition
+      AliasDefinition:
+        fields:
+          typeName: TypeName
+          alias: Type
+          docs: optional<Documentation>
+      EnumDefinition:
+        fields:
+          typeName: TypeName
+          values: list<EnumValueDefinition>
+          docs: optional<Documentation>
+      ObjectDefinition:
+        fields:
+          typeName: TypeName
+          fields: list<FieldDefinition>
+          docs: optional<Documentation>
+      UnionDefinition:
+        fields:
+          typeName: TypeName
+          union: list<FieldDefinition>
+          docs: optional<Documentation>
+      EnumValueDefinition:
+        fields:
+          value: string
+          docs: optional<Documentation>
+      FieldDefinition:
+        fields:
+          fieldName: FieldName
+          type: Type
+          docs: optional<Documentation>
+      FieldName:
+        alias: string
+        docs: Should be in lowerCamelCase, but kebab-case and snake_case are also permitted.
+
+      # services
+      ServiceDefinition:
+        fields:
+          serviceName: TypeName
+          endpoints: list<EndpointDefinition>
+          docs: optional<Documentation>
+      EndpointDefinition:
+        fields:
+          endpointName: EndpointName
+          httpMethod: HttpMethod
+          httpPath: HttpPath
+          auth: optional<AuthType>
+          args: list<ArgumentDefinition>
+          returns: optional<Type>
+          docs: optional<Documentation>
+          deprecated: optional<Documentation>
+          markers: list<Type>
+      EndpointName:
+        alias: string
+        docs: Should be in lowerCamelCase.
+      HttpMethod:
+        values:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+      HttpPath:
+        alias: string
+      AuthType:
+        union:
+          header: HeaderAuthType
+          cookie: CookieAuthType
+      HeaderAuthType:
+        fields: {}
+      CookieAuthType:
+        fields:
+          cookieName: string
+      ArgumentDefinition:
+        fields:
+          argName: ArgumentName
+          type: Type
+          paramType: ParameterType
+          docs: optional<Documentation>
+          markers: list<Type>
+      ArgumentName:
+        alias: string
+        docs: >
+          Must be in lowerCamelCase. Numbers are permitted, but not at the beginning of a word. Allowed argument names:
+          "fooBar", "build2Request". Disallowed names: "FooBar", "2BuildRequest".
+      ParameterType:
+        union:
+          body: BodyParameterType
+          header: HeaderParameterType
+          path: PathParameterType
+          query: QueryParameterType
+      BodyParameterType:
+        fields: {}
+      HeaderParameterType:
+        fields:
+          paramId: ParameterId
+      PathParameterType:
+        fields: {}
+      QueryParameterType:
+        fields:
+          paramId: ParameterId
+      ParameterId:
+        alias: string
+        docs: >
+          For header parameters, the parameter id must be in Upper-Kebab-Case. For query parameters, the parameter id
+          must be in lowerCamelCase. Numbers are permitted, but not at the beginning of a word.

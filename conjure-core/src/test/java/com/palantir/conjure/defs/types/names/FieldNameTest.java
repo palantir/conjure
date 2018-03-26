@@ -4,9 +4,10 @@
 
 package com.palantir.conjure.defs.types.names;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import com.palantir.conjure.spec.FieldName;
 import org.junit.Test;
 
 public final class FieldNameTest {
@@ -44,7 +45,7 @@ public final class FieldNameTest {
                 "x",
                 "defaultDNSName"
                 }) {
-            assertThatThrownBy(() -> FieldName.of(invalid))
+            assertThatThrownBy(() -> FieldNameWrapper.fieldName(invalid))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining(String.format(
                             "FieldName \"%s\" must follow one of the following patterns",
@@ -54,31 +55,31 @@ public final class FieldNameTest {
 
     @Test
     public void testConversion() throws Exception {
-        FieldName camelCase = FieldName.of("fooBar");
-        FieldName kebabCase = FieldName.of("foo-bar");
-        FieldName snakeCase = FieldName.of("foo_bar");
+        FieldName camelCase = FieldNameWrapper.fieldName("fooBar");
+        FieldName kebabCase = FieldNameWrapper.fieldName("foo-bar");
+        FieldName snakeCase = FieldNameWrapper.fieldName("foo_bar");
 
-        assertThat(camelCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
-        assertThat(camelCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
-        assertThat(camelCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
+        assertThat(FieldNameWrapper.toCase(camelCase, FieldNameWrapper.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(FieldNameWrapper.toCase(camelCase, FieldNameWrapper.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(FieldNameWrapper.toCase(camelCase, FieldNameWrapper.Case.SNAKE_CASE)).isEqualTo(snakeCase);
 
-        assertThat(kebabCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
-        assertThat(kebabCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
-        assertThat(kebabCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
+        assertThat(FieldNameWrapper.toCase(kebabCase, FieldNameWrapper.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(FieldNameWrapper.toCase(kebabCase, FieldNameWrapper.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(FieldNameWrapper.toCase(kebabCase, FieldNameWrapper.Case.SNAKE_CASE)).isEqualTo(snakeCase);
 
-        assertThat(snakeCase.toCase(FieldName.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
-        assertThat(snakeCase.toCase(FieldName.Case.KEBAB_CASE)).isEqualTo(kebabCase);
-        assertThat(snakeCase.toCase(FieldName.Case.SNAKE_CASE)).isEqualTo(snakeCase);
+        assertThat(FieldNameWrapper.toCase(snakeCase, FieldNameWrapper.Case.LOWER_CAMEL_CASE)).isEqualTo(camelCase);
+        assertThat(FieldNameWrapper.toCase(snakeCase, FieldNameWrapper.Case.KEBAB_CASE)).isEqualTo(kebabCase);
+        assertThat(FieldNameWrapper.toCase(snakeCase, FieldNameWrapper.Case.SNAKE_CASE)).isEqualTo(snakeCase);
     }
 
     @Test
     public void capitalize_should_turn_camel_case_into_sensible_class_name() throws Exception {
-        assertThat(FieldName.of("myVariant").capitalize()).isEqualTo("MyVariant");
+        assertThat(FieldNameWrapper.capitalize(FieldName.of("myVariant"))).isEqualTo("MyVariant");
     }
 
     @Test
     public void capitalize_capture_unused_behavior() throws Exception {
-        assertThat(FieldName.of("my-variant").capitalize()).isEqualTo("My-variant");
-        assertThat(FieldName.of("my_variant").capitalize()).isEqualTo("My_variant");
+        assertThat(FieldNameWrapper.capitalize(FieldName.of("my-variant"))).isEqualTo("My-variant");
+        assertThat(FieldNameWrapper.capitalize(FieldName.of("my_variant"))).isEqualTo("My_variant");
     }
 }

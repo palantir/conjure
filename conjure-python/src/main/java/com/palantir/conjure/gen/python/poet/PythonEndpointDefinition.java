@@ -9,16 +9,16 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.services.AuthType;
-import com.palantir.conjure.defs.services.BodyParameterType;
-import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.EndpointName;
-import com.palantir.conjure.defs.services.HeaderAuthType;
-import com.palantir.conjure.defs.services.HeaderParameterType;
-import com.palantir.conjure.defs.services.HttpPath;
-import com.palantir.conjure.defs.services.ParameterType;
-import com.palantir.conjure.defs.services.PathParameterType;
-import com.palantir.conjure.defs.services.QueryParameterType;
+import com.palantir.conjure.defs.services.HttpPathWrapper;
+import com.palantir.conjure.defs.types.AuthTypeVisitor;
+import com.palantir.conjure.defs.types.ParameterTypeVisitor;
+import com.palantir.conjure.spec.AuthType;
+import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.HeaderParameterType;
+import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ParameterId;
+import com.palantir.conjure.spec.ParameterType;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +31,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
     EndpointName methodName();
 
-    EndpointDefinition.HttpMethod httpMethod();
+    HttpMethod httpMethod();
 
     HttpPath httpPath();
 
@@ -47,6 +47,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
     @Value.Check
     default void check() {
+        HttpPathWrapper.validate(httpPath().get());
         checkState(pythonReturnType().isPresent() == myPyReturnType().isPresent(),
                 "expected both return types or neither");
     }
@@ -55,20 +56,20 @@ public interface PythonEndpointDefinition extends Emittable {
     default void emit(PythonPoetWriter poetWriter) {
         poetWriter.maintainingIndent(() -> {
             // if auth type is header, insert it as a fake param
-            boolean isHeaderType = auth().isPresent() && (auth().get() instanceof HeaderAuthType);
+            boolean isHeaderType = auth().isPresent() && auth().get().accept(AuthTypeVisitor.IS_HEADER);
             List<PythonEndpointParam> paramsWithHeader = isHeaderType
                     ? ImmutableList.<PythonEndpointParam>builder()
                     .add(PythonEndpointParam.builder()
                             .paramName("authHeader")
                             .myPyType("str")
-                            .paramType(HeaderParameterType.header("Authorization"))
+                            .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("Authorization"))))
                             .build())
                     .addAll(params())
                     .build() : params();
             paramsWithHeader = paramsWithHeader.stream().collect(Collectors.toList());
 
             poetWriter.writeIndentedLine("def %s(self, %s):",
-                    methodName().name(),
+                    methodName().get(),
                     Joiner.on(", ").join(
                             paramsWithHeader.stream()
                                     .map(PythonEndpointParam::paramName)
@@ -89,10 +90,11 @@ public interface PythonEndpointDefinition extends Emittable {
                     isBinary() ? MediaType.APPLICATION_OCTET_STREAM : MediaType.APPLICATION_JSON);
             poetWriter.writeIndentedLine("'Content-Type': 'application/json',");
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() instanceof HeaderParameterType)
+                    .filter(param -> param.paramType().accept(ParameterTypeVisitor.IS_HEADER))
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                ((HeaderParameterType) param.paramType()).paramId().name(), param.paramName());
+                                param.paramType().accept(ParameterTypeVisitor.HEADER)
+                                        .getParamId().get(), param.paramName());
                     });
             poetWriter.decreaseIndent();
             poetWriter.writeIndentedLine("} # type: Dict[str, Any]");
@@ -102,10 +104,10 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.writeIndentedLine("_params = {");
             poetWriter.increaseIndent();
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() instanceof QueryParameterType)
+                    .filter(param -> param.paramType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
-                                ((QueryParameterType) param.paramType()).paramId().name(),
+                                param.paramType().accept(ParameterTypeVisitor.QUERY).getParamId().get(),
                                 param.paramName());
                     });
             poetWriter.decreaseIndent();
@@ -117,7 +119,7 @@ public interface PythonEndpointDefinition extends Emittable {
             poetWriter.increaseIndent();
             // TODO(qchen): no need for param name twice?
             paramsWithHeader.stream()
-                    .filter(param -> param.paramType() instanceof PathParameterType)
+                    .filter(param -> param.paramType().accept(ParameterTypeVisitor.IS_PATH))
                     .forEach(param -> {
                         poetWriter.writeIndentedLine("'%s': %s,",
                                 param.paramName(),
@@ -128,7 +130,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
             // body
             Optional<PythonEndpointParam> bodyParam = paramsWithHeader.stream()
-                    .filter(param -> param.paramType() instanceof BodyParameterType)
+                    .filter(param -> param.paramType().accept(ParameterTypeVisitor.IS_BODY))
                     .findAny();
             if (bodyParam.isPresent()) {
                 poetWriter.writeLine();

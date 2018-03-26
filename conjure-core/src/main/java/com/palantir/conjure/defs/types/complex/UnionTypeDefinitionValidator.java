@@ -7,40 +7,46 @@ package com.palantir.conjure.defs.types.complex;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.palantir.conjure.defs.ConjureValidator;
+import com.palantir.conjure.spec.UnionDefinition;
 
 @com.google.errorprone.annotations.Immutable
-public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDefinition> {
+public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionDefinition> {
     KEY_SYNTAX(new KeySyntaxValidator()),
     NO_TRAILING_UNDERSCORE(new NoTrailingUnderscoreValidator());
 
+    public static void validateAll(UnionDefinition definition) {
+        for (UnionTypeDefinitionValidator validator : values()) {
+            validator.validate(definition);
+        }
+    }
 
-    private final ConjureValidator<UnionTypeDefinition> validator;
+    private final ConjureValidator<UnionDefinition> validator;
 
-    UnionTypeDefinitionValidator(ConjureValidator<UnionTypeDefinition> validator) {
+    UnionTypeDefinitionValidator(ConjureValidator<UnionDefinition> validator) {
         this.validator = validator;
     }
 
     @Override
-    public void validate(UnionTypeDefinition definition) {
+    public void validate(UnionDefinition definition) {
         validator.validate(definition);
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionTypeDefinition> {
+    private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionDefinition> {
 
         @Override
-        public void validate(UnionTypeDefinition definition) {
-            definition.union().stream().forEach(fieldDef -> {
-                Preconditions.checkArgument(!fieldDef.fieldName().name().endsWith("_"),
+        public void validate(UnionDefinition definition) {
+            definition.getUnion().stream().forEach(fieldDef -> {
+                Preconditions.checkArgument(!fieldDef.getFieldName().get().endsWith("_"),
                         "Union member key must not end with an underscore: %s",
-                        fieldDef.fieldName().name());
+                        fieldDef.getFieldName().get());
             });
         }
 
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class KeySyntaxValidator implements ConjureValidator<UnionTypeDefinition> {
+    private static final class KeySyntaxValidator implements ConjureValidator<UnionDefinition> {
 
         private static boolean isValidJavaIdentifier(String key) {
             if (!Character.isJavaIdentifierStart(key.charAt(0))) {
@@ -55,13 +61,13 @@ public enum UnionTypeDefinitionValidator implements ConjureValidator<UnionTypeDe
         }
 
         @Override
-        public void validate(UnionTypeDefinition definition) {
-            definition.union().stream().forEach(fieldDef -> {
-                        Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.fieldName().name()),
+        public void validate(UnionDefinition definition) {
+            definition.getUnion().stream().forEach(fieldDef -> {
+                        Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.getFieldName().get()),
                                 "Union member key must not be empty");
-                        Preconditions.checkArgument(isValidJavaIdentifier(fieldDef.fieldName().name()),
+                        Preconditions.checkArgument(isValidJavaIdentifier(fieldDef.getFieldName().get()),
                                 "Union member key must be a valid Java identifier: %s",
-                                fieldDef.fieldName().name());
+                                fieldDef.getFieldName().get());
                     }
             );
         }

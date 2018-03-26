@@ -9,17 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Collections2;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.collect.ListType;
-import com.palantir.conjure.defs.types.collect.MapType;
-import com.palantir.conjure.defs.types.collect.SetType;
-import com.palantir.conjure.defs.types.complex.FieldDefinition;
-import com.palantir.conjure.defs.types.complex.ObjectTypeDefinition;
-import com.palantir.conjure.defs.types.names.ConjurePackage;
-import com.palantir.conjure.defs.types.names.FieldName;
+import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.types.names.FieldNameWrapper;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
+import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.FieldName;
+import com.palantir.conjure.spec.ObjectDefinition;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -51,21 +48,21 @@ public final class BeanGenerator {
 
     public static JavaFile generateBeanType(
             TypeMapper typeMapper,
-            ObjectTypeDefinition typeDef,
+            ObjectDefinition typeDef,
             boolean ignoreUnknownProperties,
             Set<ExperimentalFeatures> experimentalFeatures) {
 
-        ConjurePackage typePackage = typeDef.typeName().conjurePackage();
-        ClassName objectClass = ClassName.get(typePackage.name(), typeDef.typeName().name());
+        String typePackage = typeDef.getTypeName().getPackage();
+        ClassName objectClass = ClassName.get(typePackage, typeDef.getTypeName().getName());
         ClassName builderClass = ClassName.get(objectClass.packageName(), objectClass.simpleName(), "Builder");
 
-        Collection<EnrichedField> fields = createFields(typeMapper, typeDef.fields());
+        Collection<EnrichedField> fields = createFields(typeMapper, typeDef.getFields());
         Collection<FieldSpec> poetFields = EnrichedField.toPoetSpecs(fields);
         Collection<EnrichedField> nonPrimitiveEnrichedFields = fields.stream()
                 .filter(f -> !f.poetSpec().type.isPrimitive())
                 .collect(Collectors.toList());
 
-        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.typeName().name())
+        TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(typeDef.getTypeName().getName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addFields(poetFields)
                 .addMethod(createConstructor(fields, poetFields))
@@ -82,7 +79,7 @@ public final class BeanGenerator {
             MethodSpecs.addCachedHashCode(typeBuilder, experimentalFeatures, poetFields);
         }
 
-        typeBuilder.addMethod(MethodSpecs.createToString(typeDef.typeName().name(),
+        typeBuilder.addMethod(MethodSpecs.createToString(typeDef.getTypeName().getName(),
                 fields.stream().map(EnrichedField::fieldName).collect(Collectors.toList())));
 
         if (poetFields.size() <= MAX_NUM_PARAMS_FOR_FACTORY) {
@@ -114,9 +111,10 @@ public final class BeanGenerator {
 
         typeBuilder.addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(BeanGenerator.class));
 
-        typeDef.docs().ifPresent(docs -> typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+        typeDef.getDocs().ifPresent(docs ->
+                typeBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
 
-        return JavaFile.builder(typePackage.name(), typeBuilder.build())
+        return JavaFile.builder(typePackage, typeBuilder.build())
                 .skipJavaLangImports(true)
                 .indent("    ")
                 .build();
@@ -132,10 +130,10 @@ public final class BeanGenerator {
     private static Collection<EnrichedField> createFields(
             TypeMapper typeMapper, List<FieldDefinition> fields) {
         return fields.stream()
-                .map(e -> EnrichedField.of(e.fieldName(), e, FieldSpec.builder(
+                .map(e -> EnrichedField.of(e.getFieldName(), e, FieldSpec.builder(
                         // fields are guarded against using reserved keywords
-                        typeMapper.getClassName(e.type()),
-                        JavaNameSanitizer.sanitize(e.fieldName()),
+                        typeMapper.getClassName(e.getType()),
+                        JavaNameSanitizer.sanitize(e.getFieldName()),
                         Modifier.PRIVATE, Modifier.FINAL)
                         .build()))
                 .collect(Collectors.toList());
@@ -158,12 +156,12 @@ public final class BeanGenerator {
 
             // Collection and Map types not copied in constructor for performance. This assumes that the constructor
             // is private and necessarily called from the builder, which does its own defensive copying.
-            if (field.conjureDef().type() instanceof ListType) {
+            if (field.conjureDef().getType().accept(TypeVisitor.IS_LIST)) {
                 // TODO(melliot): contribute a fix to JavaPoet that parses $T correctly for a JavaPoet FieldSpec
                 body.addStatement("this.$1N = $2T.unmodifiableList($1N)", spec, Collections.class);
-            } else if (field.conjureDef().type() instanceof SetType) {
+            } else if (field.conjureDef().getType().accept(TypeVisitor.IS_SET)) {
                 body.addStatement("this.$1N = $2T.unmodifiableSet($1N)", spec, Collections.class);
-            } else if (field.conjureDef().type() instanceof MapType) {
+            } else if (field.conjureDef().getType().accept(TypeVisitor.IS_MAP)) {
                 body.addStatement("this.$1N = $2T.unmodifiableMap($1N)", spec, Collections.class);
             } else {
                 body.addStatement("this.$1N = $1N", spec);
@@ -185,18 +183,18 @@ public final class BeanGenerator {
         MethodSpec.Builder getterBuilder = MethodSpec.methodBuilder(field.getterName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-                        .addMember("value", "$S", field.fieldName().name())
+                        .addMember("value", "$S", field.fieldName().get())
                         .build())
                 .returns(field.poetSpec().type);
 
-        if (field.conjureDef().type() instanceof BinaryType) {
+        if (field.conjureDef().getType().accept(TypeVisitor.IS_BINARY)) {
             getterBuilder.addStatement("return this.$N.asReadOnlyBuffer()", field.poetSpec().name);
         } else {
             getterBuilder.addStatement("return this.$N", field.poetSpec().name);
         }
 
-        field.conjureDef().docs().ifPresent(docs ->
-                getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+        field.conjureDef().getDocs().ifPresent(docs ->
+                getterBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
         return getterBuilder.build();
     }
 
@@ -209,7 +207,7 @@ public final class BeanGenerator {
             FieldSpec spec = field.poetSpec();
             builder.addParameter(ParameterSpec.builder(spec.type, spec.name).build());
             builder.addStatement(
-                    "missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, field.fieldName().name());
+                    "missingFields = addFieldIfMissing(missingFields, $N, $S)", spec, field.fieldName().get());
         }
 
         builder
@@ -302,7 +300,8 @@ public final class BeanGenerator {
 
         @Value.Derived
         default String getterName() {
-            return "get" + fieldName().toCase(FieldName.Case.LOWER_CAMEL_CASE).capitalize();
+            FieldName lowerCamelCaseName = FieldNameWrapper.toCase(fieldName(), FieldNameWrapper.Case.LOWER_CAMEL_CASE);
+            return "get" + FieldNameWrapper.capitalize(lowerCamelCaseName);
         }
 
         @Value.Parameter

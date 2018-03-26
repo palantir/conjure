@@ -40,6 +40,10 @@ public final class DateTimeAliasExample implements Serializable {
         return value.hashCode();
     }
 
+    public static DateTimeAliasExample valueOf(String value) {
+        return new DateTimeAliasExample(ZonedDateTime.parse(value));
+    }
+
     @JsonCreator
     public static DateTimeAliasExample of(ZonedDateTime value) {
         return new DateTimeAliasExample(value);
