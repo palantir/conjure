@@ -37,7 +37,7 @@ public final class DefaultClassNameVisitor implements ClassNameVisitor {
 
     private final Set<com.palantir.conjure.spec.TypeName> typesByName;
 
-    DefaultClassNameVisitor(List<TypeDefinition> types) {
+    public DefaultClassNameVisitor(List<TypeDefinition> types) {
         this.typesByName = types.stream()
                 .map(type -> type.accept(TypeDefinitionVisitor.TYPE_NAME))
                 .collect(Collectors.toSet());

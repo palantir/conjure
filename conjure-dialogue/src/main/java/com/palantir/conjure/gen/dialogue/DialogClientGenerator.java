@@ -14,24 +14,26 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.palantir.conjure.defs.ConjureDefinition;
-import com.palantir.conjure.defs.services.ArgumentDefinition;
-import com.palantir.conjure.defs.services.AuthType;
-import com.palantir.conjure.defs.services.BodyParameterType;
-import com.palantir.conjure.defs.services.EndpointDefinition;
-import com.palantir.conjure.defs.services.EndpointName;
-import com.palantir.conjure.defs.services.HeaderAuthType;
-import com.palantir.conjure.defs.services.HeaderParameterType;
-import com.palantir.conjure.defs.services.HttpPath;
-import com.palantir.conjure.defs.services.PathParameterType;
-import com.palantir.conjure.defs.services.QueryParameterType;
-import com.palantir.conjure.defs.services.ServiceDefinition;
-import com.palantir.conjure.defs.types.Type;
-import com.palantir.conjure.defs.types.builtin.BinaryType;
-import com.palantir.conjure.defs.types.reference.ReferenceType;
+import com.palantir.conjure.defs.types.AuthTypeVisitor;
+import com.palantir.conjure.defs.types.ParameterTypeVisitor;
+import com.palantir.conjure.defs.types.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.services.ServiceGenerator;
 import com.palantir.conjure.gen.java.types.TypeMapper;
+import com.palantir.conjure.spec.ArgumentDefinition;
+import com.palantir.conjure.spec.AuthType;
+import com.palantir.conjure.spec.BodyParameterType;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.HeaderParameterType;
+import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ParameterType;
+import com.palantir.conjure.spec.PathParameterType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.QueryParameterType;
+import com.palantir.conjure.spec.ServiceDefinition;
+import com.palantir.conjure.spec.Type;
 import com.palantir.dialogue.Call;
 import com.palantir.dialogue.Calls;
 import com.palantir.dialogue.Channel;
@@ -74,12 +76,12 @@ public final class DialogClientGenerator implements ServiceGenerator {
 
     @Override
     public Set<JavaFile> generate(ConjureDefinition conjureDefinition) {
-        TypeMapper parameterTypes = new TypeMapper(conjureDefinition.types(),
+        TypeMapper parameterTypes = new TypeMapper(conjureDefinition.getTypes(),
                 types -> new ClassVisitor(types, ClassVisitor.Mode.PARAMETER));
-        TypeMapper returnTypes = new TypeMapper(conjureDefinition.types(),
+        TypeMapper returnTypes = new TypeMapper(conjureDefinition.getTypes(),
                 types -> new ClassVisitor(types, ClassVisitor.Mode.RETURN_VALUE));
         TypeAwareGenerator generator = new TypeAwareGenerator(parameterTypes, returnTypes);
-        return conjureDefinition.services().stream()
+        return conjureDefinition.getServices().stream()
                 .flatMap(serviceDef -> generator.service(serviceDef).stream())
                 .collect(Collectors.toSet());
     }
@@ -106,24 +108,24 @@ public final class DialogClientGenerator implements ServiceGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(ConjureAnnotations.getConjureGeneratedAnnotation(DialogClientGenerator.class));
 
-            def.docs().ifPresent(docs ->
-                    serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.value(), "\n")));
+            def.getDocs().ifPresent(docs ->
+                    serviceBuilder.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
 
-            serviceBuilder.addMethods(def.endpoints().stream()
+            serviceBuilder.addMethods(def.getEndpoints().stream()
                     .map(this::blockingApiMethod)
                     .collect(Collectors.toList()));
 
-            return JavaFile.builder(def.serviceName().conjurePackage().name(), serviceBuilder.build()).build();
+            return JavaFile.builder(def.getServiceName().getPackage(), serviceBuilder.build()).build();
         }
 
         private MethodSpec blockingApiMethod(EndpointDefinition endpointDef) {
-            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.endpointName().name())
+            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(endpointDef.getEndpointName().get())
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameters(methodParams(endpointDef));
 
-            endpointDef.deprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(Deprecated.class));
+            endpointDef.getDeprecated().ifPresent(deprecatedDocsValue -> methodBuilder.addAnnotation(Deprecated.class));
             ServiceGenerator.getJavaDoc(endpointDef).ifPresent(content -> methodBuilder.addJavadoc("$L", content));
-            endpointDef.returns().ifPresent(type -> methodBuilder.returns(returnTypes.getClassName(type)));
+            endpointDef.getReturns().ifPresent(type -> methodBuilder.returns(returnTypes.getClassName(type)));
 
             return methodBuilder.build();
         }
@@ -142,22 +144,22 @@ public final class DialogClientGenerator implements ServiceGenerator {
                             ClassName.get("com.palantir.remoting3.ext.jackson", "ObjectMappers"))
                     .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                     .build());
-            serviceBuilder.addFields(def.endpoints().stream()
+            serviceBuilder.addFields(def.getEndpoints().stream()
                     .map(endpoint -> endpoint(endpoint, className))
                     .collect(Collectors.toList()));
 
-            return JavaFile.builder(def.serviceName().conjurePackage().name(), serviceBuilder.build()).build();
+            return JavaFile.builder(def.getServiceName().getPackage(), serviceBuilder.build()).build();
         }
 
         private FieldSpec endpoint(EndpointDefinition def, ClassName parentClassName) {
-            Optional<ArgumentDefinition> bodyParam = def.args().stream()
-                    .filter(arg -> arg.paramType() instanceof BodyParameterType)
+            Optional<ArgumentDefinition> bodyParam = def.getArgs().stream()
+                    .filter(arg -> arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .findAny();
             TypeName bodyType = bodyParam
-                    .map(arg -> parameterTypes.getClassName(arg.type()))
+                    .map(arg -> parameterTypes.getClassName(arg.getType()))
                     .orElse(TypeName.VOID)
                     .box();
-            TypeName returnType = def.returns().map(returnTypes::getClassName).orElse(TypeName.VOID).box();
+            TypeName returnType = def.getReturns().map(returnTypes::getClassName).orElse(TypeName.VOID).box();
             ParameterizedTypeName endpointType =
                     ParameterizedTypeName.get(ClassName.get(Endpoint.class), bodyType, returnType);
 
@@ -165,7 +167,7 @@ public final class DialogClientGenerator implements ServiceGenerator {
                     .addSuperinterface(endpointType)
                     .addField(FieldSpec.builder(
                             TypeName.get(PathTemplate.class), "pathTemplate", Modifier.PRIVATE, Modifier.FINAL)
-                            .initializer(CodeBlock.builder().add(pathTemplateInitializer(def.httpPath())).build())
+                            .initializer(CodeBlock.builder().add(pathTemplateInitializer(def.getHttpPath())).build())
                             .build())
                     // TODO(rfink): These fields cannot be static. Does this matter? Should we make these real
                     // instead of anonymous classes?
@@ -178,7 +180,7 @@ public final class DialogClientGenerator implements ServiceGenerator {
                     .addField(FieldSpec.builder(
                             ParameterizedTypeName.get(ClassName.get(Deserializer.class), returnType),
                             "deserializer", Modifier.PRIVATE, Modifier.FINAL)
-                            .initializer(deserializeForType(def.returns(), def.endpointName(), parentClassName))
+                            .initializer(deserializeForType(def.getReturns(), def.getEndpointName(), parentClassName))
                             .build())
                     .addMethod(MethodSpec.methodBuilder("renderPath")
                             .addAnnotation(Override.class)
@@ -192,7 +194,7 @@ public final class DialogClientGenerator implements ServiceGenerator {
                             .addModifiers(Modifier.PUBLIC)
                             .returns(HttpMethod.class)
                             .addCode(CodeBlock.builder().add("return $T.$L;", HttpMethod.class,
-                                    def.httpMethod().name()).build())
+                                    def.getHttpMethod().get()).build())
                             .build())
                     .addMethod(MethodSpec.methodBuilder("requestSerializer")
                             .addAnnotation(Override.class)
@@ -217,7 +219,7 @@ public final class DialogClientGenerator implements ServiceGenerator {
 
             return FieldSpec.builder(
                     endpointType,
-                    def.endpointName().name(),
+                    def.getEndpointName().get(),
                     Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                     .initializer(CodeBlock.builder().add("$L", endpointClass).build())
                     .build();
@@ -228,47 +230,46 @@ public final class DialogClientGenerator implements ServiceGenerator {
             return bodyParam.isPresent()
                     ? CodeBlock.builder()
                     .add("$T.jackson($S, $L.$L);",
-                            Serializers.class, def.endpointName().name(), parentClassName, MAPPER_FIELD_NAME)
+                            Serializers.class, def.getEndpointName(), parentClassName, MAPPER_FIELD_NAME)
                     .build()
                     : CodeBlock.builder().add("$T.failing();", Serializers.class).build();
         }
 
         private CodeBlock deserializeForType(
-                Optional<Type> returnType, EndpointName endpointName, ClassName parentClassName) {
+                Optional<Type> returnType, EndpointName getName, ClassName parentClassName) {
             if (!returnType.isPresent()) {
                 // No return value: use "empty" deserializer.
                 return CodeBlock.builder()
-                        .add("$T.empty($S);", Deserializers.class, endpointName.name())
+                        .add("$T.empty($S);", Deserializers.class, getName)
                         .build();
-            } else {
-                // For "binary" conjure return type, use passthrough deserializer, otherwise use Jackson deserializer
-                CodeBlock jackson = CodeBlock.builder()
-                        .add("$T.jackson($S, $L.$L, $L);",
-                                Deserializers.class,
-                                endpointName.name(),
-                                parentClassName,
-                                MAPPER_FIELD_NAME,
-                                TypeSpec.anonymousClassBuilder("")
-                                        .addSuperinterface(ParameterizedTypeName.get(
-                                                ClassName.get(TypeReference.class),
-                                                returnTypes.getClassName(returnType.get()).box()))
-                                        .build())
-                        .build();
-                return returnType.get().visit(
-                        new FixedDefaultConjureTypeVisitor<CodeBlock>(jackson) {
-                            @Override
-                            public CodeBlock visitBinary(BinaryType type) {
-                                return CodeBlock.builder()
-                                        .add("$T.passthrough();", Deserializers.class)
-                                        .build();
-                            }
-                        });
             }
+
+            // For "binary" conjure return type, use passthrough deserializer, otherwise use Jackson deserializer
+            Type type = returnType.get();
+            if (type.accept(TypeVisitor.IS_PRIMITIVE)
+                    && type.accept(TypeVisitor.PRIMITIVE).equals(PrimitiveType.BINARY)) {
+                return CodeBlock.builder()
+                        .add("$T.passthrough();", Deserializers.class)
+                        .build();
+            }
+
+            return CodeBlock.builder()
+                    .add("$T.jackson($S, $L.$L, $L);",
+                            Deserializers.class,
+                            getName,
+                            parentClassName,
+                            MAPPER_FIELD_NAME,
+                            TypeSpec.anonymousClassBuilder("")
+                                    .addSuperinterface(ParameterizedTypeName.get(
+                                            ClassName.get(TypeReference.class),
+                                            returnTypes.getClassName(type).box()))
+                                    .build())
+                    .build();
         }
 
         // TODO(rfink): Integrate/consolidate with checking code in PathDefinition class
         private CodeBlock pathTemplateInitializer(HttpPath path) {
-            UriTemplateParser uriTemplateParser = new UriTemplateParser(path.path().toString());
+            UriTemplateParser uriTemplateParser = new UriTemplateParser(path.get());
             String[] rawSegments = uriTemplateParser.getNormalizedTemplate().split("/");
             List<CodeBlock> segments = new ArrayList<>();
             for (int i = 1; i < rawSegments.length; i++) {
@@ -299,61 +300,62 @@ public final class DialogClientGenerator implements ServiceGenerator {
         private MethodSpec blockingClient(ServiceDefinition def) {
             TypeSpec.Builder impl = TypeSpec.anonymousClassBuilder("")
                     .addSuperinterface(serviceClassName("Blocking", def));
-            def.endpoints().forEach(endpoint -> impl.addMethod(
+            def.getEndpoints().forEach(endpoint -> impl.addMethod(
                     blockingClientImpl(serviceClassName("Dialogue", def).toString(), endpoint)));
 
             return MethodSpec.methodBuilder("blocking")
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                    .addJavadoc("Creates a synchronous/blocking client for a $L service.", def.serviceName().name())
+                    .addJavadoc("Creates a synchronous/blocking client for a $L service.",
+                            def.getServiceName().getName())
                     .returns(serviceClassName("Blocking", def))
                     .addParameter(Channel.class, "channel")
                     .addCode(CodeBlock.builder().add("return $L;", impl.build()).build())
                     .build();
         }
 
-        private MethodSpec blockingClientImpl(String serviceName, EndpointDefinition def) {
-            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(def.endpointName().name())
+        private MethodSpec blockingClientImpl(String getServiceName, EndpointDefinition def) {
+            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(def.getEndpointName().get())
                     .addModifiers(Modifier.PUBLIC)
                     .addParameters(methodParams(def));
-            def.returns().ifPresent(type -> methodBuilder.returns(returnTypes.getClassName(type)));
+            def.getReturns().ifPresent(type -> methodBuilder.returns(returnTypes.getClassName(type)));
 
             // Validate inputs
             CodeBlock.Builder validateParams = CodeBlock.builder();
-            def.args().stream()
-                    .filter(param -> !parameterTypes.getClassName(param.type()).isPrimitive())
+            def.getArgs().stream()
+                    .filter(param -> !parameterTypes.getClassName(param.getType()).isPrimitive())
                     .forEach(param ->
                             validateParams.add("$T.checkNotNull($L, \"parameter $L must not be null\");",
-                                    Preconditions.class, param.argName().name(), param.argName().name()));
+                                    Preconditions.class, param.getArgName(), param.getArgName()));
 
             // Construct request
             CodeBlock.Builder request = CodeBlock.builder();
-            List<ArgumentDefinition> bodyParams = def.args().stream()
-                    .filter(param -> param.paramType() instanceof BodyParameterType)
+            List<ArgumentDefinition> bodyParams = def.getArgs().stream()
+                    .filter(arg -> arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .collect(Collectors.toList());
             Optional<ArgumentDefinition> bodyParam = Optional.ofNullable(Iterables.getOnlyElement(bodyParams, null));
-            TypeName bodyType = bodyParam.map(p -> parameterTypes.getClassName(p.type()))
+            TypeName bodyType = bodyParam.map(p -> parameterTypes.getClassName(p.getType()))
                     .orElse(TypeName.get(Void.class));
             // Add path/query/header/body parameters
             request.add("$T<$T> $L = $T.<$T>builder()",
                     Request.class, bodyType, REQUEST_VAR_NAME, Request.class, bodyType);
-            def.args().forEach(param -> addParameter(request, param));
+            def.getArgs().forEach(param -> addParameter(request, param));
             // Add header parameter for HEADER authentication
-            def.auth().ifPresent(auth -> {
+            def.getAuth().ifPresent(auth -> {
                 verifyAuthTypeIsHeader(auth);
                 request.add(".putHeaderParams($S, $T.toString($L))",
-                        HeaderAuthType.HEADER_NAME, Objects.class, AUTH_HEADER_PARAM_NAME);
+                        AuthTypeVisitor.HEADER_NAME, Objects.class, AUTH_HEADER_PARAM_NAME);
             });
             request.add(".build();");
 
             // Perform call and return result
             CodeBlock.Builder call = CodeBlock.builder();
-            TypeName returnType = def.returns().map(returnTypes::getClassName)
+            TypeName returnType = def.getReturns().map(returnTypes::getClassName)
                     .orElse(TypeName.get(Void.class)).box();
             call.add("$T<$T> _call = channel.createCall($L.$L, $L);",
-                    Call.class, returnType, serviceName, def.endpointName().name(), REQUEST_VAR_NAME);
+                    Call.class, returnType, getServiceName, def.getEndpointName().get(), REQUEST_VAR_NAME);
             call.add("$T<$T> _response = $T.toFuture(_call);", ListenableFuture.class, returnType, Calls.class);
             call.beginControlFlow("try");
-            if (def.returns().isPresent()) {
+            if (def.getReturns().isPresent()) {
                 call.add("return _response.get();");
             } else {
                 call.add("_response.get();");
@@ -372,42 +374,56 @@ public final class DialogClientGenerator implements ServiceGenerator {
 
         private void addParameter(CodeBlock.Builder request, ArgumentDefinition param) {
             // TODO(rfink): Use native/primitive toString where possible instead of Objects#toString
-            // This is to avoid object churn.
-            if (param.paramType() instanceof PathParameterType) {
-                request.add(".putPathParams($S, $T.toString($L))",
-                        param.argName().name(), Objects.class, param.argName().name());
-            } else if (param.paramType() instanceof HeaderParameterType) {
-                request.add(".putHeaderParams($S, $T.toString($L))",
-                        ((HeaderParameterType) param.paramType()).paramId(), Objects.class, param.argName().name());
-            } else if (param.paramType() instanceof BodyParameterType) {
-                request.add(".body($L)", param.argName().name());
-            } else if (param.paramType() instanceof QueryParameterType) {
-                request.add(".putQueryParams($S, $T.toString($L))",
-                        ((QueryParameterType) param.paramType()).paramId(), Objects.class, param.argName().name());
-            } else {
-                throw new UnsupportedOperationException("Unknown parameter type: " + param.paramType());
-            }
+            param.getParamType().accept(new ParameterType.Visitor<CodeBlock.Builder>() {
+                @Override
+                public CodeBlock.Builder visitBody(BodyParameterType value) {
+                    return request.add(".body($L)", param.getArgName());
+                }
+
+                @Override
+                public CodeBlock.Builder visitHeader(HeaderParameterType value) {
+                    return request.add(".putHeaderParams($S, $T.toString($L))",
+                            value.getParamId(), Objects.class, param.getArgName());
+                }
+
+                @Override
+                public CodeBlock.Builder visitPath(PathParameterType value) {
+                    return request.add(".putPathParams($S, $T.toString($L))",
+                            param.getArgName(), Objects.class, param.getArgName());
+                }
+
+                @Override
+                public CodeBlock.Builder visitQuery(QueryParameterType value) {
+                    return request.add(".putQueryParams($S, $T.toString($L))",
+                            value.getParamId(), Objects.class, param.getArgName());
+                }
+
+                @Override
+                public CodeBlock.Builder visitUnknown(String unknownType) {
+                    throw new UnsupportedOperationException("Unknown parameter type: " + unknownType);
+                }
+            });
         }
 
         private List<ParameterSpec> methodParams(EndpointDefinition endpointDef) {
             List<ParameterSpec> parameterSpecs = new ArrayList<>();
-            endpointDef.auth().ifPresent(auth -> parameterSpecs.add(authParam(auth)));
+            endpointDef.getAuth().ifPresent(auth -> parameterSpecs.add(authParam(auth)));
 
-            endpointDef.args().forEach(def -> parameterSpecs.add(param(def)));
+            endpointDef.getArgs().forEach(def -> parameterSpecs.add(param(def)));
             return ImmutableList.copyOf(parameterSpecs);
         }
 
         private static void verifyAuthTypeIsHeader(AuthType authType) {
-            if (!(authType instanceof HeaderAuthType)) {
+            if (!authType.accept(AuthTypeVisitor.IS_HEADER)) {
                 throw new UnsupportedOperationException("AuthType not supported by conjure-dialogue: " + authType);
             }
         }
 
         private ParameterSpec param(ArgumentDefinition def) {
             ParameterSpec.Builder param =
-                    ParameterSpec.builder(parameterTypes.getClassName(def.type()), def.argName().name());
+                    ParameterSpec.builder(parameterTypes.getClassName(def.getType()), def.getArgName().get());
 
-            param.addAnnotations(markers(def.markers()));
+            param.addAnnotations(markers(def.getMarkers()));
             return param.build();
         }
 
@@ -417,7 +433,7 @@ public final class DialogClientGenerator implements ServiceGenerator {
         }
 
         private Set<AnnotationSpec> markers(List<Type> markers) {
-            checkArgument(markers.stream().allMatch(type -> type instanceof ReferenceType),
+            checkArgument(markers.stream().allMatch(type -> type.accept(TypeVisitor.IS_REFERENCE)),
                     "Markers must refer to reference types.");
             return markers.stream()
                     .map(parameterTypes::getClassName)
@@ -428,8 +444,8 @@ public final class DialogClientGenerator implements ServiceGenerator {
         }
 
         private static ClassName serviceClassName(@Nullable String prefix, ServiceDefinition def) {
-            String simpleName = Strings.nullToEmpty(prefix) + def.serviceName().name();
-            return ClassName.get(def.serviceName().conjurePackage().name(), simpleName);
+            String simpleName = Strings.nullToEmpty(prefix) + def.getServiceName().getName();
+            return ClassName.get(def.getServiceName().getPackage(), simpleName);
         }
     }
 }
