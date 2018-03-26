@@ -34,6 +34,7 @@ import java.util.Set;
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
     UNIQUE_SERVICE_NAMES(new UniqueServiceNamesValidator()),
     ILLEGAL_SUFFIXES(new IllegalSuffixesValidator()),
+    ILLEGAL_VERSION(new IllegalVersionValidator()),
 
     // can no longer validate at the types level
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
@@ -86,6 +87,16 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
             Preconditions.checkState(violations.isEmpty(),
                     "Service names must not end in %s: %s", RETROFIT_SUFFIX, violations);
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class IllegalVersionValidator implements ConjureValidator<ConjureDefinition> {
+        @Override
+        public void validate(ConjureDefinition definition) {
+            Preconditions.checkState(definition.getVersion() == Conjure.SUPPORTED_IR_VERSION,
+                    "Definition version must be %s, but version %s is provided instead.",
+                    Conjure.SUPPORTED_IR_VERSION, definition.getVersion());
         }
     }
 

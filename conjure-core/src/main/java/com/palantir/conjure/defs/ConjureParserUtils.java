@@ -165,7 +165,6 @@ public final class ConjureParserUtils {
         ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
 
 
-
         parsedDefs.forEach(parsed -> {
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
                     new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
@@ -182,6 +181,7 @@ public final class ConjureParserUtils {
         });
 
         ConjureDefinition definition = ConjureDefinition.builder()
+                .version(Conjure.SUPPORTED_IR_VERSION)
                 .types(typesBuilder.build())
                 .errors(errorsBuilder.build())
                 .services(servicesBuilder.build())

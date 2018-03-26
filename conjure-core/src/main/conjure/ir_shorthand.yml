@@ -4,6 +4,7 @@ types:
     objects:
       ConjureDefinition:
         fields:
+          version: integer
           errors: list<ErrorDefinition>
           types: list<TypeDefinition>
           services: list<ServiceDefinition>

@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "types": [
     {
       "type": "object",
@@ -8,6 +9,13 @@
           "package": "com.palantir.conjure.spec"
         },
         "fields": [
+          {
+            "fieldName": "version",
+            "type": {
+              "type": "primitive",
+              "primitive": "INTEGER"
+            }
+          },
           {
             "fieldName": "types",
             "type": {

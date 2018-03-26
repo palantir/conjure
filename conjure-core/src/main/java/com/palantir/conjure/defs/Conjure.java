@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.List;
 
 public final class Conjure {
+    public static final Integer SUPPORTED_IR_VERSION = 1;
 
     private Conjure() {}
 
