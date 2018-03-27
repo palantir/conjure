@@ -13,7 +13,7 @@ buildscript {
 
     dependencies {
         classpath "com.palantir.conda.gradle:conda-gradle-plugin:0.7.0"
-        classpath "com.palantir.conjure:conjure-gradle-plugin:2.1.0"
+        classpath "com.palantir.conjure:conjure-gradle-plugin:2.1.4"
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.18.2'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'

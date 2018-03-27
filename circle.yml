@@ -30,7 +30,7 @@ deployment:
   snapshots:
     commands:
       - git clean -xfd
-      - ./gradlew -i --stacktrace --continue publish condaPublish exartisi
+      - ./gradlew -i --stacktrace --continue publish condaPublish publishConjureIr_snapshot exartisi
     branch: develop
     owner: foundry
   releases:
@@ -38,7 +38,7 @@ deployment:
     owner: foundry
     commands:
       - git clean -xfd
-      - ./gradlew -i --stacktrace --continue publish condaPublish exartisi
+      - ./gradlew -i --stacktrace --continue publish condaPublish publishConjureIr_release exartisi
 
 notify:
   webhooks:

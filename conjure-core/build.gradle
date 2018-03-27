@@ -1,6 +1,10 @@
 apply plugin: 'com.palantir.conjure'
 apply plugin: 'com.palantir.publish-jar'
 
+ext {
+    baseUrl = "https://artifactory.palantir.build/artifactory"
+}
+
 dependencies {
     compile project(':parsec')
     compile project(':extras:immutables-style')
@@ -23,4 +27,16 @@ dependencies {
     testRuntime 'org.slf4j:slf4j-simple'
 
     processor 'org.immutables:value'
+}
+
+// DO NOT COPY THIS! THIS IS ONLY TEMPORARY
+['snapshot', 'release'].each {env ->
+    task "publishConjureIr_${env}"(type: Exec, dependsOn: compileIr) {
+        commandLine 'curl'
+        args '-X', 'PUT'
+        args "${project.buildDir}/conjure-ir/${project.name}.json"
+        args "-u ${System.env.ARTIFACTORY_USERNAME}:${System.env.ARTIFACTORY_PASSWORD}"
+        args "${baseUrl}/internal-conjure-${env}/${project.group.replaceAll('.', '/')}/" +
+                "${project.name}/${project.version}/${project.name}-${project.version}.json"
+    }
 }
