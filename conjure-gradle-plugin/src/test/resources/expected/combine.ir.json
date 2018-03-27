@@ -1,0 +1,1630 @@
+{
+  "errors" : [ {
+    "errorName" : {
+      "name" : "InvalidTypeDefinition",
+      "package" : "com.palantir.product"
+    },
+    "docs" : "Invalid Conjure type definition.",
+    "namespace" : "Conjure",
+    "code" : "INVALID_ARGUMENT",
+    "safeArgs" : [ {
+      "fieldName" : "typeName",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "STRING"
+      }
+    } ],
+    "unsafeArgs" : [ {
+      "fieldName" : "typeDef",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "ANY"
+      }
+    } ]
+  }, {
+    "errorName" : {
+      "name" : "InvalidServiceDefinition",
+      "package" : "com.palantir.product"
+    },
+    "docs" : "Invalid Conjure service definition.",
+    "namespace" : "Conjure",
+    "code" : "INVALID_ARGUMENT",
+    "safeArgs" : [ {
+      "fieldName" : "serviceName",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "STRING"
+      },
+      "docs" : "Name of the invalid service definition."
+    } ],
+    "unsafeArgs" : [ {
+      "fieldName" : "serviceDef",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "ANY"
+      },
+      "docs" : "Details of the invalid service definition."
+    } ]
+  }, {
+    "errorName" : {
+      "name" : "JavaCompilationFailed",
+      "package" : "com.palantir.product"
+    },
+    "docs" : "Failed to compile Conjure definition to Java code.",
+    "namespace" : "ConjureJava",
+    "code" : "INTERNAL",
+    "safeArgs" : [ ],
+    "unsafeArgs" : [ ]
+  }, {
+    "errorName" : {
+      "name" : "DifferentPackage",
+      "package" : "com.palantir.another"
+    },
+    "docs" : "Different package.",
+    "namespace" : "Conjure",
+    "code" : "INTERNAL",
+    "safeArgs" : [ ],
+    "unsafeArgs" : [ ]
+  } ],
+  "types" : [ {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "BackingFileSystem",
+        "package" : "com.palantir.product.datasets"
+      },
+      "fields" : [ {
+        "fieldName" : "fileSystemId",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        },
+        "docs" : "The name by which this file system is identified."
+      }, {
+        "fieldName" : "baseUri",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "configuration",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            },
+            "valueType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "Dataset",
+        "package" : "com.palantir.product.datasets"
+      },
+      "fields" : [ {
+        "fieldName" : "fileSystemId",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "rid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "docs" : "Uniquely identifies this dataset."
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "CreateDatasetRequest",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "fileSystemId",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "path",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "StringExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "string",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "IntegerExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "integer",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "SafeLongExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "safeLongValue",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "SAFELONG"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "RidExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "ridValue",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "RID"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "BearerTokenExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "bearerTokenValue",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "BEARERTOKEN"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "DateTimeExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "datetime",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "DATETIME"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "DoubleExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "doubleValue",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "DOUBLE"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "BinaryExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "binary",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "BINARY"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "OptionalExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "item",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "ListExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "items",
+        "type" : {
+          "type" : "list",
+          "list" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "primitiveItems",
+        "type" : {
+          "type" : "list",
+          "list" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "INTEGER"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "doubleItems",
+        "type" : {
+          "type" : "list",
+          "list" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "DOUBLE"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "SetExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "items",
+        "type" : {
+          "type" : "set",
+          "set" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "doubleItems",
+        "type" : {
+          "type" : "set",
+          "set" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "DOUBLE"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "MapExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "items",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            },
+            "valueType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "enum",
+    "enum" : {
+      "typeName" : {
+        "name" : "EnumExample",
+        "package" : "com.palantir.product"
+      },
+      "values" : [ {
+        "value" : "ONE"
+      }, {
+        "value" : "TWO"
+      } ],
+      "docs" : "This enumerates the numbers 1:2.\n"
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "BooleanExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "coin",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "BOOLEAN"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "AnyExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "any",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "ANY"
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "AnyMapExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "items",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            },
+            "valueType" : {
+              "type" : "primitive",
+              "primitive" : "ANY"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "UuidExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "uuid",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "UUID"
+        }
+      } ]
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "StringAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "STRING"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "DoubleAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "DOUBLE"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "IntegerAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "INTEGER"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "BooleanAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "BOOLEAN"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "SafeLongAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "SAFELONG"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "RidAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "RID"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "BearerTokenAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "BEARERTOKEN"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "UuidAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "UUID"
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "MapAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "map",
+        "map" : {
+          "keyType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          },
+          "valueType" : {
+            "type" : "primitive",
+            "primitive" : "ANY"
+          }
+        }
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "ReferenceAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "reference",
+        "reference" : {
+          "name" : "AnyExample",
+          "package" : "com.palantir.product"
+        }
+      }
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "DateTimeAliasExample",
+        "package" : "com.palantir.product"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "DATETIME"
+      }
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "PrimitiveOptionalsExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "num",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "DOUBLE"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "bool",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "BOOLEAN"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "integer",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "INTEGER"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "safelong",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "SAFELONG"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "rid",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "RID"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "bearertoken",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "BEARERTOKEN"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "uuid",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "UUID"
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "ManyFieldExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "string",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        },
+        "docs" : "docs for string field"
+      }, {
+        "fieldName" : "integer",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        },
+        "docs" : "docs for integer field"
+      }, {
+        "fieldName" : "doubleValue",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "DOUBLE"
+        },
+        "docs" : "docs for doubleValue field"
+      }, {
+        "fieldName" : "optionalItem",
+        "type" : {
+          "type" : "optional",
+          "optional" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "docs" : "docs for optionalItem field"
+      }, {
+        "fieldName" : "items",
+        "type" : {
+          "type" : "list",
+          "list" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "docs" : "docs for items field"
+      }, {
+        "fieldName" : "set",
+        "type" : {
+          "type" : "set",
+          "set" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "docs" : "docs for set field"
+      }, {
+        "fieldName" : "map",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            },
+            "valueType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "docs" : "docs for map field"
+      }, {
+        "fieldName" : "alias",
+        "type" : {
+          "type" : "reference",
+          "reference" : {
+            "name" : "StringAliasExample",
+            "package" : "com.palantir.product"
+          }
+        },
+        "docs" : "docs for alias field"
+      } ]
+    }
+  }, {
+    "type" : "union",
+    "union" : {
+      "typeName" : {
+        "name" : "UnionTypeExample",
+        "package" : "com.palantir.product"
+      },
+      "union" : [ {
+        "fieldName" : "stringExample",
+        "type" : {
+          "type" : "reference",
+          "reference" : {
+            "name" : "StringExample",
+            "package" : "com.palantir.product"
+          }
+        },
+        "docs" : "Docs for when UnionTypeExample is of type StringExample."
+      }, {
+        "fieldName" : "set",
+        "type" : {
+          "type" : "set",
+          "set" : {
+            "itemType" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        }
+      }, {
+        "fieldName" : "thisFieldIsAnInteger",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      }, {
+        "fieldName" : "alsoAnInteger",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      }, {
+        "fieldName" : "if",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      }, {
+        "fieldName" : "new",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      }, {
+        "fieldName" : "interface",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      } ],
+      "docs" : "A type which can either be a StringExample, a set of strings, or an integer."
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "EmptyObjectExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "AliasAsMapKeyExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "strings",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "StringAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "rids",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "RidAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "bearertokens",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "BearerTokenAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "integers",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "IntegerAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "safelongs",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "SafeLongAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "datetimes",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "DateTimeAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      }, {
+        "fieldName" : "uuids",
+        "type" : {
+          "type" : "map",
+          "map" : {
+            "keyType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "UuidAliasExample",
+                "package" : "com.palantir.product"
+              }
+            },
+            "valueType" : {
+              "type" : "reference",
+              "reference" : {
+                "name" : "ManyFieldExample",
+                "package" : "com.palantir.product"
+              }
+            }
+          }
+        }
+      } ]
+    }
+  }, {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "ReservedKeyExample",
+        "package" : "com.palantir.product"
+      },
+      "fields" : [ {
+        "fieldName" : "package",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "interface",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "field-name-with-dashes",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        }
+      }, {
+        "fieldName" : "memoizedHashCode",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "INTEGER"
+        }
+      } ]
+    }
+  } ],
+  "services" : [ {
+    "serviceName" : {
+      "name" : "TestService",
+      "package" : "com.palantir.another"
+    },
+    "endpoints" : [ {
+      "endpointName" : "getFileSystems",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/fileSystems",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ ],
+      "returns" : {
+        "type" : "map",
+        "map" : {
+          "keyType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          },
+          "valueType" : {
+            "type" : "reference",
+            "reference" : {
+              "name" : "BackingFileSystem",
+              "package" : "com.palantir.product.datasets"
+            }
+          }
+        }
+      },
+      "docs" : "Returns a mapping from file system id to backing file system configuration.\n",
+      "markers" : [ {
+        "type" : "external",
+        "external" : {
+          "externalReference" : {
+            "name" : "Nonnull",
+            "package" : "javax.annotation"
+          },
+          "fallback" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          }
+        }
+      } ]
+    }, {
+      "endpointName" : "createDataset",
+      "httpMethod" : "POST",
+      "httpPath" : "/catalog/datasets",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "request",
+        "type" : {
+          "type" : "reference",
+          "reference" : {
+            "name" : "CreateDatasetRequest",
+            "package" : "com.palantir.product"
+          }
+        },
+        "paramType" : {
+          "type" : "body",
+          "body" : { }
+        },
+        "markers" : [ ]
+      }, {
+        "argName" : "testHeaderArg",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        },
+        "paramType" : {
+          "type" : "header",
+          "header" : {
+            "paramId" : "Test-Header"
+          }
+        },
+        "markers" : [ ]
+      } ],
+      "returns" : {
+        "type" : "reference",
+        "reference" : {
+          "name" : "Dataset",
+          "package" : "com.palantir.product.datasets"
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "getDataset",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      } ],
+      "returns" : {
+        "type" : "optional",
+        "optional" : {
+          "itemType" : {
+            "type" : "reference",
+            "reference" : {
+              "name" : "Dataset",
+              "package" : "com.palantir.product.datasets"
+            }
+          }
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "getRawData",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/raw",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      } ],
+      "returns" : {
+        "type" : "primitive",
+        "primitive" : "BINARY"
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "maybeGetRawData",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/raw-maybe",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      } ],
+      "returns" : {
+        "type" : "optional",
+        "optional" : {
+          "itemType" : {
+            "type" : "primitive",
+            "primitive" : "BINARY"
+          }
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "uploadRawData",
+      "httpMethod" : "POST",
+      "httpPath" : "/catalog/datasets/upload-raw",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "input",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "BINARY"
+        },
+        "paramType" : {
+          "type" : "body",
+          "body" : { }
+        },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ]
+    }, {
+      "endpointName" : "getBranches",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/branches",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "docs" : "A valid dataset resource identifier.\n",
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      } ],
+      "returns" : {
+        "type" : "set",
+        "set" : {
+          "itemType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          }
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "getBranchesDeprecated",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/branchesDeprecated",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "docs" : "A valid dataset resource identifier.\n",
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      } ],
+      "returns" : {
+        "type" : "set",
+        "set" : {
+          "itemType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          }
+        }
+      },
+      "docs" : "Gets all branches of this dataset.\n",
+      "deprecated" : "use getBranches instead",
+      "markers" : [ ]
+    }, {
+      "endpointName" : "resolveBranch",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "Safe",
+              "package" : "com.palantir.redaction"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        } ]
+      }, {
+        "argName" : "branch",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ ]
+      } ],
+      "returns" : {
+        "type" : "optional",
+        "optional" : {
+          "itemType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          }
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "testParam",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/datasets/{datasetRid}/testParam",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "datasetRid",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "path",
+          "path" : { }
+        },
+        "markers" : [ ]
+      } ],
+      "returns" : {
+        "type" : "optional",
+        "optional" : {
+          "itemType" : {
+            "type" : "primitive",
+            "primitive" : "STRING"
+          }
+        }
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "testQueryParams",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/test-query-params",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ {
+        "argName" : "something",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "query",
+          "query" : {
+            "paramId" : "different"
+          }
+        },
+        "markers" : [ ]
+      }, {
+        "argName" : "implicit",
+        "type" : {
+          "type" : "external",
+          "external" : {
+            "externalReference" : {
+              "name" : "ResourceIdentifier",
+              "package" : "com.palantir.ri"
+            },
+            "fallback" : {
+              "type" : "primitive",
+              "primitive" : "STRING"
+            }
+          }
+        },
+        "paramType" : {
+          "type" : "query",
+          "query" : {
+            "paramId" : "implicit"
+          }
+        },
+        "markers" : [ ]
+      } ],
+      "returns" : {
+        "type" : "primitive",
+        "primitive" : "INTEGER"
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "testBoolean",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/boolean",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ ],
+      "returns" : {
+        "type" : "primitive",
+        "primitive" : "BOOLEAN"
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "testDouble",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/double",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ ],
+      "returns" : {
+        "type" : "primitive",
+        "primitive" : "DOUBLE"
+      },
+      "markers" : [ ]
+    }, {
+      "endpointName" : "testInteger",
+      "httpMethod" : "GET",
+      "httpPath" : "/catalog/integer",
+      "auth" : {
+        "type" : "header",
+        "header" : { }
+      },
+      "args" : [ ],
+      "returns" : {
+        "type" : "primitive",
+        "primitive" : "INTEGER"
+      },
+      "markers" : [ ]
+    } ],
+    "docs" : "A Markdown description of the service.\n"
+  } ]
+}

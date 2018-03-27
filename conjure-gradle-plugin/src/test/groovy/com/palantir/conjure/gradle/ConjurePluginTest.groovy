@@ -56,7 +56,9 @@ class ConjurePluginTest extends IntegrationSpec {
         }
         '''.stripIndent()
 
-        createFile('api/build.gradle') << "apply plugin: 'com.palantir.conjure'"
+        createFile('api/build.gradle') << '''
+        apply plugin: 'com.palantir.conjure'
+        '''.stripIndent()
 
         createFile('versions.props') << '''
         com.fasterxml.jackson.*:* = 2.6.7
@@ -88,7 +90,7 @@ class ConjurePluginTest extends IntegrationSpec {
         '''.stripIndent()
     }
 
-    def 'compileConjure generates code in subprojects'() {
+    def 'compileConjure generates code and ir in subprojects'() {
         when:
         ExecutionResult result = runTasksSuccessfully(':api:compileConjure')
 
@@ -98,6 +100,7 @@ class ConjurePluginTest extends IntegrationSpec {
         result.wasExecuted(':api:compileConjureJersey')
         result.wasExecuted(':api:compileConjureRetrofit')
         result.wasExecuted(':api:compileConjureTypeScript')
+        result.wasExecuted(':api:compileIr')
 
         // java
         fileExists('api/api-objects/src/generated/java/test/test/api/StringExample.java')
@@ -112,6 +115,10 @@ class ConjurePluginTest extends IntegrationSpec {
         fileExists('api/api-typescript/.gitignore')
         file('api/api-typescript/.gitignore').text.contains('*.ts')
         file('api/api-typescript/.gitignore').text.contains('package.json')
+
+        // irFile
+        fileExists('api/build/conjure-ir/api.json')
+        file('api/build/conjure-ir/api.json').text.contains('TestServiceFoo')
     }
 
     def 'pythonTask generates code when enabled'() {
@@ -206,6 +213,7 @@ class ConjurePluginTest extends IntegrationSpec {
         result.wasUpToDate(':api:compileConjureTypeScript')
         result.wasUpToDate(':api:compileConjurePython')
         result.wasUpToDate(':api:copyConjureSourcesIntoBuild')
+        result.wasUpToDate(':api:compileIr')
     }
 
     def 'compileConjure does run tasks if not up to date'() {

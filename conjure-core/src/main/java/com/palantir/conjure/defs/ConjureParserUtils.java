@@ -48,6 +48,7 @@ import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -159,7 +160,7 @@ public final class ConjureParserUtils {
         return TypeName.of(name, parsePackageOrElseThrow(def.conjurePackage(), defaultPackage));
     }
 
-    static ConjureDefinition parseConjureDef(List<com.palantir.conjure.parser.ConjureDefinition> parsedDefs) {
+    static ConjureDefinition parseConjureDef(Collection<com.palantir.conjure.parser.ConjureDefinition> parsedDefs) {
         ImmutableList.Builder<ServiceDefinition> servicesBuilder = ImmutableList.builder();
         ImmutableList.Builder<ErrorDefinition> errorsBuilder = ImmutableList.builder();
         ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();

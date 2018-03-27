@@ -1,0 +1,1241 @@
+{
+  "types" : [ {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "fileSystemId"
+      },
+      "type" : "STRING",
+      "docs" : "The name by which this file system is identified."
+    }, {
+      "fieldName" : {
+        "name" : "baseUri"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "configuration"
+      },
+      "type" : {
+        "keyType" : "STRING",
+        "valueType" : "STRING"
+      }
+    } ],
+    "typeName" : {
+      "name" : "BackingFileSystem",
+      "conjurePackage" : "com.palantir.product.datasets"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "items"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "doubleItems"
+      },
+      "type" : {
+        "itemType" : "DOUBLE"
+      }
+    } ],
+    "typeName" : {
+      "name" : "SetExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "bearerTokenValue"
+      },
+      "type" : "BEARERTOKEN"
+    } ],
+    "typeName" : {
+      "name" : "BearerTokenExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "coin"
+      },
+      "type" : "BOOLEAN"
+    } ],
+    "typeName" : {
+      "name" : "BooleanExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "union" : [ {
+      "fieldName" : {
+        "name" : "stringExample"
+      },
+      "type" : {
+        "type" : {
+          "name" : "StringExample",
+          "conjurePackage" : "com.palantir.product"
+        }
+      },
+      "docs" : "Docs for when UnionTypeExample is of type StringExample."
+    }, {
+      "fieldName" : {
+        "name" : "set"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "thisFieldIsAnInteger"
+      },
+      "type" : "INTEGER"
+    }, {
+      "fieldName" : {
+        "name" : "alsoAnInteger"
+      },
+      "type" : "INTEGER"
+    }, {
+      "fieldName" : {
+        "name" : "if"
+      },
+      "type" : "INTEGER"
+    }, {
+      "fieldName" : {
+        "name" : "new"
+      },
+      "type" : "INTEGER"
+    }, {
+      "fieldName" : {
+        "name" : "interface"
+      },
+      "type" : "INTEGER"
+    } ],
+    "typeName" : {
+      "name" : "UnionTypeExample",
+      "conjurePackage" : "com.palantir.product"
+    },
+    "docs" : "A type which can either be a StringExample, a set of strings, or an integer."
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "integer"
+      },
+      "type" : "INTEGER"
+    } ],
+    "typeName" : {
+      "name" : "IntegerExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "STRING",
+    "typeName" : {
+      "name" : "StringAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "uuid"
+      },
+      "type" : "UUID"
+    } ],
+    "typeName" : {
+      "name" : "UuidExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "INTEGER",
+    "typeName" : {
+      "name" : "IntegerAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "strings"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "StringAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "rids"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "RidAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "bearertokens"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "BearerTokenAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "integers"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "IntegerAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "safelongs"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "SafeLongAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "datetimes"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "DateTimeAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    }, {
+      "fieldName" : {
+        "name" : "uuids"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "UuidAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "ManyFieldExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    } ],
+    "typeName" : {
+      "name" : "AliasAsMapKeyExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "SAFELONG",
+    "typeName" : {
+      "name" : "SafeLongAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : {
+      "keyType" : "STRING",
+      "valueType" : { }
+    },
+    "typeName" : {
+      "name" : "MapAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "BOOLEAN",
+    "typeName" : {
+      "name" : "BooleanAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ ],
+    "typeName" : {
+      "name" : "EmptyObjectExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "ridValue"
+      },
+      "type" : "RID"
+    } ],
+    "typeName" : {
+      "name" : "RidExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "string"
+      },
+      "type" : "STRING"
+    } ],
+    "typeName" : {
+      "name" : "StringExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "datetime"
+      },
+      "type" : { }
+    } ],
+    "typeName" : {
+      "name" : "DateTimeExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "item"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      }
+    } ],
+    "typeName" : {
+      "name" : "OptionalExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "BEARERTOKEN",
+    "typeName" : {
+      "name" : "BearerTokenAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "union" : [ {
+      "fieldName" : {
+        "name" : "string"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "imported"
+      },
+      "type" : {
+        "type" : {
+          "name" : "AnyMapExample",
+          "conjurePackage" : "com.palantir.product"
+        }
+      }
+    } ],
+    "typeName" : {
+      "name" : "UnionWithImports",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "string"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "imported"
+      },
+      "type" : {
+        "type" : {
+          "name" : "StringExample",
+          "conjurePackage" : "com.palantir.product"
+        }
+      }
+    } ],
+    "typeName" : {
+      "name" : "ComplexObjectWithImports",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "alias" : {
+      "type" : {
+        "name" : "ReferenceAliasExample",
+        "conjurePackage" : "com.palantir.product"
+      }
+    },
+    "typeName" : {
+      "name" : "AliasImportedReferenceAlias",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "alias" : "RID",
+    "typeName" : {
+      "name" : "RidAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "DOUBLE",
+    "typeName" : {
+      "name" : "DoubleAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "num"
+      },
+      "type" : {
+        "itemType" : "DOUBLE"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "bool"
+      },
+      "type" : {
+        "itemType" : "BOOLEAN"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "integer"
+      },
+      "type" : {
+        "itemType" : "INTEGER"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "safelong"
+      },
+      "type" : {
+        "itemType" : "SAFELONG"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "rid"
+      },
+      "type" : {
+        "itemType" : "RID"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "bearertoken"
+      },
+      "type" : {
+        "itemType" : "BEARERTOKEN"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "uuid"
+      },
+      "type" : {
+        "itemType" : "UUID"
+      }
+    } ],
+    "typeName" : {
+      "name" : "PrimitiveOptionalsExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : {
+      "type" : {
+        "name" : "ManyFieldExample",
+        "conjurePackage" : "com.palantir.product"
+      }
+    },
+    "typeName" : {
+      "name" : "AliasImportedObject",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "safeLongValue"
+      },
+      "type" : "SAFELONG"
+    } ],
+    "typeName" : {
+      "name" : "SafeLongExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "values" : [ {
+      "value" : "ONE"
+    }, {
+      "value" : "TWO"
+    } ],
+    "typeName" : {
+      "name" : "EnumExample",
+      "conjurePackage" : "com.palantir.product"
+    },
+    "docs" : "This enumerates the numbers 1:2.\n"
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "string"
+      },
+      "type" : "STRING",
+      "docs" : "docs for string field"
+    }, {
+      "fieldName" : {
+        "name" : "integer"
+      },
+      "type" : "INTEGER",
+      "docs" : "docs for integer field"
+    }, {
+      "fieldName" : {
+        "name" : "doubleValue"
+      },
+      "type" : "DOUBLE",
+      "docs" : "docs for doubleValue field"
+    }, {
+      "fieldName" : {
+        "name" : "optionalItem"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      },
+      "docs" : "docs for optionalItem field"
+    }, {
+      "fieldName" : {
+        "name" : "items"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      },
+      "docs" : "docs for items field"
+    }, {
+      "fieldName" : {
+        "name" : "set"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      },
+      "docs" : "docs for set field"
+    }, {
+      "fieldName" : {
+        "name" : "map"
+      },
+      "type" : {
+        "keyType" : "STRING",
+        "valueType" : "STRING"
+      },
+      "docs" : "docs for map field"
+    }, {
+      "fieldName" : {
+        "name" : "alias"
+      },
+      "type" : {
+        "type" : {
+          "name" : "StringAliasExample",
+          "conjurePackage" : "com.palantir.product"
+        }
+      },
+      "docs" : "docs for alias field"
+    } ],
+    "typeName" : {
+      "name" : "ManyFieldExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "fileSystemId"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "rid"
+      },
+      "type" : {
+        "externalReference" : {
+          "name" : "ResourceIdentifier",
+          "conjurePackage" : "com.palantir.ri"
+        },
+        "fallback" : "STRING"
+      },
+      "docs" : "Uniquely identifies this dataset."
+    } ],
+    "typeName" : {
+      "name" : "Dataset",
+      "conjurePackage" : "com.palantir.product.datasets"
+    }
+  }, {
+    "alias" : {
+      "type" : {
+        "name" : "StringAliasExample",
+        "conjurePackage" : "com.palantir.product"
+      }
+    },
+    "typeName" : {
+      "name" : "AliasImportedPrimitiveAlias",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "alias" : { },
+    "typeName" : {
+      "name" : "DateTimeAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "binary"
+      },
+      "type" : { }
+    } ],
+    "typeName" : {
+      "name" : "BinaryExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "aliases"
+      },
+      "type" : {
+        "keyType" : {
+          "type" : {
+            "name" : "RidAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "valueType" : {
+          "type" : {
+            "name" : "DateTimeAliasExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        }
+      }
+    } ],
+    "typeName" : {
+      "name" : "ImportedAliasInMaps",
+      "conjurePackage" : "test.api.with.imports"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "package"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "interface"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "field-name-with-dashes"
+      },
+      "type" : "STRING"
+    } ],
+    "typeName" : {
+      "name" : "ReservedKeyExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "doubleValue"
+      },
+      "type" : "DOUBLE"
+    } ],
+    "typeName" : {
+      "name" : "DoubleExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "fileSystemId"
+      },
+      "type" : "STRING"
+    }, {
+      "fieldName" : {
+        "name" : "path"
+      },
+      "type" : "STRING"
+    } ],
+    "typeName" : {
+      "name" : "CreateDatasetRequest",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "items"
+      },
+      "type" : {
+        "keyType" : "STRING",
+        "valueType" : { }
+      }
+    } ],
+    "typeName" : {
+      "name" : "AnyMapExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : {
+      "type" : {
+        "name" : "AnyExample",
+        "conjurePackage" : "com.palantir.product"
+      }
+    },
+    "typeName" : {
+      "name" : "ReferenceAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "items"
+      },
+      "type" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "primitiveItems"
+      },
+      "type" : {
+        "itemType" : "INTEGER"
+      }
+    }, {
+      "fieldName" : {
+        "name" : "doubleItems"
+      },
+      "type" : {
+        "itemType" : "DOUBLE"
+      }
+    } ],
+    "typeName" : {
+      "name" : "ListExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "items"
+      },
+      "type" : {
+        "keyType" : "STRING",
+        "valueType" : "STRING"
+      }
+    } ],
+    "typeName" : {
+      "name" : "MapExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "fields" : [ {
+      "fieldName" : {
+        "name" : "any"
+      },
+      "type" : { }
+    } ],
+    "typeName" : {
+      "name" : "AnyExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  }, {
+    "alias" : "UUID",
+    "typeName" : {
+      "name" : "UuidAliasExample",
+      "conjurePackage" : "com.palantir.product"
+    }
+  } ],
+  "errors" : [ ],
+  "services" : [ {
+    "serviceName" : {
+      "name" : "ImportService",
+      "conjurePackage" : "test.api.with.imports"
+    },
+    "endpoints" : [ {
+      "endpointName" : {
+        "name" : "testEndpoint"
+      },
+      "httpMethod" : "POST",
+      "httpPath" : {
+        "path" : "/catalog/testEndpoint"
+      },
+      "args" : [ {
+        "argName" : {
+          "name" : "importedString"
+        },
+        "type" : {
+          "type" : {
+            "name" : "StringExample",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "paramType" : { },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "type" : {
+          "name" : "BackingFileSystem",
+          "conjurePackage" : "com.palantir.product.datasets"
+        }
+      }
+    } ]
+  }, {
+    "serviceName" : {
+      "name" : "TestService",
+      "conjurePackage" : "com.palantir.another"
+    },
+    "docs" : "A Markdown description of the service.\n",
+    "endpoints" : [ {
+      "endpointName" : {
+        "name" : "getFileSystems"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/fileSystems"
+      },
+      "auth" : { },
+      "args" : [ ],
+      "markers" : [ {
+        "externalReference" : {
+          "name" : "Nonnull",
+          "conjurePackage" : "javax.annotation"
+        },
+        "fallback" : "STRING"
+      } ],
+      "returns" : {
+        "keyType" : "STRING",
+        "valueType" : {
+          "type" : {
+            "name" : "BackingFileSystem",
+            "conjurePackage" : "com.palantir.product.datasets"
+          }
+        }
+      },
+      "docs" : "Returns a mapping from file system id to backing file system configuration.\n"
+    }, {
+      "endpointName" : {
+        "name" : "createDataset"
+      },
+      "httpMethod" : "POST",
+      "httpPath" : {
+        "path" : "/catalog/datasets"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "request"
+        },
+        "type" : {
+          "type" : {
+            "name" : "CreateDatasetRequest",
+            "conjurePackage" : "com.palantir.product"
+          }
+        },
+        "paramType" : { },
+        "markers" : [ ]
+      }, {
+        "argName" : {
+          "name" : "testHeaderArg"
+        },
+        "type" : "STRING",
+        "paramType" : {
+          "paramId" : {
+            "name" : "Test-Header"
+          }
+        },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "type" : {
+          "name" : "Dataset",
+          "conjurePackage" : "com.palantir.product.datasets"
+        }
+      }
+    }, {
+      "endpointName" : {
+        "name" : "getDataset"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : {
+          "type" : {
+            "name" : "Dataset",
+            "conjurePackage" : "com.palantir.product.datasets"
+          }
+        }
+      }
+    }, {
+      "endpointName" : {
+        "name" : "getRawData"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/raw"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      } ],
+      "markers" : [ ],
+      "returns" : { }
+    }, {
+      "endpointName" : {
+        "name" : "maybeGetRawData"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/raw-maybe"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : { }
+      }
+    }, {
+      "endpointName" : {
+        "name" : "uploadRawData"
+      },
+      "httpMethod" : "POST",
+      "httpPath" : {
+        "path" : "/catalog/datasets/upload-raw"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "input"
+        },
+        "type" : { },
+        "paramType" : { },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ]
+    }, {
+      "endpointName" : {
+        "name" : "getBranches"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/branches"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "docs" : "A valid dataset resource identifier.\n",
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "endpointName" : {
+        "name" : "getBranchesDeprecated"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/branchesDeprecated"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "docs" : "A valid dataset resource identifier.\n",
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : "STRING"
+      },
+      "docs" : "Gets all branches of this dataset.\n",
+      "deprecated" : "use getBranches instead"
+    }, {
+      "endpointName" : {
+        "name" : "resolveBranch"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/branches/{branch:.+}/resolve"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "markers" : [ {
+          "externalReference" : {
+            "name" : "Safe",
+            "conjurePackage" : "com.palantir.redaction"
+          },
+          "fallback" : "STRING"
+        } ]
+      }, {
+        "argName" : {
+          "name" : "branch"
+        },
+        "type" : "STRING",
+        "paramType" : { },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "endpointName" : {
+        "name" : "testParam"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/datasets/{datasetRid}/testParam"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "datasetRid"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : { },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ],
+      "returns" : {
+        "itemType" : "STRING"
+      }
+    }, {
+      "endpointName" : {
+        "name" : "testQueryParams"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/test-query-params"
+      },
+      "auth" : { },
+      "args" : [ {
+        "argName" : {
+          "name" : "something"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : {
+          "paramId" : {
+            "name" : "different"
+          }
+        },
+        "markers" : [ ]
+      }, {
+        "argName" : {
+          "name" : "implicit"
+        },
+        "type" : {
+          "externalReference" : {
+            "name" : "ResourceIdentifier",
+            "conjurePackage" : "com.palantir.ri"
+          },
+          "fallback" : "STRING"
+        },
+        "paramType" : {
+          "paramId" : {
+            "name" : "implicit"
+          }
+        },
+        "markers" : [ ]
+      } ],
+      "markers" : [ ],
+      "returns" : "INTEGER"
+    }, {
+      "endpointName" : {
+        "name" : "testBoolean"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/boolean"
+      },
+      "auth" : { },
+      "args" : [ ],
+      "markers" : [ ],
+      "returns" : "BOOLEAN"
+    }, {
+      "endpointName" : {
+        "name" : "testDouble"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/double"
+      },
+      "auth" : { },
+      "args" : [ ],
+      "markers" : [ ],
+      "returns" : "DOUBLE"
+    }, {
+      "endpointName" : {
+        "name" : "testInteger"
+      },
+      "httpMethod" : "GET",
+      "httpPath" : {
+        "path" : "/catalog/integer"
+      },
+      "auth" : { },
+      "args" : [ ],
+      "markers" : [ ],
+      "returns" : "INTEGER"
+    } ]
+  } ]
+}

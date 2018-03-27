@@ -4,11 +4,11 @@
 
 package com.palantir.conjure.defs;
 
-import com.google.common.collect.Lists;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public final class Conjure {
     public static final Integer SUPPORTED_IR_VERSION = 1;
@@ -18,7 +18,8 @@ public final class Conjure {
     /**
      * Deserializes {@link ConjureDefinition}s from their YAML representations in the given files.
      */
-    public static ConjureDefinition parse(List<File> files) {
-        return ConjureParserUtils.parseConjureDef(Lists.transform(files, ConjureParser::parse));
+    public static ConjureDefinition parse(Collection<File> files) {
+        return ConjureParserUtils.parseConjureDef(
+                files.stream().map(ConjureParser::parse).collect(Collectors.toList()));
     }
 }
