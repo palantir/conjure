@@ -6,7 +6,7 @@ package com.palantir.conjure.gen.python.client;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClass;
 import com.palantir.conjure.gen.python.poet.PythonClassName;

@@ -4,8 +4,8 @@
 
 package com.palantir.conjure.gen.java.types;
 
-import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
-import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.visitor.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.lib.SafeLong;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.ListType;

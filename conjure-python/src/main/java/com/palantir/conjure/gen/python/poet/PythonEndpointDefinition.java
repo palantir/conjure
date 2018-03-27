@@ -9,9 +9,9 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.services.HttpPathWrapper;
-import com.palantir.conjure.defs.types.AuthTypeVisitor;
-import com.palantir.conjure.defs.types.ParameterTypeVisitor;
+import com.palantir.conjure.defs.validator.HttpPathValidator;
+import com.palantir.conjure.defs.visitor.AuthTypeVisitor;
+import com.palantir.conjure.defs.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.spec.AuthType;
 import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.HeaderParameterType;
@@ -47,7 +47,7 @@ public interface PythonEndpointDefinition extends Emittable {
 
     @Value.Check
     default void check() {
-        HttpPathWrapper.validate(httpPath().get());
+        HttpPathValidator.validate(httpPath());
         checkState(pythonReturnType().isPresent() == myPyReturnType().isPresent(),
                 "expected both return types or neither");
     }

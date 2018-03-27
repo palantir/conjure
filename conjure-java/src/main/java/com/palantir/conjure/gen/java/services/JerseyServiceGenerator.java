@@ -7,10 +7,10 @@ package com.palantir.conjure.gen.java.services;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.services.HttpPathWrapper;
-import com.palantir.conjure.defs.types.AuthTypeVisitor;
-import com.palantir.conjure.defs.types.ParameterTypeVisitor;
-import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.validator.HttpPathValidator;
+import com.palantir.conjure.defs.visitor.AuthTypeVisitor;
+import com.palantir.conjure.defs.visitor.ParameterTypeVisitor;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.types.JerseyMethodTypeClassNameVisitor;
@@ -95,7 +95,7 @@ public final class JerseyServiceGenerator implements ServiceGenerator {
                 .addParameters(createServiceMethodParameters(endpointDef, methodTypeMapper));
 
         // @Path("") is invalid in Feign JaxRs and equivalent to absent on an endpoint method
-        String httpPath = HttpPathWrapper.withoutLeadingSlash(endpointDef.getHttpPath().get());
+        String httpPath = HttpPathValidator.withoutLeadingSlash(endpointDef.getHttpPath().get());
         if (!httpPath.isEmpty()) {
             methodBuilder.addAnnotation(AnnotationSpec.builder(ClassName.get("javax.ws.rs", "Path"))
                         .addMember("value", "$S", httpPath)

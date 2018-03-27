@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
-import com.palantir.conjure.defs.types.names.FieldNameWrapper;
+import com.palantir.conjure.defs.validator.FieldNameValidator;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
@@ -161,7 +161,7 @@ public final class UnionGenerator {
             codeBuilder.addStatement(
                     "return $1N.$2L((($3T) $4L).$4L)",
                     visitor,
-                    VISIT_METHOD_NAME + FieldNameWrapper.capitalize(memberName),
+                    VISIT_METHOD_NAME + FieldNameValidator.capitalize(memberName),
                     wrapperClass,
                     VALUE_FIELD_NAME);
         }
@@ -209,7 +209,7 @@ public final class UnionGenerator {
     private static List<MethodSpec> generateMemberVisitMethods(Map<FieldName, TypeName> memberTypes) {
         return memberTypes.entrySet().stream().map(entry -> {
             String variableName = variableName();
-            return MethodSpec.methodBuilder(VISIT_METHOD_NAME + FieldNameWrapper.capitalize(entry.getKey()))
+            return MethodSpec.methodBuilder(VISIT_METHOD_NAME + FieldNameValidator.capitalize(entry.getKey()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(entry.getValue(), variableName)
                     .returns(TYPE_VARIABLE)
@@ -376,11 +376,11 @@ public final class UnionGenerator {
         return ClassName.get(
                 unionClass.packageName(),
                 unionClass.simpleName(),
-                FieldNameWrapper.capitalize(memberTypeName) + "Wrapper");
+                FieldNameValidator.capitalize(memberTypeName) + "Wrapper");
     }
 
     private static ClassName peerWrapperClass(ClassName peerClass, FieldName memberTypeName) {
-        return peerClass.peerClass(FieldNameWrapper.capitalize(memberTypeName) + "Wrapper");
+        return peerClass.peerClass(FieldNameValidator.capitalize(memberTypeName) + "Wrapper");
     }
 
     private static String variableName() {

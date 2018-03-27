@@ -5,8 +5,8 @@
 package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
-import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.visitor.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonClassName;
 import com.palantir.conjure.spec.ExternalReference;

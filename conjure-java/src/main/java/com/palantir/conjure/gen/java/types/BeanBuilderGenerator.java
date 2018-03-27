@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.palantir.conjure.defs.types.TypeVisitor;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.types.BeanGenerator.EnrichedField;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;

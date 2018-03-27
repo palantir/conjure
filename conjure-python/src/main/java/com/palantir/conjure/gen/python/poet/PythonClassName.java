@@ -5,7 +5,7 @@
 package com.palantir.conjure.gen.python.poet;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.names.ConjurePackageWrapper;
+import com.palantir.conjure.defs.validator.PackageValidator;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -17,7 +17,7 @@ public interface PythonClassName extends Comparable<PythonClassName> {
     String className();
 
     static PythonClassName of(String conjurePackage, String className) {
-        ConjurePackageWrapper.validate(conjurePackage);
+        PackageValidator.validate(conjurePackage);
         return ImmutablePythonClassName.builder()
                 .conjurePackage(conjurePackage)
                 .className(className)

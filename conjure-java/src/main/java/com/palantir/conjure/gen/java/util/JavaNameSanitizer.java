@@ -5,7 +5,7 @@
 package com.palantir.conjure.gen.java.util;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.names.FieldNameWrapper;
+import com.palantir.conjure.defs.validator.FieldNameValidator;
 import com.palantir.conjure.spec.FieldName;
 import javax.lang.model.SourceVersion;
 
@@ -17,7 +17,7 @@ public final class JavaNameSanitizer {
      * Sanitizes the given {@link FieldName} for use as a java specifier.
      */
     public static String sanitize(FieldName fieldName) {
-        String identifier = FieldNameWrapper.toCase(fieldName, FieldNameWrapper.Case.LOWER_CAMEL_CASE).get();
+        String identifier = FieldNameValidator.toCase(fieldName, FieldNameValidator.Case.LOWER_CAMEL_CASE).get();
         return sanitize(identifier);
     }
 

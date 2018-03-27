@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Collections2;
-import com.palantir.conjure.defs.types.TypeVisitor;
-import com.palantir.conjure.defs.types.names.FieldNameWrapper;
+import com.palantir.conjure.defs.validator.FieldNameValidator;
+import com.palantir.conjure.defs.visitor.TypeVisitor;
 import com.palantir.conjure.gen.java.ConjureAnnotations;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.util.JavaNameSanitizer;
@@ -300,8 +300,9 @@ public final class BeanGenerator {
 
         @Value.Derived
         default String getterName() {
-            FieldName lowerCamelCaseName = FieldNameWrapper.toCase(fieldName(), FieldNameWrapper.Case.LOWER_CAMEL_CASE);
-            return "get" + FieldNameWrapper.capitalize(lowerCamelCaseName);
+            FieldName lowerCamelCaseName = FieldNameValidator.toCase(
+                    fieldName(), FieldNameValidator.Case.LOWER_CAMEL_CASE);
+            return "get" + FieldNameValidator.capitalize(lowerCamelCaseName);
         }
 
         @Value.Parameter

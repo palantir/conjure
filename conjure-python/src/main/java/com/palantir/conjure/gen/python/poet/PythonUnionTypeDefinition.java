@@ -7,7 +7,6 @@ package com.palantir.conjure.gen.python.poet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.names.ConjurePackageWrapper;
 import com.palantir.conjure.gen.python.poet.PythonBean.PythonField;
 import com.palantir.conjure.spec.Documentation;
 import java.util.List;
@@ -21,18 +20,12 @@ import org.immutables.value.Value;
 public interface PythonUnionTypeDefinition extends PythonClass {
 
     ImmutableSet<PythonImport> DEFAULT_IMPORTS = ImmutableSet.of(
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "List"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Set"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Dict"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Tuple"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Optional"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("conjure"), "*"), Optional.empty()));
+            PythonImport.of(PythonClassName.of("typing", "List"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Set"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Dict"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Tuple"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Optional"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("conjure", "*"), Optional.empty()));
 
     @Override
     String packageName();

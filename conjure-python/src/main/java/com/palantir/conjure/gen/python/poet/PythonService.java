@@ -6,7 +6,6 @@ package com.palantir.conjure.gen.python.poet;
 
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.defs.types.names.ConjurePackageWrapper;
 import com.palantir.conjure.spec.Documentation;
 import java.util.List;
 import java.util.Optional;
@@ -18,23 +17,14 @@ import org.immutables.value.Value;
 public interface PythonService extends PythonClass {
 
     ImmutableSet<PythonImport> DEFAULT_IMPORTS = ImmutableSet.of(
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "List"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Set"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Dict"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Tuple"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("typing"), "Optional"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("httpremoting"), "Service"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("conjure"), "*"), Optional.empty()),
-            PythonImport.of(PythonClassName.of(
-                    ConjurePackageWrapper.conjurePackage("remoting.exceptions"), "HTTPError"),
-                    Optional.empty()));
+            PythonImport.of(PythonClassName.of("typing", "List"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Set"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Dict"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Tuple"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("typing", "Optional"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("httpremoting", "Service"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("conjure", "*"), Optional.empty()),
+            PythonImport.of(PythonClassName.of("remoting.exceptions", "HTTPError"), Optional.empty()));
 
     @Override
     String packageName();

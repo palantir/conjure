@@ -6,7 +6,7 @@ package com.palantir.conjure.gen.java.types;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
+import com.palantir.conjure.defs.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.gen.java.ExperimentalFeatures;
 import com.palantir.conjure.gen.java.Settings;
 import com.palantir.conjure.spec.ErrorDefinition;

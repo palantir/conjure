@@ -5,8 +5,8 @@
 package com.palantir.conjure.gen.python.types;
 
 import com.google.common.collect.ImmutableSet;
-import com.palantir.conjure.defs.types.TypeDefinitionVisitor;
-import com.palantir.conjure.defs.types.names.FieldNameWrapper;
+import com.palantir.conjure.defs.validator.FieldNameValidator;
+import com.palantir.conjure.defs.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.gen.python.PackageNameProcessor;
 import com.palantir.conjure.gen.python.poet.PythonAlias;
 import com.palantir.conjure.gen.python.poet.PythonBean;
@@ -71,8 +71,8 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .map(unionMember -> {
                     Type conjureType = unionMember.getType();
                     return PythonField.builder()
-                            .attributeName(FieldNameWrapper.toCase(
-                                    unionMember.getFieldName(), FieldNameWrapper.Case.SNAKE_CASE).get())
+                            .attributeName(FieldNameValidator.toCase(
+                                    unionMember.getFieldName(), FieldNameValidator.Case.SNAKE_CASE).get())
                             .docs(unionMember.getDocs())
                             .jsonIdentifier(unionMember.getFieldName().get())
                             .myPyType(myPyMapper.getTypeName(conjureType))
@@ -139,8 +139,8 @@ public final class DefaultBeanGenerator implements PythonBeanGenerator {
                 .fields(typeDef.getFields()
                         .stream()
                         .map(entry -> PythonField.builder()
-                                .attributeName(FieldNameWrapper.toCase(
-                                        entry.getFieldName(), FieldNameWrapper.Case.SNAKE_CASE).get())
+                                .attributeName(FieldNameValidator.toCase(
+                                        entry.getFieldName(), FieldNameValidator.Case.SNAKE_CASE).get())
                                 .jsonIdentifier(entry.getFieldName().get())
                                 .docs(entry.getDocs())
                                 .pythonType(mapper.getTypeName(entry.getType()))
