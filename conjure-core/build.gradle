@@ -34,7 +34,7 @@ dependencies {
     task "publishConjureIr_${env}"(type: Exec, dependsOn: compileIr) {
         commandLine 'curl'
         args '-X', 'PUT'
-        args "${project.buildDir}/conjure-ir/${project.name}.json"
+        args "-T ${project.buildDir}/conjure-ir/${project.name}.json"
         args "-u ${System.env.ARTIFACTORY_USERNAME}:${System.env.ARTIFACTORY_PASSWORD}"
         args "${baseUrl}/internal-conjure-${env}/${project.group.replaceAll('[.]', '/')}/" +
                 "${project.name}/${project.version}/${project.name}-${project.version}.json"
