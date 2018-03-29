@@ -14,20 +14,17 @@ public final class FieldNameValidatorTest {
 
     @Test
     public void testValidNames() {
-        FieldName.of("camel");
-        FieldName.of("camelCase");
-        FieldName.of("camelCase1");
-        FieldName.of("camel1Case2");
-
-        FieldName.of("kebab-case");
-        FieldName.of("kebab1-case123");
-
-        FieldName.of("snake_case");
-        FieldName.of("snake1_case123");
-
-        FieldName.of("xCoordinate");
-        FieldName.of("defaultXPosition");
-        FieldName.of("defaultX");
+        FieldNameValidator.validate(FieldName.of("camel"));
+        FieldNameValidator.validate(FieldName.of("camelCase"));
+        FieldNameValidator.validate(FieldName.of("camelCase1"));
+        FieldNameValidator.validate(FieldName.of("camel1Case2"));
+        FieldNameValidator.validate(FieldName.of("kebab-case"));
+        FieldNameValidator.validate(FieldName.of("kebab1-case123"));
+        FieldNameValidator.validate(FieldName.of("snake_case"));
+        FieldNameValidator.validate(FieldName.of("snake1_case123"));
+        FieldNameValidator.validate(FieldName.of("xCoordinate"));
+        FieldNameValidator.validate(FieldName.of("defaultXPosition"));
+        FieldNameValidator.validate(FieldName.of("defaultX"));
     }
 
     @Test

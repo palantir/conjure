@@ -63,24 +63,27 @@ public class AllSpellbookDefinitionsTest {
     public void verify_conjure_yml_deserializes() throws Exception {
         String contents = new String(Files.readAllBytes(conjureYml), StandardCharsets.UTF_8);
         assumeTrue("file doesn't use conjure imports", !contents.contains("external-imports"));
+        // temporarily disabled https://github.palantir.build/foundry/conjure/issues/933
+        assumeTrue("Known issue with conjure (different param-id and param-name)",
+                !conjureYml.endsWith("tileserver-api.yml"));
 
         try {
             Conjure.parse(ImmutableList.of(conjureYml.toFile()));
         } catch (ConjureParser.ImportNotFoundException e) {
-            if (e.getMessage().contains("external-imports")) {
-                // OK: External imports are expected to not work.
-            } else {
-                throw e;
-            }
+
+            // deprecated, removed in 2.0: https://github.palantir.build/foundry/conjure/issues/735
+            assumeTrue("We can't test external-imports unfortunately", !e.getMessage().contains("external-imports"));
+
+            // introduced in 2.1.5: https://github.palantir.build/foundry/conjure/issues/935
+            assumeTrue("Known issue with relative paths", !e.getMessage().contains("../../../spark-module-tokens"));
+
+            throw e;
         } catch (ConjureParser.CyclicImportException e) {
             log.warn("Cyclic Conjure definition in {}", conjureYml, e);
         } catch (RuntimeException e) {
-            if (e.getMessage().contains("Invalid use of a built-in identifier")
-                    && e.getMessage().contains("TypeName{name=Uuid}"))  {
-                // TODO(qchen): update repos using their own uuid definitions #806
-            } else {
-                throw e;
-            }
+            assumeTrue("Known conjure-go incompatibility",
+                    !e.getMessage().contains("(\"PodCertificatePath\"): not a valid representation: null"));
+            throw e;
         }
     }
 
