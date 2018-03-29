@@ -1,0 +1,8 @@
+type: improvement
+improvement:
+  description: >
+    Move ir to conjure-api project. This means the published ir artifacts will use names, such as
+    `conjure-api-objects` and `conjure-api.json`, instead of the old names, `conjure-core-objects`
+    and `conjure-core.json`.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/949

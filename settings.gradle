@@ -1,5 +1,6 @@
 include 'conjure-core'
-include 'conjure-core:conjure-core-objects'
+include 'conjure-api'
+include 'conjure-api:conjure-api-objects'
 include 'conjure-gradle-plugin'
 include 'conjure-java-lib'
 include 'conjure-java'

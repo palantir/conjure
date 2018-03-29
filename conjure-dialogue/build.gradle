@@ -18,7 +18,7 @@ tasks.checkstyleIntegration.enabled = false
 
 dependencies {
     compile project(':conjure-core')
-    compile project(':conjure-core:conjure-core-objects')
+    compile project(':conjure-api:conjure-api-objects')
     compile project(':conjure-java')
     compile project(':conjure-java-lib')
 
