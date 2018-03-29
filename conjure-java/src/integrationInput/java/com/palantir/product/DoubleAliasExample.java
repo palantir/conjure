@@ -45,4 +45,9 @@ public final class DoubleAliasExample implements Serializable {
     public static DoubleAliasExample of(double value) {
         return new DoubleAliasExample(value);
     }
+
+    @JsonCreator
+    public static DoubleAliasExample of(int value) {
+        return new DoubleAliasExample((double) value);
+    }
 }

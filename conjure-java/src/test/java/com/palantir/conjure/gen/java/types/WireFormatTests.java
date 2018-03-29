@@ -291,6 +291,18 @@ public final class WireFormatTests {
     }
 
     @Test
+    public void double_alias_should_serialize_with_decimal_point() throws Exception {
+        assertThat(mapper.writeValueAsString(DoubleAliasExample.of(100L)))
+                .isEqualTo("100.0");
+    }
+
+    @Test
+    public void double_alias_should_deserialize_without_decimal_point() throws Exception {
+        // frontends can send numbers like this!
+        assertThat(mapper.readValue("100", DoubleAliasExample.class)).isEqualTo(DoubleAliasExample.of(100L));
+    }
+
+    @Test
     public void testUuidType_roundTrip() throws Exception {
         String serialized = "{\"uuid\":\"0db30881-8f3e-46f4-a8bb-df5883bf7eb8\"}";
         UuidExample deserialized = UuidExample.of(UUID.fromString("0db30881-8f3e-46f4-a8bb-df5883bf7eb8"));

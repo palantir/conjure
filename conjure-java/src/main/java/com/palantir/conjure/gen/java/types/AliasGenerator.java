@@ -91,6 +91,21 @@ public final class AliasGenerator {
                 .addStatement("return new $T(value)", thisClass)
                 .build());
 
+        if (typeDef.getAlias().accept(TypeVisitor.IS_PRIMITIVE) && typeDef.getAlias().accept(
+                TypeVisitor.PRIMITIVE).equals(PrimitiveType.DOUBLE)) {
+            CodeBlock codeBlock = CodeBlock.builder()
+                    .addStatement("return new $T((double) value)", thisClass)
+                    .build();
+
+            spec.addMethod(MethodSpec.methodBuilder("of")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addAnnotation(JsonCreator.class)
+                    .addParameter(TypeName.INT, "value")
+                    .returns(thisClass)
+                    .addCode(codeBlock)
+                    .build());
+        }
+
         typeDef.getDocs().ifPresent(docs -> spec.addJavadoc("$L", StringUtils.appendIfMissing(docs.get(), "\n")));
 
         return JavaFile.builder(typePackage, spec.build())
