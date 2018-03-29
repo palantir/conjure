@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: >
+      Provide more descriptive error message for path parameter validation when no longer
+      supported `param-id` gets used to define the endpoint path.
+  links:
+  - https://github.palantir.build/foundry/conjure/pull/948

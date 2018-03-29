@@ -132,7 +132,10 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
             Set<ArgumentName> pathArgs = HttpPathValidator.pathArgs(definition.getHttpPath().get());
             Set<ArgumentName> extraParams = Sets.difference(pathParamIds, pathArgs);
             Preconditions.checkState(extraParams.isEmpty(),
-                    "Path parameters defined in endpoint but not present in path template: %s", extraParams);
+                    "Path parameters defined in endpoint but not present in path template: %s. "
+                            + "Note that the `param-id` is no longer supported and the path template name is always "
+                            + "used instead. So make sure the path template name matches the path parameter defined "
+                            + "in endpoint.", extraParams);
 
             Set<ArgumentName> missingParams = Sets.difference(pathArgs, pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),

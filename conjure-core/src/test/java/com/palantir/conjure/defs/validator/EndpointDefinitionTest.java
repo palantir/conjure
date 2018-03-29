@@ -119,7 +119,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Path parameters defined in endpoint but not present in path template: [paramName]");
+                .hasMessageContaining(
+                        "Path parameters defined in endpoint but not present in path template: [paramName]");
     }
 
     @Test
