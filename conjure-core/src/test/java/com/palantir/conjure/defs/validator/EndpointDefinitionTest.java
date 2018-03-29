@@ -149,4 +149,22 @@ public final class EndpointDefinitionTest {
                         HttpMethod.GET,
                         "/a/path"));
     }
+
+    @Test
+    public void testComplexHeader() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("someName"))
+                        .type(Type.primitive(PrimitiveType.ANY))
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
+                        + " \"someName\" is not allowed");
+    }
 }

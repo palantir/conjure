@@ -33,6 +33,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     PATH_PARAM(new PathParamValidator()),
     NO_BEARER_TOKEN_PATH_PARAMS(new NoBearerTokenPathParams()),
     NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
+    NO_COMPLEX_HEADER_PARAMS(new NoComplexHeaderParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
@@ -154,6 +155,30 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
                                 entry.getArgName());
                     });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexHeaderParamValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            definition.getArgs().stream()
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
+                    .forEach(entry -> {
+                        Type conjureType = entry.getType();
+
+                        boolean isValid = isPrimitive(conjureType)
+                                || (conjureType.accept(TypeVisitor.IS_OPTIONAL)
+                                && isPrimitive(conjureType.accept(TypeVisitor.OPTIONAL).getItemType()));
+                        Preconditions.checkState(isValid,
+                                "Header parameters must be primitives, aliases or optional primitive:"
+                                        + " \"%s\" is not allowed",
+                                entry.getArgName());
+                    });
+        }
+
+        private boolean isPrimitive(Type type) {
+            return type.accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE) && !type.accept(TypeVisitor.IS_ANY);
         }
     }
 

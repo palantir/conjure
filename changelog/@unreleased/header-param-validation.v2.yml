@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Enforce that header parameters must be primitives
+  links:
+    - https://github.palantir.build/foundry/conjure/pull/939

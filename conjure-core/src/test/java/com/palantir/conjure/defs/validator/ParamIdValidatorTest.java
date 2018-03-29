@@ -79,7 +79,7 @@ public final class ParamIdValidatorTest {
         ArgumentDefinition arg = ArgumentDefinition.builder()
                 .argName(PARAMETER_NAME)
                 .paramType(paramType)
-                .type(Type.primitive(PrimitiveType.ANY))
+                .type(Type.primitive(PrimitiveType.INTEGER))
                 .build();
         EndpointDefinition definition = EndpointDefinition.builder()
                 .httpMethod(HttpMethod.POST)
