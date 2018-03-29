@@ -77,16 +77,16 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     private static final class UniqueNamesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
         public void validate(ConjureDefinition definition) {
-            Set<String> seenNames = new HashSet<>();
+            Set<TypeName> seenNames = new HashSet<>();
             definition.getTypes().forEach(typeDef ->
-                    verifyNameIsUnique(seenNames, typeDef.accept(TypeDefinitionVisitor.TYPE_NAME).getName()));
+                    verifyNameIsUnique(seenNames, typeDef.accept(TypeDefinitionVisitor.TYPE_NAME)));
             definition.getErrors().forEach(errorDef ->
-                    verifyNameIsUnique(seenNames, errorDef.getErrorName().getName()));
+                    verifyNameIsUnique(seenNames, errorDef.getErrorName()));
             definition.getServices().forEach(serviceDef ->
-                    verifyNameIsUnique(seenNames, serviceDef.getServiceName().getName()));
+                    verifyNameIsUnique(seenNames, serviceDef.getServiceName()));
         }
 
-        private static void verifyNameIsUnique(Set<String> seenNames, String name) {
+        private static void verifyNameIsUnique(Set<TypeName> seenNames, TypeName name) {
             boolean isNewName = seenNames.add(name);
             Verify.verify(isNewName,
                     "Type, error, and service names must be unique across locally defined and imported "

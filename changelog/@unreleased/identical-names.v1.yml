@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: >
+    Types with the same name but different packages are once again allowed.
+    Note that this still is discouraged because it makes typescript clients harder to use.
