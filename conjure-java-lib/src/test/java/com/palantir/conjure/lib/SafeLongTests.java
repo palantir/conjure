@@ -6,7 +6,6 @@ package com.palantir.conjure.lib;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +27,7 @@ public final class SafeLongTests {
     public void testTooLarge() {
         long tooLarge = maxValue + 1;
 
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("number must be safely representable in javascript");
         SafeLong.of(tooLarge);
     }
@@ -37,7 +36,7 @@ public final class SafeLongTests {
     public void testTooSmall() {
         long tooSmall = minValue - 1;
 
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("number must be safely representable in javascript");
         SafeLong.of(tooSmall);
     }
@@ -58,7 +57,7 @@ public final class SafeLongTests {
     }
 
     @Test
-    public void testDeserializationFailsWhenTooLarge() throws JsonParseException, JsonMappingException, IOException {
+    public void testDeserializationFailsWhenTooLarge() throws IOException {
         String json = "{\"value\": 9007199254740992}";
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<Map<String, SafeLong>> typeReference = new TypeReference<Map<String, SafeLong>>() {};

@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Value range validation in SafeLong now throws IllegalArgumentException instead of IllegalStateException.
+  links:
+    - https://github.palantir.build/foundry/conjure/pull/945

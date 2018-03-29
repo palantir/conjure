@@ -25,7 +25,7 @@ public abstract class SafeLong {
     @Value.Check
     protected final void check() {
         if (!(MIN_SAFE_VALUE <= longValue() && longValue() <= MAX_SAFE_VALUE)) {
-            throw new IllegalStateException(String.format(
+            throw new IllegalArgumentException(String.format(
                     "number must be safely representable in javascript i.e. lie between %s and %s",
                     MIN_SAFE_VALUE, MAX_SAFE_VALUE));
         }
