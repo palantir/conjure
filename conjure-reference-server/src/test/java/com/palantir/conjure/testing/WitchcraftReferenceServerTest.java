@@ -23,7 +23,7 @@ import org.junit.Test;
  * Verifies that the reference server implements the Conjure spec. This test must not use Conjure objects or types,
  * or Conjure clients like JaxRsClients, RetrofitClients, Dialogue clients, etc.
  */
-public class WitchcraftReferenceServerTest extends TestBase {
+public class WitchcraftReferenceServerTest {
 
     @Rule
     public final WitchcraftReferenceServer server = new WitchcraftReferenceServer();
@@ -37,7 +37,6 @@ public class WitchcraftReferenceServerTest extends TestBase {
 
         server.witchcraft().servletHolder(new ServletHolder(new SerializationServlet()), "/serialization/*");
     }
-
 
     @Test
     public void primitives() {
@@ -70,7 +69,8 @@ public class WitchcraftReferenceServerTest extends TestBase {
 
     @Test
     public void builtIns() {
-        assertThat(fetch("/map", "{\"a\":\"A\",\"b\":42,\"c\":true}")).isEqualTo("{\"a\":\"A\",\"b\":42,\"c\":true}");
+        assertThat(fetch("/map", "{\"a\":\"A\",\"b\":42,\"c\":true,\"d\":[false]}"))
+                .isEqualTo("{\"a\":\"A\",\"b\":42,\"c\":true,\"d\":[false]}");
         assertThat(fetch("/list", "[\"a\",42,true]")).isEqualTo("[\"a\",42,true]");
         assertThat(fetch("/set", "[\"a\",42,true]")).isEqualTo("[\"a\",42,true]");
         assertThat(fetch("/optional", "42")).isEqualTo("42");
