@@ -30,6 +30,7 @@ public final class SerializationServlet extends HttpServlet {
 
     private static final ObjectMapper mapper = ObjectMappers.newServerObjectMapper();
 
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity") // it's not really that complex, it's just long.
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String method = req.getPathInfo().substring(1);
