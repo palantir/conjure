@@ -1,0 +1,14 @@
+apply plugin: 'com.palantir.conjure'
+
+dependencies {
+    compile project(':conjure-reference-server:conjure-reference-server-jersey')
+    compile('com.palantir.witchcraft:witchcraft-core') {
+        exclude module: 'conjure-java-lib'
+    }
+    compile 'junit:junit'
+
+    testCompile 'com.palantir.remoting3:jackson-support'
+    testCompile 'org.assertj:assertj-core'
+    testCompile 'org.mockito:mockito-core'
+    testCompile 'com.palantir.remoting3:okhttp-clients'
+}

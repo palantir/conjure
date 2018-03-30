@@ -1,0 +1,68 @@
+services:
+  SerializationService:
+    name: Conjure Reference Serialization Service
+    package: com.palantir.conjure.testing.reference
+    default-auth: none
+    base-path: /serialization
+
+    endpoints:
+      string:
+        http: POST /string
+        args:
+          value: string
+        returns: binary
+
+      integer:
+        http: POST /integer
+        args:
+          value: integer
+        returns: binary
+
+      # TODO(rfink): Why does the Jersey generator complain about the names "double", "boolean", etc?
+      _double:
+        http: POST /double
+        args:
+          value: double
+        returns: binary
+
+      _boolean:
+        http: POST /boolean
+        args:
+          value: boolean
+        returns: binary
+
+      safelong:
+        http: POST /safelong
+        args:
+          value: safelong
+        returns: binary
+
+      rid:
+        http: POST /rid
+        args:
+          value: rid
+        returns: binary
+
+      bearertoken:
+        http: POST /bearertoken
+        args:
+          value: bearertoken
+        returns: binary
+
+      uuid:
+        http: POST /uuid
+        args:
+          value: uuid
+        returns: binary
+
+      datetime:
+        http: POST /datetime
+        args:
+          value: datetime
+        returns: binary
+
+      binary:
+        http: POST /binary
+        args:
+          value: binary
+        returns: binary

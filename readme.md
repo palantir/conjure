@@ -105,6 +105,21 @@ Base types in the system are:
  * `rid`: a [Resource Identifier](https://github.com/palantir/resource-identifier)
  * `bearertoken`: a [BearerToken](https://github.com/palantir/auth-tokens/#bearertoken)
  * `uuid`: a [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+ * `datetime`: a date/time capable of precisely representing an instant in
+   human readable time, encoded as a string using ISO-8601 with required offset
+   and optional zone id. Second-precision is required, formats may include up to
+   nanosecond precision. Implementations must support handling the received
+   string or precisely modeling the received human readable time with
+   nanosecond precision. e.g. all of these are equivalent:
+    * `2017-01-02T03:04:05Z`
+    * `2017-01-02T03:04:05.000Z`
+    * `2017-01-02T03:04:05.000000Z`
+    * `2017-01-02T03:04:05.000000000Z`
+    * `2017-01-02T04:04:05.000000000+01:00`
+    * `2017-01-02T05:04:05.000000000+02:00`
+    * `2017-01-02T04:04:05.000000000+01:00[Europe/Berlin]`
+ * `binary`: a sequence of bytes. When present as a return value for a service
+   method, encodes an output stream.
 
 ### Built-ins
 Conjure offers several built-ins to assist with mapping to existing language
@@ -119,21 +134,6 @@ defined Conjure types, which may also be built-ins (a Map of Maps is allowed):
  * `optional<T>`: an optional type to help prevent nullity. Optional types will
    serialize as null when absent and as a concrete non-null value when present.
    The empty string and the empty map/object are valid non-null values.
- * `binary`: a sequence of bytes. When present as a return value for a service
-   method, encodes an output stream.
- * `datetime`: a date/time capable of precisely representing an instant in
-   human readable time, encoded as a string using ISO-8601 with required offset
-   and optional zone id. Second-precision is required, formats may include up to
-   nanosecond precision. Implementations must support handling the received
-   string or precisely modeling the received human readable time with
-   nanosecond precision. e.g. all of these are equivalent:
-    * `2017-01-02T03:04:05Z`
-    * `2017-01-02T03:04:05.000Z`
-    * `2017-01-02T03:04:05.000000Z`
-    * `2017-01-02T03:04:05.000000000Z`
-    * `2017-01-02T04:04:05.000000000+01:00`
-    * `2017-01-02T05:04:05.000000000+02:00`
-    * `2017-01-02T04:04:05.000000000+01:00[Europe/Berlin]`
 
 ### Imported Types
 External types, or imports, consist of references to types defined outside
