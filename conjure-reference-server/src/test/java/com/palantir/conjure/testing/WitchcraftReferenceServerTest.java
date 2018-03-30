@@ -52,6 +52,8 @@ public class WitchcraftReferenceServerTest extends TestBase {
         assertThat(fetch("/integer", "0")).isEqualTo("0");
         assertThat(fetch("/double", "4.2")).isEqualTo("4.2");
         assertThat(fetch("/double", "4.0")).isEqualTo("4.0");
+        assertThat(fetch("/boolean", "true")).isEqualTo("true");
+        assertThat(fetch("/boolean", "false")).isEqualTo("false");
         assertThat(fetch("/safelong", "42")).isEqualTo("42");
         assertThat(fetch("/safelong", "-42")).isEqualTo("-42");
         assertThat(fetch("/safelong", "0")).isEqualTo("0");
@@ -69,6 +71,16 @@ public class WitchcraftReferenceServerTest extends TestBase {
         assertThat(fetch("/datetime", "\"2017-01-02T05:04:05.000000000+02:00\""))
                 .isEqualTo("\"2017-01-02T05:04:05+02:00\"");
         assertThat(fetch("/binary", "\"123abc\"")).isEqualTo("\"123abc\"");
+    }
+
+    @Test
+    public void builtIns() {
+        assertThat(fetch("/map", "{\"a\":\"A\",\"b\":42,\"c\":true}")).isEqualTo("{\"a\":\"A\",\"b\":42,\"c\":true}");
+        assertThat(fetch("/list", "[\"a\",42,true]")).isEqualTo("[\"a\",42,true]");
+        assertThat(fetch("/set", "[\"a\",42,true]")).isEqualTo("[\"a\",42,true]");
+        assertThat(fetch("/optional", "42")).isEqualTo("42");
+        assertThat(fetch("/optional", "\"42\"")).isEqualTo("\"42\"");
+        assertThat(fetch("/optional", "null")).isEqualTo("null");
     }
 
     private String fetch(String path, String data) {

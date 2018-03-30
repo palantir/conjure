@@ -5,6 +5,7 @@
 package com.palantir.conjure.testing;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import com.palantir.ri.ResourceIdentifier;
@@ -13,6 +14,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,38 +30,54 @@ public final class SerializationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String method = req.getPathInfo().substring(1);
-        final Class<?> clazz;
+        final TypeReference<?> clazz;
         switch (method) {
+            // Primitives
             case "string":
-                clazz = String.class;
+                clazz = new TypeReference<String>() {};
                 break;
             case "integer":
-                clazz = Integer.class;
+                clazz = new TypeReference<Integer>() {};
                 break;
             case "double":
-                clazz = Double.class;
+                clazz = new TypeReference<Double>() {};
                 break;
             case "boolean":
-                clazz = Boolean.class;
+                clazz = new TypeReference<Boolean>() {};
                 break;
             case "safelong":
-                clazz = Long.class;
+                clazz = new TypeReference<Long>() {};
                 break;
             case "rid":
-                clazz = ResourceIdentifier.class;
+                clazz = new TypeReference<ResourceIdentifier>() {};
                 break;
             case "bearertoken":
-                clazz = BearerToken.class;
+                clazz = new TypeReference<BearerToken>() {};
                 break;
             case "uuid":
-                clazz = UUID.class;
+                clazz = new TypeReference<UUID>() {};
                 break;
             case "datetime":
-                clazz = OffsetDateTime.class;
+                clazz = new TypeReference<OffsetDateTime>() {};
                 break;
             case "binary":
-                clazz = String.class;
+                clazz = new TypeReference<String>() {};
                 break;
+
+            // Built-ins
+            case "map":
+                clazz = new TypeReference<Map<String, Object>>() {};
+                break;
+            case "list":
+                clazz = new TypeReference<List<Object>>() {};
+                break;
+            case "set":
+                clazz = new TypeReference<Set<Object>>() {};
+                break;
+            case "optional":
+                clazz = new TypeReference<Optional<Object>>() {};
+                break;
+
             default:
                 resp.setStatus(500);
                 return;
@@ -65,46 +86,9 @@ public final class SerializationServlet extends HttpServlet {
         serialize(clazz, req.getReader(), resp.getWriter());
     }
 
-    //
-    //    public Response integer(int value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response _double(double value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response _boolean(boolean value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response safelong(SafeLong value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response rid(ResourceIdentifier value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response bearertoken(BearerToken value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response uuid(UUID value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response datetime(ZonedDateTime value) {
-    //        return serialize(value);
-    //    }
-    //
-    //    public Response binary(InputStream value) {
-    //        return serialize(value);
-    //    }
-
-    private static <T> void serialize(Class<T> type, Reader input, Writer output) {
+    private static void serialize(TypeReference<?> type, Reader input, Writer output) {
         try {
-            T value = mapper.readValue(input, type);
+            Object value = mapper.readValue(input, type);
             mapper.writeValue(output, value);
         } catch (Throwable e) {
             throw new RuntimeException("Failed to deserialize or serialize", e);
