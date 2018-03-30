@@ -6,10 +6,7 @@ package com.palantir.conjure.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palantir.conjure.testing.reference.SerializationService;
 import com.palantir.remoting3.clients.UserAgent;
-import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import com.palantir.remoting3.okhttp.OkHttpClients;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,8 +25,6 @@ import org.junit.Test;
  */
 public class WitchcraftReferenceServerTest extends TestBase {
 
-    private static final ObjectMapper mapper = ObjectMappers.newClientObjectMapper();
-
     @Rule
     public final WitchcraftReferenceServer server = new WitchcraftReferenceServer();
     private final OkHttpClient okhttpClient;
@@ -38,7 +33,7 @@ public class WitchcraftReferenceServerTest extends TestBase {
         okhttpClient = OkHttpClients.create(
                 server.clientConfiguration(),
                 UserAgent.of(UserAgent.Agent.of("test", "0.0.0")),
-                SerializationService.class);
+                WitchcraftReferenceServer.class);
 
         server.witchcraft().servletHolder(new ServletHolder(new SerializationServlet()), "/serialization/*");
     }

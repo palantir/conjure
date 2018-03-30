@@ -21,6 +21,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import org.junit.rules.ExternalResource;
 
+// TODO(rfink): Publish as Docker image
 public final class WitchcraftReferenceServer extends ExternalResource {
 
     private static final SslConfiguration TRUST_STORE_CONFIGURATION =
