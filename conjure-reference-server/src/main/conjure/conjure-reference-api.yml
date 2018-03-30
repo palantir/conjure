@@ -2,6 +2,22 @@ types:
   definitions:
     default-package: com.palantir.conjure.testing.reference
     objects:
+      # TODO(rfink): "Object" clashes with Java object in conjure-java
+      MyObject:
+        fields:
+          # TODO(rfink): If we call this "a", then we get: "not a valid representation, problem: null"
+          foo: string
+          bar: integer
+          baz: optional<boolean>
+      Union:
+        union:
+          foo: string
+          bar: integer
+      # TODO(rfink): Jersey generator doesn't like "Enum"
+      MyEnum:
+        values:
+          - A
+          - B
 
 services:
   SerializationService:
@@ -85,3 +101,21 @@ services:
         args:
           value: optional<any>
         returns: optional<any>
+
+      # Complex
+      object:
+        http: POST /object
+        args:
+          value: MyObject
+        returns: MyObject
+      union:
+        http: POST /union
+        args:
+          value: Union
+        returns: Union
+      # TODO(rfink): Jersey generator doesn't like "enum"
+      _enum:
+        http: POST /enum
+        args:
+          value: MyEnum
+        returns: MyEnum

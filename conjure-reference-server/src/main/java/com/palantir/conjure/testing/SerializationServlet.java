@@ -7,6 +7,9 @@ package com.palantir.conjure.testing;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palantir.conjure.testing.reference.MyEnum;
+import com.palantir.conjure.testing.reference.MyObject;
+import com.palantir.conjure.testing.reference.Union;
 import com.palantir.remoting3.ext.jackson.ObjectMappers;
 import com.palantir.ri.ResourceIdentifier;
 import com.palantir.tokens.auth.BearerToken;
@@ -76,6 +79,17 @@ public final class SerializationServlet extends HttpServlet {
                 break;
             case "optional":
                 clazz = new TypeReference<Optional<Object>>() {};
+                break;
+
+            // Complex
+            case "object":
+                clazz = new TypeReference<MyObject>() {};
+                break;
+            case "union":
+                clazz = new TypeReference<Union>() {};
+                break;
+            case "enum":
+                clazz = new TypeReference<MyEnum>() {};
                 break;
 
             default:

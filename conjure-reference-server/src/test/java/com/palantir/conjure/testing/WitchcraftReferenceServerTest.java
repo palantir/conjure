@@ -83,6 +83,19 @@ public class WitchcraftReferenceServerTest extends TestBase {
         assertThat(fetch("/optional", "null")).isEqualTo("null");
     }
 
+    @Test
+    public void complex() {
+        assertThat(fetch("/object", "{\"foo\":\"FOO\",\"bar\":42}"))
+                .isEqualTo("{\"foo\":\"FOO\",\"bar\":42,\"baz\":null}"); // Note: omitting the baz key is acceptable
+        assertThat(fetch("/object", "{\"foo\":\"FOO\",\"bar\":42,\"baz\":true}"))
+                .isEqualTo("{\"foo\":\"FOO\",\"bar\":42,\"baz\":true}");
+        assertThat(fetch("/union", "{\"type\":\"foo\",\"foo\":\"42\"}")).isEqualTo("{\"type\":\"foo\",\"foo\":\"42\"}");
+        assertThat(fetch("/union", "{\"type\":\"bar\",\"bar\":42}")).isEqualTo("{\"type\":\"bar\",\"bar\":42}");
+        assertThat(fetch("/enum", "\"A\"")).isEqualTo("\"A\"");
+        assertThat(fetch("/enum", "\"B\"")).isEqualTo("\"B\"");
+        assertThat(fetch("/enum", "\"BOGUS\"")).isEqualTo("\"BOGUS\"");
+    }
+
     private String fetch(String path, String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), bytes);
