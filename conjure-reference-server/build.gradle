@@ -1,7 +1,7 @@
 apply plugin: 'com.palantir.conjure'
 
 dependencies {
-    compile project(':conjure-reference-server:conjure-reference-server-jersey')
+    compile project(':conjure-reference-server:conjure-reference-server-objects')
     compile('com.palantir.witchcraft:witchcraft-core') {
         exclude module: 'conjure-java-lib'
     }
