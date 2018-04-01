@@ -15,7 +15,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -23,19 +22,17 @@ import org.junit.Test;
  * Verifies that the reference server implements the Conjure spec. This test must not use Conjure objects or types,
  * or Conjure clients like JaxRsClients, RetrofitClients, Dialogue clients, etc.
  */
-public class WitchcraftReferenceServerTest {
+public class JsonSerdeEchoServletTest {
 
     @Rule
     public final WitchcraftReferenceServer server = new WitchcraftReferenceServer();
     private final OkHttpClient okhttpClient;
 
-    public WitchcraftReferenceServerTest() {
+    public JsonSerdeEchoServletTest() {
         okhttpClient = OkHttpClients.create(
                 server.clientConfiguration(),
                 UserAgent.of(UserAgent.Agent.of("test", "0.0.0")),
                 WitchcraftReferenceServer.class);
-
-        server.witchcraft().servletHolder(new ServletHolder(new SerializationServlet()), "/serialization/*");
     }
 
     @Test
@@ -95,7 +92,7 @@ public class WitchcraftReferenceServerTest {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), bytes);
         Request jsonStringRequest = new Request.Builder()
-                .url(server.clientConfiguration().uris().get(0) + "/serialization" + path)
+                .url(server.clientConfiguration().uris().get(0) + "/json-serde-echo" + path)
                 .post(requestBody)
                 .build();
         try {

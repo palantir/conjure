@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public final class SerializationServlet extends HttpServlet {
+// See Conjure JsonSerdeEchoService
+public final class JsonSerdeEchoServlet extends HttpServlet {
 
     private static final ObjectMapper mapper = ObjectMappers.newServerObjectMapper();
 
@@ -98,10 +99,10 @@ public final class SerializationServlet extends HttpServlet {
                 return;
         }
 
-        serialize(clazz, req.getReader(), resp.getWriter());
+        serializeDeserialize(clazz, req.getReader(), resp.getWriter());
     }
 
-    private static void serialize(TypeReference<?> type, Reader input, Writer output) {
+    private static void serializeDeserialize(TypeReference<?> type, Reader input, Writer output) {
         try {
             Object value = mapper.readValue(input, type);
             mapper.writeValue(output, value);

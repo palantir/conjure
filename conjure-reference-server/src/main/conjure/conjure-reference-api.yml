@@ -20,11 +20,15 @@ types:
           - B
 
 services:
-  SerializationService:
-    name: Conjure Reference Serialization Service
+  JsonSerdeEchoService:
+    name: Conjure Reference Serialization/Deserialization Echo Service for Conjure JSON format
+    docs: |
+      Accepts Conjure-defined JSON objects, deserializes them, serializes them according to the Conjure JSON wire
+      format, and returns them to the caller. Responds with HTTP status 5xx if deserialization or serialization
+      failed.
     package: com.palantir.conjure.testing.reference
     default-auth: none
-    base-path: /serialization
+    base-path: /json-serde-echo
 
     endpoints:
       # Primitives

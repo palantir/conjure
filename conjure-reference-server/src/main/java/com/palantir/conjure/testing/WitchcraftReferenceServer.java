@@ -19,6 +19,7 @@ import com.palantir.witchcraft.config.RuntimeConfiguration;
 import java.nio.file.Paths;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.rules.ExternalResource;
 
 // TODO(rfink): Publish as Docker image
@@ -49,6 +50,7 @@ public final class WitchcraftReferenceServer extends ExternalResource {
 
     @Override
     protected void before() {
+        witchcraft().servletHolder(new ServletHolder(new JsonSerdeEchoServlet()), "/json-serde-echo/*");
         witchcraft.start();
     }
 
