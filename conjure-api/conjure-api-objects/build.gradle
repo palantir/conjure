@@ -15,6 +15,6 @@
  */
 
 dependencies {
-    compile 'com.palantir.conjure.java:conjure-java-lib'
+    compile 'com.palantir.conjure.java:conjure-lib'
     compile 'com.fasterxml.jackson.core:jackson-databind'
 }

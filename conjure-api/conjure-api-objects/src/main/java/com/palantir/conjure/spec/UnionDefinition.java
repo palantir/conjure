@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.palantir.conjure.lib.internal.ConjureCollections;
+import com.palantir.conjure.java.lib.internal.ConjureCollections;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,35 +12,33 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@JsonDeserialize(builder = ServiceDefinition.Builder.class)
+@JsonDeserialize(builder = UnionDefinition.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class ServiceDefinition {
-    private final TypeName serviceName;
+public final class UnionDefinition {
+    private final TypeName typeName;
 
-    private final List<EndpointDefinition> endpoints;
+    private final List<FieldDefinition> union;
 
     private final Optional<Documentation> docs;
 
     private volatile int memoizedHashCode;
 
-    private ServiceDefinition(
-            TypeName serviceName,
-            List<EndpointDefinition> endpoints,
-            Optional<Documentation> docs) {
-        validateFields(serviceName, endpoints, docs);
-        this.serviceName = serviceName;
-        this.endpoints = Collections.unmodifiableList(endpoints);
+    private UnionDefinition(
+            TypeName typeName, List<FieldDefinition> union, Optional<Documentation> docs) {
+        validateFields(typeName, union, docs);
+        this.typeName = typeName;
+        this.union = Collections.unmodifiableList(union);
         this.docs = docs;
     }
 
-    @JsonProperty("serviceName")
-    public TypeName getServiceName() {
-        return this.serviceName;
+    @JsonProperty("typeName")
+    public TypeName getTypeName() {
+        return this.typeName;
     }
 
-    @JsonProperty("endpoints")
-    public List<EndpointDefinition> getEndpoints() {
-        return this.endpoints;
+    @JsonProperty("union")
+    public List<FieldDefinition> getUnion() {
+        return this.union;
     }
 
     @JsonProperty("docs")
@@ -51,34 +49,34 @@ public final class ServiceDefinition {
     @Override
     public boolean equals(Object other) {
         return this == other
-                || (other instanceof ServiceDefinition && equalTo((ServiceDefinition) other));
+                || (other instanceof UnionDefinition && equalTo((UnionDefinition) other));
     }
 
-    private boolean equalTo(ServiceDefinition other) {
-        return this.serviceName.equals(other.serviceName)
-                && this.endpoints.equals(other.endpoints)
+    private boolean equalTo(UnionDefinition other) {
+        return this.typeName.equals(other.typeName)
+                && this.union.equals(other.union)
                 && this.docs.equals(other.docs);
     }
 
     @Override
     public int hashCode() {
         if (memoizedHashCode == 0) {
-            memoizedHashCode = Objects.hash(serviceName, endpoints, docs);
+            memoizedHashCode = Objects.hash(typeName, union, docs);
         }
         return memoizedHashCode;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("ServiceDefinition")
+        return new StringBuilder("UnionDefinition")
                 .append("{")
-                .append("serviceName")
+                .append("typeName")
                 .append(": ")
-                .append(serviceName)
+                .append(typeName)
                 .append(", ")
-                .append("endpoints")
+                .append("union")
                 .append(": ")
-                .append(endpoints)
+                .append(union)
                 .append(", ")
                 .append("docs")
                 .append(": ")
@@ -87,22 +85,16 @@ public final class ServiceDefinition {
                 .toString();
     }
 
-    public static ServiceDefinition of(
-            TypeName serviceName, List<EndpointDefinition> endpoints, Documentation docs) {
-        return builder()
-                .serviceName(serviceName)
-                .endpoints(endpoints)
-                .docs(Optional.of(docs))
-                .build();
+    public static UnionDefinition of(
+            TypeName typeName, List<FieldDefinition> union, Documentation docs) {
+        return builder().typeName(typeName).union(union).docs(Optional.of(docs)).build();
     }
 
     private static void validateFields(
-            TypeName serviceName,
-            List<EndpointDefinition> endpoints,
-            Optional<Documentation> docs) {
+            TypeName typeName, List<FieldDefinition> union, Optional<Documentation> docs) {
         List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, serviceName, "serviceName");
-        missingFields = addFieldIfMissing(missingFields, endpoints, "endpoints");
+        missingFields = addFieldIfMissing(missingFields, typeName, "typeName");
+        missingFields = addFieldIfMissing(missingFields, union, "union");
         missingFields = addFieldIfMissing(missingFields, docs, "docs");
         if (missingFields != null) {
             throw new IllegalArgumentException(
@@ -129,43 +121,43 @@ public final class ServiceDefinition {
     @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private TypeName serviceName;
+        private TypeName typeName;
 
-        private List<EndpointDefinition> endpoints = new ArrayList<>();
+        private List<FieldDefinition> union = new ArrayList<>();
 
         private Optional<Documentation> docs = Optional.empty();
 
         private Builder() {}
 
-        public Builder from(ServiceDefinition other) {
-            serviceName(other.getServiceName());
-            endpoints(other.getEndpoints());
+        public Builder from(UnionDefinition other) {
+            typeName(other.getTypeName());
+            union(other.getUnion());
             docs(other.getDocs());
             return this;
         }
 
-        @JsonSetter("serviceName")
-        public Builder serviceName(TypeName serviceName) {
-            this.serviceName = Objects.requireNonNull(serviceName, "serviceName cannot be null");
+        @JsonSetter("typeName")
+        public Builder typeName(TypeName typeName) {
+            this.typeName = Objects.requireNonNull(typeName, "typeName cannot be null");
             return this;
         }
 
-        @JsonSetter("endpoints")
-        public Builder endpoints(Iterable<EndpointDefinition> endpoints) {
-            this.endpoints.clear();
+        @JsonSetter("union")
+        public Builder union(Iterable<FieldDefinition> union) {
+            this.union.clear();
             ConjureCollections.addAll(
-                    this.endpoints, Objects.requireNonNull(endpoints, "endpoints cannot be null"));
+                    this.union, Objects.requireNonNull(union, "union cannot be null"));
             return this;
         }
 
-        public Builder addAllEndpoints(Iterable<EndpointDefinition> endpoints) {
+        public Builder addAllUnion(Iterable<FieldDefinition> union) {
             ConjureCollections.addAll(
-                    this.endpoints, Objects.requireNonNull(endpoints, "endpoints cannot be null"));
+                    this.union, Objects.requireNonNull(union, "union cannot be null"));
             return this;
         }
 
-        public Builder endpoints(EndpointDefinition endpoints) {
-            this.endpoints.add(endpoints);
+        public Builder union(FieldDefinition union) {
+            this.union.add(union);
             return this;
         }
 
@@ -180,8 +172,8 @@ public final class ServiceDefinition {
             return this;
         }
 
-        public ServiceDefinition build() {
-            return new ServiceDefinition(serviceName, endpoints, docs);
+        public UnionDefinition build() {
+            return new UnionDefinition(typeName, union, docs);
         }
     }
 }

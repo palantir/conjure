@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.palantir.conjure.lib.internal.ConjureCollections;
+import com.palantir.conjure.java.lib.internal.ConjureCollections;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,22 +12,22 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@JsonDeserialize(builder = UnionDefinition.Builder.class)
+@JsonDeserialize(builder = EnumDefinition.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class UnionDefinition {
+public final class EnumDefinition {
     private final TypeName typeName;
 
-    private final List<FieldDefinition> union;
+    private final List<EnumValueDefinition> values;
 
     private final Optional<Documentation> docs;
 
     private volatile int memoizedHashCode;
 
-    private UnionDefinition(
-            TypeName typeName, List<FieldDefinition> union, Optional<Documentation> docs) {
-        validateFields(typeName, union, docs);
+    private EnumDefinition(
+            TypeName typeName, List<EnumValueDefinition> values, Optional<Documentation> docs) {
+        validateFields(typeName, values, docs);
         this.typeName = typeName;
-        this.union = Collections.unmodifiableList(union);
+        this.values = Collections.unmodifiableList(values);
         this.docs = docs;
     }
 
@@ -36,9 +36,9 @@ public final class UnionDefinition {
         return this.typeName;
     }
 
-    @JsonProperty("union")
-    public List<FieldDefinition> getUnion() {
-        return this.union;
+    @JsonProperty("values")
+    public List<EnumValueDefinition> getValues() {
+        return this.values;
     }
 
     @JsonProperty("docs")
@@ -49,34 +49,34 @@ public final class UnionDefinition {
     @Override
     public boolean equals(Object other) {
         return this == other
-                || (other instanceof UnionDefinition && equalTo((UnionDefinition) other));
+                || (other instanceof EnumDefinition && equalTo((EnumDefinition) other));
     }
 
-    private boolean equalTo(UnionDefinition other) {
+    private boolean equalTo(EnumDefinition other) {
         return this.typeName.equals(other.typeName)
-                && this.union.equals(other.union)
+                && this.values.equals(other.values)
                 && this.docs.equals(other.docs);
     }
 
     @Override
     public int hashCode() {
         if (memoizedHashCode == 0) {
-            memoizedHashCode = Objects.hash(typeName, union, docs);
+            memoizedHashCode = Objects.hash(typeName, values, docs);
         }
         return memoizedHashCode;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("UnionDefinition")
+        return new StringBuilder("EnumDefinition")
                 .append("{")
                 .append("typeName")
                 .append(": ")
                 .append(typeName)
                 .append(", ")
-                .append("union")
+                .append("values")
                 .append(": ")
-                .append(union)
+                .append(values)
                 .append(", ")
                 .append("docs")
                 .append(": ")
@@ -85,16 +85,16 @@ public final class UnionDefinition {
                 .toString();
     }
 
-    public static UnionDefinition of(
-            TypeName typeName, List<FieldDefinition> union, Documentation docs) {
-        return builder().typeName(typeName).union(union).docs(Optional.of(docs)).build();
+    public static EnumDefinition of(
+            TypeName typeName, List<EnumValueDefinition> values, Documentation docs) {
+        return builder().typeName(typeName).values(values).docs(Optional.of(docs)).build();
     }
 
     private static void validateFields(
-            TypeName typeName, List<FieldDefinition> union, Optional<Documentation> docs) {
+            TypeName typeName, List<EnumValueDefinition> values, Optional<Documentation> docs) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, typeName, "typeName");
-        missingFields = addFieldIfMissing(missingFields, union, "union");
+        missingFields = addFieldIfMissing(missingFields, values, "values");
         missingFields = addFieldIfMissing(missingFields, docs, "docs");
         if (missingFields != null) {
             throw new IllegalArgumentException(
@@ -123,15 +123,15 @@ public final class UnionDefinition {
     public static final class Builder {
         private TypeName typeName;
 
-        private List<FieldDefinition> union = new ArrayList<>();
+        private List<EnumValueDefinition> values = new ArrayList<>();
 
         private Optional<Documentation> docs = Optional.empty();
 
         private Builder() {}
 
-        public Builder from(UnionDefinition other) {
+        public Builder from(EnumDefinition other) {
             typeName(other.getTypeName());
-            union(other.getUnion());
+            values(other.getValues());
             docs(other.getDocs());
             return this;
         }
@@ -142,22 +142,22 @@ public final class UnionDefinition {
             return this;
         }
 
-        @JsonSetter("union")
-        public Builder union(Iterable<FieldDefinition> union) {
-            this.union.clear();
+        @JsonSetter("values")
+        public Builder values(Iterable<EnumValueDefinition> values) {
+            this.values.clear();
             ConjureCollections.addAll(
-                    this.union, Objects.requireNonNull(union, "union cannot be null"));
+                    this.values, Objects.requireNonNull(values, "values cannot be null"));
             return this;
         }
 
-        public Builder addAllUnion(Iterable<FieldDefinition> union) {
+        public Builder addAllValues(Iterable<EnumValueDefinition> values) {
             ConjureCollections.addAll(
-                    this.union, Objects.requireNonNull(union, "union cannot be null"));
+                    this.values, Objects.requireNonNull(values, "values cannot be null"));
             return this;
         }
 
-        public Builder union(FieldDefinition union) {
-            this.union.add(union);
+        public Builder values(EnumValueDefinition values) {
+            this.values.add(values);
             return this;
         }
 
@@ -172,8 +172,8 @@ public final class UnionDefinition {
             return this;
         }
 
-        public UnionDefinition build() {
-            return new UnionDefinition(typeName, union, docs);
+        public EnumDefinition build() {
+            return new EnumDefinition(typeName, values, docs);
         }
     }
 }
