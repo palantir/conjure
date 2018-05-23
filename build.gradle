@@ -1,0 +1,134 @@
+/*
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://dl.bintray.com/palantir/releases/'
+        }
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+        classpath 'com.netflix.nebula:nebula-dependency-recommender:5.2.0'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:7.0.12'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.19.0'
+        classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
+        classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
+    }
+}
+
+apply plugin: 'com.palantir.baseline-config'
+apply plugin: 'com.palantir.baseline-idea'
+apply plugin: 'com.palantir.circle.style'
+apply plugin: 'com.palantir.git-version'
+
+allprojects {
+    version gitVersion()
+    group 'com.palantir.conjure'
+
+    repositories {
+        maven {url 'https://artifactory.palantir.build/artifactory/all-jar/'}
+        maven {url 'https://artifactory.palantir.build/artifactory/internal-dist-release'}
+    }
+    apply plugin: 'com.palantir.configuration-resolver'
+    apply plugin: 'nebula.dependency-recommender'
+
+    dependencyRecommendations {
+        strategy OverrideTransitives
+        propertiesFile file: project.rootProject.file('versions.props')
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+        }
+    }
+}
+
+configure(subprojects - project(':conjure-api')) {
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'com.palantir.baseline-checkstyle'
+    apply plugin: 'com.palantir.baseline-eclipse'
+    apply plugin: 'com.palantir.baseline-error-prone'
+    apply plugin: 'com.palantir.baseline-idea'
+    apply plugin: 'jacoco'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'nebula.maven-publish'
+    apply plugin: 'nebula.publish-verification'
+    apply plugin: 'nebula.source-jar'
+    apply plugin: 'org.inferred.processors'
+
+    bintray {
+        user = System.env.BINTRAY_USERNAME
+        key = System.env.BINTRAY_PASSWORD
+        publish = true
+        pkg {
+            repo = 'releases'
+            name = 'conjure'
+            userOrg = 'palantir'
+            licenses = ['Apache-2.0']
+            publications = ['nebula']
+        }
+    }
+    publish.dependsOn bintrayUpload
+    bintrayUpload.onlyIf {
+        versionDetails().isCleanTag
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    tasks.jacocoTestReport.dependsOn(tasks.test)
+    tasks.check.dependsOn(tasks.jacocoTestReport)
+    tasks.check.dependsOn(javadoc)
+
+    sourceCompatibility = 1.8
+
+    if (System.env.CIRCLE_TEST_REPORTS) {
+        test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ['-XepDisableWarningsInGeneratedCode', '-Werror']
+    }
+
+    // Run `./gradlew test -Drecreate=true` to recreate all the expected
+    // generated code that we have checked into the repo.
+    tasks.withType(Test) {
+        systemProperty 'recreate', System.getProperty('recreate', 'false')
+    }
+
+    configurations.errorprone {
+        resolutionStrategy {
+            force 'com.google.guava:guava:21.0'
+        }
+    }
+}
+
+dependencies {
+    baseline 'com.palantir.baseline:gradle-baseline-java-config@zip'
+}

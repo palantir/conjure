@@ -1,0 +1,4 @@
+include 'conjure-api'
+include 'conjure-api:conjure-api-objects'
+include 'conjure-generator-common'
+include 'conjure-core'

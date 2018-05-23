@@ -1,0 +1,32 @@
+test-case-name: "unique-types-names"
+positive:
+  packagesCanDisambiguateIdenticallyNamedTypes:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            Foo:
+              package: test.api2
+              fields:
+                bar: string
+          errors:
+            Foo:
+              namespace: Conjure
+              code: INVALID_ARGUMENT
+
+negative:
+  duplicateObjectAndErrorNamesNotAllowed:
+    expected-error: 'Type, error, and service names must be unique across locally defined and imported types/errors'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            Foo:
+              fields:
+                bar: string
+          errors:
+            Foo:
+              namespace: Conjure
+              code: INVALID_ARGUMENT

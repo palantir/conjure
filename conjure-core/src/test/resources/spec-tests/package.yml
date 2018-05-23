@@ -1,0 +1,45 @@
+test-case-name: "package properties"
+positive:
+  typePackageSpecifiedUsingDefault:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            SimpleObject:
+              fields:
+                name: string
+  typePackageSpecifiedUsingPackage:
+    conjure:
+      types:
+        definitions:
+          # valid: "default-package" property is optional if package is specified for individual types
+          objects:
+            SimpleObject:
+              package: test.api
+              fields:
+                name: string
+  servicesPackageSpecified:
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.api
+negative:
+  typesPackageRequired:
+    expected-error: 'Must provide default conjure package or explicit conjure package for every object and service'
+    conjure:
+      types:
+        definitions:
+          objects:
+            SimpleObject:
+              # invalid: "default-package" property is not specified for "definitions" and "package" property is not specified for object
+              fields:
+                name: string
+  servicesPackageRequired:
+    expected-error: 'Cannot build ServiceDefinition, some of required attributes are not set [conjurePackage]'
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          # invalid: "package" is a required property

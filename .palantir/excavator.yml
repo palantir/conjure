@@ -1,0 +1,6 @@
+auto-label:
+  names:
+    roomba/latest-gradle-wrapper: [ "merge when ready" ]
+    roomba/latest-baseline: [ "merge when ready" ]
+    roomba/apply-preflight: [ "merge when ready" ]
+    roomba/roomba-lint: [ "merge when ready" ]

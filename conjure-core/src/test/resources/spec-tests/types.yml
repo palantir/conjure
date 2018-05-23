@@ -1,0 +1,165 @@
+test-case-name: "types"
+positive:
+  primitives:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            StringExample:
+              fields:
+                string: string
+            IntegerExample:
+              fields:
+                integer: integer
+            DoubleExample:
+              fields:
+                double: double
+            BooleanExample:
+              fields:
+                boolean: boolean
+            SafeLongExample:
+              fields:
+                safelong: safelong
+            RidExample:
+              fields:
+                rid: rid
+            BearerToken:
+              fields:
+                bearertoken: bearertoken
+            UuidExample:
+              fields:
+                uuid: uuid
+  builtins:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            AnyExample:
+              fields:
+                any: any
+            MapExample:
+              fields:
+                map: map<string, string>
+            ListExample:
+              fields:
+                list: list<string>
+            SetExample:
+              fields:
+                set: set<string>
+            OptionalExample:
+              fields:
+                optional: optional<string>
+            BinaryExample:
+              fields:
+                binary: binary
+            DateTimeExample:
+              fields:
+                datetime: datetime
+  enums:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            EnumExample:
+              values:
+                - ONE
+                - TWO
+  aliases:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            BaseType:
+              fields:
+                name: string
+            PrimitiveAliasExample:
+              alias: string
+            BuiltinAliasExample:
+              alias: map<string, rid>
+            ObjectAliasExample:
+              alias: BaseType
+            AliasAliasExample:
+              alias: ObjectAliasExample
+  unions:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            StringExample:
+              alias: string
+            UnionTypeExample:
+              union:
+                stringExample:
+                  type: StringExample
+                  docs: Docs for when UnionTypeExample is of type StringExample.
+                set: set<string>
+                thisFieldIsAnInteger: integer
+            UnionTypeMultipleFieldsSameTypeExample:
+              union:
+                stringOne: string
+                stringTwo: string
+  errors:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            InvalidTypeDefinition:
+              namespace: Conjure
+              code: INVALID_ARGUMENT
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any
+            CustomDefinition:
+              package: test.api.other.errors
+              namespace: Conjure
+              code: INVALID_ARGUMENT
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any
+negative:
+  selfAliasTypeNotAllowed:
+    expected-error: 'Illegal recursive data type: SelfAlias -> SelfAlias'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            SelfAlias:
+              alias: SelfAlias
+  aliasCycleNotAllowed:
+    expected-error: 'Illegal recursive data type: CycleType -> SelfAlias -> CycleType'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            CycleType:
+              fields:
+                name: SelfAlias
+            SelfAlias:
+              alias: CycleType
+  errorsCodeMustBeSpecificValue:
+    expected-error: 'Invalid error code badCode.'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            InvalidTypeDefinition:
+              namespace: Conjure
+              code: badCode
+              docs: Invalid Conjure type definition.
+              safe-args:
+                typeName: string
+              unsafe-args:
+                typeDef: any

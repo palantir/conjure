@@ -1,0 +1,22 @@
+types:
+  imports:
+    ResourceIdentifier:
+      base-type: string
+      external:
+        java: com.palantir.ri.ResourceIdentifier
+
+  definitions: 
+    default-package: test.api
+    objects:     
+      SimpleObject:
+        fields:
+          stringField: string
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api
+
+    endpoints:
+      get:
+        http: GET /get

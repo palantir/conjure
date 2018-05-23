@@ -1,0 +1,38 @@
+/*
+ * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+dependencies {
+    compile project(':conjure-generator-common')
+    compile project(':conjure-api:conjure-api-objects')
+
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    compile 'com.google.guava:guava'
+    compile 'com.palantir.remoting-api:errors'
+    compile 'com.palantir.syntactic-paths:syntactic-paths'
+    compile 'org.glassfish.jersey.core:jersey-common'
+    compile 'org.slf4j:slf4j-api'
+    implementation 'com.google.errorprone:error_prone_annotations'
+    implementation 'io.dropwizard.metrics:metrics-core'
+
+    testCompile 'junit:junit'
+    testCompile 'org.assertj:assertj-core'
+    testCompile 'org.mockito:mockito-core'
+    testRuntime 'org.slf4j:slf4j-simple'
+
+    processor 'org.immutables:value'
+}
