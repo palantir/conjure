@@ -22,7 +22,6 @@ dependencies {
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     compile 'com.google.guava:guava'
-    compile 'com.palantir.remoting-api:errors'
     compile 'com.palantir.syntactic-paths:syntactic-paths'
     compile 'org.glassfish.jersey.core:jersey-common'
     compile 'org.slf4j:slf4j-api'

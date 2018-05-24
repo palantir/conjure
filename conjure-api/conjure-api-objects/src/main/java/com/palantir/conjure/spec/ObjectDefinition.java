@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.palantir.conjure.lib.internal.ConjureCollections;
+import com.palantir.conjure.java.lib.internal.ConjureCollections;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,22 +12,22 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@JsonDeserialize(builder = EnumDefinition.Builder.class)
+@JsonDeserialize(builder = ObjectDefinition.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class EnumDefinition {
+public final class ObjectDefinition {
     private final TypeName typeName;
 
-    private final List<EnumValueDefinition> values;
+    private final List<FieldDefinition> fields;
 
     private final Optional<Documentation> docs;
 
     private volatile int memoizedHashCode;
 
-    private EnumDefinition(
-            TypeName typeName, List<EnumValueDefinition> values, Optional<Documentation> docs) {
-        validateFields(typeName, values, docs);
+    private ObjectDefinition(
+            TypeName typeName, List<FieldDefinition> fields, Optional<Documentation> docs) {
+        validateFields(typeName, fields, docs);
         this.typeName = typeName;
-        this.values = Collections.unmodifiableList(values);
+        this.fields = Collections.unmodifiableList(fields);
         this.docs = docs;
     }
 
@@ -36,9 +36,9 @@ public final class EnumDefinition {
         return this.typeName;
     }
 
-    @JsonProperty("values")
-    public List<EnumValueDefinition> getValues() {
-        return this.values;
+    @JsonProperty("fields")
+    public List<FieldDefinition> getFields() {
+        return this.fields;
     }
 
     @JsonProperty("docs")
@@ -49,34 +49,34 @@ public final class EnumDefinition {
     @Override
     public boolean equals(Object other) {
         return this == other
-                || (other instanceof EnumDefinition && equalTo((EnumDefinition) other));
+                || (other instanceof ObjectDefinition && equalTo((ObjectDefinition) other));
     }
 
-    private boolean equalTo(EnumDefinition other) {
+    private boolean equalTo(ObjectDefinition other) {
         return this.typeName.equals(other.typeName)
-                && this.values.equals(other.values)
+                && this.fields.equals(other.fields)
                 && this.docs.equals(other.docs);
     }
 
     @Override
     public int hashCode() {
         if (memoizedHashCode == 0) {
-            memoizedHashCode = Objects.hash(typeName, values, docs);
+            memoizedHashCode = Objects.hash(typeName, fields, docs);
         }
         return memoizedHashCode;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("EnumDefinition")
+        return new StringBuilder("ObjectDefinition")
                 .append("{")
                 .append("typeName")
                 .append(": ")
                 .append(typeName)
                 .append(", ")
-                .append("values")
+                .append("fields")
                 .append(": ")
-                .append(values)
+                .append(fields)
                 .append(", ")
                 .append("docs")
                 .append(": ")
@@ -85,16 +85,16 @@ public final class EnumDefinition {
                 .toString();
     }
 
-    public static EnumDefinition of(
-            TypeName typeName, List<EnumValueDefinition> values, Documentation docs) {
-        return builder().typeName(typeName).values(values).docs(Optional.of(docs)).build();
+    public static ObjectDefinition of(
+            TypeName typeName, List<FieldDefinition> fields, Documentation docs) {
+        return builder().typeName(typeName).fields(fields).docs(Optional.of(docs)).build();
     }
 
     private static void validateFields(
-            TypeName typeName, List<EnumValueDefinition> values, Optional<Documentation> docs) {
+            TypeName typeName, List<FieldDefinition> fields, Optional<Documentation> docs) {
         List<String> missingFields = null;
         missingFields = addFieldIfMissing(missingFields, typeName, "typeName");
-        missingFields = addFieldIfMissing(missingFields, values, "values");
+        missingFields = addFieldIfMissing(missingFields, fields, "fields");
         missingFields = addFieldIfMissing(missingFields, docs, "docs");
         if (missingFields != null) {
             throw new IllegalArgumentException(
@@ -123,15 +123,15 @@ public final class EnumDefinition {
     public static final class Builder {
         private TypeName typeName;
 
-        private List<EnumValueDefinition> values = new ArrayList<>();
+        private List<FieldDefinition> fields = new ArrayList<>();
 
         private Optional<Documentation> docs = Optional.empty();
 
         private Builder() {}
 
-        public Builder from(EnumDefinition other) {
+        public Builder from(ObjectDefinition other) {
             typeName(other.getTypeName());
-            values(other.getValues());
+            fields(other.getFields());
             docs(other.getDocs());
             return this;
         }
@@ -142,22 +142,22 @@ public final class EnumDefinition {
             return this;
         }
 
-        @JsonSetter("values")
-        public Builder values(Iterable<EnumValueDefinition> values) {
-            this.values.clear();
+        @JsonSetter("fields")
+        public Builder fields(Iterable<FieldDefinition> fields) {
+            this.fields.clear();
             ConjureCollections.addAll(
-                    this.values, Objects.requireNonNull(values, "values cannot be null"));
+                    this.fields, Objects.requireNonNull(fields, "fields cannot be null"));
             return this;
         }
 
-        public Builder addAllValues(Iterable<EnumValueDefinition> values) {
+        public Builder addAllFields(Iterable<FieldDefinition> fields) {
             ConjureCollections.addAll(
-                    this.values, Objects.requireNonNull(values, "values cannot be null"));
+                    this.fields, Objects.requireNonNull(fields, "fields cannot be null"));
             return this;
         }
 
-        public Builder values(EnumValueDefinition values) {
-            this.values.add(values);
+        public Builder fields(FieldDefinition fields) {
+            this.fields.add(fields);
             return this;
         }
 
@@ -172,8 +172,8 @@ public final class EnumDefinition {
             return this;
         }
 
-        public EnumDefinition build() {
-            return new EnumDefinition(typeName, values, docs);
+        public ObjectDefinition build() {
+            return new ObjectDefinition(typeName, fields, docs);
         }
     }
 }

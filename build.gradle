@@ -47,8 +47,10 @@ allprojects {
     group 'com.palantir.conjure'
 
     repositories {
-        maven {url 'https://artifactory.palantir.build/artifactory/all-jar/'}
-        maven {url 'https://artifactory.palantir.build/artifactory/internal-dist-release'}
+        mavenCentral()
+        maven {
+            url 'https://dl.bintray.com/palantir/releases/'
+        }
     }
     apply plugin: 'com.palantir.configuration-resolver'
     apply plugin: 'nebula.dependency-recommender'

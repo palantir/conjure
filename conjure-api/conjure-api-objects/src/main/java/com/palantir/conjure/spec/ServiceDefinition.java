@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.palantir.conjure.lib.internal.ConjureCollections;
+import com.palantir.conjure.java.lib.internal.ConjureCollections;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,33 +12,35 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@JsonDeserialize(builder = ObjectDefinition.Builder.class)
+@JsonDeserialize(builder = ServiceDefinition.Builder.class)
 @Generated("com.palantir.conjure.gen.java.types.BeanGenerator")
-public final class ObjectDefinition {
-    private final TypeName typeName;
+public final class ServiceDefinition {
+    private final TypeName serviceName;
 
-    private final List<FieldDefinition> fields;
+    private final List<EndpointDefinition> endpoints;
 
     private final Optional<Documentation> docs;
 
     private volatile int memoizedHashCode;
 
-    private ObjectDefinition(
-            TypeName typeName, List<FieldDefinition> fields, Optional<Documentation> docs) {
-        validateFields(typeName, fields, docs);
-        this.typeName = typeName;
-        this.fields = Collections.unmodifiableList(fields);
+    private ServiceDefinition(
+            TypeName serviceName,
+            List<EndpointDefinition> endpoints,
+            Optional<Documentation> docs) {
+        validateFields(serviceName, endpoints, docs);
+        this.serviceName = serviceName;
+        this.endpoints = Collections.unmodifiableList(endpoints);
         this.docs = docs;
     }
 
-    @JsonProperty("typeName")
-    public TypeName getTypeName() {
-        return this.typeName;
+    @JsonProperty("serviceName")
+    public TypeName getServiceName() {
+        return this.serviceName;
     }
 
-    @JsonProperty("fields")
-    public List<FieldDefinition> getFields() {
-        return this.fields;
+    @JsonProperty("endpoints")
+    public List<EndpointDefinition> getEndpoints() {
+        return this.endpoints;
     }
 
     @JsonProperty("docs")
@@ -49,34 +51,34 @@ public final class ObjectDefinition {
     @Override
     public boolean equals(Object other) {
         return this == other
-                || (other instanceof ObjectDefinition && equalTo((ObjectDefinition) other));
+                || (other instanceof ServiceDefinition && equalTo((ServiceDefinition) other));
     }
 
-    private boolean equalTo(ObjectDefinition other) {
-        return this.typeName.equals(other.typeName)
-                && this.fields.equals(other.fields)
+    private boolean equalTo(ServiceDefinition other) {
+        return this.serviceName.equals(other.serviceName)
+                && this.endpoints.equals(other.endpoints)
                 && this.docs.equals(other.docs);
     }
 
     @Override
     public int hashCode() {
         if (memoizedHashCode == 0) {
-            memoizedHashCode = Objects.hash(typeName, fields, docs);
+            memoizedHashCode = Objects.hash(serviceName, endpoints, docs);
         }
         return memoizedHashCode;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("ObjectDefinition")
+        return new StringBuilder("ServiceDefinition")
                 .append("{")
-                .append("typeName")
+                .append("serviceName")
                 .append(": ")
-                .append(typeName)
+                .append(serviceName)
                 .append(", ")
-                .append("fields")
+                .append("endpoints")
                 .append(": ")
-                .append(fields)
+                .append(endpoints)
                 .append(", ")
                 .append("docs")
                 .append(": ")
@@ -85,16 +87,22 @@ public final class ObjectDefinition {
                 .toString();
     }
 
-    public static ObjectDefinition of(
-            TypeName typeName, List<FieldDefinition> fields, Documentation docs) {
-        return builder().typeName(typeName).fields(fields).docs(Optional.of(docs)).build();
+    public static ServiceDefinition of(
+            TypeName serviceName, List<EndpointDefinition> endpoints, Documentation docs) {
+        return builder()
+                .serviceName(serviceName)
+                .endpoints(endpoints)
+                .docs(Optional.of(docs))
+                .build();
     }
 
     private static void validateFields(
-            TypeName typeName, List<FieldDefinition> fields, Optional<Documentation> docs) {
+            TypeName serviceName,
+            List<EndpointDefinition> endpoints,
+            Optional<Documentation> docs) {
         List<String> missingFields = null;
-        missingFields = addFieldIfMissing(missingFields, typeName, "typeName");
-        missingFields = addFieldIfMissing(missingFields, fields, "fields");
+        missingFields = addFieldIfMissing(missingFields, serviceName, "serviceName");
+        missingFields = addFieldIfMissing(missingFields, endpoints, "endpoints");
         missingFields = addFieldIfMissing(missingFields, docs, "docs");
         if (missingFields != null) {
             throw new IllegalArgumentException(
@@ -121,43 +129,43 @@ public final class ObjectDefinition {
     @Generated("com.palantir.conjure.gen.java.types.BeanBuilderGenerator")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private TypeName typeName;
+        private TypeName serviceName;
 
-        private List<FieldDefinition> fields = new ArrayList<>();
+        private List<EndpointDefinition> endpoints = new ArrayList<>();
 
         private Optional<Documentation> docs = Optional.empty();
 
         private Builder() {}
 
-        public Builder from(ObjectDefinition other) {
-            typeName(other.getTypeName());
-            fields(other.getFields());
+        public Builder from(ServiceDefinition other) {
+            serviceName(other.getServiceName());
+            endpoints(other.getEndpoints());
             docs(other.getDocs());
             return this;
         }
 
-        @JsonSetter("typeName")
-        public Builder typeName(TypeName typeName) {
-            this.typeName = Objects.requireNonNull(typeName, "typeName cannot be null");
+        @JsonSetter("serviceName")
+        public Builder serviceName(TypeName serviceName) {
+            this.serviceName = Objects.requireNonNull(serviceName, "serviceName cannot be null");
             return this;
         }
 
-        @JsonSetter("fields")
-        public Builder fields(Iterable<FieldDefinition> fields) {
-            this.fields.clear();
+        @JsonSetter("endpoints")
+        public Builder endpoints(Iterable<EndpointDefinition> endpoints) {
+            this.endpoints.clear();
             ConjureCollections.addAll(
-                    this.fields, Objects.requireNonNull(fields, "fields cannot be null"));
+                    this.endpoints, Objects.requireNonNull(endpoints, "endpoints cannot be null"));
             return this;
         }
 
-        public Builder addAllFields(Iterable<FieldDefinition> fields) {
+        public Builder addAllEndpoints(Iterable<EndpointDefinition> endpoints) {
             ConjureCollections.addAll(
-                    this.fields, Objects.requireNonNull(fields, "fields cannot be null"));
+                    this.endpoints, Objects.requireNonNull(endpoints, "endpoints cannot be null"));
             return this;
         }
 
-        public Builder fields(FieldDefinition fields) {
-            this.fields.add(fields);
+        public Builder endpoints(EndpointDefinition endpoints) {
+            this.endpoints.add(endpoints);
             return this;
         }
 
@@ -172,8 +180,8 @@ public final class ObjectDefinition {
             return this;
         }
 
-        public ObjectDefinition build() {
-            return new ObjectDefinition(typeName, fields, docs);
+        public ServiceDefinition build() {
+            return new ServiceDefinition(serviceName, endpoints, docs);
         }
     }
 }
