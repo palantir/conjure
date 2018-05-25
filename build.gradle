@@ -29,7 +29,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.2.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:7.0.12'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.19.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.20.1'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
@@ -73,7 +73,6 @@ configure(subprojects - project(':conjure-api')) {
     apply plugin: 'com.palantir.baseline-eclipse'
     apply plugin: 'com.palantir.baseline-error-prone'
     apply plugin: 'com.palantir.baseline-idea'
-    apply plugin: 'jacoco'
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'nebula.maven-publish'
@@ -98,21 +97,7 @@ configure(subprojects - project(':conjure-api')) {
         versionDetails().isCleanTag
     }
 
-    jacocoTestReport {
-        reports {
-            xml.enabled true
-        }
-    }
-
-    tasks.jacocoTestReport.dependsOn(tasks.test)
-    tasks.check.dependsOn(tasks.jacocoTestReport)
-    tasks.check.dependsOn(javadoc)
-
     sourceCompatibility = 1.8
-
-    if (System.env.CIRCLE_TEST_REPORTS) {
-        test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
-    }
 
     tasks.withType(JavaCompile) {
         options.compilerArgs += ['-XepDisableWarningsInGeneratedCode', '-Werror']
@@ -122,12 +107,6 @@ configure(subprojects - project(':conjure-api')) {
     // generated code that we have checked into the repo.
     tasks.withType(Test) {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
-    }
-
-    configurations.errorprone {
-        resolutionStrategy {
-            force 'com.google.guava:guava:21.0'
-        }
     }
 }
 
