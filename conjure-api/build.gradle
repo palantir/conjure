@@ -24,3 +24,8 @@ project (':conjure-api:conjure-api-objects') {
         compile 'com.fasterxml.jackson.core:jackson-databind'
     }
 }
+
+project (':conjure-api:conjure-api-typescript') {
+    task publish
+    publish.dependsOn publishTypeScript
+}
