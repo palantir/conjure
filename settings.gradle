@@ -2,5 +2,6 @@ rootProject.name = 'conjure'
 
 include 'conjure-api'
 include 'conjure-api:conjure-api-objects'
+include 'conjure-api:conjure-api-typescript'
 include 'conjure-generator-common'
 include 'conjure-core'

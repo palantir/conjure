@@ -1,0 +1,4 @@
+*.js
+*.ts
+package.json
+tsconfig.json
