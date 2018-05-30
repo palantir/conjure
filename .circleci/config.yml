@@ -26,7 +26,7 @@ jobs:
           paths:
             - ~/.gradle/caches
 
-      - run: ./gradlew --parallel build -x conjure-api:conjure-api-objects:checkStyleMain
+      - run: ./gradlew --parallel build
 
       - run:
           command: |
