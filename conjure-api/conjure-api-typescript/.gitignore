@@ -2,3 +2,4 @@
 *.ts
 package.json
 tsconfig.json
+node_modules
