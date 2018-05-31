@@ -7,6 +7,7 @@ com.google.guava:guava = 22.0
 com.netflix.nebula:nebula-test = 6.7.0
 com.palantir.baseline:* = 0.19.0
 com.palantir.conjure.java:* = 0.2.1
+com.palantir.conjure.typescript:* = 0.3.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 3.0.1
 commons-io:commons-io = 2.6
