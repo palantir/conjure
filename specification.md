@@ -139,7 +139,7 @@ The object specifies the types available in the Conjure definition.
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="typeConjureImport"></a>conjure-imports | Map[`string`, `string`] | A map between a namespace alias and a relative path to a Conjure definition. 
+<a name="typeConjureImport"></a>conjure-imports | Map[`string`, `string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 <a name="typeImports"></a>imports | Map[`string`, [External Type Object](#externalTypeObject)] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 <a name="typeDefinitions"></a>definitions | [Type Definitions Object](#definedTypesObject) | The types specified in this definition.
 

@@ -31,7 +31,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public abstract class Namespace {
 
-    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("^[a-z][a-z]+([A-Z][a-z]+)*$");
+    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("^[_a-zA-Z][_a-zA-Z0-9]*$");
 
     @JsonValue
     public abstract String name();
