@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/palantir/conjure.svg?style=svg)](https://circleci.com/gh/palantir/conjure)
+[![CircleCI](https://circleci.com/gh/palantir/conjure/tree/develop.svg?style=svg&circle-token=1543ec1fb1c8d77e73de0caec27c43db8c1feae0)](https://circleci.com/gh/palantir/conjure/tree/develop)
 
 Conjure
 =======
