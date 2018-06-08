@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/palantir/conjure.svg?style=svg)](https://circleci.com/gh/palantir/conjure)
+
 Conjure
 =======
 An interface and object definition language and code generator for RESTy APIs.
