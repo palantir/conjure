@@ -99,15 +99,29 @@ function demo(): Promise<void> {
 }
 ```
 
-## Architecture / How it works?
+## Ecosystem
 
-- gradle-conjure
-- What is IR
-- conjure-java
-- conjure-typescript
-- conjure-python
+Build tool
 
-Extensibility
+- [gradle-conjure](https://github.com/palantir/gradle-conjure)
+
+Code generators
+
+- [conjure-java](https://github.com/palantir/conjure-java)
+- [conjure-typescript](https://github.com/palantir/conjure-typescript)
+- conjure-python (coming)
+- conjure-go (coming soon)
+- conjure-rust (coming soon)
+
+Client libraries
+
+- [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
+- [conjure-python-client](https://github.com/palantir/conjure-python-client)
+- [http-remoting](https://github.com/palantir/http-remoting)
+
+Server libraries
+
+- [dropwizard](https://github.com/dropwizard/dropwizard)
 
 ## Contributing
 
