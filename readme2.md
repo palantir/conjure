@@ -4,7 +4,7 @@ Magically generate multi-language HTTP/JSON clients and servers.
 
 _Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
 
-Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested in hundreds of microservices and has allowed devs to be productive in many languages across many repos.
+Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
 
 Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Golang, Rust etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
 
@@ -119,7 +119,7 @@ Client libraries
 - [conjure-python-client](https://github.com/palantir/conjure-python-client)
 - [http-remoting](https://github.com/palantir/http-remoting)
 
-Server libraries
+Recommended server libraries
 
 - [dropwizard](https://github.com/dropwizard/dropwizard)
 
