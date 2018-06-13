@@ -1,25 +1,17 @@
+Magically generate multi-language HTTP/JSON clients and servers.
+
 # Conjure
 
-<!-- tagline -->
-
-interface and objects for RESTy APIS
-interface definition language (IDL) for JSON over HTTP microservices
-codegen clients for your JSON/HTTP servers
-codegen RESTful clients and servers
-polyglot / multi-language
-magically bridging clients and servers across language divide
-
+_Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
 
 <!-- 1 paragraph what/why -->
 
-simple and opinionated but based on stable, mature standards
-enables devs to be productive  of microservices across many repos and languages
-easily responsibly scale your microservices
-type safe development
-end to end framework
-battle tested / proved in production
-allows many microservices to coexist
-easy & approachable
+Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested in hundreds of microservices and has allowed devs to be productive in many languages across many repos.
+
+Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Golang, Rust etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
+
+For example in Java, Conjure interfaces allow you to build servers using existing Jersey compatible libraries like Dropwizard/Jetty.
+
 
 ## Features
 
