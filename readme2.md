@@ -72,8 +72,33 @@ services:
             param-type: body
 ```
 
-example Conjure java
-example Conjure typescript
+
+```java
+package com.palantir.petstore;
+
+...
+
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@Path("/")
+@Generated("com.palantir.conjure.java.services.JerseyServiceGenerator")
+public interface PetStoreService {
+    /** Add a new pet to the store */
+    @POST
+    @Path("pet")
+    void addPet(@HeaderParam("Authorization") AuthHeader authHeader, AddPetRequest addPetRequest);
+}
+```
+
+```js
+PetStoreService petStoreService = JaxRsClients.create(..., PetStoreService.class);
+petStoreService.addPet(AddPetRequest.builder()
+    .id(1)
+    .name("Rover")
+    .tags(Tag.of("mytag"))
+    .status(Status.AVAILABLE)
+    .build());
+```
 
 
 ## Motivation/history
