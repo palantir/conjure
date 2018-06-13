@@ -1,5 +1,3 @@
-Magically generate multi-language HTTP/JSON clients and servers.
-
 # Conjure
 
 _Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
