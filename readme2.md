@@ -125,7 +125,4 @@ Server libraries
 
 ## Contributing
 
-- What is an appropriate github issue
-- How to set up your dev environment, recommended IDE, forking, tests, CircleCI etc
-- what to use stackoverflow for?
-
+See the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
