@@ -20,7 +20,13 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 - Supports incremental switchover from existing JSON/HTTP servers
 - Zero config (works out of the box)
 
+## Getting started
+
+See our _5 minute guide_ to build a backend and frontend with Conjure.
+
 ## Example
+
+The following YAML file defines a simple Pet Store API. (See [full reference](./specification.md))
 
 ```yml
 types:
@@ -60,6 +66,7 @@ services:
             param-type: body
 ```
 
+The following generated Java interface can be used on the client and the server.
 
 ```java
 package com.palantir.petstore;
@@ -78,21 +85,19 @@ public interface PetStoreService {
 }
 ```
 
-```js
-PetStoreService petStoreService = JaxRsClients.create(..., PetStoreService.class);
-petStoreService.addPet(AddPetRequest.builder()
-    .id(1)
-    .name("Rover")
-    .tags(Tag.of("mytag"))
-    .status(Status.AVAILABLE)
-    .build());
+Type-safe network calls to this API can made from TypeScript as follows:
+
+```ts
+function demo(): Promise<void> {
+    const request: IAddPetRequest = {
+        id: 1,
+        name: "Rover",
+        tags: [ "mytag" ],
+        status: Status.AVAILABLE
+    };
+    return new PetStoreService(bridge).addPet(request);
+}
 ```
-
-
-## Motivation/history
-
-
-
 
 ## Architecture / How it works?
 
