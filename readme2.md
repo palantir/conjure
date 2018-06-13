@@ -34,7 +34,43 @@ easy & approachable
 
 ## Example
 
-Conjure yml input
+```yml
+types:
+  definitions:
+    default-package: com.palantir.petstore
+    objects:
+
+      AddPetRequest:
+        fields:
+          id: integer
+          name: string
+          tags: set<Tag>
+          status: Status
+
+      Tag:
+        alias: string
+
+      Status:
+        values:
+        - AVAILABLE
+        - PENDING
+        - SOLD
+
+services:
+  PetStoreService:
+    name: Pet Store Service
+    package: com.palantir.petstore
+    default-auth: header
+
+    endpoints:
+      addPet:
+        docs: Add a new pet to the store
+        http: POST /pet
+        args:
+          addPetRequest:
+            type: AddPetRequest
+            param-type: body
+```
 
 example Conjure java
 example Conjure typescript
