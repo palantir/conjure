@@ -32,7 +32,7 @@ conjure-<lang> generate <input-json> <output-directory>
 
 Generators can assume that this output directory already exists and is empty. (It is not the responsibility of conjure generators to do any diffing or up-to-date checking - this should be done by a higher level build tool, like gradle-conjure.)
 
-Generators are free to implement any other behaviour if the generate command is not invoked. For example, returning sensible information for  `conjure-<lang> --version` and `conjure-<lang> --help` are encouraged.
+Generators are free to implement any other behaviour if the `generate` command is not invoked.
 
 ## Options
 
