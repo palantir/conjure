@@ -20,7 +20,7 @@ conjure-java-0.2.3
     ...
 ```
 
-`conjure-<lang>-<version>/bin/conjure-<lang>` should be a script that works on Mac / Linux. There is currently no requirement to run on windows, but this may change in the future.
+`conjure-<lang>-<version>/bin/conjure-<lang>` should be a script that works on Mac / Linux. There is currently no requirement to run on Windows, but this may change in the future.
 
 ## Primary command
 
