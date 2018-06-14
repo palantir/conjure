@@ -36,15 +36,15 @@ Generators are free to implement any other behaviour if the generate command is 
 
 ## Options
 
-**Allow arbitrary --key=value and --foo command line flags, for example:**
+**Allow arbitrary `--key=value` options and `--foo` flags, for example:**
 
 ```
 conjure-typescript --version="0.1.0" --goFastMode
 ```
 
-Ideally, conjure-generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain an author, license and version field (otherwise it would be very inconvenient to publish), but these clearly need to be chosen by the user.
+Ideally, conjure-generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain author, license and version fields (otherwise it would be very inconvenient to publish), but these clearly need to be specified by the user.
 
-conjure-generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string. Values may contain spaces. A single <key> should not appear more than once. Keys do not contain the '=' character. Unknown flags should fail.
+conjure-generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate <key>. Unknown keys should be rejected.
 
 Flags such as `--foo` may also be passed to switch on some functionality, or `--foo=false` to switch it off.
 
@@ -52,7 +52,7 @@ Flags such as `--foo` may also be passed to switch on some functionality, or `--
 
 1. **pass arbitrary JSON to the CLI.** - This would satisfy the requirements, but the ease of passing complex options (e.g. lists, maps etc) may actually encourage conjure-generator authors to stray from the 'zero-config' recommendation and build increasingly complicated CLIs.
 2. **plain on/off feature flags: GO_FAST, PRESERVE_DINGBATS** - This is aesthetically very attractive, but doesn't support some essential requirements of conjure-typescript, e.g. license, version, author (this must be an arbitrary string, it's not a boolean on/off flag).
-3. **configurability via environment variables** - This is less intuitive than the --key=value flags.
+3. **configurability via environment variables** - This is less intuitive than the --key=value options.
 
 ### Example interface from gradle-conjure
 
