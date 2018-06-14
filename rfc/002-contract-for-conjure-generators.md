@@ -24,7 +24,7 @@ conjure-java-0.2.3
 
 ## Primary command
 
-Conjure generators should expect to be called with the command `generate` as the first argument. They should read a single JSON file, specified by the positional argument <input-json> and write to the <ouput-directory> folder. They should exit 0 on success, or a non-zero code if they failed.  Errors should be written to stderr.
+Conjure generators should expect to be called with the command `generate` as the first argument. They read a single JSON file, specified by the positional argument <input-json> and write to the <ouput-directory> folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
 
 ```
 conjure-<lang> generate <input-json> <output-directory>
@@ -32,7 +32,7 @@ conjure-<lang> generate <input-json> <output-directory>
 
 Generators can assume that this output directory already exists and is empty. (It is not the responsibility of conjure generators to do any diffing or up-to-date checking - this should be done by a higher level build tool, like gradle-conjure.)
 
-Generators are free to implement any other behaviour if the generate command is not invoked. For example, returning sensible information for  `conjure<lang> --version` and `conjure-<lang> --help` are encouraged.
+Generators are free to implement any other behaviour if the generate command is not invoked. For example, returning sensible information for  `conjure-<lang> --version` and `conjure-<lang> --help` are encouraged.
 
 ## Options
 
