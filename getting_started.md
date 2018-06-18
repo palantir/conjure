@@ -1,10 +1,10 @@
 # Getting started
 
-_This guide assumes you want to add a Conjure-defined API to an existing gradle project._
+_This guide adds a Conjure-defined API to an existing gradle project.  It is recommended to define your API in the same git repo as your server._
 
 ## 1. Add the gradle plugin
 
-In your `settings.gradle` file, add some new projects to contain your API YML and Conjure-generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, `-typescript` projects. Note, you can omit any of these projects if you don't need the generated code.  For example, if you only want to generate Java objects, you can just add the `-objects` project.
+In your `settings.gradle` file, add some new projects to contain your API YML and Conjure-generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, `-typescript` projects.
 
 ```diff
  rootProject.name = 'your-project'
@@ -15,6 +15,8 @@ In your `settings.gradle` file, add some new projects to contain your API YML an
 +include 'your-project-api:your-project-api-jersey'
 +include 'your-project-api:your-project-api-typescript'
 ```
+
+_Note, you can omit any of these projects if you don't need the generated code.  For example, if you only want to generate Java objects, you can just add the `-objects` project._
 
 In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 
@@ -37,16 +39,16 @@ Then in `./your-project-api/build.gradle`, apply the plugin:
 ```gradle
 apply plugin: 'com.palantir.conjure'
 
-// alternatively, use nebula.dependency-recommender (see below)
 configurations.all {
     resolutionStrategy {
         force 'com.palantir.conjure.java:conjure-java:0.2.1'
         force 'com.palantir.conjure.typescript:conjure-typescript:0.3.0'
     }
 }
+// alternatively, use nebula.dependency-recommender (see below)
 ```
 
-> `gradle-conjure` requires you to explicitly specify versions of the conjure-generators so that users are encouraged to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately.
+> `gradle-conjure` requires you to explicitly specify versions of the conjure-generators to encourage users to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately.
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -127,9 +129,28 @@ services:
             param-type: body
 ```
 
-## 3. Publish artifacts
+You should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 
-If you want to publish npm packages, you can modify `./your-project-api/build.gradle`:
+## 3. Implement your server
+
+In your main gradle project, you can now depend on the generated Jersey interfaces:
+
+```gradle
+// ./your-project/build.gradle
+
+dependencies {
+    project(':your-project-api:your-project-api-jersey')
+    ...
+}
+```
+
+You can now write a `PetStoreResource` class which `implements PetStoreService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
+
+## 4. Publish artifacts
+
+Jars can be published using your favourite Gradle publishing set-up, e.g. [Bintray](https://bintray.com/).
+
+If you want to publish npm packages, you need to simulate the `npm login` command to ensure you have the necessary credentials to `npm publish`.  Add the following snippet to your `./your-project-api/build.gradle` to write the `$NPM_AUTH_TOKEN` environment variable to disk.  You should specify this as a secret variable on your CI server (e.g. CircleCI or TravisCI).
 
 ```diff
  apply plugin: 'com.palantir.conjure'
