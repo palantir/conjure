@@ -46,12 +46,27 @@ configurations.all {
 }
 ```
 
-`gradle-conjure` requires you to explicitly specify versions of the conjure-generators so that users are encouraged to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately.
+> `gradle-conjure` requires you to explicitly specify versions of the conjure-generators so that users are encouraged to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately.
+
+Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
+
+```
+$ ./gradlew tasks
+
+...
+
+Conjure tasks
+-------------
+compileConjure - Generates code for your API definitions in src/main/conjure/**/*.yml
+compileConjureObjects - Generates Java POJOs from your Conjure definitions.
+
+...
+```
 
 
 ### (Optional) Use `nebula.dependency-recommender`
 
-Rather than adding `force` lines, [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin) is currently the preferred way to specify these version numbers. It can source versions from a well-structured properties file (which is easy to automatically upgrade).
+Instead of adding `force` lines, you can use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin) to specify these version numbers. This is preferrable to the `force` approach because it can read versions from a well-structured properties file which is easy to automatically upgrade.
 
 ```gradle
 // build.gradle
