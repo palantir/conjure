@@ -1,0 +1,32 @@
+apply plugin: 'application'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+distTar.compression = Compression.GZIP
+distZip.enabled = false
+
+bintray {
+    user = System.env.BINTRAY_USERNAME
+    key = System.env.BINTRAY_PASSWORD
+    publish = true
+    pkg {
+        repo = 'releases'
+        name = rootProject.name
+        userOrg = 'palantir'
+        licenses = ['Apache-2.0']
+        publications = ['dist']
+    }
+}
+
+publish.dependsOn bintrayUpload
+bintrayUpload.onlyIf {
+    versionDetails().isCleanTag
+}
+
+publishing {
+    publications {
+        dist(MavenPublication) {
+            artifact distTar
+        }
+    }
+}

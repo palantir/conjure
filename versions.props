@@ -10,6 +10,7 @@ com.palantir.conjure.java:* = 0.2.1
 com.palantir.conjure.typescript:* = 0.3.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 3.0.1
+commons-cli:commons-cli = 1.2
 commons-io:commons-io = 2.6
 io.dropwizard.metrics:metrics-core = 3.2.5
 javax.ws.rs:javax.ws.rs-api = 2.0.1
