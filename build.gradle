@@ -31,7 +31,7 @@ buildscript {
         classpath 'com.netflix.nebula:nebula-publishing-plugin:7.0.12'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.20.1'
         classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:0.3.0'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc4'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
