@@ -1,10 +1,10 @@
 # Getting started
 
-_This guide adds a Conjure-defined API to an existing gradle project.  It is recommended to define your API in the same git repo as your server._
+_This guide explains how to add a Conjure-defined API to an existing gradle project.  It is recommended to define your API in the same git repo that you implement your server._
 
-## 1. Add the gradle plugin
+## 1. Add the `com.palantir.conjure` gradle plugin
 
-In your `settings.gradle` file, add some new projects to contain your API YML and Conjure-generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, `-typescript` projects.
+In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, `-typescript` projects.
 
 ```diff
  rootProject.name = 'your-project'
@@ -32,23 +32,26 @@ buildscript {
         classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc3'
     }
 }
+
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force 'com.palantir.conjure.java:conjure-java:0.2.4'
+            force 'com.palantir.conjure.java:conjure-java-lib:0.2.4'
+            force 'com.palantir.conjure.typescript:conjure-typescript:0.6.1'
+        }
+    }
+}
+// alternatively, use nebula.dependency-recommender (see below)
 ```
 
 Then in `./your-project-api/build.gradle`, apply the plugin:
 
 ```gradle
 apply plugin: 'com.palantir.conjure'
-
-configurations.all {
-    resolutionStrategy {
-        force 'com.palantir.conjure.java:conjure-java:0.2.1'
-        force 'com.palantir.conjure.typescript:conjure-typescript:0.3.0'
-    }
-}
-// alternatively, use nebula.dependency-recommender (see below)
 ```
 
-> `gradle-conjure` requires you to explicitly specify versions of the conjure-generators to encourage users to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately.
+_`gradle-conjure` requires you to explicitly specify versions of the conjure-generators to encourage users to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately._
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -71,7 +74,7 @@ compileConjureObjects - Generates Java POJOs from your Conjure definitions.
 Instead of adding `force` lines, you can use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin) to specify these version numbers. This is preferrable to the `force` approach because it can read versions from a well-structured properties file which is easy to automatically upgrade.
 
 ```gradle
-// build.gradle
+// root build.gradle
 
 subprojects {
     apply plugin: 'nebula.dependency-recommender'
@@ -84,7 +87,7 @@ subprojects {
 # versions.props
 
 com.palantir.conjure.java:* = 0.2.4
-com.palantir.conjure.typescript:conjure-typescript = 0.3.0
+com.palantir.conjure.typescript:conjure-typescript = 0.6.1
 ```
 
 ## 2. Define your API in Conjure YML
@@ -129,6 +132,8 @@ services:
             param-type: body
 ```
 
+_Refer to the [Conjure specification](./specification.md) for an exhaustive list of allowed YML parameters._
+
 You should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 
 ## 3. Implement your server
@@ -161,3 +166,4 @@ If you want to publish npm packages, you need to simulate the `npm login` comman
 +    }
 +}
 ```
+
