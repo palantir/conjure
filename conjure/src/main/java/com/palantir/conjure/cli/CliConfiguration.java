@@ -30,7 +30,7 @@ import org.immutables.value.Value;
 public abstract class CliConfiguration {
     abstract Collection<File> inputFiles();
 
-    abstract File outputDirectory();
+    abstract File outputLocation();
 
     static Builder builder() {
         return new Builder();
@@ -47,7 +47,7 @@ public abstract class CliConfiguration {
                         .collect(Collectors.toList());
             }
         }
-        return new Builder().inputFiles(inputFiles).outputDirectory(new File(outputDirectory)).build();
+        return new Builder().inputFiles(inputFiles).outputLocation(new File(outputDirectory)).build();
     }
 
     public static final class Builder extends ImmutableCliConfiguration.Builder {}

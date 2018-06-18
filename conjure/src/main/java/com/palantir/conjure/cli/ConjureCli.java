@@ -49,7 +49,7 @@ public final class ConjureCli {
 
             Preconditions.checkArgument(parsedArgs.length == 2, "Usage: conjure <target> <output>");
 
-            return CliConfiguration.of(parsedArgs[1], parsedArgs[2]);
+            return CliConfiguration.of(parsedArgs[0], parsedArgs[1]);
         } catch (ParseException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,7 @@ public final class ConjureCli {
 
     static void generate(CliConfiguration config) throws IOException {
         ConjureDefinition definition = Conjure.parse(config.inputFiles());
-        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputDirectory(), definition);
+        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputLocation(), definition);
     }
 
 }
