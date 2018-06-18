@@ -85,9 +85,47 @@ com.palantir.conjure.java:* = 0.2.4
 com.palantir.conjure.typescript:conjure-typescript = 0.3.0
 ```
 
-## 2. Write conjure yml
+## 2. Define your API in Conjure YML
 
-TODO
+Create your first YML file, e.g. `./your-project-api/src/main/conjure/your-project-api.yml`.  Run `./gradlew compileConjure` frequently to validate your syntax.
+
+```yml
+types:
+  definitions:
+    default-package: com.company.product
+    objects:
+
+      AddPetRequest:
+        fields:
+          id: integer
+          name: string
+          tags: set<Tag>
+          status: Status
+
+      Tag:
+        alias: string
+
+      Status:
+        values:
+        - AVAILABLE
+        - PENDING
+        - SOLD
+
+services:
+  PetStoreService:
+    name: Pet Store Service
+    package: com.company.product
+    default-auth: header
+
+    endpoints:
+      addPet:
+        docs: Add a new pet to the store
+        http: POST /pet
+        args:
+          addPetRequest:
+            type: AddPetRequest
+            param-type: body
+```
 
 ## 3. Publish artifacts
 
