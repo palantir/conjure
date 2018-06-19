@@ -231,7 +231,7 @@ Definition for a field in a complex data type.
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="fieldType"></a>field | `string` | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
+<a name="fieldType"></a>type | `string` | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
 <a name="fieldDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
