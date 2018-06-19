@@ -43,7 +43,7 @@ public abstract class CliConfiguration {
         if (input.isDirectory()) {
             try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {
                 inputFiles = fileStream
-                        .map(path -> new File(path.toAbsolutePath().toString()))
+                        .map(Path::toFile)
                         .collect(Collectors.toList());
             }
         }

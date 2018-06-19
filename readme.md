@@ -99,6 +99,9 @@ function demo(): Promise<void> {
 
 ## Ecosystem
 
+Compiler
+- [conjure](https://github.com/palantir/conjure)
+
 Build tool
 
 - [gradle-conjure](https://github.com/palantir/gradle-conjure)
