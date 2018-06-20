@@ -47,9 +47,11 @@ public final class ConjureCli {
             CommandLine cmd = parser.parse(new Options(), args, false);
             String[] parsedArgs = cmd.getArgs();
 
-            Preconditions.checkArgument(parsedArgs.length == 2, "Usage: conjure <target> <output>");
+            // `compile` is an unused command argument as a placeholder for other generator commands, see issues/24.
+            Preconditions.checkArgument(parsedArgs.length == 3 && "compile".equals(parsedArgs[0]),
+                    "Usage: conjure compile <target> <output>");
 
-            return CliConfiguration.of(parsedArgs[0], parsedArgs[1]);
+            return CliConfiguration.of(parsedArgs[1], parsedArgs[2]);
         } catch (ParseException | IOException e) {
             throw new RuntimeException(e);
         }

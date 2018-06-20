@@ -44,6 +44,7 @@ public final class ConjureCliTest {
     @Test
     public void correctlyParseArguments() {
         String[] args = {
+                "compile",
                 inputFile.getAbsolutePath(),
                 folder.getRoot().getAbsolutePath()
         };
@@ -57,6 +58,7 @@ public final class ConjureCliTest {
     @Test
     public void discoversFilesInDirectory() {
         String[] args = {
+                "compile",
                 folder.getRoot().getAbsolutePath(),
                 folder.getRoot().getAbsolutePath(),
         };
@@ -65,6 +67,18 @@ public final class ConjureCliTest {
                 .outputLocation(folder.getRoot())
                 .build();
         assertThat(ConjureCli.parseCliConfiguration(args)).isEqualTo(expectedConfiguration);
+    }
+
+    @Test
+    public void throwsWhenSubCommandIsNotCompile() {
+        String[] args = {
+                "compiles",
+                folder.getRoot().getAbsolutePath(),
+                folder.getRoot().getAbsolutePath(),
+                };
+        assertThatThrownBy(() -> ConjureCli.parseCliConfiguration(args))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Usage: conjure compile <target> <output>");
     }
 
     @Test
