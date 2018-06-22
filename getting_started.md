@@ -126,7 +126,7 @@ services:
 
 _Refer to the [Conjure specification](./specification.md) for an exhaustive list of allowed YML parameters._
 
-You should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
+After running `./gradlew compileConjure`, you should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 
 ## 3. Implement your server
 
