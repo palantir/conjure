@@ -4,7 +4,7 @@ _This guide explains how to add a Conjure-defined API to an existing gradle proj
 
 ## 1. Add the `com.palantir.conjure` gradle plugin
 
-In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, `-typescript` projects.
+In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, and `-typescript` sub-projects.
 
 ```diff
  rootProject.name = 'your-project'
