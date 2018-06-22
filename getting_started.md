@@ -136,7 +136,7 @@ In your main gradle project, you can now depend on the generated Jersey interfac
 // ./your-project/build.gradle
 
 dependencies {
-    project(':your-project-api:your-project-api-jersey')
+    compile project(':your-project-api:your-project-api-jersey')
     ...
 }
 ```
