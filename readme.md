@@ -20,7 +20,7 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 
 ## Getting started
 
-See our _5 minute guide_ to build a backend and frontend with Conjure.
+See our [getting started](./getting_started.md) guide to define your first Conjure API.
 
 ## Example
 
