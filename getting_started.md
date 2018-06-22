@@ -76,9 +76,11 @@ compileConjureObjects - Generates Java POJOs from your Conjure definitions.
 If you already use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin), you can omit the `resolutionStrategy` lines and use a properties file like `versions.props` instead:
 
 ```
-com.palantir.conjure.java:* = 0.2.4
-com.palantir.conjure.typescript:conjure-typescript = 0.6.1
+com.palantir.conjure.java:* = <latest>
+com.palantir.conjure.typescript:conjure-typescript = <latest>
 ```
+
+_Check the GitHub releases page to find the latest version of [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
 
 ## 2. Define your API in Conjure YML
 
