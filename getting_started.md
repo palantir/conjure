@@ -33,6 +33,9 @@ buildscript {
     }
 }
 
+// conjure-generator versions must be specified explicitly so that it's clear they can be upgraded independently.
+
+// (option 1):
 subprojects {
     configurations.all {
         resolutionStrategy {
@@ -42,7 +45,8 @@ subprojects {
         }
     }
 }
-// alternatively, use nebula.dependency-recommender (see below)
+
+// (option 2): nebula.dependency-recommender (see below)
 ```
 
 Then in `./your-project-api/build.gradle`, apply the plugin:
@@ -50,8 +54,6 @@ Then in `./your-project-api/build.gradle`, apply the plugin:
 ```gradle
 apply plugin: 'com.palantir.conjure'
 ```
-
-_`gradle-conjure` requires you to explicitly specify versions of the conjure-generators to encourage users to update them frequently.  These generators are released entirely independently from the gradle-conjure plugin and can be upgraded separately._
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -71,21 +73,9 @@ compileConjureObjects - Generates Java POJOs from your Conjure definitions.
 
 ### (Optional) Use `nebula.dependency-recommender`
 
-Instead of adding `force` lines, you can use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin) to specify these version numbers. This is preferrable to the `force` approach because it can read versions from a well-structured properties file which is easy to automatically upgrade.
+If you already use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin), you can omit the `resolutionStrategy` lines and use a properties file like `versions.props` instead:
 
-```gradle
-// root build.gradle
-
-subprojects {
-    apply plugin: 'nebula.dependency-recommender'
-    dependencyRecommendations {
-        propertiesFile file: project.rootProject.file('versions.props')
-    }
-}
 ```
-```
-# versions.props
-
 com.palantir.conjure.java:* = 0.2.4
 com.palantir.conjure.typescript:conjure-typescript = 0.6.1
 ```
