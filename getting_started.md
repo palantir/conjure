@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc3'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc6'
     }
 }
 
