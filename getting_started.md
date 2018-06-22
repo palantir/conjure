@@ -16,7 +16,7 @@ In your `settings.gradle` file, add some new projects to contain your API YML an
 +include 'your-project-api:your-project-api-typescript'
 ```
 
-_Note, you can omit any of these projects if you don't need the generated code.  For example, if you only want to generate Java objects, you can just add the `-objects` project._
+_Note, you can omit any of these projects if you don't need the generated code (gradle-conjure just looks at the project name suffix to figure out where to put generated code).  For example, if you only want to generate Java objects, you can just add the `your-project-api-objects` project and omit the others._
 
 In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 
