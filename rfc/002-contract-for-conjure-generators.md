@@ -1,12 +1,12 @@
-# RFC: Contract for conjure-generators
+# RFC: Contract for Conjure generators
 
 11 Jun 2018
 
-conjure-generators should conform to a well-defined contract so that a single build tool (e.g. gradle-conjure) can easily support new generators.
+Conjure generators should conform to a well-defined contract so that a single build tool (e.g. gradle-conjure) can easily support new generators.
 
 ## Distribution
 
-conjure-generators may be distributed as a tgz containing a platform independent executable. For example, the archive conjure-java-0.2.3.tgz unpacks to the following structure:
+Conjure generators may be distributed as a tgz containing a platform independent executable. For example, the archive conjure-java-0.2.3.tgz unpacks to the following structure:
 
 ```
 conjure-java-0.2.3
@@ -21,6 +21,8 @@ conjure-java-0.2.3
 ```
 
 `conjure-<lang>-<version>/bin/conjure-<lang>` should be a script that works on Mac / Linux. There is currently no requirement to run on Windows, but this may change in the future.
+
+
 
 ## Primary command
 
@@ -42,15 +44,15 @@ Generators are free to implement any other behaviour if the `generate` command i
 conjure-typescript --version="0.1.0" --goFastMode
 ```
 
-Ideally, conjure-generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain author, license and version fields (otherwise it would be very inconvenient to publish), but these clearly need to be specified by the user.
+Ideally, Conjure generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain author, license and version fields (otherwise it would be very inconvenient to publish), but these clearly need to be specified by the user.
 
-conjure-generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be rejected.
+Conjure generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be rejected.
 
 Flags such as `--foo` may also be passed to switch on some functionality, or `--foo=false` to switch it off.
 
 ### Alternatives considered
 
-1. **pass arbitrary JSON to the CLI.** - This would satisfy the requirements, but the ease of passing complex options (e.g. lists, maps etc) may actually encourage conjure-generator authors to stray from the 'zero-config' recommendation and build increasingly complicated CLIs.
+1. **pass arbitrary JSON to the CLI.** - This would satisfy the requirements, but the ease of passing complex options (e.g. lists, maps etc) may actually encourage Conjure generator authors to stray from the 'zero-config' recommendation and build increasingly complicated CLIs.
 2. **plain on/off feature flags: GO_FAST, PRESERVE_DINGBATS** - This is aesthetically very attractive, but doesn't support some essential requirements of conjure-typescript, e.g. license, version, author (this must be an arbitrary string, it's not a boolean on/off flag).
 3. **configurability via environment variables** - This is less intuitive than the `--key=value` options.
 
