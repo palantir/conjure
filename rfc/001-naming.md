@@ -1,5 +1,7 @@
 # RFC: Conjure naming
 
+4 Jun 2018
+
 Consistent names across the Conjure family of repos are important so that people can instinctively reach for the right thing and be productive across many different languages.
 
 ## Example: `conjure-typescript`
