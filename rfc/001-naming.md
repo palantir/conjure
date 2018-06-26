@@ -15,7 +15,7 @@ npm install conjure-client
 
 The `foo-api` package would be produced by a _Conjure generator_:
 
-- **Maven coordinates of executable**: [`com.palantir.conjure.typescript:conjure-typescript:1.2.3`](https://bintray.com/palantir/releases/conjure-typescript/0.3.0#files/com/palantir/conjure/typescript/conjure-typescript/0.3.0)
+- **Maven coordinates of executable**: `com.palantir.conjure.typescript:conjure-typescript:<version>`
 - **Git repo**: [`palantir/conjure-typescript`](https://github.com/palantir/conjure-typescript)
 
 Network requests are actually made by the `conjure-client` NPM package, which lives in a separate repo (so it can be released independently):
@@ -27,26 +27,28 @@ _Note: the npm package is not called `conjure-typescript-client` because it actu
 
 ## Generic guidelines
 
-_Conjure generators_ are CLIs that take Conjure JSON (IR) and output some files in another language. Names should comply with the following:
+_Conjure generators_ are CLIs that take Conjure JSON (IR) and output some files in another language (_&lt;lang&gt;_). Names should comply with the following:
 
-- **Executable**: `conjure-<lang>`.
-- **Maven coordinates of executable**: `com.palantir.conjure.<lang>:conjure-<lang>:1.2.3`. The executable must be downloaded as a .tgz file, where the actual executable is invoked by expanding the archive then running `./conjure-<lang>-1.2.3/bin/conjure-<lang>` where the appropriate version is substituted for 1.2.3.
-- **Git repo**: `palantir/conjure-<lang>`, where _lang_ is the unabbreviated name of the output language, e.g. conjure-python.
+- **Executable**: `conjure-<lang>`
+- **Maven coordinates of executable**: `com.palantir.conjure.<lang>:conjure-<lang>:<version>`
+- **Git repo**: `palantir/conjure-<lang>`
+
+_Runtime libraries_ include functionality not specific to network requests which would otherwise be duplicated across all generated code (e.g. serialization types/utilities). These should be named `conjure-lib` if possible.
+
+- **Git repo**: It is often acceptable to colocate this code with the Client library, but if a separate repo is warranted, it must include the name of the source language, e.g. `palantir/conjure-<lang>-lib`.
+
+_Serialization code_ should be versioned together (in the same repo) as the runtime library.
 
 _Client libraries_ include code necessary to make outgoing network requests.
 
 - **Artifact name**: `conjure-client`.  This should be idiomatic within the language but should not include the language name itself as this would be redundant. For example, `conjure_client` is acceptable if dashes are not allowed.
-- **Maven coordinates** (if necessary): `com.palantir.conjure.<lang>:conjure-client:1.2.3`.
-- **Git repo** should be named `conjure-<lang>-client`.
+- **Maven coordinates** (if necessary): `com.palantir.conjure.<lang>:conjure-client:<version>`.
+- **Git repo**: `conjure-<lang>-client`.
 
-
-_Runtime libraries_ include functionality not specific to network requests which would otherwise be duplicated across all generated code (e.g. serialization types/utilties). These should be named `conjure-lib` if possible.
-
-- **Git repo**: It is often acceptable to colocate this code with the Client library, but if a separate repo is warranted, it must include the name of the source language, e.g. `palantir/conjure-<lang>-lib`.
 
 _Build tools_ make it convenient to use Conjure CLIs within a particular build ecosystem. [`gradle-conjure`](https://github.com/palantir/gradle-conjure) is the Palantir supported Conjure build tool:
 
-- **Maven coordinates**: `com.palantir.gradle.conjure:gradle-conjure:1.2.3`
+- **Maven coordinates**: `com.palantir.gradle.conjure:gradle-conjure:<version>`
 - **Gradle plugin name**: `com.palantir.conjure`.  (Including 'gradle' here would be redundant)
 - **Git repo**: `gradle-conjure`.  Build tools must be well differentiated from code generators.
 
@@ -58,6 +60,8 @@ All functionality in the Conjure ecosystem should be decomposed and named such t
 2. Easy for consumers to file bugs or feature requests.
 3. Easy for maintainers to keep compile backwards-compatibility (i.e. hard to cause unintentional breaks).
 4. Easy to version all artifacts in a SemVer compliant way.
+
+A corollary of (1) is that only one repo should ever publish artifacts to one maven group (so that consumers can easy force one version).
 
 ## Alternatives considered
 
