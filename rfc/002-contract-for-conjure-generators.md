@@ -22,8 +22,6 @@ conjure-java-0.2.3
 
 `conjure-<lang>-<version>/bin/conjure-<lang>` should be a script that works on Mac / Linux. There is currently no requirement to run on Windows, but this may change in the future.
 
-
-
 ## Primary command
 
 Conjure generators should expect to be called with the command `generate` as the first argument. They read a single JSON file, specified by the positional argument `<input-json>` and write to the `<ouput-directory>` folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
@@ -32,7 +30,9 @@ Conjure generators should expect to be called with the command `generate` as the
 conjure-<lang> generate <input-json> <output-directory>
 ```
 
-Generators can assume that this output directory already exists and is empty. (It is not the responsibility of conjure generators to do any diffing or up-to-date checking - this should be done by a higher level build tool, like gradle-conjure.)
+Generators can assume that this output directory already exists and is empty. (It is not the responsibility of conjure generators to do any diffing or up-to-date checking - this should be done by a higher level build tool, like [gradle-conjure](https://github.com/palantir/gradle-conjure).)
+
+Generators should not produce `.gitignore` files or any files that would only make sense if checked in to a repository.
 
 Generators are free to implement any other behaviour if the `generate` command is not invoked.
 
