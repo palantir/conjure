@@ -27,23 +27,23 @@ _Note: the npm package is not called `conjure-typescript-client` because it actu
 
 ## Generic guidelines
 
-_"Conjure generators"_ are CLIs that take Conjure JSON (IR) and output some files in another language. Names should comply with the following:
+_Conjure generators_ are CLIs that take Conjure JSON (IR) and output some files in another language. Names should comply with the following:
 
 - **Git repo**: `palantir/conjure-<lang>`, where _lang_ is the unabbreviated name of the output language, e.g. conjure-python.
 - **CLI**:`conjure-<lang>`.
 - **Maven coordinates of executable**: `com.palantir.conjure.<lang>:conjure-<lang>:1.2.3`. The executable must be downloaded as a .tgz file, where the actual executable is invoked by expanding the archive then running `./conjure-<lang>-1.2.3/bin/conjure-<lang>` where the appropriate version is substituted for 1.2.3.
 
-_"Client libraries"_ include code necessary to make outgoing network requests.
+_Client libraries_ include code necessary to make outgoing network requests.
 
 - **Git repo** should be named `conjure-<lang>-client`.
 - **Artifact name**: `conjure-client`.  This should be idiomatic within the language but should not include the language name itself as this would be redundant. For example, `conjure_client` is acceptable if dashes are not allowed.
 - **Maven coordinates** (if necessary): `com.palantir.conjure.<lang>:conjure-client:1.2.3`.
 
-_"Runtime libraries"_ include functionality not specific to network requests which would otherwise be duplicated across all generated code (e.g. serialization types/utilties). These should be named `conjure-lib` if possible.
+_Runtime libraries_ include functionality not specific to network requests which would otherwise be duplicated across all generated code (e.g. serialization types/utilties). These should be named `conjure-lib` if possible.
 
 - **Git repo**: It is often acceptable to colocate this code with the Client library, but if a separate repo is warranted, it must include the name of the source language, e.g. `palantir/conjure-<lang>-lib`.
 
-_"Build tools"_ make it convenient to use Conjure CLIs within a particular build ecosystem. [`gradle-conjure`](https://github.com/palantir/gradle-conjure) is the Palantir supported Conjure build tool:
+_Build tools_ make it convenient to use Conjure CLIs within a particular build ecosystem. [`gradle-conjure`](https://github.com/palantir/gradle-conjure) is the Palantir supported Conjure build tool:
 
 - **Git repo**: `gradle-conjure`.  Build tools must be well differentiated from code generators.
 - **Maven coordinates**: `com.palantir.gradle.conjure:gradle-conjure:1.2.3`
