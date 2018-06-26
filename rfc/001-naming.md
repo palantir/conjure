@@ -50,6 +50,15 @@ _Build tools_ make it convenient to use Conjure CLIs within a particular build e
 - **Gradle plugin name**: `com.palantir.conjure`.  (Including 'gradle' here would be redundant)
 - **Git repo**: `gradle-conjure`.  Build tools must be well differentiated from code generators.
 
+## Goals
+
+All functionality in the Conjure ecosystem should be decomposed and named such that it is:
+
+1. Easy for consumers to use (idiomatically in their chosen language).
+2. Easy for consumers to file bugs or feature requests.
+3. Easy for maintainers to keep compile backwards-compatibility (i.e. hard to cause unintentional breaks).
+4. Easy to version all artifacts in a SemVer compliant way.
+
 ## Alternatives considered
 
 Use a single pattern to derive repo and artifact name for generators, client libraries and runtime libraries: `conjure-<lang>(-(client|lib))?`.   This is sub-optimal for consumers, as published artifacts don't usually contain the source language.  For example, a Kotlin repo using API jars would have to depend on `conjure-java-lib`, or a pure javascript project might need to pull in `conjure-typescript-client` even if they don't want to use typescript.
