@@ -30,8 +30,14 @@
 * client implementations
 
 
-# Alternatives considered
+## Alternatives considered
 
 ### Everything in one repository
 
-* makes it hard for maintainers to comply with Goal #1
+Makes it hard for maintainers to comply with Goals 1 and 2, because one PR to this repository could inadvertently change the contract between generated code and client implementations, such that there might be two conjurized APIs that cannot be satisfied by a single client implementation.
+
+Goal 1 in particular is hard to comply with because implementations don't have a clear contract to adhere to.
+
+### Generated artifacts contain client implementations inline
+
+Violates Goal 1 (bring your own client) - users can't upgrade the client to fix a bug in e.g. the failover behaviour without having to ask the API maintainer to upgrade the generator and re-publish the relevant conjurized API (which might require back-porting).
