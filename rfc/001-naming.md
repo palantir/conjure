@@ -4,6 +4,20 @@
 
 Consistent names across the Conjure family of repos are important so that people can instinctively reach for the right thing and be productive across many different languages.
 
+## Goals
+
+All functionality in the Conjure ecosystem should be decomposed and named such that it is:
+
+1. Easy for consumers to use (idiomatically in their chosen language).
+2. Easy for consumers to file bugs or feature requests on the right repo.
+3. Easy for maintainers to ensure backwards-compatibility (i.e. hard to cause unintentional compilation breaks).
+4. Easy to version all artifacts in a SemVer compliant way.
+
+A corollary of (1) is that only one repo should ever publish artifacts to one maven group (so that consumers can easily force one version).
+
+
+<!--
+
 ## Example: `conjure-typescript`
 
 Making API calls should be simple from a user's perspective:
@@ -24,7 +38,7 @@ Network requests are actually made by the `conjure-client` NPM package, which li
 - **Git repo**: [`palantir/conjure-typescript-client`](https://github.com/palantir/conjure-typescript-client)
 
 _Note: the npm package is not called `conjure-typescript-client` because it actually works with any javascript ecosystem language - the `typescript` part would be at best redundant and at worst confusing._
-
+ -->
 ## Conjure generators
 
 _Conjure generators_ are CLIs that take Conjure JSON (IR) and output some files in another language, _&lt;lang&gt;_. Conjure generator behaviour is specified in [002-contract-for-conjure-generators.md](002-contract-for-conjure-generators.md).
@@ -58,17 +72,6 @@ _Build tools_ make it convenient to use Conjure CLIs within a particular build e
 - **Maven coordinates**: `com.palantir.gradle.conjure:gradle-conjure:<version>`
 - **Gradle plugin name**: `com.palantir.conjure`.  (Including 'gradle' here would be redundant)
 - **Git repo**: `gradle-conjure`.  Build tools must be well differentiated from code generators, so shouldn't use the `conjure-<foo>` pattern.
-
-## Goals
-
-All functionality in the Conjure ecosystem should be decomposed and named such that it is:
-
-1. Easy for consumers to use (idiomatically in their chosen language).
-2. Easy for consumers to file bugs or feature requests.
-3. Easy for maintainers to keep compile backwards-compatibility (i.e. hard to cause unintentional breaks).
-4. Easy to version all artifacts in a SemVer compliant way.
-
-A corollary of (1) is that only one repo should ever publish artifacts to one maven group (so that consumers can easy force one version).
 
 ## Alternatives considered
 
