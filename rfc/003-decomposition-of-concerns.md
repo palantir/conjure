@@ -21,15 +21,15 @@ For servers, it should be feasible to use completely different technologies (net
 
 ### API
 
-* client APIs (one for each supported flavour)
-* server APIs (one for each supported flavour)
+* client APIs
+* server APIs
 * common runtime library
 
 ### Generator
 
-* client API generators (one for each supported flavour)
+* client API generators
     * generated artifact depends on client API and object artifact
-* server API generators (one for each supported flavour)
+* server API generators
     * generated artifact depends on server API and object artifact
 * object generators
     * generated artifact containing objects depends on common runtime library
