@@ -1,4 +1,4 @@
-# RFC: Language repository structure
+# RFC: Loosely coupled Conjure clients
 
 27 Jun 2018
 
@@ -13,7 +13,7 @@ _Recommendations for how to decompose and version functionality related to one C
 
 ## Generated code should be loosely coupled to clients
 
-The output of a Conjure generator should not contain client/server logic, instead it should just comply with a _contract_. In the case of Conjure services, it should be a minimal specification of the user defined API. This allows users to upgrade/swap out their client implementation, as long as the new client conforms to the same contract.
+The output of a Conjure generator should not contain client/server logic, instead it should just comply with a _contract_. In the case of Conjure services, it should just convey a minimal representation of the user defined API. This allows consumers to upgrade/swap out their client implementation, as long as the new client conforms to the same contract.
 
 This contract affects _all_ generated code and client implementations, so should be as stable as possible.
 
@@ -36,7 +36,7 @@ export class SomeGeneratedService {
 }
 ```
 
-*Bad example*: In the snippet below, the generated code is not decoupled from the actual fetch implementation.  This is sub-optimal because users are not able to substitute their own client and would not even be able to pick up improvements/bugfixes to the `parseResponseBasedOnContentType` or `rejectNon2XXResponses` functions without asking the API author to re-publish this API with a new conjure version
+*Bad example*: In the snippet below, the generated code is not decoupled from the actual fetch implementation.  This is sub-optimal because users are not able to substitute their own client and would not even be able to pick up improvements/bugfixes to the `parseResponseBasedOnContentType` or `rejectNon2XXResponses` functions without asking the API author to re-publish this API with a new conjure version.
 
 ```typescript
 export class SomeGeneratedService {
@@ -57,26 +57,49 @@ export class SomeGeneratedService {
 ```
 
 
-## Suggested Repository Structure
+## Suggested repositories
 
-### Contracts
+### (1) Generator
 
-* client contracts
-* server contracts
-* shared objects (e.g. SafeLong for conjure-java)
+Conjure generators should explicitly define what contract their generated code will conform to. This contract could be an existing external one like Retrofit or Feign annotations, or a brand-new set of custom-written interfaces.
 
-### Generator
+### (2) Contract implementations
 
-* client API generators
-    * generated artifact depends on client contract and object artifact
-* server API generators
-    * generated artifact depends on server contract and object artifact
-* object generators
-    * generated artifact containing objects depends on common runtime library
+Ideally, one git repository should contain all client implementations (this example has two flavours, `foo` and `bar`), any server wiring code, and serialization support:
 
-### Implementation
+```
+conjure-<lang>-runtime
+├── conjure-<lang>-foo-client
+├── conjure-<lang>-bar-client
+└── conjure-<lang>-baz-server
+```
 
-<!-- TODO -->
+### (3) Contract definitions and shared objects
+
+For maximum safety, it is recommended to put contract definitions, shared objects and serialization code in another separate repo, e.g. `conjure-<lang>-contract`.  Ideally, this repo would change very infrequently and it's changelog would be very easy to read.
+
+```
+conjure-<lang>-contract
+├── conjure-<lang>-foo-contract
+├── conjure-<lang>-bar-contract
+├── conjure-<lang>-baz-contract
+├── conjure-<lang>-jackson-serialization
+└── conjure-<lang>-lib
+```
+
+If maintaining three repos is deemed an excessive overhead for maintainers, it is also tolerable to colocate all these contract definitions and shared objects with the implementations mentioned earlier:
+
+```diff
+ conjure-<lang>-runtime
++├── conjure-<lang>-foo-contract
+ ├── conjure-<lang>-foo-client
++├── conjure-<lang>-bar-contract
+ ├── conjure-<lang>-bar-client
++├── conjure-<lang>-baz-contract
+ ├── conjure-<lang>-baz-server
++├── conjure-<lang>-jackson-serialization
++└── conjure-<lang>-lib
+```
 
 
 ## Alternatives considered
