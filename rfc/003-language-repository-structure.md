@@ -2,22 +2,60 @@
 
 27 Jun 2018
 
+_Recommendations for how to decompose and version functionality related to one Conjure generator._
+
 ## Goals
 
-1. **Bring your own client** - clients should be decoupled from conjurized API so that users can substitute their own client implementation, or upgrade an existing client implementation without changing their conjurized API dependency
-1. **Multiple conjurized APIs can coexist** - users must be able to depend on APIs coming from multiple different generator versions without encountering a diamond dependency
-1. **Support multiple flavours** of client / server specifications - e.g. clients might be blocking or non-blocking, use dynamic proxies or not, and  servers could be netty, jetty etc.
+1. **Bring your own client** - clients should be decoupled from generated Conjure APIs so that users can substitute their own client implementation, or upgrade an existing implementation without changing their conjurized API dependency.
+1. **Multiple conjurized APIs can coexist** - users must be able to depend on APIs coming from multiple different generator versions without encountering a diamond dependency.
+1. **Support multiple flavours** of client / server specifications - e.g. clients might be blocking or non-blocking, use dynamic proxies or not, and  servers could be netty, jetty etc; the repository structure should not preclude this.
+1. **Contributor-friendly** - repositories should be consistently named and easily discoverable so that contributors can easily open PRs and file issues.
 
-## Conjurized API
+## Generated code should be loosely coupled to clients
 
-The output of a Conjure generator should not contain client/server logic.
-In the case of services, it should be a minimal specification of the user defined API.
+The output of a Conjure generator should not contain client/server logic, instead it should just comply with a _contract_. In the case of Conjure services, it should be a minimal specification of the user defined API. This allows users to upgrade/swap out their client implementation, as long as the new client conforms to the same contract.
 
-This allows users to upgrade/swap out their client implementation, as long as it conforms to some predefined contract.
+This contract affects _all_ generated code and client implementations, so should be as stable as possible.
 
-This contract couples generated code and implementations and therefore should be incredibly stable.
+*Good example*: In the generated TypeScript code below, the 'contract' is the `IHttpApiBridge` and `IHttpEndopintOptions` interfaces.  You can see the generated code doesn't actually contain any logic, but delegates the real work to the user-supplied `client`.  This client can be upgraded independently, as long as it still complies with the contract.
 
-E.g. for conjure-java, the default contract for both clients and servers is jax-rs annotations.
+```typescript
+export class SomeGeneratedService {
+    constructor(private client: IHttpApiBridge) {}
+
+    public myEndpoint(body: SomeRequestBody): Promise<void> {
+        const options: IHttpEndpointOptions = {
+            data: body,
+            endpointPath: "/my-endpoint",
+            method: "POST",
+            requestMediaType: MediaType.APPLICATION_JSON,
+            responseMediaType: MediaType.APPLICATION_JSON,
+        };
+        return this.client.callEndpoint<void>(options);
+    }
+}
+```
+
+*Bad example*: In the snippet below, the generated code is not decoupled from the actual fetch implementation.  This is sub-optimal because users are not able to substitute their own client and would not even be able to pick up improvements/bugfixes to the `parseResponseBasedOnContentType` or `rejectNon2XXResponses` functions without asking the API author to re-publish this API with a new conjure version
+
+```typescript
+export class SomeGeneratedService {
+    constructor(private url: string) {}
+
+    public myEndpoint(body: SomeRequestBody): Promise<void> {
+        return fetch(url + "/my-endpoint", {
+            credentials: "same-origin",
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${getAuthHeaderSomehow()}`
+            }
+        })
+        .then(parseResponseBasedOnContentType)
+        .then(rejectNon2XXResponses);
+    }
+}
+```
+
 
 ## Suggested Repository Structure
 
