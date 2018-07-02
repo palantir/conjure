@@ -65,7 +65,7 @@ Conjure generators should explicitly define what contract their generated code w
 
 ### (2) Contract implementations
 
-Ideally, one git repository should contain all client implementations (this example has two flavours, `foo` and `bar`), any server wiring code, and serialization support:
+Ideally, one git repository should contain all client implementations (this example has two flavours, `foo` and `bar`) and any server wiring code:
 
 ```
 conjure-<lang>-runtime
@@ -76,7 +76,7 @@ conjure-<lang>-runtime
 
 ### (3) Contract definitions and shared objects
 
-For maximum safety, it is recommended to put contract definitions, shared objects and serialization code in another separate repo, e.g. `conjure-<lang>-contract`.  Ideally, this repo would change very infrequently and it's changelog would be very easy to read.
+For maximum safety, it is recommended to put contract definitions, serialization code and shared objects in another separate repo, e.g. `conjure-<lang>-contract`.  'Shared objects' include any types that are be shared between all generated APIs, e.g. `SafeLong`. Ideally, this repo would change very infrequently and its changelog would be very easy to read.
 
 ```
 conjure-<lang>-contract
