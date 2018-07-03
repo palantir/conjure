@@ -39,9 +39,10 @@ buildscript {
 subprojects {
     configurations.all {
         resolutionStrategy {
-            force 'com.palantir.conjure.java:conjure-java:0.2.4'
-            force 'com.palantir.conjure.java:conjure-java-lib:0.2.4'
-            force 'com.palantir.conjure.typescript:conjure-typescript:0.6.1'
+            force 'com.palantir.conjure:conjure:4.0.0'
+            force 'com.palantir.conjure.java:conjure-java:1.0.0'
+            force 'com.palantir.conjure.java:conjure-java-lib:1.0.0'
+            force 'com.palantir.conjure.typescript:conjure-typescript:3.0.0'
         }
     }
 }
