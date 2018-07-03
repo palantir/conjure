@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc6'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
     }
 }
 
@@ -41,7 +41,7 @@ subprojects {
         resolutionStrategy {
             force 'com.palantir.conjure:conjure:4.0.0'
             force 'com.palantir.conjure.java:conjure-java:1.0.0'
-            force 'com.palantir.conjure.java:conjure-java-lib:1.0.0'
+            force 'com.palantir.conjure.java:conjure-lib:1.0.0'
             force 'com.palantir.conjure.typescript:conjure-typescript:3.0.0'
         }
     }
