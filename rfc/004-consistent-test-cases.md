@@ -24,26 +24,26 @@ A single generator may generate just clients or servers, so these will be tested
     - servers must return spec-compliant responses
     - servers must reject non-compliant requests
 
-_Note, there isn't a 'serialization' category here because client-side and server-side serialization and deserialization are subtly different. For example, servers should not tolerate unknown fields in a JSON request body as this is likely a programmer error, but clients must tolerate extra fields in a server response otherwise server authors would never be able to add new functionality!_
+_Note, there isn't a 'serialization' category here because client-side and server-side serialization and deserialization are subtly different. For example, clients must tolerate extra fields in a server response (otherwise server authors would never be able to add new functionality). Servers on the other hand may reject unknown fields in a JSON request body as this is likely a programmer error._
 
 ## Proposal
 
 A single repository should publish the following versioned artifacts:
 
-* `testcases.yml` - a self-contained file containing exhaustive tests for both clients and servers
-* `test-api.conjure.json` - clients must be generated from this conjure IR in order to interact with the test server. This conjure definition should also contain types sufficient for deserializing the testcases.yml file.
-* `testserver` - an executable that will send sample responses and make assertions about the generated client's requests
-* `testclient` - an executable that will send sample requests and make assertions about the generated server's responses
+* `test-cases.yml` - a self-contained file containing exhaustive tests for both clients and servers
+* `test-api.conjure.json` - clients must be generated from this conjure IR in order to interact with the test server. This conjure definition should also contain types sufficient for deserializing the test-cases.yml file.
+* `compliance-server` - an executable that will send sample responses and make assertions about the generated client's requests
+* `compliance-client` - an executable that will send sample requests and make assertions about the generated server's responses
 
 ## Running the tests
 
 Contributors should be able to run the tests from within their IDE using a language-native test harness.  For example, for conjure-java, the tests should be runnable from JUnit inside IntelliJ.
 
-It is recommended that setting up the tests for the first time requires minimal hand-written network requests - ideally, these should just be loaded from the master testcases.yml file to facilitate easy updates.
+It is recommended that setting up the tests for the first time requires minimal hand-written network requests - ideally, these should just be loaded from the master test-cases.yml file to facilitate easy updates.
 
-## `testcases.yml`
+## `test-cases.yml`
 
-The testcases.yml file should be well-typed and easy to deserialize. It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md):
+The test-cases.yml file should be well-typed and easy to deserialize. It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md):
 
 * primitives (string, boolean, datetime, safelong, etc)
 * collection types (list, set, map, optional)
@@ -57,21 +57,21 @@ The testcases.yml file should be well-typed and easy to deserialize. It should c
 * invalid JSON
 * set uniqueness, duplicate map keys
 
-## Client verification using the testserver
+## Client verification using the compliance-server
 
-To prove compliance, a conjure-generator should generate objects and client interfaces for a special IR file: test-api.conjure.json. These generated clients will be used to make network requests to the testserver.
+To prove compliance, a conjure-generator should generate objects and client interfaces for a special IR file: `test-api.conjure.json`. These generated clients will be used to make network requests to the compliance-server.
 
-The testserver has a few responsibilities:
+The compliance-server has a few responsibilities:
 
 * it should issue a variety of both valid and invalid responses to exercise the client deserialization code
 * it should make detailed assertions about incoming requests from the generated client
 * accumulate statistics about passed/failed tests
 
-To verify a client's serialization and deserialization logic, the client under test should repeatedly make requests to a series of GET endpoints on the testserver. The testserver will return successive valid and then invalid JSON responses (in a well-defined order). The client should deserialize the response body for the positive tests, then re-serialize this and echo it back to the server as a POST request.  For the non-compliant server responses (negative cases), the client should error and the test harness should notify the testserver of the expected deserialization failure.
+To verify a client's serialization and deserialization logic, the client under test should repeatedly make requests to a series of GET endpoints on the compliance-server. The compliance-server will return successive valid and then invalid JSON responses (in a well-defined order). The client should deserialize the response body for the positive tests, then re-serialize this and echo it back to the server as a POST request.  For the non-compliant server responses (negative cases), the client should error and the test harness should notify the compliance-server of the expected deserialization failure.
 
 More intricate requests may need to be constructed manually.
 
-## Server verification using the testclient
+## Server verification using the compliance-client
 
 TODO
 
