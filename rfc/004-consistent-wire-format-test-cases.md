@@ -1,4 +1,4 @@
-# RFC: Consistent test cases
+# RFC: Consistent wire-format test cases
 
 5 Jul 2018
 
