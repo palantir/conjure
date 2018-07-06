@@ -59,7 +59,7 @@ The test-cases.json file should be well-typed and easy to deserialize. It should
 
 ## Client verification using compliance-server
 
-To prove compliance, a conjure-generator should generate objects and client interfaces for the master IR file: `test-api.conjure.json`. These generated clients will be used to make network requests to the compliance-server.
+To prove client-side compliance, a conjure-generator should generate objects and client interfaces from the master IR file: `test-api.conjure.json`. These generated clients will be used to make network requests to the compliance-server.
 
 The compliance-server has a few responsibilities:
 
@@ -67,13 +67,20 @@ The compliance-server has a few responsibilities:
 * it should make detailed assertions about incoming requests from the generated client
 * accumulate statistics about passed/failed tests
 
-To verify a client's serialization and deserialization logic, the client under test should repeatedly make requests to a series of GET endpoints on the compliance-server. The compliance-server will return successive valid and then invalid JSON responses (in a well-defined order). The client should deserialize the response body for the positive tests, then re-serialize this and echo it back to the server as a POST request.  For the non-compliant server responses (negative cases), the client should error and the test harness should notify the compliance-server of the expected deserialization failure.
+Some test cases can be automated easily, but some will need to be constructed manually:
 
-More intricate requests may need to be constructed manually.
+1. For basic serialization cases, client under test should repeatedly make requests to a series of GET endpoints on the compliance-server. The compliance-server will return successive valid and then invalid JSON responses (in a well-defined order). The client should deserialize the response body for the positive tests, then re-serialize this and send it back to the server's 'confirm' endpoint as a POST request.  For the non-compliant server responses (negative cases), the client should error and the test harness should notify the compliance-server of the expected deserialization failure.
+2. For more complicated test cases, network calls will need to be constructed manually
 
-## Server verification using the compliance-client
+## Server verification using compliance-client
 
-TODO
+To prove server-side compliance, a conjure-generator should again generate objects and server interfaces from the master IR file: `test-api.conjure.json`.  The generated server will receive requests from the compliance-client.
+
+Similar to the client-side verification, there are some easily-automated tests and some manually constructed ones:
+
+1. Automatable echo endpoints: the server will implement a variety of POST endpoints which just receive a type and return the same type.  The compliance-client will make requests to these echo endpoints and make assertions about the responses from the server under test.
+
+2. Hand-written endpoints: the generated server should also implement more complicated endpoints with combinations of path parameters, authentication, headers etc.
 
 ## Degrees of compliance
 
