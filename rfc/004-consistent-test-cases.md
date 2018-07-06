@@ -77,7 +77,7 @@ TODO
 
 ## Degrees of compliance
 
-TODO
+Ideally generators should be 100% compliant, but new generators might not comply with all the edge cases from `test-cases.yml`. The generator may still be usable in this state, but these caveats should be called out explicitly so that users can assess its completeness.
 
 ## Where should tests be run
 
