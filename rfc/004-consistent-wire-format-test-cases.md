@@ -59,12 +59,12 @@ The test-cases.json file should be well-typed and easy to deserialize. It should
 
 ## Client verification using compliance-server
 
-To prove client-side compliance, a conjure-generator should generate objects and client interfaces from the master IR file: `compliance-api.conjure.json`. These generated clients will be used to make network requests to the compliance-server.
+To prove client-side compliance, a conjure-generator must generate objects and client interfaces from the master IR file: `compliance-api.conjure.json`. These generated clients will be used to make network requests to the compliance-server.
 
 The compliance-server has a few responsibilities:
 
-* it should issue a variety of both valid and invalid responses to exercise the client deserialization code
-* it should make detailed assertions about incoming requests from the generated client
+* it must issue a variety of both valid and invalid responses to exercise the client deserialization code
+* it must make detailed assertions about incoming requests from the generated client
 * accumulate statistics about passed/failed tests
 
 Some test cases can be automated easily, but some will need to be constructed manually:
@@ -74,7 +74,7 @@ Some test cases can be automated easily, but some will need to be constructed ma
 
 ## Server verification using compliance-client
 
-To prove server-side compliance, a conjure-generator should again generate objects and server interfaces from the master IR file: `compliance-api.conjure.json`.  The generated server will receive requests from the compliance-client.
+To prove server-side compliance, a conjure-generator must again generate objects and server interfaces from the master IR file: `compliance-api.conjure.json`.  The generated server will receive requests from the compliance-client.
 
 Similar to the client-side verification, there are some easily-automated tests and some manually constructed ones:
 
