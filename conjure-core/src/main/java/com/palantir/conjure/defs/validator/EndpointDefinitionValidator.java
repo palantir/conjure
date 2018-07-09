@@ -164,7 +164,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                     .forEach(entry -> {
                         Type conjureType = entry.getType();
 
-                        Boolean isValid = conjureType.accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)
+                        Boolean isValid = conjureType.accept(TypeVisitor.IS_PRIMITIVE)
                                 && !conjureType.accept(TypeVisitor.IS_ANY);
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
