@@ -183,6 +183,9 @@ public final class ServiceDefinitionTests {
                                                 .putFields(FieldName.of("stringField"),
                                                         FieldDefinition.of(PrimitiveType.STRING))
                                                 .build())
+                                        .putObjects(TypeName.of("StringAlias"), AliasTypeDefinition.builder()
+                                                .alias(PrimitiveType.STRING)
+                                                .build())
                                         .build())
                                 .build())
                         .putServices(TypeName.of("TestService"), ServiceDefinition.builder()
@@ -190,6 +193,13 @@ public final class ServiceDefinitionTests {
                                 .conjurePackage(ConjurePackage.of("test.api"))
                                 .putEndpoints("get", EndpointDefinition.builder()
                                         .http(RequestLineDefinition.of("GET", PathDefinition.of("/get")))
+                                        .build())
+                                .putEndpoints("post", EndpointDefinition.builder()
+                                        .http(RequestLineDefinition.of("POST", PathDefinition.of("/post")))
+                                        .args(ImmutableMap.of(ParameterName.of("foo"), ArgumentDefinition.builder()
+                                                .paramType(ArgumentDefinition.ParamType.HEADER)
+                                                .type(LocalReferenceType.of(TypeName.of("StringAlias")))
+                                                .build()))
                                         .build())
                                 .build())
                         .build());
