@@ -26,7 +26,7 @@ See our [getting started](./getting_started.md) guide to define your first Conju
 
 The following YAML file defines a simple Pet Store API. (See [full reference](./specification.md))
 
-```yml
+```yaml
 types:
   definitions:
     default-package: com.palantir.petstore
