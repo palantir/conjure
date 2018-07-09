@@ -1,6 +1,6 @@
 
 - **Getting started**
-    - [Overview](./README.md)
+    - [Overview](./overview.md)
     - [Get started with `gradle-conjure`](getting_started.md)
 - **Reference**
     - [Language specification](specification.md)
