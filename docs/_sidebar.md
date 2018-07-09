@@ -1,0 +1,12 @@
+
+- **Getting started**
+    - [Overview](./overview.md)
+    - [Get started with `gradle-conjure`](getting_started.md)
+- **Reference**
+    - [Language specification](specification.md)
+    - [Intermediate representation (IR)](intermediate_representation.md)
+    - [Wire specification](wire.md)
+- **RFCs**
+    - [001 Naming](rfc/001-naming.md)
+    - [002 Contract for Conjure generators](rfc/002-contract-for-conjure-generators.md)
+    - [003 Loosely coupled Conjure clients](rfc/003-loosely-coupled-conjure-clients.md)
