@@ -74,7 +74,7 @@ Some test cases can be automated easily, but some will need to be constructed ma
 
 ## Server verification using compliance-client
 
-To prove server-side compliance, a conjure-generator must again generate objects and server interfaces from the master IR file: `compliance-api.conjure.json`.  The generated server will receive requests from the compliance-client.
+To prove server-side compliance, a conjure-generator must again generate objects and server interfaces from the master IR file: `compliance-api.conjure.json`.  The generated interfaces must be implemented, then the resultant server will receive requests from the compliance-client.
 
 Similar to the client-side verification, there are some easily-automated tests and some manually constructed ones:
 
