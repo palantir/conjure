@@ -43,7 +43,7 @@ It is recommended that setting up the tests for the first time requires minimal 
 
 ## `test-cases.json`
 
-The test-cases.json file should be well-typed and easy to deserialize. It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md):
+The test-cases.json file should be well-typed and easy to deserialize. It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
 
 * primitives (string, boolean, datetime, safelong, etc)
 * collection types (list, set, map, optional)
@@ -51,8 +51,8 @@ The test-cases.json file should be well-typed and easy to deserialize. It should
 * binary uploads and responses, binary fields and path params
 * auth types (header, none, cookie)
 * headers
-* http methods (GET, POST, DELETE)
-* path parameters
+* http methods (GET, PUT, POST, DELETE)
+* path and query parameters
 * coercing from absent fields / null fields
 * invalid JSON
 * set uniqueness, duplicate map keys
