@@ -89,3 +89,9 @@ Ideally generators should be 100% compliant, but new generators might not comply
 ## Where should tests be run
 
 Ideally, this test-suite should be run as part of CI for the `conjure-<lang>` generator, but also on the `conjure-<lang>-runtime` repo (suggested in RFC 003) so that regressions are also prevented in the supporting libraries.
+
+## Versioning
+
+Improvements to the `test-cases.json` (e.g. additional inputs) will be released as SemVer minor versions. They will only exercise functionality described in version 1 of the [Intermediate Representation](../intermediate_representation.md).
+
+Changing the names of endpoints or services in `verification-api.conjure.json` will not be released as a major version.
