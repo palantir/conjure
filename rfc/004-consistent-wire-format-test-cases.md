@@ -33,14 +33,16 @@ A single repository will publish the following versioned artifacts:
 
 **Prerequisites**
 
-- ensure `test-cases.json` is available locally (either checked in or downloaded from bintray)
+- ensure `test-cases.json` is available locally
 - ensure clients have been generated from the `verification-api.conjure.json` IR file.
+
+In some languages it is acceptable to check-in these files and in other languages it is more appropriate to declare a dependency on the versioned artifact and download them on demand.  We recommend downloading them on demand if possible, as this reduces the risk of contributors modifying these files.
 
 **Users must write some language-specific test harness** - this harness must:
 
-1. spin up the `verification-server` as an external resource (e.g. in JUnit, this would probably be a `@ClassRule`).
+1. spin up the `verification-server` as an external resource. For example in JUnit, this would probably be a `@BeforeClass` method.
 1. read in `test-cases.json` and invoke their client to make a network call to the running `verification-server`.
-1. make one final call to the `verification-server` to check no test-cases have been missed.
+1. make one final call to the `verification-server` to check no test-cases have been missed.  In JUnit this could be an `@AfterClass` method.
 1. shut down the `verification-server`.
 
 _Note, we recommend making the harness easy to run from within your IDE so that devs have familiar tools available if they want to step through a particular test._
@@ -81,31 +83,24 @@ client:
 * invalid JSON
 * set uniqueness, duplicate map keys
 
-## Client verification using verification-server
+## Stateful verification-server
 
-To prove client-side compliance, a conjure-generator must generate objects and client interfaces from the master IR file: `verification-api.conjure.json`. These generated clients will be used to make network requests to the verification-server.
+The verification-server must be stateful so that it can keep track of endpoints calls (and thereby which tests have passed/failed/never been run).
 
-The verification-server has a few responsibilities:
+In addition to all the test endpoints, it must expose a special "checkNoTestCasesHaveBeenMissed" endpoint which will return a HTTP 200 response to signify that the client has passed everything, otherwise, it must return a non 2XX response. Intentional `IgnoredTestCases` (see below) may be POSTed to this endpoint in which case the verification-server will return a successful 200 response if all non-ignored tests have passed.
 
-* it must issue a variety of both valid and invalid responses to exercise the client deserialization code
-* it must make detailed assertions about incoming requests from the generated client
-* accumulate statistics about passed/failed tests
+The server's state can be reset by restarting the server.
 
-Some test cases can be automated easily, but some will need to be constructed manually:
+## Partial compliance
 
-1. For basic serialization cases, client under test should repeatedly make requests to a series of GET endpoints on the verification-server. The verification-server will return successive valid and then invalid JSON responses (in a well-defined order). The client should deserialize the response body for the positive tests, then re-serialize this and send it back to the server's 'confirm' endpoint as a POST request.  For the non-compliant server responses (negative cases), the client should error and the test harness should notify the verification-server of the expected deserialization failure.
-2. For more complicated test cases, network calls will need to be constructed manually
+Ideally generators should be 100% compliant, but new generators might not comply with all the edge cases from `test-cases.json`. Generators may still be usable in this state, but it is recommended to declare any ignored tests in a well-structured `ignored-test-cases.json` file so that potential users can easily evaluate degrees of completeness.
 
-## Degrees of compliance
-
-Ideally generators should be 100% compliant, but new generators might not comply with all the edge cases from `test-cases.json`. The generator may still be usable in this state, but these caveats should be called out explicitly so that users can assess its completeness.
+This file should be typed according to the `IgnoredTestCases` Conjure type from `verification-api.conjure.json`.
 
 ## Where should tests be run
 
-Ideally, this test-suite should be run as part of CI for the `conjure-<lang>` generator, but also on the `conjure-<lang>-runtime` repo (suggested in RFC 003) so that regressions are also prevented in the supporting libraries.
+Ideally, these tests should run as part of continuous integration for the `conjure-<lang>` generator, but also on the `conjure-<lang>-runtime` repo (suggested in RFC 003) so that regressions are also prevented in the supporting libraries.
 
 ## Versioning
 
-Improvements to the `test-cases.json` (e.g. additional inputs) will be released as SemVer minor versions. They will only exercise functionality described in version 1 of the [Intermediate Representation](../intermediate_representation.md).
-
-Changing the names of endpoints or services in `verification-api.conjure.json` will not be released as a major version.
+Improvements to the `test-cases.json` or `verification-server` (e.g. additional inputs) will be released as SemVer minor versions. They will only exercise functionality described in version 1 of the [Intermediate Representation](../intermediate_representation.md).
