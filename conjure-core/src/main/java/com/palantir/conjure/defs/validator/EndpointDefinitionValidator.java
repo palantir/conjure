@@ -164,7 +164,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                     .forEach(entry -> {
                         Type conjureType = entry.getType();
 
-                        Boolean isValid = conjureType.accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)
+                        Boolean isValid = conjureType.accept(TypeVisitor.IS_PRIMITIVE)
                                 && !conjureType.accept(TypeVisitor.IS_ANY);
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
@@ -182,18 +182,17 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
                     .forEach(entry -> {
                         Type conjureType = entry.getType();
 
-                        boolean isValid = isPrimitive(conjureType)
-                                || (conjureType.accept(TypeVisitor.IS_OPTIONAL)
-                                && isPrimitive(conjureType.accept(TypeVisitor.OPTIONAL).getItemType()));
-                        Preconditions.checkState(isValid,
+                        boolean isDefinedPrimitive = conjureType.accept(TypeVisitor.IS_PRIMITIVE)
+                                && !conjureType.accept(TypeVisitor.IS_ANY);
+                        boolean isOptionalPrimitive = conjureType.accept(TypeVisitor.IS_OPTIONAL)
+                                && conjureType.accept(TypeVisitor.OPTIONAL)
+                                .getItemType()
+                                .accept(TypeVisitor.IS_PRIMITIVE);
+                        Preconditions.checkState(isDefinedPrimitive || isOptionalPrimitive,
                                 "Header parameters must be primitives, aliases or optional primitive:"
                                         + " \"%s\" is not allowed",
                                 entry.getArgName());
                     });
-        }
-
-        private boolean isPrimitive(Type type) {
-            return type.accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE) && !type.accept(TypeVisitor.IS_ANY);
         }
     }
 

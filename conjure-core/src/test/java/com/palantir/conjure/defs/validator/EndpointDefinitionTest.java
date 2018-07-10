@@ -32,6 +32,7 @@ import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PathParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeName;
 import org.junit.Test;
 
 public final class EndpointDefinitionTest {
@@ -169,6 +170,24 @@ public final class EndpointDefinitionTest {
                 .args(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("someName"))
                         .type(Type.primitive(PrimitiveType.ANY))
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
+                        + " \"someName\" is not allowed");
+    }
+
+    @Test
+    public void testComplexHeaderObject() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("someName"))
+                        .type(Type.reference(TypeName.of("SomeObject", "com.palantir.foo")))
                         .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
                         .build())
                 .endpointName(ENDPOINT_NAME)
