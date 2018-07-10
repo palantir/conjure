@@ -8,7 +8,7 @@ _Currently, conjure-generators all use slightly different test-cases, each cover
 
 1. **Fearless code reviews** - a conjure-generator can be drastically refactored and still demonstrate that it will maintain wire compatibility with other conjure-generated clients/servers.
 2. **Eliminate duplicated work** - maintainers no longer need to try to think of all possible edge cases when testing a conjure-generator or client/server, these should be exhaustively defined in one place.
-3. **Easy to run the tests** - it should be easy for contributors to run the tests locally and on CI.
+3. **Easy to use** - it should be easy for contributors to verify their generator is compliant locally and on CI.
 4. **Easy to update the tests** - the master test cases should have a compact, human-readable definition and should be published centrally so that consumers can easily upgrade.
 
 ## Types of compliance
@@ -39,11 +39,11 @@ A single repository should publish the following versioned artifacts:
 
 Contributors should be able to run the tests from within their IDE using a language-native test harness.  For example, for conjure-java, the tests should be runnable from JUnit inside IntelliJ.
 
-It is recommended that setting up the tests for the first time requires minimal hand-written network requests - ideally, these should just be loaded from the master test-cases.json file to facilitate easy updates.
+It is recommended that setting up the tests for the first time requires minimal hand-written network requests - ideally, these should just be loaded from the master `test-cases.json` file to facilitate easy updates.
 
 ## `test-cases.json`
 
-The test-cases.json file should be well-typed and easy to deserialize. It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
+The test-cases.json file should be well-structured (i.e. can be deserialized into a Conjure-defiend type). It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
 
 * primitives (string, boolean, datetime, safelong, etc)
 * collection types (list, set, map, optional)
@@ -56,6 +56,26 @@ The test-cases.json file should be well-typed and easy to deserialize. It should
 * coercing from absent fields / null fields
 * invalid JSON
 * set uniqueness, duplicate map keys
+
+This RFC doesn't specify the exact format or contents as we'll undoubtedly want to release improvements (see the 'Versioning' secion below).  Here is an illustrative example of some YAML test-cases, before conversion to JSON:
+
+```yaml
+client:
+  autoDeserialize:
+    ...
+    receiveSafeLongExample:
+      positive:
+        - '{"value":-9007199254740991}'
+        - '{"value":0}'
+        - '{"value":9007199254740991}'
+      negative:
+        - '{"value":null}'
+        - '{}'
+        - '{"value":-9007199254740992}'
+        - '{"value":9007199254740992}'
+        - '{"value":1.23}'
+        - '{"value":"12"}'
+```
 
 ## Client verification using verification-server
 
