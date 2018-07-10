@@ -21,37 +21,33 @@ To be fully compliant, a Conjure-generated client must:
 
 _Note, there isn't a 'serialization' category here because client-side and server-side serialization and deserialization are subtly different. For example, clients must tolerate extra fields in a server response (otherwise server authors would never be able to add new functionality). Servers on the other hand may reject unknown fields in a JSON request body as this is likely a programmer error._
 
-## Proposal
+## Published artifacts
 
-A single repository should publish the following versioned artifacts:
+A single repository will publish the following versioned artifacts:
 
 * `test-cases.json` - a self-contained file containing exhaustive tests for both clients and servers.
 * `verification-api.conjure.json` - clients must be generated from this conjure IR file in order to interact with the test server. This conjure definition should also contain types sufficient for deserializing the test-cases.json file.
 * `verification-server` - an executable that will produce sample responses and make assertions about the generated client's requests.
 
-## Running the tests
+## Workflow
 
-Contributors should be able to run the tests from within their IDE using a language-native test harness.  For example, for conjure-java, the tests should be runnable from JUnit inside IntelliJ.
+**Prerequisites**
 
-It is recommended that setting up the tests for the first time requires minimal hand-written network requests - ideally, these should just be loaded from the master `test-cases.json` file to facilitate easy updates.
+- ensure `test-cases.json` is available locally (either checked in or downloaded from bintray)
+- ensure clients have been generated from the `verification-api.conjure.json` IR file.
+
+**Users must write some language-specific test harness** - this harness must:
+
+1. spin up the `verification-server` as an external resource (e.g. in JUnit, this would probably be a `@ClassRule`).
+1. read in `test-cases.json` and invoke their client to make a network call to the running `verification-server`.
+1. make one final call to the `verification-server` to check no test-cases have been missed.
+1. shut down the `verification-server`.
+
+_Note, we recommend making the harness easy to run from within your IDE so that devs have familiar tools available if they want to step through a particular test._
 
 ## `test-cases.json`
 
-The test-cases.json file should be well-structured (i.e. can be deserialized into a Conjure-defiend type). It should capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
-
-* primitives (string, boolean, datetime, safelong, etc)
-* collection types (list, set, map, optional)
-* complex types (object, union, enum)
-* binary uploads and responses, binary fields and path params
-* auth types (header, none, cookie)
-* headers
-* http methods (GET, PUT, POST, DELETE)
-* path and query parameters
-* coercing from absent fields / null fields
-* invalid JSON
-* set uniqueness, duplicate map keys
-
-This RFC doesn't specify the exact format or contents as we'll undoubtedly want to release improvements (see the 'Versioning' secion below).  Here is an illustrative example of some YAML test-cases, before conversion to JSON:
+The test-cases.json file is a well-structured file that will capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
 
 ```yaml
 client:
@@ -70,6 +66,20 @@ client:
         - '{"value":1.23}'
         - '{"value":"12"}'
 ```
+
+`test-cases.json` file can be deserialized using the Conjure `TestCases` type, defined in `verification-api.conjure.json`. Note that this RFC doesn't specify the exact format or contents as we'll undoubtedly want to release improvements (see the 'Versioning' section below). Key topics that will be covered include:
+
+* primitives (string, boolean, datetime, safelong, etc)
+* collection types (list, set, map, optional)
+* complex types (object, union, enum)
+* binary uploads and responses, binary fields and path params
+* auth types (header, none, cookie)
+* headers
+* http methods (GET, PUT, POST, DELETE)
+* path and query parameters
+* coercing from absent fields / null fields
+* invalid JSON
+* set uniqueness, duplicate map keys
 
 ## Client verification using verification-server
 
