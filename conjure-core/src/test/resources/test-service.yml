@@ -12,6 +12,9 @@ types:
         fields:
           stringField: string
 
+      StringAlias:
+        alias: string
+
 services:
   TestService:
     name: Test Service
@@ -20,3 +23,10 @@ services:
     endpoints:
       get:
         http: GET /get
+
+      post:
+        http: POST /post
+        args:
+          foo:
+            type: StringAlias
+            param-type: header

@@ -20,7 +20,7 @@ _Note, you can omit any of these projects if you don't need the generated code (
 
 In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 
-```gradle
+```groovy
 buildscript {
     repositories {
         maven {
@@ -29,7 +29,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0-rc6'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
     }
 }
 
@@ -41,7 +41,7 @@ subprojects {
         resolutionStrategy {
             force 'com.palantir.conjure:conjure:4.0.0'
             force 'com.palantir.conjure.java:conjure-java:1.0.0'
-            force 'com.palantir.conjure.java:conjure-java-lib:1.0.0'
+            force 'com.palantir.conjure.java:conjure-lib:1.0.0'
             force 'com.palantir.conjure.typescript:conjure-typescript:3.0.0'
         }
     }
@@ -52,7 +52,7 @@ subprojects {
 
 Then in `./your-project-api/build.gradle`, apply the plugin:
 
-```gradle
+```groovy
 apply plugin: 'com.palantir.conjure'
 ```
 
@@ -87,7 +87,7 @@ _Check the GitHub releases page to find the latest version of [conjure-java](htt
 
 Create your first YML file, e.g. `./your-project-api/src/main/conjure/your-project-api.yml`.  Run `./gradlew compileConjure` frequently to validate your syntax.
 
-```yml
+```yaml
 types:
   definitions:
     default-package: com.company.product
@@ -133,7 +133,7 @@ After running `./gradlew compileConjure`, you should see a variety of files gene
 
 In your main gradle project, you can now depend on the generated Jersey interfaces:
 
-```gradle
+```groovy
 // ./your-project/build.gradle
 
 dependencies {

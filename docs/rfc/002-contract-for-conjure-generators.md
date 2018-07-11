@@ -58,7 +58,7 @@ Flags such as `--foo` may also be passed to switch on some functionality, or `--
 
 ### Example interface from gradle-conjure
 
-```gradle
+```groovy
 conjure {
   typescript {
     version = '0.1.0'

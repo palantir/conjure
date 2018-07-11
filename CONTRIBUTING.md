@@ -17,4 +17,11 @@ If your change affects just one language or client, you'll probably just need to
 
 For speculative changes, consider opening a GitHub issue to describe the problem you encountered and the motivation behind solving it.  If it affects more than one language, feel free to open the issue on this repo.
 
+## Local development on docs
 
+Our docs are built using [docsify](https://docsify.js.org/) which just renders markdown documents from the `/docs` folder. You can preview the docs site locally:
+
+```
+$ npm install -g docsify
+$ docsify serve ./docs
+```
