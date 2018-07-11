@@ -2,7 +2,7 @@
 
 5 Jul 2018
 
-_Currently, conjure-generators all use slightly different test-cases, each covering different edge cases. This makes code reviews tricky as it isn't always self-evident whether a change will maintain wire compatibility. This RFC proposes a single tool to test that clients adhere to a common wire spec, defined in [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md). Verifying server compliance will be tackled in a separate, dedicated RFC._
+_Currently, conjure-generators all use slightly different test-cases, each covering different edge cases. This makes code reviews tricky as it isn't always self-evident whether a change will maintain wire compatibility. This RFC proposes a single tool to test that clients adhere to a common wire spec, defined in [wire.md](../wire.md). Verifying server compliance will be tackled in a separate, dedicated RFC._
 
 ## Goals
 
@@ -50,7 +50,7 @@ _Note, we recommend making the harness easy to run from within your IDE so that 
 
 ## `test-cases.json`
 
-The test-cases.json file is a well-structured file that will capture behaviour and edge cases from [wire.md](https://github.com/palantir/conjure/blob/develop/wire.md), e.g.:
+The test-cases.json file is a well-structured file that will capture behaviour and edge cases from [wire.md](../wire.md), e.g.:
 
 ```yaml
 client:
