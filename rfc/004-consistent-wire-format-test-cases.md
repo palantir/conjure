@@ -34,7 +34,8 @@ A single repository will publish the following versioned artifacts:
 **Prerequisites**
 
 - ensure `test-cases.json` is available locally
-- ensure clients have been generated from the `verification-api.conjure.json` IR file.
+- ensure clients have been generated from the `verification-api.conjure.json` IR file
+- ensure `verification-server` is available (either as a binary or as a docker image)
 
 In some languages it is acceptable to check-in these files and in other languages it is more appropriate to declare a dependency on the versioned artifact and download them on demand.  We recommend downloading them on demand if possible, as this reduces the risk of contributors modifying these files.
 
