@@ -41,7 +41,7 @@ In some languages it is acceptable to check-in these files and in other language
 **Users must write some language-specific test harness** - this harness must:
 
 1. spin up the `verification-server` as an external resource. For example in JUnit, this would probably be a `@BeforeClass` method.
-1. read in `test-cases.json` and invoke their client to make a network call to the running `verification-server`.
+1. read in `test-cases.json` and invoke their client to make all network calls to the running `verification-server`.
 1. make one final call to the `verification-server` to check no test-cases have been missed.  In JUnit this could be an `@AfterClass` method.
 1. shut down the `verification-server`.
 
@@ -104,3 +104,9 @@ Ideally, these tests should run as part of continuous integration for the `conju
 ## Versioning
 
 Improvements to the `test-cases.json` or `verification-server` (e.g. additional inputs) will be released as SemVer minor versions. They will only exercise functionality described in version 1 of the [Intermediate Representation](../intermediate_representation.md).
+
+## Alternatives considered
+
+- **tests are driven by a central harness binary** - instead of requiring users to write a harness as described above, the harness could be written once and then provided to all languages.  In this formulation, the harness "drives" all the tests.  The downside of this approach is that IDE integration is sub-optimal, so it's harder to debug failing tests.  The upside is that the harness binary is the source of truth of which tests to run, so there isn't the "checkNoTestCasesHaveBeenMissed" step at the end.
+
+- **generative tests** - fuzzing and generative testing involve producing vast numbers of test cases that all maintain some invariant.  This can catch bugs that nobody anticipated, but has the downside that tests are not always deterministic or reproducible.
