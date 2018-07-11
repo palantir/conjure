@@ -27,7 +27,7 @@ A single repository will publish the following versioned artifacts:
 
 * `test-cases.json` - a self-contained file containing exhaustive tests for both clients and servers.
 * `verification-api.conjure.json` - clients must be generated from this conjure IR file in order to interact with the test server. This conjure definition should also contain types sufficient for deserializing the test-cases.json file.
-* `verification-server` - an executable that will produce sample responses and make assertions about the generated client's requests.
+* `verification-server` - an executable that will produce sample responses and make assertions about the generated client's requests. This will be published as a docker image and as a standalone binary (initially just supporting Linux/Darwin).
 
 ## Workflow
 
