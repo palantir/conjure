@@ -104,7 +104,7 @@ Ideally, these tests should run as part of continuous integration for the `conju
 
 ## Versioning
 
-Improvements to the `test-cases.json` or `verification-server` (e.g. additional inputs) will be released as SemVer minor versions. They will only exercise functionality described in version 1 of the [Intermediate Representation](../intermediate_representation.md).
+Changes to the `test-cases.json`, `verification-api.conjure.json` or `verification-server` will be released and versioned according to SemVer - new test cases will be considered a minor bump, adding whole new categories of tests or renaming classes will be considered a break.
 
 ## Alternatives considered
 
