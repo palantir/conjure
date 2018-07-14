@@ -62,7 +62,7 @@ Conjure Name | Type     | Comments
 bearertoken | `string`  |
 binary      | `string`  | // TODO
 boolean     | `boolean` |
-datetime    | `datetime` | As defined by [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt).
+datetime    | `datetime` | As defined by [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) but without localized timestamps like `2017-01-02T04:04:05.000000000+01:00[Europe/Berlin]`. Only UTC is supported.
 double      | `number`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/), except `NaN`.
 integer     | `integer` | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 rid         | `string`  | In accordance with the [Resource Identifer](https://github.com/palantir/resource-identifier) definition.
