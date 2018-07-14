@@ -58,12 +58,12 @@ supported and is defined as a JSON number without a fraction or exponent part. `
 The primitive data types defined by the Conjure Specification are:
 
 Conjure Name | Type     | Comments
------------ | ------    | -------- 
+----------- | ------    | --------
 bearertoken | `string`  |
 binary      | `string`  | // TODO
 boolean     | `boolean` |
-datetime    | `datetime` | // TODO
-double      | `number`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+datetime    | `datetime` | As defined by [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt).
+double      | `number`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/), except `NaN`.
 integer     | `integer` | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 rid         | `string`  | In accordance with the [Resource Identifer](https://github.com/palantir/resource-identifier) definition.
 safelong    | `integer` | Integer with value ranging from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
@@ -75,7 +75,7 @@ any         |           | May be any of the above types or an `object` with any 
 The collection data types defined by the Conjure Specification are:
 
 Conjure Name | type     | Comments
------------ | ------    | -------- 
+----------- | ------    | --------
 list\<V>    | Array[V]  | An array where all the elements are of type V. If the associated field is omitted then the value is an empty list.
 set\<V>     | Array[V]  | An array where all elements are of type V and are unique. // TODO: equality/ordering
 map\<K, V>  | Map[K, V] | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type.
@@ -153,7 +153,7 @@ Field Name | Type | Description
 base-type | `string` | MUST be a a primitive data type.
 external | Map[`string`, `string`] | A map between a language name and its associated fully qualified type.
 
-A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that 
+A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that
 the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
 
 Each generator specifies what key they will consume within the `external` map.
@@ -170,14 +170,14 @@ imports:
 
 #### <a name="definedTypesObject"></a>Defined Types Object
 
-The object specifies the types that are defined in the Conjure definition. 
+The object specifies the types that are defined in the Conjure definition.
 
 ##### Fixed Fields
 
 Field Name | Type | Description
 ---|:---:|---
-default-package | `string` | 
-<a name="typeDefinitions"></a>definitions | Map[`string`, [Alias Definition](#aliasDefinition) \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions. 
+default-package | `string` |
+<a name="typeDefinitions"></a>definitions | Map[`string`, [Alias Definition](#aliasDefinition) \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
 <a name="typeErrors"></a>errors | Map[`string`, [Error Definition](#errorDefinition)] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
@@ -194,7 +194,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="aliasAlias"></a>alias | `string` | **REQUIRED**. The name of the type to be aliased.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 #### <a name="objectDefinition"></a>Object Definition
 
@@ -206,7 +206,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="objectFields"></a>fields | Map[`string`, [Field Definition](#fieldDefinition) \| `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 Field names must appear in either lowerCamelCase, or kebab-case, or snake_case. Code generators will respect casing for wire format, but may convert case formats to conform with language restrictions. As a result, field names must be unique independent of case format (e.g. an object may not define both caseFormat and case-format as fields).
 
@@ -245,9 +245,9 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="unionUnion"></a>union | Map[`string`, [Field Definition](#fieldDefinition) \| `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
-It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types. 
+It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types.
 
 ##### Union Definition Example
 ```yaml
@@ -268,7 +268,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="enumValues"></a>values | Array[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 
 ##### Enum Definition Example
@@ -314,17 +314,17 @@ An object representing a service. A service is a collection of endpoints.
 ##### Fixed Fields
 Field name | Type | Description
 ---|:---:|---
-<a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service. 
+<a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
 <a name="serviceBasePath"></a>base-path | [Path Segment Field](#pathSegmentField) | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
 <a name="serviceDefaultAuth"></a>default-auth | [Auth Field](#authField) | **REQUIRED** The default authentication mechanism for all endpoints in the service.
-<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions. 
+<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 #### <a name="pathSegmentField"></a> Path Segment Field
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
 
-When comparing multiple paths, the path with the longest concrete path should be matched first. 
+When comparing multiple paths, the path with the longest concrete path should be matched first.
 
 ##### <a name="pathTemplating"></a>Path Templating
 Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters. The template may include `:.+` and `:.*` regular expressions with the following semantics and limitations:
@@ -389,4 +389,4 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 
 ### <a name="richText"></a>Rich Text Formatting
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
-Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/). 
+Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
