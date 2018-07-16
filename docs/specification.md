@@ -12,12 +12,15 @@ APIs.
 
 ## Table of Contents
 - [Specification](#specification)
-    - [Format](#format)
+    - [Formats](#format)
+        - [Document Format](#documentFormat)
+        - [Json Format](#jsonFormat)
+        - [Plain Format](#plainFormat)
     - [Data Types](#dataTypes)
         - [Primitive Data Types](#primitiveDataTypes)
         - [Collection Data Types](#collectionDataTypes)
         - [Complex Data Types](#complexDataTypes)
-    - [Structure](#structure)
+    - [Language ](#structure)
         - [Conjure Object](#conjureObject)
         - [Types Object](#typesObject)
         - [External Type Object](#externalTypeObject)
@@ -40,6 +43,8 @@ APIs.
 
 ### Format
 
+#### Document Format
+
 A Conjure definition that conforms to the Conjure Specification is a JSON object, which is often represented in the YAML
 format. A definition may consist of one or several Conjure documents. A definition may be split across several documents
 for programmer convenience, but the file boundaries contain no semantic value. Parsers may combine the documents into a
@@ -47,17 +52,29 @@ single document for generation purposes.
 
 All field names in the specification are **case sensitive**.
 
-### <a name="dataTypes"></a>Data Types
+#### Json Format
 
+The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations 
+of Conjure clients/servers MUST expect all HTTP requests, responses and header parameters to be represented in this way.
 The data types in the Conjure Specification are based on the types supported by the [JSON Schema Specification Wright
-Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2). Note that `integer` as a type is also
-supported and is defined as a JSON number without a fraction or exponent part. `null` is not supported as a type (see
-[`optional`](#dataTypeOptional) for an alternative solution).
+Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2). 
+
+#### Plain Format
+
+The Plain format defines the raw representation of Conjure primitives. There is no raw representation of
+Conjure-defined types and collections. Implementations of Conjure clients/servers MUST expect all path and query
+parameters to be represented in this way.
 
 #### <a name="primitiveDataTypes"></a>Primitive Data Types
+
+##### <a name="bearerToken"></a>Bearer Token
+A Bearer token is a type that conforms to [RFC 7519](https://tools.ietf.org/html/rfc7519). 
+Its Plain format is an optionally URL encoded unquoted string.
+
+
 The primitive data types defined by the Conjure Specification are:
 
-Conjure Name | Type     | Comments
+Conjure Name | JSON Type | Plain Type     | Comments
 ----------- | ------    | -------- 
 bearertoken | `string`  |
 binary      | `string`  | // TODO
