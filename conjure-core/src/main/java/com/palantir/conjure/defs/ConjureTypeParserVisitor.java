@@ -35,6 +35,7 @@ import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
+import com.palantir.conjure.visitor.TypeVisitor;
 import java.util.Optional;
 
 /** The core translator between parsed/raw types and the IR spec representation exposed to compilers. */
@@ -127,7 +128,10 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
     @Override
     public Type visitOptional(OptionalType type) {
-        return Type.optional(com.palantir.conjure.spec.OptionalType.of(type.itemType().visit(this)));
+        com.palantir.conjure.spec.OptionalType innerType = com.palantir.conjure.spec.OptionalType.of(
+                type.itemType().visit(this));
+        Preconditions.checkState(!innerType.getItemType().accept(TypeVisitor.IS_OPTIONAL), "Illegal nested optionals");
+        return Type.optional(innerType);
     }
 
     @Override
