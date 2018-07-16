@@ -55,3 +55,14 @@ negative:
                 other: Other
             Other:
               alias: One
+
+  nestedOptionals:
+    expected-error: 'Illegal nested optionals'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            One:
+              fields:
+                other: optional<optional<string>>
