@@ -24,7 +24,7 @@ See our [getting started](./docs/getting_started.md) guide to define your first 
 
 ## Example
 
-The following YAML file defines a simple Pet Store API. (See [full reference](./docs/specification.md))
+The following YAML file defines a simple Pet Store API. (See [full reference](docs/language_specification.md))
 
 ```yaml
 types:
