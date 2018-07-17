@@ -88,7 +88,7 @@ negative:
             One:
               fields:
                 other: optional<optional<string>>
-  nestedOptionalsInAlias:
+  nestedOptionalsInObject:
       expected-error: 'Illegal nested optionals'
       conjure:
         types:
@@ -100,7 +100,7 @@ negative:
               ObjectOne:
                 fields:
                   someOptional: optional<AliasOne>
-  nestedOptionalsInNestedAliases:
+  nestedOptionalsInUnion:
       expected-error: 'Illegal nested optionals'
       conjure:
         types:
@@ -108,10 +108,11 @@ negative:
             default-package: test.api
             objects:
               AliasOne:
-                alias: optional<AliasTwo>
-              AliasTwo:
                 alias: optional<string>
-  nestedOptionalsIndirectly:
+              UnionExample:
+                union:
+                  someOptional: optional<AliasOne>
+  nestedOptionalsInNestedAliases:
         expected-error: 'Illegal nested optionals'
         conjure:
           types:
