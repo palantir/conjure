@@ -30,20 +30,24 @@ import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
+import com.palantir.conjure.spec.UnionDefinition;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @com.google.errorprone.annotations.Immutable
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
     UNIQUE_SERVICE_NAMES(new UniqueServiceNamesValidator()),
     ILLEGAL_VERSION(new IllegalVersionValidator()),
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
-    UNIQUE_NAMES(new UniqueNamesValidator());
+    UNIQUE_NAMES(new UniqueNamesValidator()),
+    NO_NESTED_OPTIONAL(new NoNestedOptionalValidator());
 
     public static void validateAll(ConjureDefinition definition) {
         for (ConjureValidator validator : values()) {
@@ -116,8 +120,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
             definition.getTypes().stream().forEach(type ->
                     getReferenceType(type)
-                    .ifPresent(entry -> typeToRefFields.put(
-                            type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
+                            .ifPresent(entry -> typeToRefFields.put(
+                                    type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -165,4 +169,65 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             path.remove(path.size() - 1);
         }
     }
+
+    @com.google.errorprone.annotations.Immutable
+    public static final class NoNestedOptionalValidator implements ConjureValidator<ConjureDefinition> {
+        @Override
+        public void validate(ConjureDefinition definition) {
+            // create mapping for resolving reference types during validation
+            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
+                    Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
+            definition.getTypes().stream().forEach(def -> validateTypeDefinition(def, definitionMap));
+        }
+
+        private static void validateTypeDefinition(TypeDefinition typeDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+            if (typeDef.accept(TypeDefinitionVisitor.IS_ALIAS)) {
+                AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
+                if (isNestedOptionalsFound(aliasDef.getAlias(), definitionMap, false)) {
+                    throw new IllegalStateException(
+                            "Illegal nested optionals found in " + aliasDef.getTypeName().getName());
+                }
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_OBJECT)) {
+                ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
+                objectDefinition.getFields().stream()
+                        .filter(fieldDefinition -> isNestedOptionalsFound(
+                                fieldDefinition.getType(), definitionMap, false))
+                        .findAny()
+                        .ifPresent(found -> {
+                            throw new IllegalStateException(
+                                    "Illegal nested optionals found in " + objectDefinition.getTypeName().getName());
+                        });
+            } else if (typeDef.accept(TypeDefinitionVisitor.IS_UNION)) {
+                UnionDefinition unionDefinition = typeDef.accept(TypeDefinitionVisitor.UNION);
+                unionDefinition.getUnion().stream()
+                        .filter(fieldDefinition -> isNestedOptionalsFound(
+                                fieldDefinition.getType(), definitionMap, false))
+                        .findAny()
+                        .ifPresent(found -> {
+                            throw new IllegalStateException(
+                                    "Illegal nested optionals found in" + unionDefinition.getTypeName().getName());
+                        });
+            }
+        }
+
+        private static boolean isNestedOptionalsFound(
+                Type type, Map<TypeName, TypeDefinition> definitionMap, boolean optionalSeen) {
+            if (type.accept(TypeVisitor.IS_REFERENCE)) {
+                TypeDefinition referenceDefinition = definitionMap.get(type.accept(TypeVisitor.REFERENCE));
+                // we only care about reference of alias type
+                if (referenceDefinition != null && referenceDefinition.accept(TypeDefinitionVisitor.IS_ALIAS)) {
+                    AliasDefinition aliasDef = referenceDefinition.accept(TypeDefinitionVisitor.ALIAS);
+                    return isNestedOptionalsFound(aliasDef.getAlias(), definitionMap, optionalSeen);
+                }
+            } else if (type.accept(TypeVisitor.IS_OPTIONAL)) {
+                if (optionalSeen) {
+                    return true;
+                }
+                return isNestedOptionalsFound(type.accept(TypeVisitor.OPTIONAL).getItemType(), definitionMap, true);
+            }
+            return false;
+        }
+    }
+
 }
