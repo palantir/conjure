@@ -7,25 +7,25 @@ _[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s NaN/Infinity frequently ap
 > Numeric values that cannot be represented as sequences of digits
    (such as Infinity and NaN) are not permitted.
 
-In addition, NaN is frequently a source of programmer error as it is not orderable, so languages often just return false for any comparison (e.g.both x > NaN and x < NaN return false).  In addition, 'NaN' has multiple possible binary representations because it can be produced from multiple different non-sensical mathematical operations, e.g. 0/0, sqrt(-1).
+In addition, NaN is frequently a source of programmer error as it is not orderable, so languages often just return false for any comparison (e.g. both x > NaN and x < NaN return false).  In addition, 'NaN' has multiple possible binary representations because it can be produced from multiple different non-sensical mathematical operations, e.g. 0/0, sqrt(-1).
 
 ## Proposal
 
 Amend the Conjure specification to explicitly define a JSON wire representation for NaN and positive and negative Infinity:
 
-| IEEE 754 double    | json representation      |
+| IEEE 754 double    | JSON representation      |
 |--------------------|--------------------------|
-| NaN                | json string `"NaN"`      |
-| positive infinity  | json string `"Infinity"` |
-| negative infinity  | json string `"-Infinity"`|
-| (all other values) | json number              |
+| NaN                | JSON string `"NaN"`      |
+| positive infinity  | JSON string `"Infinity"` |
+| negative infinity  | JSON string `"-Infinity"`|
+| (all other values) | JSON number              |
 
-_Note: this definition is case sensitive, so “nan” and “infinity” are not valid, and neither is “+Infinity”. [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s negative zero is already valid JSON._
+_Note: this definition is case sensitive, so "nan" and "infinity" are not valid, and neither is "+Infinity". [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s negative zero is already valid JSON._
 
 To comply with the principle of least-surprise for NaN handling, we have two additional goals:
 
-1. A received conjure set<double> should never contain more than one NaN
-2. A received conjure map<double, T> should never contain more than one NaN key
+1. A received conjure `set<double>` should never contain more than one NaN
+2. A received conjure `map<double, T>` should never contain more than one NaN key
 
 To achieve these goals, we can define the canonical representation of NaN as the json string `"NaN"`, so that languages can deserialize JSON lists and de-dupe NaN values appropriately.
 
