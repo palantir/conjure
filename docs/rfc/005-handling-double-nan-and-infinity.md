@@ -46,9 +46,9 @@ System.out.println(new Double(0.0d).equals(new Double(-0.0d))); // prints 'false
 Most languages already have a concept of Infinity and NaN, so we'd need to write some code to convert the JSON strings received from the wire into usable first-class concepts, e.g.:
 
 * in Java, this could be `Double.NaN`, `Double.POSITIVE_INFINITY`, `Double.NEGATIVE_INFINITY`
-* in JavaScript, this could be `Infinity` and `NaN`
-* in Python this could be `float('inf')`, `float('nan')`
-* in Rust this could be `std::f64::INFINITY`, `std::f64::NEG_INFINITY`, `std::f64::NAN`
+* in JavaScript, this could be `NaN`, `Infinity`, `-Infinity`
+* in Python this could be `float('nan')`, `float('inf')`, `-float('inf')`
+* in Rust this could be `std::f64::NAN`, `std::f64::INFINITY`, `std::f64::NEG_INFINITY`
 
 ## Alternative: Ban NaN and Infinity
 
