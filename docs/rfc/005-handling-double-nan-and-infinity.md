@@ -52,6 +52,8 @@ Most languages already have a concept of Infinity and NaN, so we'd need to write
 * in Python this could be `float('nan')`, `float('inf')`, `-float('inf')`
 * in Rust this could be `std::f64::NAN`, `std::f64::INFINITY`, `std::f64::NEG_INFINITY`
 
+Each language's serialization layer must also serialize their specific NaN or Infinity values as the appropriate JSON strings specified in the table above.
+
 ## Alternative: Ban NaN and Infinity
 
 This entire problem could be avoided by re-defining the Conjure 'double' type to be a modified IEEE 754 type, where Infinity and NaN are _not considered valid_. This could be implemented by throwing errors at serialization time or by introducing some new SafeDouble class.
