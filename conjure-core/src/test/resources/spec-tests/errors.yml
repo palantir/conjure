@@ -15,13 +15,13 @@ positive:
                 exceptionCause: optional<string>
 negative:
   errorNestedOptionals:
-    expected-error: 'Illegal nested optionals'
+    expected-error: 'Illegal nested optionals found in one of arguments of error NestedOptionalArgError'
     conjure:
       types:
         definitions:
           default-package: test.api.errors
           errors:
-            NestedOptionalArgs:
+            NestedOptionalArgError:
               namespace: Test
               code: INVALID_ARGUMENT
               safe-args:
@@ -29,18 +29,18 @@ negative:
               unsafe-args:
                 exceptionCause: optional<optional<string>>
   errorNestedOptionalsInAlias:
-    expected-error: 'Illegal nested optionals'
+    expected-error: 'Illegal nested optionals found in one of arguments of error NestedOptionalArgError'
     conjure:
       types:
         definitions:
           default-package: test.api.errors
           objects:
             AliasOne:
-              alias: optional<optional<string>>
+              alias: optional<string>
             AliasTwo:
               alias: AliasOne
           errors:
-            NestedOptionalArgs:
+            NestedOptionalArgError:
               namespace: Test
               code: INVALID_ARGUMENT
               safe-args:

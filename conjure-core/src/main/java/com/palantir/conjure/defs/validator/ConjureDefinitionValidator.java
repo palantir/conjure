@@ -27,6 +27,7 @@ import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.ServiceDefinition;
@@ -44,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.xml.ws.Service;
 
 @com.google.errorprone.annotations.Immutable
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
@@ -182,35 +184,51 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
                     Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
             definition.getTypes().stream().forEach(def -> validateTypeDefinition(def, definitionMap));
-            definition.getServices().stream()
-                    .flatMap(service -> service.getEndpoints().stream())
-                    .flatMap(endpoint -> endpoint.getArgs().stream())
-                    .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
-                    .findAny()
-                    .ifPresent(arg -> {
-                        throw new IllegalStateException(
-                                "Illegal nested optionals found in" + arg.getArgName().get());
-                    });
-            definition.getErrors().stream()
-                    .flatMap(error -> Stream.concat(error.getSafeArgs().stream(), error.getUnsafeArgs().stream()))
-                    .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
-                    .findAny()
-                    .ifPresent(arg -> {
-                        throw new IllegalStateException(
-                                "Illegal nested optionals found in" + arg.getFieldName().get());
-                    });
+            definition.getErrors().forEach(def -> validateErrorDefinition(def, definitionMap));
+            definition.getServices().forEach(def -> validateServiceDefinition(def, definitionMap));
+        }
 
+        private static void validateServiceDefinition(ServiceDefinition serviceDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+            serviceDef.getEndpoints().stream().forEach(endpoint -> {
+                endpoint.getArgs().stream()
+                        .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
+                        .findAny()
+                        .ifPresent(arg -> {
+                            throw new IllegalStateException(
+                                    "Illegal nested optionals found in one of the arguments of endpoint "
+                                            + endpoint.getEndpointName().get());
+                        });
+                endpoint.getReturns().ifPresent(returnType -> {
+                    if (recursivelyFindNestedOptionals(returnType, definitionMap, false)) {
+                        throw new IllegalStateException(
+                                "Illegal nested optionals found in return type of endpoint " + endpoint.getEndpointName().get());
+                    }
+                });
+            });
+        }
+
+        private static void validateErrorDefinition(ErrorDefinition errorDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+            Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
+                    .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
+                    .findAny()
+                    .ifPresent(arg -> {
+                        throw new IllegalStateException(
+                                "Illegal nested optionals found in one of arguments of error " + errorDef.getErrorName().getName());
+                    });
         }
 
         private static void validateTypeDefinition(TypeDefinition typeDef,
                 Map<TypeName, TypeDefinition> definitionMap) {
+
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
                 public Void visitAlias(AliasDefinition value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, false)) {
                         throw new IllegalStateException(
-                                "Illegal nested optionals found in " + aliasDef.getTypeName().getName());
+                                "Illegal nested optionals found in alias " + aliasDef.getTypeName().getName());
                     }
                     return null;
                 }
@@ -224,7 +242,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .findAny()
                             .ifPresent(found -> {
                                 throw new IllegalStateException(
-                                        "Illegal nested optionals found in "
+                                        "Illegal nested optionals found in object "
                                                 + objectDefinition.getTypeName().getName());
                             });
                     return null;
@@ -239,7 +257,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .findAny()
                             .ifPresent(found -> {
                                 throw new IllegalStateException(
-                                        "Illegal nested optionals found in" + unionDefinition.getTypeName().getName());
+                                        "Illegal nested optionals found in union " + unionDefinition.getTypeName().getName());
                             });
                     return null;
                 }

@@ -79,7 +79,7 @@ negative:
               alias: One
 
   nestedOptionals:
-    expected-error: 'Illegal nested optionals'
+    expected-error: 'Illegal nested optionals found in object One'
     conjure:
       types:
         definitions:
@@ -89,7 +89,7 @@ negative:
               fields:
                 other: optional<optional<string>>
   nestedOptionalsInObject:
-      expected-error: 'Illegal nested optionals'
+      expected-error: 'Illegal nested optionals found in object ObjectOne'
       conjure:
         types:
           definitions:
@@ -101,7 +101,7 @@ negative:
                 fields:
                   someOptional: optional<AliasOne>
   nestedOptionalsInUnion:
-      expected-error: 'Illegal nested optionals'
+      expected-error: 'Illegal nested optionals found in union UnionExample'
       conjure:
         types:
           definitions:
@@ -113,7 +113,7 @@ negative:
                 union:
                   someOptional: optional<AliasOne>
   nestedOptionalsInNestedAliases:
-        expected-error: 'Illegal nested optionals'
+        expected-error: 'Illegal nested optionals found in object ObjectOne'
         conjure:
           types:
             definitions:
