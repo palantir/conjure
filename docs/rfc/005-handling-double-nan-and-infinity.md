@@ -31,6 +31,8 @@ To comply with the principle of least-surprise for NaN handling, we have two add
 
 To achieve these goals, we can define the canonical representation of NaN as the json string `"NaN"`, so that languages can deserialize JSON lists and de-dupe NaN values appropriately.
 
+Positive and negative Infinity and zero already behave sensibly in maps and sets because they satisfy reflexive equality.
+
 ## Note on positive and negative zero
 
 [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) also includes provision for both a positive and negative zero. In the table above, these are both considered valid, distinct values that can appear in sets and also as map keys (as they are not considered equal). Beware that java has inconsistent behaviour here between unboxed and boxed variants - we want the boxed behaviour.
