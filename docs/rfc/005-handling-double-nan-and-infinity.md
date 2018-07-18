@@ -2,7 +2,7 @@
 
 17 Jul 2018
 
-_[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s NaN/Infinity frequently appear in real-world data, but the [JSON spec](https://tools.ietf.org/html/rfc4627) has no provision for them (and they are under-specified in Conjure):_
+_[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s NaN/Infinity frequently appear in real-world data, but they are underspecified in Conjure - in fact, the [JSON spec](https://tools.ietf.org/html/rfc4627) itself has no provision for them:_
 
 > Numeric values that cannot be represented as sequences of digits
    (such as Infinity and NaN) are not permitted.
