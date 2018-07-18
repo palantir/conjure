@@ -16,6 +16,28 @@ positive:
                   selfOptional: optional<SelfRecursiveObject>
                   selfMap: map<string, SelfRecursiveObject>
                   selfSet: set<SelfRecursiveObject>
+  optionalsOk:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.optionals
+          objects:
+            ObjectOne:
+              fields:
+                one: optional<string>
+            ObjectTwo:
+              fields:
+                one: string
+                two: optional<string>
+                three: optional<ObjectOne>
+            UnionExample:
+              union:
+                setExample: set<string>
+                optionalExample: optional<ObjectTwo>
+            AliasOne:
+              alias: optional<ObjectTwo>
+            AliasTwo:
+              alias: optional<UnionExample>
 negative:
   recursiveNotAllowed:
     expected-error: 'Illegal recursive data type: SelfRecursiveObject -> SelfRecursiveObject'
@@ -55,3 +77,55 @@ negative:
                 other: Other
             Other:
               alias: One
+
+  nestedOptionals:
+    expected-error: 'Illegal nested optionals found in object One'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api
+          objects:
+            One:
+              fields:
+                other: optional<optional<string>>
+  nestedOptionalsInObject:
+      expected-error: 'Illegal nested optionals found in object ObjectOne'
+      conjure:
+        types:
+          definitions:
+            default-package: test.api
+            objects:
+              AliasOne:
+                alias: optional<string>
+              ObjectOne:
+                fields:
+                  someOptional: optional<AliasOne>
+  nestedOptionalsInUnion:
+      expected-error: 'Illegal nested optionals found in union UnionExample'
+      conjure:
+        types:
+          definitions:
+            default-package: test.api
+            objects:
+              AliasOne:
+                alias: optional<string>
+              UnionExample:
+                union:
+                  someOptional: optional<AliasOne>
+  nestedOptionalsInNestedAliases:
+        expected-error: 'Illegal nested optionals found in object ObjectOne'
+        conjure:
+          types:
+            definitions:
+              default-package: test.api
+              objects:
+                AliasOne:
+                  alias: optional<string>
+                AliasTwo:
+                  alias: AliasOne
+                AliasThree:
+                  alias: AliasTwo
+                ObjectOne:
+                  fields:
+                    someOptional: optional<AliasThree>
+
