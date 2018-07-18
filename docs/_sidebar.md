@@ -10,3 +10,5 @@
     - [001 Naming](rfc/001-naming.md)
     - [002 Contract for Conjure generators](rfc/002-contract-for-conjure-generators.md)
     - [003 Loosely coupled Conjure clients](rfc/003-loosely-coupled-conjure-clients.md)
+    - [004 Consistent wire-format test cases](rfc/004-consistent-wire-format-test-cases.md)
+    - [005 Handling double NaN and Infinity](rfc/005-handling-double-nan-and-infinity.md)
