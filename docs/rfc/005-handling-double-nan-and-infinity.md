@@ -13,14 +13,16 @@ In addition, NaN is frequently a source of programmer error as it is not orderab
 
 Amend the Conjure specification to explicitly define a JSON wire representation for NaN and positive and negative Infinity:
 
-| IEEE 754 double    | JSON representation      |
-|--------------------|--------------------------|
-| NaN                | JSON string `"NaN"`      |
-| positive infinity  | JSON string `"Infinity"` |
-| negative infinity  | JSON string `"-Infinity"`|
-| (all other values) | JSON number              |
+| IEEE 754 double    | JSON representation          |
+|--------------------|------------------------------|
+| NaN                | JSON string `"NaN"`          |
+| positive infinity  | JSON string `"Infinity"`     |
+| negative infinity  | JSON string `"-Infinity"`    |
+| positive zero      | JSON number `0.0`            |
+| negative zero      | JSON number `-0.0`           |
+| (all other values) | JSON number                  |
 
-_Note: this definition is case sensitive, so "nan" and "infinity" are not valid, and neither is "+Infinity". [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)'s negative zero is already valid JSON._
+_Note: this definition is case sensitive, so "nan" and "infinity" are not valid, and neither is "+Infinity"._
 
 To comply with the principle of least-surprise for NaN handling, we have two additional goals:
 
@@ -31,7 +33,7 @@ To achieve these goals, we can define the canonical representation of NaN as the
 
 ## Note on positive and negative zero
 
-[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) also includes provision for both a positive and negative zero. In Conjure's wire spec, these should both be considered valid, distinct values of the double type and can both appear in sets and as map keys (they are not considered equal). Beware that java has inconsistent behaviour here between unboxed and boxed variants - we want the boxed variant.
+[IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) also includes provision for both a positive and negative zero. In the table above, these are both considered valid, distinct values can both appear in sets and as map keys (as they are not considered equal). Beware that java has inconsistent behaviour here between unboxed and boxed variants - we want the boxed variant.
 
 ```java
 // Java handles zero equality differently for unboxed and boxed values!
