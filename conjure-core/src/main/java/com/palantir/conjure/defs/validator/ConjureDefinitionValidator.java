@@ -25,7 +25,6 @@ import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
-import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
@@ -45,7 +44,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.xml.ws.Service;
 
 @com.google.errorprone.annotations.Immutable
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
@@ -202,7 +200,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindNestedOptionals(returnType, definitionMap, false)) {
                         throw new IllegalStateException(
-                                "Illegal nested optionals found in return type of endpoint " + endpoint.getEndpointName().get());
+                                "Illegal nested optionals found in return type of endpoint "
+                                        + endpoint.getEndpointName().get());
                     }
                 });
             });
@@ -215,7 +214,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                     .findAny()
                     .ifPresent(arg -> {
                         throw new IllegalStateException(
-                                "Illegal nested optionals found in one of arguments of error " + errorDef.getErrorName().getName());
+                                "Illegal nested optionals found in one of arguments of error "
+                                        + errorDef.getErrorName().getName());
                     });
         }
 
@@ -257,7 +257,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .findAny()
                             .ifPresent(found -> {
                                 throw new IllegalStateException(
-                                        "Illegal nested optionals found in union " + unionDefinition.getTypeName().getName());
+                                        "Illegal nested optionals found in union "
+                                                + unionDefinition.getTypeName().getName());
                             });
                     return null;
                 }
