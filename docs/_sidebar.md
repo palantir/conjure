@@ -3,7 +3,7 @@
     - [Overview](./overview.md)
     - [Get started with `gradle-conjure`](getting_started.md)
 - **Reference**
-    - [Language specification](language_specification.md)
+    - [Language specification](specification.md)
     - [Intermediate representation (IR)](intermediate_representation.md)
     - [Wire specification](wire.md)
 - **RFCs**

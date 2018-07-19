@@ -52,16 +52,26 @@ The primitive data types defined by the Conjure Specification are:
 Conjure Name | JSON Type |     Plain Type    | Canonical Representation | Comments |
 ------------ | --------- | ----------------- | ------------------------ | -------- |
 bearertoken  | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).  
-binary       | `string`  | unquoted `string` | No ambiguity             | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary
+binary       | `string`  | unquoted `string` | No ambiguity             | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
 boolean      | `boolean` | `boolean`         | No ambiguity             |
-datetime     | `string`  | unquoted `string` | Formatted according to `YYYY-MM-DDTHH:mm:ssZ`   | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
-double       | `number`  | `number`          | With at least 1 trailing decimal         | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+datetime     | `string`  | unquoted `string` | Formatted according to `YYYY-MM-DDTHH:mm:ssZ`   | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+double       | `number`  | `number`          | With at least 1 decimal  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 integer      | `integer` | `number`          | No ambiguity             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 rid          | `string`  | unquoted `string` | No ambiguity             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
 safelong     | `integer` | `number`          | No ambiguity             | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
 string       | `string`  | unquoted `string` | No ambiguity             | 
-uuid         | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122)
-any          | N/A       | N/A               | N/A                      | May be any of the above types or an `object` with any fields
+uuid         | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
+any          | N/A       | N/A               | N/A                      | May be any of the above types or an `object` with any fields.
+
+Example format conversions to canonical format:
+
+Conjure Name |     JSON Representation     |   Plain Representation    | Canonical Representation |
+------------ | --------------------------- | ------------------------- | ------------------------ |
+datetime     | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00 | "2018-07-19T08:11:21Z"   
+datetime     | "20180719T081121Z"          | 20180719T081121Z          | "2018-07-19T08:11:21Z"   
+double       | 1                           | 1                         | 1.0
+double       | 1.00000                     | 1.000000                  | 1.0
+double       | 1.2345678                   | 1.2345678                 | 1.2345678
 
 #### <a name="collectionDataTypes"></a>Collection Data Types
  
