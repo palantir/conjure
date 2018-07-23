@@ -65,15 +65,17 @@ any          | N/A       | N/A               | N/A                      | May be
 
 Example format conversions to canonical format:
 
-Conjure Name |     JSON Representation     |   Plain Representation    |  Canonical Representation   |
------------- | --------------------------- | ------------------------- | --------------------------- |
-datetime     | "2018-07-19T08:11:21Z"      | "2018-07-19T08:11:21Z"    | "2018-07-19T08:11:21+00:00"
-datetime     | "20180719T081121Z"          | 20180719T081121Z          | "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00 | "2018-07-19T05:11:21+03:00"
-double       | 1                           | 1                         | 1.0
-double       | 1.00000                     | 1.000000                  | 1.0
-double       | 1.2345678                   | 1.2345678                 | 1.2345678
-double       | 1.23456780                  | 1.23456780                | 1.2345678
+Conjure Name |     JSON Representation     |    Plain Representation    |  Canonical Representation   |
+------------ | --------------------------- | -------------------------- | --------------------------- |
+datetime     | "2018-07-19T08:11:21Z"      | "2018-07-19T08:11:21Z"     | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21+00:00" | "2018-07-19T08:11:21+00:00"| "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21-00:00" | "2018-07-19T08:11:21-00:00"| "2018-07-19T08:11:21+00:00"
+datetime     | "20180719T081121Z"          | 20180719T081121Z           | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  | "2018-07-19T05:11:21+03:00"
+double       | 1                           | 1                          | 1.0
+double       | 1.00000                     | 1.000000                   | 1.0
+double       | 1.2345678                   | 1.2345678                  | 1.2345678
+double       | 1.23456780                  | 1.23456780                 | 1.2345678
 
 #### <a name="collectionDataTypes"></a>Collection Data Types
  
@@ -84,7 +86,7 @@ Conjure Name |  JSON Type  | Canonical Representation | Comments
 ------------ | ----------- | ------------------------ | --------
 list\<V>     | Array[V]    | No ambiguity             | An array where all the elements are of type V. If the associated field is omitted then the value is an empty list.
 set\<V>      | Array[V]    | No ambiguity             | An array where all elements are of type V and are unique. The order the elements appear in the list does not impact equality.
-map\<K, V>   | Map[K,V]   | No ambiguity             | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type.
+map\<K, V>   | Map[K,V]   | No ambiguity             | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type. If the type is non-string, then it is serialized into a quoted version of its plain reprehension.
 optional\<V> | V or `null` | `null` if absent otherwise the value | The value is considered absent if it is null or its associated field is omitted. 
 
 #### <a name="complexDataTypes"></a>Complex Data Types
