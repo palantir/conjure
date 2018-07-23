@@ -47,7 +47,7 @@ jobs:
       - image: circleci/openjdk:8u171-jdk-node-browsers
     steps:
       - checkout
-      - run: npm install -g markdown-link-check
+      - run: sudo npm install -g markdown-link-check
       - run: find . -name \*.md -exec markdown-link-check -c .circleci/markdown-link-check-config.json {} \;
 
 workflows:
