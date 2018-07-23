@@ -48,9 +48,7 @@ jobs:
     steps:
       - checkout
       - run: sudo npm install -g markdown-link-check
-      - run: |
-          set -e
-          find . -name \*.md -exec markdown-link-check -c .circleci/markdown-link-check-config.json {} \;
+      - run: find . -name \*.md | xargs -n 1 markdown-link-check -c .circleci/markdown-link-check-config.json
 
 workflows:
   version: 2
