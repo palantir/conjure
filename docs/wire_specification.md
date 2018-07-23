@@ -99,7 +99,7 @@ alias        |  -        | No ambiguity             | An Alias is a type that is
 enum         | `string`  | No ambiguity             | An Enum is a type that represents a fixed set of `string` values. Clients MUST deserialize a value which is not contained within the enumeration as `"UNKNOWN"`.
 error        | `object`  | No ambiguity             | An Error is a type that represents a structured, non-successful response. It includes three required fields: `errorCode`, `errorName`, `errorInstanceId`, and an optional field `parameters`.
 object       | `object`  | No ambiguity             | An Object is a type that represents an `object` with a predefined set of fields with associated types.
-union        | `object`  | No ambiguity             | A Union is a type that represents a possibility from a fixed set of Objects. A Union is an object with a type field which specifies the name of the possibility and a field which is the name of the possibility which contains the payload. // TODO remove type field
+union        | `object`  | No ambiguity             | A Union is a type that represents a possibility from a fixed set of Objects. A Union is a JSON object with two fields: a `type` field which specifies the name of the variant, and a field which is the name of the variant which contains the payload.
 
 
 #### 
