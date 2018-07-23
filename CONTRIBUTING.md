@@ -23,5 +23,5 @@ Our docs are built using [docsify](https://docsify.js.org/) which just renders m
 
 ```
 $ npm install -g docsify
-$ docsify serve ./docs
+$ docsify serve
 ```
