@@ -1,0 +1,14 @@
+
+- **Getting started**
+    - [Overview](./readme.md)
+    - [Get started with `gradle-conjure`](docs/getting_started.md)
+- **Reference**
+    - [Language specification](docs/specification.md)
+    - [Intermediate representation (IR)](docs/intermediate_representation.md)
+    - [Wire specification](docs/wire.md)
+- **RFCs**
+    - [001 Naming](docs/rfc/001-naming.md)
+    - [002 Contract for Conjure generators](docs/rfc/002-contract-for-conjure-generators.md)
+    - [003 Loosely coupled Conjure clients](docs/rfc/003-loosely-coupled-conjure-clients.md)
+    - [004 Consistent wire-format test cases](docs/rfc/004-consistent-wire-format-test-cases.md)
+    - [005 Handling double NaN and Infinity](docs/rfc/005-handling-double-nan-and-infinity.md)
