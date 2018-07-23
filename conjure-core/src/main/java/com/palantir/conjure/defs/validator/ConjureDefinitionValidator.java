@@ -25,25 +25,33 @@ import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.ServiceDefinition;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
+import com.palantir.conjure.spec.UnionDefinition;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @com.google.errorprone.annotations.Immutable
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
     UNIQUE_SERVICE_NAMES(new UniqueServiceNamesValidator()),
     ILLEGAL_VERSION(new IllegalVersionValidator()),
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
-    UNIQUE_NAMES(new UniqueNamesValidator());
+    UNIQUE_NAMES(new UniqueNamesValidator()),
+    NO_NESTED_OPTIONAL(new NoNestedOptionalValidator());
 
     public static void validateAll(ConjureDefinition definition) {
         for (ConjureValidator validator : values()) {
@@ -116,8 +124,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
             definition.getTypes().stream().forEach(type ->
                     getReferenceType(type)
-                    .ifPresent(entry -> typeToRefFields.put(
-                            type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
+                            .ifPresent(entry -> typeToRefFields.put(
+                                    type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -165,4 +173,126 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             path.remove(path.size() - 1);
         }
     }
+
+    @com.google.errorprone.annotations.Immutable
+    public static final class NoNestedOptionalValidator implements ConjureValidator<ConjureDefinition> {
+        @Override
+        public void validate(ConjureDefinition definition) {
+            // create mapping for resolving reference types during validation
+            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
+                    Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
+            definition.getTypes().stream().forEach(def -> validateTypeDefinition(def, definitionMap));
+            definition.getErrors().forEach(def -> validateErrorDefinition(def, definitionMap));
+            definition.getServices().forEach(def -> validateServiceDefinition(def, definitionMap));
+        }
+
+        private static void validateServiceDefinition(ServiceDefinition serviceDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+            serviceDef.getEndpoints().stream().forEach(endpoint -> {
+                endpoint.getArgs().stream()
+                        .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
+                        .findAny()
+                        .ifPresent(arg -> {
+                            throw new IllegalStateException(
+                                    "Illegal nested optionals found in one of the arguments of endpoint "
+                                            + endpoint.getEndpointName().get());
+                        });
+                endpoint.getReturns().ifPresent(returnType -> {
+                    if (recursivelyFindNestedOptionals(returnType, definitionMap, false)) {
+                        throw new IllegalStateException(
+                                "Illegal nested optionals found in return type of endpoint "
+                                        + endpoint.getEndpointName().get());
+                    }
+                });
+            });
+        }
+
+        private static void validateErrorDefinition(ErrorDefinition errorDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+            Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
+                    .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
+                    .findAny()
+                    .ifPresent(arg -> {
+                        throw new IllegalStateException(
+                                "Illegal nested optionals found in one of arguments of error "
+                                        + errorDef.getErrorName().getName());
+                    });
+        }
+
+        private static void validateTypeDefinition(TypeDefinition typeDef,
+                Map<TypeName, TypeDefinition> definitionMap) {
+
+            typeDef.accept(new TypeDefinition.Visitor<Void>() {
+                @Override
+                public Void visitAlias(AliasDefinition value) {
+                    AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
+                    if (recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, false)) {
+                        throw new IllegalStateException(
+                                "Illegal nested optionals found in alias " + aliasDef.getTypeName().getName());
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visitObject(ObjectDefinition value) {
+                    ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
+                    objectDefinition.getFields().stream()
+                            .filter(fieldDefinition -> recursivelyFindNestedOptionals(
+                                    fieldDefinition.getType(), definitionMap, false))
+                            .findAny()
+                            .ifPresent(found -> {
+                                throw new IllegalStateException(
+                                        "Illegal nested optionals found in object "
+                                                + objectDefinition.getTypeName().getName());
+                            });
+                    return null;
+                }
+
+                @Override
+                public Void visitUnion(UnionDefinition value) {
+                    UnionDefinition unionDefinition = typeDef.accept(TypeDefinitionVisitor.UNION);
+                    unionDefinition.getUnion().stream()
+                            .filter(fieldDefinition -> recursivelyFindNestedOptionals(
+                                    fieldDefinition.getType(), definitionMap, false))
+                            .findAny()
+                            .ifPresent(found -> {
+                                throw new IllegalStateException(
+                                        "Illegal nested optionals found in union "
+                                                + unionDefinition.getTypeName().getName());
+                            });
+                    return null;
+                }
+
+                @Override
+                public Void visitEnum(EnumDefinition value) {
+                    return null;
+                }
+
+                @Override
+                public Void visitUnknown(String unknownType) {
+                    return null;
+                }
+            });
+        }
+
+        private static boolean recursivelyFindNestedOptionals(
+                Type type, Map<TypeName, TypeDefinition> definitionMap, boolean isOptionalSeen) {
+            if (type.accept(TypeVisitor.IS_REFERENCE)) {
+                TypeDefinition referenceDefinition = definitionMap.get(type.accept(TypeVisitor.REFERENCE));
+                // we only care about reference of alias type
+                if (referenceDefinition != null && referenceDefinition.accept(TypeDefinitionVisitor.IS_ALIAS)) {
+                    AliasDefinition aliasDef = referenceDefinition.accept(TypeDefinitionVisitor.ALIAS);
+                    return recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, isOptionalSeen);
+                }
+            } else if (type.accept(TypeVisitor.IS_OPTIONAL)) {
+                if (isOptionalSeen) {
+                    return true;
+                }
+                return recursivelyFindNestedOptionals(type.accept(TypeVisitor.OPTIONAL).getItemType(), definitionMap,
+                        true);
+            }
+            return false;
+        }
+    }
+
 }

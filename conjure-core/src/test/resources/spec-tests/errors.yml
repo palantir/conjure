@@ -1,0 +1,49 @@
+test-case-name: "types"
+positive:
+  errorOK:
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            OptionalArgs:
+              namespace: Test
+              code: INVALID_ARGUMENT
+              safe-args:
+                message: string
+              unsafe-args:
+                exceptionCause: optional<string>
+negative:
+  errorNestedOptionals:
+    expected-error: 'Illegal nested optionals found in one of arguments of error NestedOptionalArgError'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            NestedOptionalArgError:
+              namespace: Test
+              code: INVALID_ARGUMENT
+              safe-args:
+                message: string
+              unsafe-args:
+                exceptionCause: optional<optional<string>>
+  errorNestedOptionalsInAlias:
+    expected-error: 'Illegal nested optionals found in one of arguments of error NestedOptionalArgError'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          objects:
+            AliasOne:
+              alias: optional<string>
+            AliasTwo:
+              alias: AliasOne
+          errors:
+            NestedOptionalArgError:
+              namespace: Test
+              code: INVALID_ARGUMENT
+              safe-args:
+                message: optional<AliasTwo>
+              unsafe-args:
+                exceptionCause: string

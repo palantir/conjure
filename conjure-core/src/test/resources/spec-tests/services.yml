@@ -143,3 +143,28 @@ negative:
               http: GET /myEndpoint
             otherTestEndpoint:
               http: GET /myEndpoint
+  endpointReturnsWithNestedOptional:
+    expected-error: "Illegal nested optionals found in return type of endpoint testEndpoint"
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http: GET /myEndpoint
+              returns: optional<optional<string>>
+  endpointQueryParamWithNestedOptional:
+      expected-error: "Illegal nested optionals found in one of the arguments of endpoint testEndpoint"
+      conjure:
+        services:
+          TestService:
+            name: Test Service
+            package: test.a
+            endpoints:
+              testEndpoint:
+                http: GET /myEndpoint
+                args:
+                  queryName:
+                    type: optional<optional<string>>
+                    param-type: query
