@@ -1,7 +1,7 @@
 Conjure Intermediate Representation
 ===================================
 
-The format described in [readme.md](readme.md) is for a human-friendly format that allows specification of
+The format described in [readme.md](../readme.md) is for a human-friendly format that allows specification of
 defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
 (IR).
 
@@ -467,14 +467,14 @@ HTTP remoting](https://github.com/palantir/http-remoting-api/blob/develop/errors
 
 Each error definition may include the following keys:
 - "docs": a string documentation of the error.
-- "safeArgs": a list of safe arguments with a field definition as the list item type. See the [objects section](#objects) 
+- "safeArgs": a list of safe arguments with a field definition as the list item type. See the [objects section](#objects)
 for details on the field definition format.
-- "unsafeArgs": a list of unsafe arguments with a field definition as the list item type. See the [objects section](#objects) 
+- "unsafeArgs": a list of unsafe arguments with a field definition as the list item type. See the [objects section](#objects)
 for details on the field definition format.
 
 Note, the difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
 
 ### Self-describing definition
 
-See [ir.json](ir.json) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
+See [conjure-api.yml](../conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
 may use this definition to generate code for deserializing the IR format.
