@@ -26,10 +26,10 @@ The Conjure Wire Specification defines the serialization format of Conjure defin
 
 #### JSON Format
 
-The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations 
+The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations
 of Conjure clients/servers MUST expect all HTTP requests and responses, and header parameters to be represented in this way.
 The data types in the Conjure Specification are based on the types supported by the [JSON Schema Specification Wright
-Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2). 
+Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2).
 
 #### Plain Format
 
@@ -40,7 +40,7 @@ parameters to be represented in this way.
 #### Canonical Format
 
 The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
-when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers 
+when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
 MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
 
 ### Data Types
@@ -51,15 +51,15 @@ The primitive data types defined by the Conjure Specification are:
 
 Conjure Name | JSON Type |     Plain Type    | Canonical Representation | Comments |
 ------------ | --------- | ----------------- | ------------------------ | -------- |
-bearertoken  | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).  
+bearertoken  | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
 binary       | `string`  | unquoted `string` | No ambiguity             | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
 boolean      | `boolean` | `boolean`         | No ambiguity             |
 datetime     | `string`  | unquoted `string` | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm`   | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-double       | `number`  | `number`          | With at least 1 decimal  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+double       | `number` \| `string`  | `number` \| unquoted `string`          | Number with at least 1 decimal or "NaN" or "Infinity" or "-Infinity"  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 integer      | `integer` | `number`          | No ambiguity             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 rid          | `string`  | unquoted `string` | No ambiguity             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
 safelong     | `integer` | `number`          | No ambiguity             | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
-string       | `string`  | unquoted `string` | No ambiguity             | 
+string       | `string`  | unquoted `string` | No ambiguity             |
 uuid         | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 any          | N/A       | N/A               | N/A                      | May be any of the above types or an `object` with any fields.
 
@@ -67,19 +67,22 @@ Example format conversions to canonical format:
 
 Conjure Name |     JSON Representation     |    Plain Representation    |  Canonical Representation   |
 ------------ | --------------------------- | -------------------------- | --------------------------- |
-datetime     | "2018-07-19T08:11:21Z"      | "2018-07-19T08:11:21Z"     | "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T08:11:21+00:00" | "2018-07-19T08:11:21+00:00"| "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T08:11:21-00:00" | "2018-07-19T08:11:21-00:00"| "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21Z"      | 2018-07-19T08:11:21Z       | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00  | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21-00:00" | 2018-07-19T08:11:21-00:00  | "2018-07-19T08:11:21+00:00"
 datetime     | "20180719T081121Z"          | 20180719T081121Z           | "2018-07-19T08:11:21+00:00"
 datetime     | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  | "2018-07-19T05:11:21+03:00"
 double       | 1                           | 1                          | 1.0
 double       | 1.00000                     | 1.000000                   | 1.0
 double       | 1.2345678                   | 1.2345678                  | 1.2345678
 double       | 1.23456780                  | 1.23456780                 | 1.2345678
+double       | "NaN"                       | NaN                        | "NaN"
+double       | "Infinity"                  | Infinity                   | "Infinity"
+double       | "-Infinity"                 | -Infinity                  | "-Infinity"
 
 #### <a name="collectionDataTypes"></a>Collection Data Types
- 
-Collections can be omitted if they are empty or in the case of optionals absent. The collection data types defined by 
+
+Collections can be omitted if they are empty or in the case of optionals absent. The collection data types defined by
 the Conjure Specification are:
 
 Conjure Name |  JSON Type  | Canonical Representation | Comments
@@ -87,7 +90,7 @@ Conjure Name |  JSON Type  | Canonical Representation | Comments
 list\<V>     | Array[V]    | No ambiguity             | An array where all the elements are of type V. If the associated field is omitted then the value is an empty list.
 set\<V>      | Array[V]    | No ambiguity             | An array where all elements are of type V and are unique. The order the elements appear in the list does not impact equality.
 map\<K, V>   | Map[K,V]   | No ambiguity             | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type. If the type is non-string, then it is serialized into a quoted version of its plain reprehension.
-optional\<V> | V or `null` | `null` if absent otherwise the value | The value is considered absent if it is null or its associated field is omitted. 
+optional\<V> | V or `null` | `null` if absent otherwise the value | The value is considered absent if it is null or its associated field is omitted.
 
 #### <a name="complexDataTypes"></a>Complex Data Types
 
@@ -102,7 +105,7 @@ object       | `object`  | No ambiguity             | An Object is a type that r
 union        | `object`  | No ambiguity             | A Union is a type that represents a possibility from a fixed set of Objects. A Union is a JSON object with two fields: a `type` field which specifies the name of the variant, and a field which is the name of the variant which contains the payload.
 
 
-#### 
+####
 An example error type would be serialized as follows:
 ```json
 {
