@@ -55,8 +55,6 @@ considered OPTIONAL.
 
 This is the root document object of a Conjure definition.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="conjureTypes"></a>types | [`Types Object`](#typesObject) | The types to be included in the definition.
@@ -67,8 +65,6 @@ Field Name | Type | Description
 
 The object specifies the types available in the Conjure definition.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="typeConjureImport"></a>conjure-imports | Map[`string`, `string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
@@ -78,14 +74,12 @@ Field Name | Type | Description
 #### <a name="externalTypeObject"></a>External Type Object
 
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
-
-##### Fixed Fields
 Field Name | Type | Description
 ---|:---:|---
 base-type | `string` | MUST be a a primitive data type.
 external | Map[`string`, `string`] | A map between a language name and its associated fully qualified type.
 
-A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that 
+A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that
 the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
 
 Each generator specifies what key they will consume within the `external` map.
@@ -102,14 +96,12 @@ imports:
 
 #### <a name="definedTypesObject"></a>Defined Types Object
 
-The object specifies the types that are defined in the Conjure definition. 
-
-##### Fixed Fields
+The object specifies the types that are defined in the Conjure definition.
 
 Field Name | Type | Description
 ---|:---:|---
-default-package | `string` | 
-<a name="typeDefinitions"></a>definitions | Map[`string`, [Alias Definition](#aliasDefinition) \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions. 
+default-package | `string` |
+<a name="typeDefinitions"></a>definitions | Map[`string`, [Alias Definition](#aliasDefinition) \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
 <a name="typeErrors"></a>errors | Map[`string`, [Error Definition](#errorDefinition)] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
@@ -120,25 +112,21 @@ Type names MUST be in PascalCase and be unique within a package.
 
 Definition for an alias complex data type.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="aliasAlias"></a>alias | `string` | **REQUIRED**. The name of the type to be aliased.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 #### <a name="objectDefinition"></a>Object Definition
 
 Definition for an object complex data type.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="objectFields"></a>fields | Map[`string`, [Field Definition](#fieldDefinition) \| `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 Field names must appear in either lowerCamelCase, or kebab-case, or snake_case. Code generators will respect casing for wire format, but may convert case formats to conform with language restrictions. As a result, field names must be unique independent of case format (e.g. an object may not define both caseFormat and case-format as fields).
 
@@ -159,8 +147,6 @@ TypeAlias:
 
 Definition for a field in a complex data type.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="fieldType"></a>type | `string` | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
@@ -171,15 +157,13 @@ Field Name | Type | Description
 
 Definition for a union complex data type.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---------- | ---- | -----------
 <a name="unionUnion"></a>union | Map[`string`, [`Field Definition`](#fieldDefinition) \| `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
-It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types. 
+It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types.
 
 ##### Union Definition Example
 ```yaml
@@ -194,13 +178,11 @@ Payload:
 
 Definition for an enum complex data type.
 
-##### Fixed Fields
-
 Field Name | Type | Description
 ---|:---:|---
 <a name="enumValues"></a>values | Array[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject). 
+<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
 
 ##### Enum Definition Example
@@ -215,8 +197,6 @@ LoadState:
 #### <a name="errorDefinition"></a>Error Definition
 
 Definition for an error type.
-
-##### Fixed Fields
 Field Name | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
@@ -242,21 +222,19 @@ A field describing the error category. MUST be one of the following strings, whi
 #### <a name="serviceObject"></a>Service Object
 
 An object representing a service. A service is a collection of endpoints.
-
-##### Fixed Fields
 Field name | Type | Description
 ---|:---:|---
-<a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service. 
+<a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
 <a name="serviceBasePath"></a>base-path | [Path Segment Field](#pathSegmentField) | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
 <a name="serviceDefaultAuth"></a>default-auth | [Auth Field](#authField) | **REQUIRED** The default authentication mechanism for all endpoints in the service.
-<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions. 
+<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 #### <a name="pathSegmentField"></a> Path Segment Field
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
 
-When comparing multiple paths, the path with the longest concrete path should be matched first. 
+When comparing multiple paths, the path with the longest concrete path should be matched first.
 
 ##### <a name="pathTemplating"></a>Path Templating
 Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters. The template may include `:.+` and `:.*` regular expressions with the following semantics and limitations:
@@ -285,8 +263,6 @@ A field describing an authentication mechanism. It is a `string` which MUST be o
 
 ### <a name="endpointObject"></a>Endpoint Object
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
-
-##### Fixed Fields
 Field name | Type | Description
 ---|:---:|---
 <a name="endpointHttp"></a>http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [Path Segment Field](#pathSegmentField).
@@ -298,8 +274,6 @@ Field name | Type | Description
 
 ### <a name="argumentObject"></a>Argument Object
 An object representing an argument to an endpoint.
-
-##### Fixed Fields
 Field name | Type | Description
 ---|:---:|---
 <a name="argumentType"></a>type | `string` | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter and primitive or optional of primitive if the argument is header or query parameter.
@@ -318,4 +292,4 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 
 ### <a name="richText"></a>Rich Text Formatting
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
-Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/). 
+Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
