@@ -3,6 +3,7 @@
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
 - **Reference**
+    - [Mega specification](docs/mega_specification.md)
     - [Language specification](docs/specification.md)
     - [Intermediate representation (IR)](docs/intermediate_representation.md)
     - [Wire specification](docs/wire.md)
