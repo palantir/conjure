@@ -12,8 +12,8 @@ your-project/src/main/conjure/baz.yml
 
 The Conjure compiler requires each file to conform to the `Conjure YML File` structure, specified recursively below:
 
-  - [Conjure YML File](#conjureYMLFile)
-  - [Types Object](#typesObject)
+  - [Conjure YML File](#conjure-yml-file)
+  - [TypesDefinition](#typesdefinition)
   - [External Type Object](#externalTypeObject)
   - [Defined Types Object](#definedTypesObject)
   - [Alias Definition](#aliasDefinition)
@@ -33,16 +33,16 @@ The Conjure compiler requires each file to conform to the `Conjure YML File` str
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
 
-## <a name="conjureYMLFile"></a>Conjure YML File
+## Conjure YML File
 Each source file must be a YAML object with the following allowed fields:
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="conjureTypes"></a>types | [`Types Object`](#typesObject) | The types to be included in the definition.
+<a name="conjureTypes"></a>types | [`TypesDefinition`](#typesdefinition) | The types to be included in the definition.
 <a name="conjureServices"></a>services | Map[`string`, [`Service Object`](#serviceObject)] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
-## <a name="typesObject"></a>Types Object
+## TypesDefinition
 The object specifies the types available in the Conjure definition.
 
 Field Name | Type | Description
