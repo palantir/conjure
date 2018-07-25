@@ -1,31 +1,31 @@
-# Features
+# Conjure Features
 
 ## HTTP endpoints
 
-- GET, PUT, POST, DELETE
-- Query parameters
-- Path parameters
-- Headers
-- Cookie auth
+- `GET`, `PUT`, `POST`, `DELETE` - [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
+- _Query parameters_ - e.g. `https://example.com/api/something?foo=bar&baz=2`
+- _Path parameters_ - Parsed sections of URLs e.g. `https://example.com/repo/{owner}/{repo}/pulls/{id}`
+- _Headers_ - A non-case sensitive string name associated with a Conjure value (see [docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)).
+- _Cookie auth_ - A [HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), often used for authentication.
 
-## Types
 
-### Complex types
+## Named types
 
-Conjure supports defining the following named types. These can be referenced by their name elsewhere in a Conjure definition.
+Users may define the following kinds of named types. These can be referenced by their name elsewhere in a Conjure definition.
 
   - _Object_ - a collection of named fields, each of which has their own Conjure type.
   - _Enum_ - a type consisting of named string variants, e.g. "RED", "GREEN", "BLUE".
+  - _Alias_ - a named shorthand for another Conjure type, purely for readability.
   - _Union_ - a type representing different named variants, each of which can contain differen types. (Also known as 'algebraic data types' or 'tagged unions')
 
-### Collection types
+## Collection types
 
   - `list<T>` - an ordered sequence of items of type `T`.
   - `map<K, V>` - values of type `V` each indexed by a unique key of type `K` (keys are unordered).
   - `optional<T>` - represents a value of type `T` which is either present or not present.
   - `set<T>` - a collection of distinct values of type `T`.
 
-### Built-in types
+## Built-in types
 
   - `any` - a catch-all type which can represent arbitrary JSON including lists, maps, strings, numbers or booleans.
   - `bearertoken` - a string [Json Web Token (JWT)](https://jwt.io/)
@@ -39,8 +39,8 @@ Conjure supports defining the following named types. These can be referenced by 
   - `string` - a sequence of UTF-8 characters
   - `uuid` - a 128-bit number: [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid)
 
-### Opaque types:
+## Opaque types
 
 When migrating an existing API, it may be useful to use the following 'escape hatch' type.  These are not recommended for normal APIs because Conjure can't introspect these external types to figure out what their JSON structure will be, so they're effectively opaque.
 
-  - _External Reference_ - a reference to a non-Conjure type
+  - _External Reference_ - a reference to a non-Conjure type, with an associated fallback Conjure type
