@@ -1,10 +1,20 @@
 # Conjure YML structure
 
-A Conjure definition is made up of YML files.
+A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files.
+
+The files must end in `.yml`, but the actual name has no effect on generated code (it is only used for referencing types across files).  Here is a suggested structure:
+
+```
+your-project/src/main/conjure/foo.yml
+your-project/src/main/conjure/bar.yml
+your-project/src/main/conjure/baz.yml
+```
+
+Each YAML file may define multiple types, services and errors.  The Conjure compiler expects these files to conform to the following JSON schema, but it also enforces some additional constraints (e.g. no complex types in path parameters).
 
 ## JSON schema
 
-```json
+```js
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
@@ -28,6 +38,7 @@ A Conjure definition is made up of YML files.
     },
 
     "ServicesDefinition": {
+      "type": "object",
       "patternProperties": {
         "^.*$": {
           "$ref": "#/definitions/ServiceDefinition"
