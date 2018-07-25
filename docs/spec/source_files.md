@@ -1,4 +1,4 @@
-# Conjure YML source files
+# Conjure Source Files
 
 A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document. Source files must end in `.yml`.  Here is a suggested structure:
 
@@ -271,7 +271,7 @@ Field | Type | Description
 ---|:---:|---
 http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
 markers | List[`string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
-auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
+auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [ServiceDefinition][].
 returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
 args | Map[`string`, [ArgumentDefinition][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
