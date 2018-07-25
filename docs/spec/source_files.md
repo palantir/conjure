@@ -16,7 +16,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
     - [TypesDefinition][]
       - [ExternalTypeDefinition][]
       - [NamedTypesDefinition][]
-        - [Alias Definition](#aliasDefinition)
+        - [AliasDefinition][]
         - [Object Definition](#objectDefinition)
         - [Field Definition](#fieldDefinition)
         - [Union Definition](#unionDefinition)
@@ -34,6 +34,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
 [TypesDefinition]: #typesdefinition
 [ExternalTypeDefinition]: #externaltypedefinition
 [NamedTypesDefinition]: #namedtypesdefinition
+[AliasDefinition]: #aliasdefinition
 [ServicesDefinition]: #servicesdefinition
 [PathString]: #pathstring
 
@@ -89,7 +90,7 @@ The object specifies the types that are defined in the Conjure definition.
 Field Name | Type | Description
 ---|:---:|---
 default-package | `string` |
-<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[Alias Definition](#aliasDefinition) \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
+<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] \| [Object Definition](#errorDefinition) \| [Union Definition](#unionDefinition) \| [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
 <a name="typeErrors"></a>errors | Map[`string`,&nbsp;[Error Definition](#errorDefinition)] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
@@ -97,7 +98,7 @@ Package names are used by generator implementations to determine the output loca
 Type names MUST be in PascalCase and be unique within a package.
 
 
-## <a name="aliasDefinition"></a>Alias Definition
+## AliasDefinition
 Definition for an alias complex data type.
 
 Field Name | Type | Description
