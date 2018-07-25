@@ -2,7 +2,7 @@
 - **Getting started**
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
-- **Reference**
+- **[Reference](docs/spec/index.md)**
     - [Features](docs/spec/features.md)
     - [Source files](docs/spec/source_files.md)
     - [Constraints](docs/spec/constraints.md)

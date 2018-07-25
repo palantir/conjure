@@ -1,5 +1,9 @@
 # Conjure Features
 
+_Conjure offers the following features and abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification][]._
+
+[Wire specification]: (/docs/spec/wire.md)
+
 ## HTTP endpoints
 
 - `GET`, `PUT`, `POST`, `DELETE` - [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
