@@ -2,7 +2,7 @@
 
 5 Jul 2018
 
-_Currently, conjure-generators all use slightly different test-cases, each covering different edge cases. This makes code reviews tricky as it isn't always self-evident whether a change will maintain wire compatibility. This RFC proposes a single tool to test that clients adhere to a common wire spec, defined in [wire.md](../wire.md). Verifying server compliance will be tackled in a separate, dedicated RFC._
+_Currently, conjure-generators all use slightly different test-cases, each covering different edge cases. This makes code reviews tricky as it isn't always self-evident whether a change will maintain wire compatibility. This RFC proposes a single tool to test that clients adhere to a common wire spec, defined in [wire.md](../spec/wire.md). Verifying server compliance will be tackled in a separate, dedicated RFC._
 
 ## Goals
 

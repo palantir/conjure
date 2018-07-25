@@ -2,7 +2,6 @@
 - **Getting started**
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
-    - [Concepts](docs/spec/concepts.md)
 - **[Reference](docs/spec/index.md)**
     - [Source files](docs/spec/source_files.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)

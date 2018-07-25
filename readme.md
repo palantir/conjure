@@ -7,7 +7,7 @@ Define your API once and then Conjure will generate idiomatic clients for Java, 
 
 For example in Java, Conjure interfaces allow you to build servers using existing Jersey compatible libraries like Dropwizard/Jetty.
 
-See our [getting started](/docs/getting_started.md) guide to define your first Conjure API.
+See our [getting started](./docs/getting_started.md) guide to define your first Conjure API.
 
 ## Features
 - Enables teams to work together across many languages
@@ -75,7 +75,7 @@ Conjure allows defining named, structured errors so that clients can expect spec
 
 
 ## Example
-The following YAML file defines a simple Pet Store API. (See [full reference](/docs/spec/source_files.md))
+The following YAML file defines a simple Pet Store API. (See [full reference](./docs/spec/source_files.md))
 
 ```yaml
 types:
