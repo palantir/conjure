@@ -39,6 +39,8 @@ Conjure supports defining the following named types. These can be referenced by 
   - `string` - a sequence of UTF-8 characters
   - `uuid` - a 128-bit number: [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid)
 
-### Migration types:
+### Opaque types:
 
-  - ExternalReference
+When migrating an existing API, it may be useful to use the following 'escape hatch' type.  These are not recommended for normal APIs because Conjure can't introspect these external types to figure out what their JSON structure will be, so they're effectively opaque.
+
+  - _External Reference_ - a reference to a non-Conjure type
