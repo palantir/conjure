@@ -86,11 +86,8 @@ A type that is not defined within Conjure. Usage of external types is not recomm
 
 Field | Type | Description
 ---|:---:|---
-base&#8209;type | [ConjureType][]
+base&#8209;type | [ConjureType][] | A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
 external | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a language name and its associated fully qualified type.
-
-A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that
-the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
 
 Each generator specifies what key they will consume within the `external` map.
 
@@ -126,7 +123,7 @@ Named types must be in PascalCase and be unique within a package.
 
 
 ## ContainerType
-Container types like `optional<T>`, `list<T>`, `set<T>` and `map<K, V>` can be referenced using their lowercase names, where template variables like `T`, `K` and `V` can be substituted for a Conjure named type, a built-in or more container types:
+Container types like `optional<T>`, `list<T>`, `set<T>` and `map<K, V>` can be referenced using their lowercase names, where variables like `T`, `K` and `V` can be substituted for a Conjure named type, a built-in or more container types:
 
 **Examples:**
 ```
@@ -134,13 +131,12 @@ optional<datetime>
 list<double>
 map<string, boolean>
 set<SomeExistingType>
-list<optional<boolean>>
 map<rid, optional<datetime>>
 ```
 
 
 ## BuiltIn
-Built-in types can be referenced using their lowercase names.
+Built-in types are always lowercase, to distinguish them from user-defined types which are PascalCase.
 
 **Examples:**
 ```
@@ -342,7 +338,6 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 - `body`: defined as the singular body parameter.
 - `header`: defined as a header parameter.
 - `query`: defined as a querystring parameter.
-- `auto`: argument is treated as a path parameter if the argument name appears between braces in the request line and as a body argument otherwise.
 
 
 ## DocString
