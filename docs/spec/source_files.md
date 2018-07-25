@@ -28,7 +28,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
       - [EndpointDefinition][]
       - [Argument Object](#argumentObject)
       - [Param Type Field](#paramTypeField)
-    - [Rich Text Formatting](#richText)
+    - [Markdown Docs Fields][]
 
 [AliasDefinition]: #aliasdefinition
 [ConjureSourceFile]: #conjuresourcefile
@@ -40,6 +40,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
 [AuthDefinition]: #authdefinition
+[Markdown Docs Fields]: #rich-text-formatting
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
@@ -288,6 +289,6 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 - `auto`: argument is treated as a path parameter if the argument name appears between braces in the request line and as a body argument otherwise.
 
 
-## <a name="richText"></a>Rich Text Formatting
+## Markdown Docs Fields
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
 Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
