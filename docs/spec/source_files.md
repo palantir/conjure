@@ -20,7 +20,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
         - [UnionTypeDefinition][]
         - [EnumTypeDefinition][]
       - [ErrorDefinition][]
-      - [Error Code Field](#errorCodeField)
+      - [ErrorCode][]
     - [ServiceDefinition][]
       - [AuthDefinition][]
       - [EndpointDefinition][]
@@ -33,6 +33,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [ConjureSourceFile]: #conjuresourcefile
 [EndpointDefinition]: #endpointdefinition
 [EnumTypeDefinition]: #enumtypedefinition
+[ErrorCode]: #errorcode
 [ErrorDefinition]: #errordefinition
 [ExternalTypeDefinition]: #externaltypedefinition
 [FieldDefinition]: #fielddefinition
@@ -195,13 +196,13 @@ Definition for an error type.
 Field | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
-<a name="errorCode"></a>code | [Error Code](#errorCode) | **REQUIRED**. The general category for the error.
+<a name="errorCode"></a>code | [ErrorCode][] | **REQUIRED**. The general category for the error.
 <a name="errorSafeArgs"></a>safe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorUnsafeArgs"></a>unsafe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
-## <a name="errorCodeField"></a>Error Code Field
+## ErrorCode
 A field describing the error category. MUST be one of the following strings, which have associated HTTP status codes:
 * PERMISSION_DENIED (403)
 * INVALID_ARGUMENT(400)
