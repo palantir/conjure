@@ -261,7 +261,7 @@ first.
 A field describing an authentication mechanism. It is a `string` which MUST be of the following:
 * `none`: do not apply authorization requirements
 * `header`: apply an `Authorization` header argument/requirement to every endpoint.
-* `cookie:<cookie name>`: apply a cookie argument/requirement to every endpoint with cookie name `<cookie name>`.
+* `cookie:{{name}}`: apply a cookie argument/requirement to every endpoint, where `{{name}}` should be replaced with your desired cookie name.
 
 
 ## EndpointDefinition
@@ -270,7 +270,7 @@ An object representing an endpoint. An endpoint describes a method, arguments an
 Field | Type | Description
 ---|:---:|---
 http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
-markers | List[[FieldDefinition](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+markers | List[`string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
 returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
 args | Map[`string`, [ArgumentDefinition][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
@@ -283,7 +283,7 @@ An object representing an argument to an endpoint.
 Field | Type | Description
 ---|:---:|---
 type | `string` | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter and primitive or optional of primitive if the argument is header or query parameter.
-markers | List[[FieldDefinition](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
