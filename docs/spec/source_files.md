@@ -45,7 +45,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 ## ConjureSourceFile
 Each source file must be a YAML object with the following allowed fields:
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="conjureTypes"></a>types | [TypesDefinition][] | The types to be included in the definition.
 <a name="conjureServices"></a>services | Map[`string`,&nbsp;[ServicesDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
@@ -54,7 +54,7 @@ Field Name | Type | Description
 ## TypesDefinition
 The object specifies the types available in the Conjure definition.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="typeConjureImport"></a>conjure-imports | Map[`string`,&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 <a name="typeImports"></a>imports | Map[`string`,&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
@@ -64,7 +64,7 @@ Field Name | Type | Description
 ## ExternalTypeDefinition
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 base-type | `string` | MUST be a a primitive data type.
 external | Map[`string`,&nbsp;`string`] | A map between a language name and its associated fully qualified type.
@@ -88,7 +88,7 @@ imports:
 ## NamedTypesDefinition
 The object specifies the types that are defined in the Conjure definition.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
 <a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectDefinition](#errorDefinition) or [Union Definition](#unionDefinition) or [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
@@ -102,7 +102,7 @@ Type names MUST be in PascalCase and be unique within a package.
 ## AliasDefinition
 Definition for an alias complex data type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="aliasAlias"></a>alias | `string` | **REQUIRED**. The name of the type to be aliased.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -112,7 +112,7 @@ Field Name | Type | Description
 ## ObjectDefinition
 Definition for an object complex data type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="objectFields"></a>fields | Map[`string`,&nbsp;[Field Definition](#fieldDefinition) or `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -136,7 +136,7 @@ TypeAlias:
 ## <a name="fieldDefinition"></a>Field Definition
 Definition for a field in a complex data type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="fieldType"></a>type | `string` | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
 <a name="fieldDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -145,7 +145,7 @@ Field Name | Type | Description
 ## <a name="unionDefinition"></a> Union Definition
 Definition for a union complex data type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---------- | ---- | -----------
 <a name="unionUnion"></a>union | Map[`string`,&nbsp;[`Field Definition`](#fieldDefinition) or `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -166,7 +166,7 @@ Payload:
 ## <a name="enumDefinition"></a>Enum Definition
 Definition for an enum complex data type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="enumValues"></a>values | Array[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -185,7 +185,7 @@ LoadState:
 ## <a name="errorDefinition"></a>Error Definition
 Definition for an error type.
 
-Field Name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
 <a name="errorCode"></a>code | [Error Code](#errorCode) | **REQUIRED**. The general category for the error.
@@ -211,7 +211,7 @@ A field describing the error category. MUST be one of the following strings, whi
 ## ServicesDefinition
 A service is a collection of endpoints.
 
-Field name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
@@ -255,7 +255,7 @@ A field describing an authentication mechanism. It is a `string` which MUST be o
 ## <a name="endpointObject"></a>Endpoint Object
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
 
-Field name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="endpointHttp"></a>http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
 <a name="endpointMarker"></a>markers | List[[Field Definitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
@@ -268,7 +268,7 @@ Field name | Type | Description
 ## <a name="argumentObject"></a>Argument Object
 An object representing an argument to an endpoint.
 
-Field name | Type | Description
+Field | Type | Description
 ---|:---:|---
 <a name="argumentType"></a>type | `string` | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter and primitive or optional of primitive if the argument is header or query parameter.
 <a name="argumentMarker"></a>markers | List[[Field Definitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
