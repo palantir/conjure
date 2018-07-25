@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
+import com.palantir.conjure.spec.Type;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,7 +59,7 @@ public class ConjureParserTest {
     @Test
     public void testConjureExternalImports() {
         ConjureDefinition conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
-        assertThat(conjure.types().imports().get(TypeName.of("ExternalType")).baseType()).isEqualTo(PrimitiveType.fromString("any"));
+        assertThat(conjure.types().imports().get(TypeName.of("ExampleAnyImport")).baseType()).isEqualTo(PrimitiveType.fromString("any"));
     }
 
     @Test

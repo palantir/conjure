@@ -36,10 +36,7 @@ public abstract class TypeName {
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
     static final ImmutableSet<String> PRIMITIVE_TYPES =
             ImmutableSet.of(
-                    "unknown", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
-
-
-    public static final TypeName UNKNOWN = TypeName.of("unknown");
+                    "any", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
 
     @JsonValue
     public abstract String name();
