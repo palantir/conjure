@@ -44,3 +44,25 @@ Users may define the following kinds of named types. These can be referenced by 
 When migrating an existing API, it may be useful to use the following 'escape hatch' type.  These are not recommended for normal APIs because Conjure can't introspect these external types to figure out what their JSON structure will be, so they're effectively opaque.
 
   - _External Reference_ - a reference to a non-Conjure type, with an associated fallback Conjure type
+
+## Errors
+
+Conjure allows defining named, structured errors so that clients can expect specific pieces of information on failure or handle entire categories of problems in one fell swoop.
+
+- _Structured errors_ - have the following properties:
+  - _Name_ -  a user chosen description of the error e.g. `RecipeLocked`
+  - _Namespace_ - a user chosen category of the error e.g. `RecipeErrors`
+  - _Code_ - one of the following pre-defined categories
+    ```
+    PERMISSION_DENIED (403)
+    INVALID_ARGUMENT(400)
+    NOT_FOUND (404)
+    CONFLICT (409)
+    REQUEST_ENTITY_TOO_LARGE (413)
+    FAILED_PRECONDITION (500)
+    INTERNAL (500)
+    TIMEOUT (500)
+    CUSTOM_CLIENT (400)
+    CUSTOM_SERVER (500)
+    ```
+  - _Args_ - a map from string keys to Conjure types

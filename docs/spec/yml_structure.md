@@ -10,7 +10,7 @@ your-project/src/main/conjure/bar.yml
 your-project/src/main/conjure/baz.yml
 ```
 
-Each YAML file may define multiple types, services and errors.  The Conjure compiler expects these files to conform to the following JSON schema, but it also enforces some additional constraints (e.g. no complex types in path parameters).
+Each YAML file may define multiple _types_, _services_ and _errors_.  The Conjure compiler expects these files to conform to the following JSON schema, but it also enforces some additional constraints (e.g. no complex types in path parameters).
 
 ## JSON schema
 
