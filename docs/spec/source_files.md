@@ -15,7 +15,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
   - [ConjureSourceFile][]
     - [TypesDefinition][]
       - [ExternalTypeDefinition][]
-      - [Defined Types Object](#definedTypesObject)
+      - [NamedTypesDefinition][]
         - [Alias Definition](#aliasDefinition)
         - [Object Definition](#objectDefinition)
         - [Field Definition](#fieldDefinition)
@@ -33,6 +33,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
 [ConjureSourceFile]: #conjuresourcefile
 [TypesDefinition]: #typesdefinition
 [ExternalTypeDefinition]: #externaltypedefinition
+[NamedTypesDefinition]: #namedtypesdefinition
 [ServicesDefinition]: #servicesdefinition
 [PathString]: #pathstring
 
@@ -55,10 +56,10 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="typeConjureImport"></a>conjure-imports | Map[`string`, `string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 <a name="typeImports"></a>imports | Map[`string`, [ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
-<a name="typeDefinitions"></a>definitions | [`Type Definitions Object`](#definedTypesObject) | The types specified in this definition.
+<a name="typeDefinitions"></a>definitions | [`Type Definitions Object`][] | The types specified in this definition.
 
 
-## <a name="externalTypeObject"></a>ExternalTypeDefinition
+## ExternalTypeDefinition
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
 
 Field Name | Type | Description
@@ -82,7 +83,7 @@ imports:
 ```
 
 
-## <a name="definedTypesObject"></a>Defined Types Object
+## NamedTypesDefinition
 The object specifies the types that are defined in the Conjure definition.
 
 Field Name | Type | Description
@@ -103,7 +104,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="aliasAlias"></a>alias | `string` | **REQUIRED**. The name of the type to be aliased.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 
 ## <a name="objectDefinition"></a>Object Definition
@@ -113,7 +114,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="objectFields"></a>fields | Map[`string`, [Field Definition](#fieldDefinition) \| `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
+<a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 Field names must appear in either lowerCamelCase, or kebab-case, or snake_case. Code generators will respect casing for wire format, but may convert case formats to conform with language restrictions. As a result, field names must be unique independent of case format (e.g. an object may not define both caseFormat and case-format as fields).
 
@@ -146,7 +147,7 @@ Field Name | Type | Description
 ---------- | ---- | -----------
 <a name="unionUnion"></a>union | Map[`string`, [`Field Definition`](#fieldDefinition) \| `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
+<a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types.
 
@@ -167,7 +168,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="enumValues"></a>values | Array[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
+<a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 **Example:**
 ```yaml
