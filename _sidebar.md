@@ -4,7 +4,7 @@
     - [Get started with `gradle-conjure`](docs/getting_started.md)
 - **Reference**
     - [Features](docs/spec/features.md)
-    - [YML structure](docs/spec/yml_structure.md)
+    - [Source files](docs/spec/source_files.md)
     - [Constraints](docs/spec/constraints.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
     - [Wire specification](docs/spec/wire.md)
