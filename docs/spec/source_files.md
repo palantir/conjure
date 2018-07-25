@@ -1,8 +1,6 @@
 # Conjure YML source files
 
-A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each YAML file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document.
-
-Source files must end in `.yml`, but the actual name has no effect on generated code (it is only used for referencing types across files).  Here is a suggested structure:
+A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document. Source files must end in `.yml`.  Here is a suggested structure:
 
 ```
 your-project/src/main/conjure/foo.yml
@@ -10,7 +8,7 @@ your-project/src/main/conjure/bar.yml
 your-project/src/main/conjure/baz.yml
 ```
 
-The Conjure compiler requires each file to conform to the `ConjureSourceFile` structure, specified recursively below:
+The Conjure compiler requires each file to conform to the [ConjureSourceFile][] structure, specified below:
 
   - [ConjureSourceFile][]
     - [TypesDefinition][]
