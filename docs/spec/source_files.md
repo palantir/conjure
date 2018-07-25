@@ -15,9 +15,9 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
       - [ExternalTypeDefinition][]
       - [NamedTypesDefinition][]
         - [AliasDefinition][]
-        - [ObjectDefinition][]
+        - [ObjectTypeDefinition][]
         - [FieldDefinition][]
-        - [Union Definition](#unionDefinition)
+        - [UnionTypeDefinition][]
         - [Enum Definition](#enumDefinition)
       - [Error Definition](#errorDefinition)
       - [Error Code Field](#errorCodeField)
@@ -29,17 +29,19 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
     - [Markdown Docs Fields][]
 
 [AliasDefinition]: #aliasdefinition
+[AuthDefinition]: #authdefinition
 [ConjureSourceFile]: #conjuresourcefile
 [EndpointDefinition]: #endpointdefinition
-[FieldDefinition]: #fielddefinition
 [ExternalTypeDefinition]: #externaltypedefinition
+[FieldDefinition]: #fielddefinition
+[Markdown Docs Fields]: #rich-text-formatting
 [NamedTypesDefinition]: #namedtypesdefinition
-[ObjectDefinition]: #objectdefinition
+[ObjectTypeDefinition]: #objecttypedefinition
 [PathString]: #pathstring
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
-[AuthDefinition]: #authdefinition
-[Markdown Docs Fields]: #rich-text-formatting
+[UnionTypeDefinition]: #uniontypedefinition
+
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
@@ -94,7 +96,7 @@ The object specifies the types that are defined in the Conjure definition.
 Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
-<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectDefinition](#errorDefinition) or [Union Definition](#unionDefinition) or [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
+<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectTypeDefinition](#errorDefinition) or [UnionTypeDefinition][] or [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
 <a name="typeErrors"></a>errors | Map[`string`,&nbsp;[Error Definition](#errorDefinition)] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
@@ -112,7 +114,7 @@ Field | Type | Description
 <a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 
-## ObjectDefinition
+## ObjectTypeDefinition
 Definition for an object complex data type.
 
 Field | Type | Description
@@ -145,12 +147,12 @@ Field | Type | Description
 <a name="fieldDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
-## <a name="unionDefinition"></a> Union Definition
+## UnionTypeDefinition
 Definition for a union complex data type.
 
 Field | Type | Description
 ---------- | ---- | -----------
-<a name="unionUnion"></a>union | Map[`string`,&nbsp;[`FieldDefinition`][] or `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
+<a name="unionUnion"></a>union | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
