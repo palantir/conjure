@@ -1,8 +1,8 @@
 # Conjure YML source files
 
-A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files.
+A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each YAML file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document.
 
-The files must end in `.yml`, but the actual name has no effect on generated code (it is only used for referencing types across files).  Here is a suggested structure:
+Source files must end in `.yml`, but the actual name has no effect on generated code (it is only used for referencing types across files).  Here is a suggested structure:
 
 ```
 your-project/src/main/conjure/foo.yml
@@ -10,16 +10,9 @@ your-project/src/main/conjure/bar.yml
 your-project/src/main/conjure/baz.yml
 ```
 
-Each YAML file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document.
+The Conjure compiler requires each file to conform to the `Conjure YML File` structure, specified recursively below:
 
-The Conjure compiler expects these files to conform to the following JSON schema, but it also enforces some additional constraints (e.g. no complex types in path parameters).
-
-All field names in the specification are **case sensitive**.
-
-In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be
-considered OPTIONAL.
-
-  - [Conjure Object](#conjureObject)
+  - [Conjure YML File](#conjureYMLFile)
   - [Types Object](#typesObject)
   - [External Type Object](#externalTypeObject)
   - [Defined Types Object](#definedTypesObject)
@@ -37,9 +30,11 @@ considered OPTIONAL.
   - [Param Type Field](#paramTypeField)
   - [Rich Text Formatting](#richText)
 
+Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
-## <a name="conjureObject"></a>Conjure Object
-This is the root document object of a Conjure definition.
+
+## <a name="conjureYMLFile"></a>Conjure YML File
+Each source file must be a YAML object with the following allowed fields:
 
 Field Name | Type | Description
 ---|:---:|---
@@ -59,6 +54,7 @@ Field Name | Type | Description
 
 ## <a name="externalTypeObject"></a>External Type Object
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
+
 Field Name | Type | Description
 ---|:---:|---
 base-type | `string` | MUST be a a primitive data type.
