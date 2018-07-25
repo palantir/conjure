@@ -22,7 +22,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - _Alias_ - a named shorthand for another Conjure type, purely for readability.
   - _Union_ - a type representing different named variants, each of which can contain differen types. (Also known as 'algebraic data types' or 'tagged unions')
 
-## Collection types
+## Container types
 
   - `list<T>` - an ordered sequence of items of type `T`.
   - `map<K, V>` - values of type `V` each indexed by a unique key of type `K` (keys are unordered).
