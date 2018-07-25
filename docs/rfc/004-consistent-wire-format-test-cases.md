@@ -50,7 +50,7 @@ _Note, we recommend making the harness easy to run from within your IDE so that 
 
 ## `test-cases.json`
 
-The test-cases.json file is a well-structured file that will capture behaviour and edge cases from [wire.md](../wire.md), e.g.:
+The test-cases.json file is a well-structured file that will capture behaviour and edge cases from [wire.md](../spec/wire.md), e.g.:
 
 ```yaml
 client:
