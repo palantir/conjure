@@ -37,7 +37,7 @@ public class ConjureParserTest {
 
     @Test
     public void testConjureInlinedImports() throws IOException {
-        ConjureDefinition conjure = ConjureParser.parse(new File("src/test/resources/example-conjure-imports.yml"));
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-conjure-imports.yml"));
         assertThat(conjure.types().conjureImports()).containsKey(Namespace.of("imports"));
     }
 
@@ -69,7 +69,7 @@ public class ConjureParserTest {
         generateFiles(top, mid);
         generateFiles(ImmutableList.of(root), top);
 
-        ConjureDefinition result = ConjureParser.parse(
+        ConjureSourceFile result = ConjureParser.parse(
                 temporaryFolder.getRoot().toPath().resolve(root + ".yml").toFile());
         assertThat(result.types().conjureImports()).isNotEmpty();
     }

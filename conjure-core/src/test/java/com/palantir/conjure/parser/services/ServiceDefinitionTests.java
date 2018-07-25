@@ -23,7 +23,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
-import com.palantir.conjure.parser.ConjureDefinition;
+import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ObjectsDefinition;
@@ -171,9 +171,9 @@ public final class ServiceDefinitionTests {
     @Test
     @SuppressWarnings("deprecation")
     public void testParseConjureFile() throws IOException {
-        ConjureDefinition def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
+        ConjureSourceFile def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def).isEqualTo(
-                ConjureDefinition.builder()
+                ConjureSourceFile.builder()
                         .types(TypesDefinition.builder()
                                 .putImports(TypeName.of("ResourceIdentifier"),
                                         ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))

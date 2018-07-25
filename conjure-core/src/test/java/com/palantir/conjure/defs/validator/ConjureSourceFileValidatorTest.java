@@ -33,7 +33,7 @@ import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import org.junit.Test;
 
-public class ConjureDefinitionValidatorTest {
+public class ConjureSourceFileValidatorTest {
     private static final String PACKAGE = "package";
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);

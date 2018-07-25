@@ -36,7 +36,7 @@ public final class ConjureMetrics {
                 metrics.histogram(MetricRegistry.name(clazz, names)).update(value));
     }
 
-    public static void recordMetrics(ConjureDefinition definition) {
+    public static void recordMetrics(ConjureSourceFile definition) {
         Optional.ofNullable(SharedMetricRegistries.tryGetDefault()).ifPresent(metrics -> {
             metrics.counter(MetricRegistry.name(TypesDefinition.class, "conjure-imports"))
                     .inc(definition.types().conjureImports().size());

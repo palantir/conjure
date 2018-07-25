@@ -27,7 +27,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableConjureDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface ConjureDefinition {
+public interface ConjureSourceFile {
 
     @Value.Default
     default TypesDefinition types() {
@@ -41,5 +41,4 @@ public interface ConjureDefinition {
     }
 
     class Builder extends ImmutableConjureDefinition.Builder {}
-
 }

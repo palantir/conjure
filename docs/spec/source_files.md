@@ -10,9 +10,9 @@ your-project/src/main/conjure/bar.yml
 your-project/src/main/conjure/baz.yml
 ```
 
-The Conjure compiler requires each file to conform to the `Conjure YML File` structure, specified recursively below:
+The Conjure compiler requires each file to conform to the `ConjureSourceFile` structure, specified recursively below:
 
-  - [Conjure YML File](#conjure-yml-file)
+  - [ConjureSourceFile](#conjuresourcefile)
     - [TypesDefinition](#typesdefinition)
       - [External Type Object](#externalTypeObject)
       - [Defined Types Object](#definedTypesObject)
@@ -33,7 +33,7 @@ The Conjure compiler requires each file to conform to the `Conjure YML File` str
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
 
-## Conjure YML File
+## ConjureSourceFile
 Each source file must be a YAML object with the following allowed fields:
 
 Field Name | Type | Description
