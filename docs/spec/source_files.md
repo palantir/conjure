@@ -14,8 +14,6 @@ Each YAML file may define multiple _types_, _services_ and _errors_. The file bo
 
 The Conjure compiler expects these files to conform to the following JSON schema, but it also enforces some additional constraints (e.g. no complex types in path parameters).
 
-## YML structure
-
 All field names in the specification are **case sensitive**.
 
 In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be
@@ -39,8 +37,8 @@ considered OPTIONAL.
   - [Param Type Field](#paramTypeField)
   - [Rich Text Formatting](#richText)
 
-#### <a name="conjureObject"></a>Conjure Object
 
+## <a name="conjureObject"></a>Conjure Object
 This is the root document object of a Conjure definition.
 
 Field Name | Type | Description
@@ -49,8 +47,7 @@ Field Name | Type | Description
 <a name="conjureServices"></a>services | Map[`string`, [`Service Object`](#serviceObject)] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
-#### <a name="typesObject"></a>Types Object
-
+## <a name="typesObject"></a>Types Object
 The object specifies the types available in the Conjure definition.
 
 Field Name | Type | Description
@@ -59,8 +56,8 @@ Field Name | Type | Description
 <a name="typeImports"></a>imports | Map[`string`, [`External Type Object`](#externalTypeObject)] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 <a name="typeDefinitions"></a>definitions | [`Type Definitions Object`](#definedTypesObject) | The types specified in this definition.
 
-#### <a name="externalTypeObject"></a>External Type Object
 
+## <a name="externalTypeObject"></a>External Type Object
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
 Field Name | Type | Description
 ---|:---:|---
@@ -72,7 +69,7 @@ the serialization format of the `base-type` fallback should match the format of 
 
 Each generator specifies what key they will consume within the `external` map.
 
-##### External Type Object Example
+**Example:**
 ```yaml
 imports:
   SomeDataType:
@@ -82,8 +79,8 @@ imports:
       typescript: @palantir/package
 ```
 
-#### <a name="definedTypesObject"></a>Defined Types Object
 
+## <a name="definedTypesObject"></a>Defined Types Object
 The object specifies the types that are defined in the Conjure definition.
 
 Field Name | Type | Description
@@ -96,8 +93,8 @@ Package names are used by generator implementations to determine the output loca
 
 Type names MUST be in PascalCase and be unique within a package.
 
-#### <a name="aliasDefinition"></a>Alias Definition
 
+## <a name="aliasDefinition"></a>Alias Definition
 Definition for an alias complex data type.
 
 Field Name | Type | Description
@@ -106,8 +103,8 @@ Field Name | Type | Description
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
-#### <a name="objectDefinition"></a>Object Definition
 
+## <a name="objectDefinition"></a>Object Definition
 Definition for an object complex data type.
 
 Field Name | Type | Description
@@ -118,7 +115,7 @@ Field Name | Type | Description
 
 Field names must appear in either lowerCamelCase, or kebab-case, or snake_case. Code generators will respect casing for wire format, but may convert case formats to conform with language restrictions. As a result, field names must be unique independent of case format (e.g. an object may not define both caseFormat and case-format as fields).
 
-##### Object Definition Examples
+**Examples:**
 ```yaml
 TypeAlias:
   docs: Some documentation about the whole type
@@ -131,8 +128,7 @@ TypeAlias:
 ```
 
 
-#### <a name="fieldDefinition"></a>Field Definition
-
+## <a name="fieldDefinition"></a>Field Definition
 Definition for a field in a complex data type.
 
 Field Name | Type | Description
@@ -141,8 +137,7 @@ Field Name | Type | Description
 <a name="fieldDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
-#### <a name="unionDefinition"></a> Union Definition
-
+## <a name="unionDefinition"></a> Union Definition
 Definition for a union complex data type.
 
 Field Name | Type | Description
@@ -153,7 +148,7 @@ Field Name | Type | Description
 
 It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types.
 
-##### Union Definition Example
+**Example:**
 ```yaml
 Payload:
   package: com.palantir.example
@@ -162,8 +157,8 @@ Payload:
     notAServiceLog: RequestLog
 ```
 
-#### <a name="enumDefinition"></a>Enum Definition
 
+## <a name="enumDefinition"></a>Enum Definition
 Definition for an enum complex data type.
 
 Field Name | Type | Description
@@ -172,8 +167,7 @@ Field Name | Type | Description
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [Defined Types Object](#definedTypesObject).
 
-
-##### Enum Definition Example
+**Example:**
 ```yaml
 LoadState:
   values:
@@ -182,8 +176,8 @@ LoadState:
     - ERROR
 ```
 
-#### <a name="errorDefinition"></a>Error Definition
 
+## <a name="errorDefinition"></a>Error Definition
 Definition for an error type.
 Field Name | Type | Description
 ---|:---:|---
@@ -193,8 +187,8 @@ Field Name | Type | Description
 <a name="errorUnsafeArgs"></a>unsafe-args | Map[`string`, [Field Definition](#fieldDefinition) \| `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
-#### <a name="errorCodeField"></a>Error Code Field
 
+## <a name="errorCodeField"></a>Error Code Field
 A field describing the error category. MUST be one of the following strings, which have associated HTTP status codes:
 * PERMISSION_DENIED (403)
 * INVALID_ARGUMENT(400)
@@ -207,8 +201,8 @@ A field describing the error category. MUST be one of the following strings, whi
 * CUSTOM_CLIENT (400)
 * CUSTOM_SERVER (500)
 
-#### <a name="serviceObject"></a>Service Object
 
+## <a name="serviceObject"></a>Service Object
 An object representing a service. A service is a collection of endpoints.
 Field name | Type | Description
 ---|:---:|---
@@ -219,17 +213,18 @@ Field name | Type | Description
 <a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
-#### <a name="pathSegmentField"></a> Path Segment Field
+
+## <a name="pathSegmentField"></a> Path Segment Field
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
 
 When comparing multiple paths, the path with the longest concrete path should be matched first.
 
-##### <a name="pathTemplating"></a>Path Templating
+## <a name="pathTemplating"></a>Path Templating
 Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters. The template may include `:.+` and `:.*` regular expressions with the following semantics and limitations:
 - `:.+` A non-greedy match of one or more path segments should be performed for the parameter
 - `:.*` A non-greedy match of zero or more path segments should be performed for the parameter. `:.*` is only supported if the template is the final segment of the path
 
-##### Path Resolution Examples
+**Examples:**
 Assuming the following paths, the concrete definition `/branch/foo` would be matched first.
 ```
 /branch/{branchPath}
@@ -243,13 +238,15 @@ first.
 /path/dataset/{arg}
 ```
 
-#### <a name="authField"></a>Auth Field
+
+## <a name="authField"></a>Auth Field
 A field describing an authentication mechanism. It is a `string` which MUST be of the following:
 * `none`: do not apply authorization requirements
 * `header`: apply an `Authorization` header argument/requirement to every endpoint.
 * `cookie:<cookie name>`: apply a cookie argument/requirement to every endpoint with cookie name `<cookie name>`.
 
-### <a name="endpointObject"></a>Endpoint Object
+
+## <a name="endpointObject"></a>Endpoint Object
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
 Field name | Type | Description
 ---|:---:|---
@@ -260,7 +257,8 @@ Field name | Type | Description
 <a name="endpointArgs"></a>args | Map[`string`, [Argument Object](#argumentObject) \| `string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [Param Type Field](#paramTypeField).
 <a name="endpointDocs"></a>docs | `string` | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
-### <a name="argumentObject"></a>Argument Object
+
+## <a name="argumentObject"></a>Argument Object
 An object representing an argument to an endpoint.
 Field name | Type | Description
 ---|:---:|---
@@ -270,7 +268,8 @@ Field name | Type | Description
 <a name="argumentParamId"></a>param-id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 <a name="argumentParamType"></a>param-type | [Param Type Field](#paramTypeField) | The type of the endpoint parameter. If omitted the default type is `auto`.
 
-### <a name="paramTypeField"></a>Param Type Field
+
+## <a name="paramTypeField"></a>Param Type Field
 A field describing the type of an endpoint parameter. It is a `string` which MUST be one of the following:
 - `path`: defined as a path parameter; the argument name must appear in the request line.
 - `body`: defined as the singular body parameter.
@@ -278,116 +277,7 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 - `query`: defined as a querystring parameter.
 - `auto`: argument is treated as a path parameter if the argument name appears between braces in the request line and as a body argument otherwise.
 
-### <a name="richText"></a>Rich Text Formatting
+
+## <a name="richText"></a>Rich Text Formatting
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
 Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
-
-
-## JSON schema
-
-```js
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "properties": {
-    "types": {
-      "$ref": "#/definitions/TypesDefinition"
-    },
-    "services": {
-      "$ref": "#/definitions/ServicesDefinition"
-    }
-  },
-  "definitions": {
-
-    "TypesDefinition": {
-      "type": "object",
-      "properties": {
-        "imports": {
-          // TODO
-        },
-        "conjure-imports": {
-          // TODO
-        },
-        "definitions": {
-          // TODO
-        },
-      }
-    },
-
-    "ServicesDefinition": {
-      "type": "object",
-      "patternProperties": {
-        "^.*$": {
-          "$ref": "#/definitions/ServiceDefinition"
-        }
-      }
-    },
-
-    "ServiceDefinition": {
-      "type": "object",
-      "required": ["package", "base-path"],
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "package": {
-          "type": "string"
-        },
-        "docs": {
-          "type": "string"
-        },
-        "default-auth": {
-          "$ref": "#/definitions/AuthDefinition"
-        },
-        "base-path": {
-          "type": "string"
-        },
-        "endpoints": {
-          "type": "object",
-          "patternProperties": {
-            "^.*$": {
-              "$ref": "#/definitions/EndpointDefinition"
-            }
-          }
-        }
-      }
-    },
-
-    "AuthDefinition": {
-       // TODO
-    },
-
-    "EndpointDefinition": {
-      "type": "object",
-      "required": ["http"],
-      "properties": {
-        "http": {
-          "type": "string"
-        },
-        "auth": {
-          "$ref": "#/definitions/AuthDefinition"
-        },
-        "args": {
-          // TODO
-        },
-        "markers": {
-          "type": "array",
-          "itemType": {
-            "type": "string"
-          }
-        },
-        "returns": {
-          "type": "string"
-        },
-        "docs": {
-          "type": "string"
-        },
-        "deprecated": {
-          "type": "string"
-        },
-      }
-    }
-
-  }
-}
-```
