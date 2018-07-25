@@ -14,6 +14,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
     - [TypesDefinition][]
       - [ExternalTypeDefinition][]
       - [NamedTypesDefinition][]
+        - [TypeName][]
         - [AliasDefinition][]
         - [ObjectTypeDefinition][]
         - [FieldDefinition][]
@@ -50,6 +51,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 [PathString]: #pathstring
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
+[TypeName]: #typename
 [UnionTypeDefinition]: #uniontypedefinition
 
 <!-- This markdown document uses non-breaking dashes '&#8209;' and non-breaking spaces '&nbsp;' to ensure that table rows look nice. -->
@@ -60,7 +62,7 @@ Each source file must be a YAML object with the following allowed fields:
 Field | Type | Description
 ---|:---:|---
 types | [TypesDefinition][] | The types to be included in the definition.
-services | Map[`string`,&nbsp;[ServiceDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
+services | Map[`string`&nbsp;&rarr;&nbsp;[ServiceDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
 ## TypesDefinition
@@ -68,8 +70,8 @@ The object specifies the types available in the Conjure definition.
 
 Field | Type | Description
 ---|:---:|---
-conjure&#8209;imports | Map[`string`,&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
-imports | Map[`string`,&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
+conjure&#8209;imports | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
+imports | Map[`string`&nbsp;&rarr;&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 definitions | [NamedTypesDefinition][] | The types specified in this definition.
 
 
@@ -79,7 +81,7 @@ A type that is not defined within Conjure. Usage of external types is not recomm
 Field | Type | Description
 ---|:---:|---
 base&#8209;type | `string` | MUST be a a primitive data type.
-external | Map[`string`,&nbsp;`string`] | A map between a language name and its associated fully qualified type.
+external | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a language name and its associated fully qualified type.
 
 A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that
 the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
@@ -103,12 +105,14 @@ The object specifies the types that are defined in the Conjure definition.
 Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
-definitions | Map[`string`, [AliasDefinition][] or [ObjectTypeDefinition][] or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
-errors | Map[`string`,&nbsp;[ErrorDefinition][]] |A map between type names and error definitions.
+definitions | Map[[TypeName][] &rarr; [AliasDefinition][] or [ObjectTypeDefinition][] or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
+errors | Map[`string`&nbsp;&rarr;&nbsp;[ErrorDefinition][]] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
 
-Type names MUST be in PascalCase and be unique within a package.
+
+## TypeName
+Named types must be in PascalCase and be unique within a package.
 
 
 ## AliasDefinition
@@ -126,7 +130,7 @@ Definition for an object complex data type.
 
 Field | Type | Description
 ---|:---:|---
-fields | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+fields | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -159,7 +163,7 @@ Definition for a union complex data type.
 
 Field | Type | Description
 ---------- | ---- | -----------
-union | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
+union | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -201,8 +205,8 @@ Field | Type | Description
 ---|:---:|---
 namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
 code | [ErrorCode][] | **REQUIRED**. The general category for the error.
-safe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
-unsafe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+safe&#8209;args | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+unsafe&#8209;args | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
@@ -230,7 +234,7 @@ package | `string` | **REQUIRED** The package of the service.
 base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating][] is not allowed.
 default&#8209;auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 docs | [DocString][] | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-endpoints | Map[`string`,&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
+endpoints | Map[`string`&nbsp;&rarr;&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
 ## PathString
 A field describing an extendible path. A path segment MAY have [Path templating][].
@@ -273,7 +277,7 @@ http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST 
 markers | List[`string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [ServiceDefinition][].
 returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
-args | Map[`string`, [ArgumentDefinition][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
+args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
