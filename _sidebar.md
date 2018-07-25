@@ -8,7 +8,7 @@
     - [Constraints](docs/spec/constraints.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
     - [Wire specification](docs/spec/wire.md)
-    - [Language specification](docs/spec/todo.md)
+    - [Old specification](docs/spec/old-spec.md)
 - **RFCs**
     - [001 Naming](docs/rfc/001-naming.md)
     - [002 Contract for Conjure generators](docs/rfc/002-contract-for-conjure-generators.md)
