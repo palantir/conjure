@@ -1,38 +1,44 @@
-# Conjure specification
+# Features
+
+## HTTP endpoints
+
+- GET, PUT, POST, DELETE
+- Query parameters
+- Path parameters
+- Headers
+- Cookie auth
 
 ## Types
 
-You can define APIs using the following types. Wire representation defined below. Restrictions for how these can be combined are defined below.
+You can define APIs using the following types:
 
-Primitives
-- `any`
-- `bearertoken`
-- `binary`
-- `boolean`
-- `datetime`
-- `double`
-- `integer`
-- `rid`
-- `safelong`
-- `string`
-- `uuid`
+- Complex types:
+  - `list<T>`
+  - `map<K, V>`
+  - `optional<T>`
+  - `set<T>`
+  - Enum
+  - Union
 
-Generic types:
-- `list<T>`
-- `map<K, V>`
-- `optional<T>`
-- `set<T>`
+- Primitives
+  - `any`
+  - `bearertoken`
+  - `binary`
+  - `boolean`
+  - `datetime`
+  - `double`
+  - `integer`
+  - `rid`
+  - `safelong`
+  - `string`
+  - `uuid`
 
-Complex types:
-- Enum
-- Union
+- Migration types:
+  - ExternalReference
 
-Migration types:
-- ExternalReference
+## Example
 
-## Endpoints
-
-_Endpoints_ are grouped together in _Services_, here's an example Conjure YML file:
+Here's an example Conjure YML file that uses many of the above features:
 
 ```yaml
 services:
@@ -97,11 +103,3 @@ types:
         fields:
           id: safelong
 ```
-
-
-Restrictions
-
-- No nested optionals
-
-- Path params
-  - no bearer token

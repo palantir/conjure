@@ -3,10 +3,12 @@
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
 - **Reference**
-    - [Mega specification](docs/mega_specification.md)
-    - [Language specification](docs/specification.md)
-    - [Intermediate representation (IR)](docs/intermediate_representation.md)
-    - [Wire specification](docs/wire.md)
+    - [Features](docs/spec/features.md)
+    - [YML structure](docs/spec/yml_structure.md)
+    - [Constraints](docs/spec/constraints.md)
+    - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
+    - [Wire format](docs/spec/wire.md)
+    - [Language specification](docs/spec/dotod.md)
 - **RFCs**
     - [001 Naming](docs/rfc/001-naming.md)
     - [002 Contract for Conjure generators](docs/rfc/002-contract-for-conjure-generators.md)
