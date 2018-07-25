@@ -1,51 +1,45 @@
 # Conjure Wire Specification
 
+_This document defines the serialization format of Conjure defined types._
+
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
 RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
-## Introduction
+- [Formats](#format)
+    - [Json Format](#jsonFormat)
+    - [Plain Format](#plainFormat)
+    - [Canonical Format](#canonicalFormat)
+- [Data Types](#dataTypes)
+    - [Primitive Data Types](#primitiveDataTypes)
+    - [Collection Data Types](#collectionDataTypes)
+    - [Complex Data Types](#complexDataTypes)
 
-The Conjure Wire Specification defines the serialization format of Conjure defined types.
+## Formats
 
-## Table of Contents
-- [Specification](#specification)
-    - [Formats](#format)
-        - [Json Format](#jsonFormat)
-        - [Plain Format](#plainFormat)
-        - [Canonical Format](#canonicalFormat)
-    - [Data Types](#dataTypes)
-        - [Primitive Data Types](#primitiveDataTypes)
-        - [Collection Data Types](#collectionDataTypes)
-        - [Complex Data Types](#complexDataTypes)
-
-## Specification
-
-### Formats
-
-#### JSON Format
+### JSON Format
 
 The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations
 of Conjure clients/servers MUST expect all HTTP requests and responses, and header parameters to be represented in this way.
 The data types in the Conjure Specification are based on the types supported by the [JSON Schema Specification Wright
 Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2).
 
-#### Plain Format
+### Plain Format
 
 The Plain format defines the raw representation of Conjure primitives. There is no raw representation of
 Conjure-defined types and collections. Implementations of Conjure clients/servers MUST expect all path and query
 parameters to be represented in this way.
 
-#### Canonical Format
+### Canonical Format
 
 The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
 when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
 MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
 
-### Data Types
+## Data Types
 
-#### <a name="primitiveDataTypes"></a>Primitive Data Types
+### <a name="primitiveDataTypes"></a>Primitive Data Types
 
 The primitive data types defined by the Conjure Specification are:
 
@@ -80,7 +74,7 @@ double       | "NaN"                       | NaN                        | "NaN"
 double       | "Infinity"                  | Infinity                   | "Infinity"
 double       | "-Infinity"                 | -Infinity                  | "-Infinity"
 
-#### <a name="collectionDataTypes"></a>Collection Data Types
+### <a name="collectionDataTypes"></a>Collection Data Types
 
 Collections can be omitted if they are empty or in the case of optionals absent. The collection data types defined by
 the Conjure Specification are:
@@ -92,7 +86,7 @@ set\<V>      | Array[V]    | No ambiguity             | An array where all eleme
 map\<K, V>   | Map[K,V]   | No ambiguity             | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type. If the type is non-string, then it is serialized into a quoted version of its plain reprehension.
 optional\<V> | V or `null` | `null` if absent otherwise the value | The value is considered absent if it is null or its associated field is omitted.
 
-#### <a name="complexDataTypes"></a>Complex Data Types
+### <a name="complexDataTypes"></a>Complex Data Types
 
 The complex data types defined by the Conjure Specification are:
 
@@ -104,10 +98,9 @@ error        | `object`  | No ambiguity             | An Error is a type that re
 object       | `object`  | No ambiguity             | An Object is a type that represents an `object` with a predefined set of fields with associated types.
 union        | `object`  | No ambiguity             | A Union is a type that represents a possibility from a fixed set of Objects. A Union is a JSON object with two fields: a `type` field which specifies the name of the variant, and a field which is the name of the variant which contains the payload.
 
-
-####
 An example error type would be serialized as follows:
-```json
+
+```js
 {
   "errorCode": "INVALID_ARGUMENT",
   "errorName": "MyApplication:DatasetNotFound",
@@ -120,7 +113,8 @@ An example error type would be serialized as follows:
 ```
 
 An example union type would be serialized as follows:
-```json
+
+```js
 {
   "type": "serviceLog",
   "serviceLog": {

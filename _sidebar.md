@@ -7,7 +7,7 @@
     - [YML structure](docs/spec/yml_structure.md)
     - [Constraints](docs/spec/constraints.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
-    - [Wire format](docs/spec/wire.md)
+    - [Wire specification](docs/spec/wire.md)
     - [Language specification](docs/spec/dotod.md)
 - **RFCs**
     - [001 Naming](docs/rfc/001-naming.md)
