@@ -43,6 +43,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
+<!-- This markdown document uses non-breaking dashes '&#8209;' and non-breaking spaces '&nbsp;' to ensure that table rows look nice. -->
 
 ## ConjureSourceFile
 Each source file must be a YAML object with the following allowed fields:
@@ -58,7 +59,7 @@ The object specifies the types available in the Conjure definition.
 
 Field | Type | Description
 ---|:---:|---
-<a name="typeConjureImport"></a>conjure-imports | Map[`string`,&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
+<a name="typeConjureImport"></a>conjure&#8209;imports | Map[`string`,&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 <a name="typeImports"></a>imports | Map[`string`,&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 <a name="typeDefinitions"></a>definitions | [NamedTypesDefinition][] | The types specified in this definition.
 
@@ -68,7 +69,7 @@ A type that is not defined within Conjure. Usage of external types is not recomm
 
 Field | Type | Description
 ---|:---:|---
-base-type | `string` | MUST be a a primitive data type.
+base&#8209;type | `string` | MUST be a a primitive data type.
 external | Map[`string`,&nbsp;`string`] | A map between a language name and its associated fully qualified type.
 
 A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that
@@ -191,8 +192,8 @@ Field | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
 <a name="errorCode"></a>code | [Error Code](#errorCode) | **REQUIRED**. The general category for the error.
-<a name="errorSafeArgs"></a>safe-args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
-<a name="errorUnsafeArgs"></a>unsafe-args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorSafeArgs"></a>safe&#8209;args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorUnsafeArgs"></a>unsafe&#8209;args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
@@ -217,8 +218,8 @@ Field | Type | Description
 ---|:---:|---
 <a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
-<a name="serviceBasePath"></a>base-path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
-<a name="serviceDefaultAuth"></a>default-auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
+<a name="serviceBasePath"></a>base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
+<a name="serviceDefaultAuth"></a>default&#8209;auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="serviceEndpoints"></a>endpoints | Map[`string`,&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
@@ -275,8 +276,8 @@ Field | Type | Description
 <a name="argumentType"></a>type | `string` | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter and primitive or optional of primitive if the argument is header or query parameter.
 <a name="argumentMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="argumentDeprecated"></a>deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="argumentParamId"></a>param-id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
-<a name="argumentParamType"></a>param-type | [Param Type Field](#paramTypeField) | The type of the endpoint parameter. If omitted the default type is `auto`.
+<a name="argumentParamId"></a>param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
+<a name="argumentParamType"></a>param&#8209;type | [Param Type Field](#paramTypeField) | The type of the endpoint parameter. If omitted the default type is `auto`.
 
 
 ## <a name="paramTypeField"></a>Param Type Field
