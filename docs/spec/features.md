@@ -25,19 +25,19 @@ Conjure supports defining the following named types. These can be referenced by 
   - `optional<T>` - represents a value of type `T` which is either present or not present.
   - `set<T>` - a collection of distinct values of type `T`.
 
-### Primitives
+### Built-in types
 
-  - `any`
-  - `bearertoken`
-  - `binary`
-  - `boolean`
-  - `datetime`
-  - `double`
-  - `integer`
-  - `rid`
-  - `safelong`
-  - `string`
-  - `uuid`
+  - `any` - a catch-all type which can represent arbitrary JSON including lists, maps, strings, numbers or booleans.
+  - `bearertoken` - a string [Json Web Token (JWT)](https://jwt.io/)
+  - `binary` - a sequence of binary.
+  - `boolean` - `true` or `false`
+  - `datetime` - an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) value e.g. `2018-07-25T10:20:32+01:00`
+  - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes also be NaN, +/-Infinity and signed zero.
+  - `integer` - a signed 32-bit integer value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+  - `rid` - a [Resource Identifier](https://github.com/palantir/resource-identifier), e.g. `ri.recipes.main.ingredient.1234`
+  - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> to 2<sup>53</sup> - 1
+  - `string` - a sequence of UTF-8 characters
+  - `uuid` - a 128-bit number: [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid)
 
 ### Migration types:
 
