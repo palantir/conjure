@@ -24,14 +24,17 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
     - [ServiceDefinition][]
       - [AuthDefinition][]
       - [EndpointDefinition][]
-      - [ArgumentObject][]
-      - [Param Type Field](#paramTypeField)
+      - [ArgumentDefinition][]
+      - [ArgumentDefinition.ParamType][]
     - [Markdown Docs Fields][]
+
+Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
 <!-- These are not rendered, they just allow us to specify the hash URL in one place. -->
 
-[ArgumentObject]: #argumentobject
 [AliasDefinition]: #aliasdefinition
+[ArgumentDefinition.ParamType]: #argumentdefinitionparamtype
+[ArgumentDefinition]: #argumentdefinition
 [AuthDefinition]: #authdefinition
 [ConjureSourceFile]: #conjuresourcefile
 [EndpointDefinition]: #endpointdefinition
@@ -47,9 +50,6 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
 [UnionTypeDefinition]: #uniontypedefinition
-
-
-Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
 <!-- This markdown document uses non-breaking dashes '&#8209;' and non-breaking spaces '&nbsp;' to ensure that table rows look nice. -->
 
@@ -272,11 +272,11 @@ Field | Type | Description
 <a name="endpointMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="endpointAuth"></a>auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
 <a name="endpointReturns"></a>returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
-<a name="endpointArgs"></a>args | Map[`string`, [ArgumentObject][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [Param Type Field](#paramTypeField).
+<a name="endpointArgs"></a>args | Map[`string`, [ArgumentDefinition][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 <a name="endpointDocs"></a>docs | `string` | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
-## ArgumentObject
+## ArgumentDefinition
 An object representing an argument to an endpoint.
 
 Field | Type | Description
@@ -285,10 +285,10 @@ Field | Type | Description
 <a name="argumentMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="argumentDeprecated"></a>deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="argumentParamId"></a>param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
-<a name="argumentParamType"></a>param&#8209;type | [Param Type Field](#paramTypeField) | The type of the endpoint parameter. If omitted the default type is `auto`.
+<a name="argumentParamType"></a>param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
 
 
-## <a name="paramTypeField"></a>Param Type Field
+## ArgumentDefinition.ParamType
 A field describing the type of an endpoint parameter. It is a `string` which MUST be one of the following:
 - `path`: defined as a path parameter; the argument name must appear in the request line.
 - `body`: defined as the singular body parameter.
