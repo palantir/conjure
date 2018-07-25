@@ -30,10 +30,10 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
       - [Param Type Field](#paramTypeField)
     - [Rich Text Formatting](#richText)
 
-[PathDefinition]: #pathdefinition
 [ConjureSourceFile]: #conjuresourcefile
 [TypesDefinition]: #typesdefinition
 [ServicesDefinition]: #servicesdefinition
+[PathString]: #pathstring
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
@@ -210,12 +210,12 @@ Field name | Type | Description
 ---|:---:|---
 <a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
-<a name="serviceBasePath"></a>base-path | [PathDefinition][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
+<a name="serviceBasePath"></a>base-path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
 <a name="serviceDefaultAuth"></a>default-auth | [Auth Field](#authField) | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
-## PathDefinition
+## PathString
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
 
 When comparing multiple paths, the path with the longest concrete path should be matched first.
@@ -251,7 +251,7 @@ A field describing an authentication mechanism. It is a `string` which MUST be o
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
 Field name | Type | Description
 ---|:---:|---
-<a name="endpointHttp"></a>http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathDefinition][].
+<a name="endpointHttp"></a>http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
 <a name="endpointMarker"></a>markers | List[[Field Definitions](#fieldDefinitions) \| `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="endpointAuth"></a>auth | [Auth Field](#authField) | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
 <a name="endpointReturns"></a>returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
