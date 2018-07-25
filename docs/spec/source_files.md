@@ -23,7 +23,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
         - [Enum Definition](#enumDefinition)
       - [Error Definition](#errorDefinition)
       - [Error Code Field](#errorCodeField)
-    - [Service Object](#serviceObject)
+    - [ServicesDefinition](#servicesdefinition)
       - [Auth Field](#authField)
       - [Endpoint Object](#endpointObject)
       - [Argument Object](#argumentObject)
@@ -39,7 +39,7 @@ Each source file must be a YAML object with the following allowed fields:
 Field Name | Type | Description
 ---|:---:|---
 <a name="conjureTypes"></a>types | [`TypesDefinition`](#typesdefinition) | The types to be included in the definition.
-<a name="conjureServices"></a>services | Map[`string`, [`Service Object`](#serviceObject)] | A  map between a service name and its definition. Service names MUST be in PascalCase.
+<a name="conjureServices"></a>services | Map[`string`, [`ServicesDefinition`](#servicesdefinition)] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
 ## TypesDefinition
@@ -198,17 +198,17 @@ A field describing the error category. MUST be one of the following strings, whi
 * CUSTOM_SERVER (500)
 
 
-## <a name="serviceObject"></a>Service Object
-An object representing a service. A service is a collection of endpoints.
+## ServicesDefinition
+A service is a collection of endpoints.
+
 Field name | Type | Description
 ---|:---:|---
 <a name="serviceName"></a>name | `string` | **REQUIRED** A human readable name for the service.
 <a name="servicePackage"></a>package | `string` | **REQUIRED** The package of the service.
 <a name="serviceBasePath"></a>base-path | [Path Segment Field](#pathSegmentField) | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
 <a name="serviceDefaultAuth"></a>default-auth | [Auth Field](#authField) | **REQUIRED** The default authentication mechanism for all endpoints in the service.
-<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-
+<a name="serviceEndpoints"></a>endpoints | Map[`string`, [Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
 ## <a name="pathSegmentField"></a> Path Segment Field
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
