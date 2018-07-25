@@ -23,20 +23,21 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
         - [Enum Definition](#enumDefinition)
       - [Error Definition](#errorDefinition)
       - [Error Code Field](#errorCodeField)
-    - [ServicesDefinition][]
+    - [ServiceDefinition][]
       - [Auth Field](#authField)
-      - [Endpoint Object](#endpointObject)
+      - [EndpointDefinition][]
       - [Argument Object](#argumentObject)
       - [Param Type Field](#paramTypeField)
     - [Rich Text Formatting](#richText)
 
 [AliasDefinition]: #aliasdefinition
 [ConjureSourceFile]: #conjuresourcefile
+[EndpointDefinition]: #endpointdefinition
 [ExternalTypeDefinition]: #externaltypedefinition
 [NamedTypesDefinition]: #namedtypesdefinition
 [ObjectDefinition]: #objectdefinition
 [PathString]: #pathstring
-[ServicesDefinition]: #servicesdefinition
+[ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
@@ -48,7 +49,7 @@ Each source file must be a YAML object with the following allowed fields:
 Field | Type | Description
 ---|:---:|---
 <a name="conjureTypes"></a>types | [TypesDefinition][] | The types to be included in the definition.
-<a name="conjureServices"></a>services | Map[`string`,&nbsp;[ServicesDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
+<a name="conjureServices"></a>services | Map[`string`,&nbsp;[ServiceDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
 ## TypesDefinition
@@ -208,7 +209,7 @@ A field describing the error category. MUST be one of the following strings, whi
 * CUSTOM_SERVER (500)
 
 
-## ServicesDefinition
+## ServiceDefinition
 A service is a collection of endpoints.
 
 Field | Type | Description
@@ -218,7 +219,7 @@ Field | Type | Description
 <a name="serviceBasePath"></a>base-path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating](#pathTemplating) is not allowed.
 <a name="serviceDefaultAuth"></a>default-auth | [Auth Field](#authField) | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 <a name="serviceDocs"></a>docs | `string` | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-<a name="serviceEndpoints"></a>endpoints | Map[`string`,&nbsp;[Endpoint Object](#endpointObject)] | **REQUIRED** A map of endpoint names to endpoint definitions.
+<a name="serviceEndpoints"></a>endpoints | Map[`string`,&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
 ## PathString
 A field describing an extendible path. A path segment MAY have [Path templating](#pathTemplating).
@@ -252,7 +253,7 @@ A field describing an authentication mechanism. It is a `string` which MUST be o
 * `cookie:<cookie name>`: apply a cookie argument/requirement to every endpoint with cookie name `<cookie name>`.
 
 
-## <a name="endpointObject"></a>Endpoint Object
+## EndpointDefinition
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
 
 Field | Type | Description
