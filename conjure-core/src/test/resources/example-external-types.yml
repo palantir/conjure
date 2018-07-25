@@ -1,0 +1,14 @@
+types:
+  imports:
+    ExampleAnyImport:
+      base-type: any
+      external:
+        java: com.palantir.example.ExternalAnyImport
+    ExampleIntegerImport:
+      base-type: string
+      external:
+        java: com.palantir.example.ExternalIntegerImport
+    ExampleTypeScriptImport:
+      base-type: string
+      external:
+        typescript: "@palantir/foo"
