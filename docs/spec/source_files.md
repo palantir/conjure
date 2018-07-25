@@ -19,7 +19,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
         - [FieldDefinition][]
         - [UnionTypeDefinition][]
         - [EnumTypeDefinition][]
-      - [Error Definition](#errorDefinition)
+      - [ErrorDefinition][]
       - [Error Code Field](#errorCodeField)
     - [ServiceDefinition][]
       - [AuthDefinition][]
@@ -32,6 +32,8 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [AuthDefinition]: #authdefinition
 [ConjureSourceFile]: #conjuresourcefile
 [EndpointDefinition]: #endpointdefinition
+[EnumTypeDefinition]: #enumtypedefinition
+[ErrorDefinition]: #errordefinition
 [ExternalTypeDefinition]: #externaltypedefinition
 [FieldDefinition]: #fielddefinition
 [Markdown Docs Fields]: #rich-text-formatting
@@ -41,7 +43,6 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
 [UnionTypeDefinition]: #uniontypedefinition
-[EnumTypeDefinition]: #enumtypedefinition
 
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
@@ -97,8 +98,8 @@ The object specifies the types that are defined in the Conjure definition.
 Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
-<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectTypeDefinition](#errorDefinition) or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
-<a name="typeErrors"></a>errors | Map[`string`,&nbsp;[Error Definition](#errorDefinition)] |A map between type names and error definitions.
+<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectTypeDefinition][] or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
+<a name="typeErrors"></a>errors | Map[`string`,&nbsp;[ErrorDefinition][]] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
 
@@ -120,7 +121,7 @@ Definition for an object complex data type.
 
 Field | Type | Description
 ---|:---:|---
-<a name="objectFields"></a>fields | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="objectFields"></a>fields | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -188,15 +189,15 @@ LoadState:
 ```
 
 
-## <a name="errorDefinition"></a>Error Definition
+## ErrorDefinition
 Definition for an error type.
 
 Field | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
 <a name="errorCode"></a>code | [Error Code](#errorCode) | **REQUIRED**. The general category for the error.
-<a name="errorSafeArgs"></a>safe&#8209;args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
-<a name="errorUnsafeArgs"></a>unsafe&#8209;args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorSafeArgs"></a>safe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorUnsafeArgs"></a>unsafe&#8209;args | Map[`string`, [FieldDefinition][]&nbsp;or&nbsp;`string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
