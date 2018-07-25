@@ -16,7 +16,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
       - [NamedTypesDefinition][]
         - [AliasDefinition][]
         - [ObjectDefinition][]
-        - [Field Definition](#fieldDefinition)
+        - [FieldDefinition][]
         - [Union Definition](#unionDefinition)
         - [Enum Definition](#enumDefinition)
       - [Error Definition](#errorDefinition)
@@ -31,6 +31,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [AliasDefinition]: #aliasdefinition
 [ConjureSourceFile]: #conjuresourcefile
 [EndpointDefinition]: #endpointdefinition
+[FieldDefinition]: #fielddefinition
 [ExternalTypeDefinition]: #externaltypedefinition
 [NamedTypesDefinition]: #namedtypesdefinition
 [ObjectDefinition]: #objectdefinition
@@ -115,7 +116,7 @@ Definition for an object complex data type.
 
 Field | Type | Description
 ---|:---:|---
-<a name="objectFields"></a>fields | Map[`string`,&nbsp;[Field Definition](#fieldDefinition) or `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="objectFields"></a>fields | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from field names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="objectDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="objectPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -134,7 +135,7 @@ TypeAlias:
 ```
 
 
-## <a name="fieldDefinition"></a>Field Definition
+## FieldDefinition
 Definition for a field in a complex data type.
 
 Field | Type | Description
@@ -148,7 +149,7 @@ Definition for a union complex data type.
 
 Field | Type | Description
 ---------- | ---- | -----------
-<a name="unionUnion"></a>union | Map[`string`,&nbsp;[`Field Definition`](#fieldDefinition) or `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
+<a name="unionUnion"></a>union | Map[`string`,&nbsp;[`FieldDefinition`][] or `string`] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 <a name="unionDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="unionPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -190,8 +191,8 @@ Field | Type | Description
 ---|:---:|---
 <a name="errorNamespace"></a>namespace | `string` | **REQUIRED**. The namespace of the error. The namespace MUST be in PascalCase.
 <a name="errorCode"></a>code | [Error Code](#errorCode) | **REQUIRED**. The general category for the error.
-<a name="errorSafeArgs"></a>safe-args | Map[`string`,&nbsp;[Field Definition](#fieldDefinition) or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
-<a name="errorUnsafeArgs"></a>unsafe-args | Map[`string`,&nbsp;[Field Definition](#fieldDefinition) or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorSafeArgs"></a>safe-args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered safe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="errorUnsafeArgs"></a>unsafe-args | Map[`string`,&nbsp;[FieldDefinition][] or `string`] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="errorDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
@@ -259,7 +260,7 @@ An object representing an endpoint. An endpoint describes a method, arguments an
 Field | Type | Description
 ---|:---:|---
 <a name="endpointHttp"></a>http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
-<a name="endpointMarker"></a>markers | List[[Field Definitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="endpointMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="endpointAuth"></a>auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
 <a name="endpointReturns"></a>returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
 <a name="endpointArgs"></a>args | Map[`string`,&nbsp;[Argument Object](#argumentObject) or `string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [Param Type Field](#paramTypeField).
@@ -272,7 +273,7 @@ An object representing an argument to an endpoint.
 Field | Type | Description
 ---|:---:|---
 <a name="argumentType"></a>type | `string` | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter and primitive or optional of primitive if the argument is header or query parameter.
-<a name="argumentMarker"></a>markers | List[[Field Definitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+<a name="argumentMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="argumentDeprecated"></a>deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="argumentParamId"></a>param-id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 <a name="argumentParamType"></a>param-type | [Param Type Field](#paramTypeField) | The type of the endpoint parameter. If omitted the default type is `auto`.
