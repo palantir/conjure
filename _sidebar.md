@@ -5,7 +5,7 @@
 - **Reference**
     - [Language specification](docs/specification.md)
     - [Intermediate representation (IR)](docs/intermediate_representation.md)
-    - [Wire specification](docs/wire.md)
+    - [Wire specification](docs/wire_specification.md)
 - **RFCs**
     - [001 Naming](docs/rfc/001-naming.md)
     - [002 Contract for Conjure generators](docs/rfc/002-contract-for-conjure-generators.md)
