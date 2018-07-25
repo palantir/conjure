@@ -43,8 +43,8 @@ Each source file must be a YAML object with the following allowed fields:
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="conjureTypes"></a>types | [`TypesDefinition`][] | The types to be included in the definition.
-<a name="conjureServices"></a>services | Map[`string`, [`ServicesDefinition`][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
+<a name="conjureTypes"></a>types | [TypesDefinition][] | The types to be included in the definition.
+<a name="conjureServices"></a>services | Map[`string`, [ServicesDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
 
 ## TypesDefinition
