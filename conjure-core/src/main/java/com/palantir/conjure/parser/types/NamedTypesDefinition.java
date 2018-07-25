@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableObjectsDefinition.class)
-@JsonSerialize(as = ImmutableObjectsDefinition.class)
+@JsonDeserialize(as = ImmutableNamedTypesDefinition.class)
+@JsonSerialize(as = ImmutableNamedTypesDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface ObjectsDefinition {
+public interface NamedTypesDefinition {
 
     @JsonProperty("default-package")
     Optional<ConjurePackage> defaultConjurePackage();
@@ -44,5 +44,5 @@ public interface ObjectsDefinition {
         return new Builder();
     }
 
-    class Builder extends ImmutableObjectsDefinition.Builder {}
+    class Builder extends ImmutableNamedTypesDefinition.Builder {}
 }

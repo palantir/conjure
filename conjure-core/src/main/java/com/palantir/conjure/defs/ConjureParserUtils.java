@@ -32,6 +32,7 @@ import com.palantir.conjure.defs.validator.TypeNameValidator;
 import com.palantir.conjure.defs.validator.UnionDefinitionValidator;
 import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.services.PathString;
+import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -249,7 +250,7 @@ public final class ConjureParserUtils {
     }
 
     static List<ErrorDefinition> parseErrors(
-            com.palantir.conjure.parser.types.ObjectsDefinition defs,
+            NamedTypesDefinition defs,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage = defs.defaultConjurePackage().map(p -> p.name());
         ImmutableList.Builder<ErrorDefinition> errorsBuidler = ImmutableList.builder();
