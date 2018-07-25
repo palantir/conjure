@@ -5,7 +5,6 @@
 - **[Reference](docs/spec/index.md)**
     - [Features](docs/spec/features.md)
     - [Source files](docs/spec/source_files.md)
-    - [Constraints](docs/spec/constraints.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
     - [Wire specification](docs/spec/wire.md)
 - **RFCs**
