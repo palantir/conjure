@@ -14,7 +14,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
 
   - [ConjureSourceFile][]
     - [TypesDefinition][]
-      - [External Type Object](#externalTypeObject)
+      - [ExternalTypeDefinition][]
       - [Defined Types Object](#definedTypesObject)
         - [Alias Definition](#aliasDefinition)
         - [Object Definition](#objectDefinition)
@@ -32,6 +32,7 @@ The Conjure compiler requires each file to conform to the `ConjureSourceFile` st
 
 [ConjureSourceFile]: #conjuresourcefile
 [TypesDefinition]: #typesdefinition
+[ExternalTypeDefinition]: #externaltypedefinition
 [ServicesDefinition]: #servicesdefinition
 [PathString]: #pathstring
 
@@ -53,11 +54,11 @@ The object specifies the types available in the Conjure definition.
 Field Name | Type | Description
 ---|:---:|---
 <a name="typeConjureImport"></a>conjure-imports | Map[`string`, `string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
-<a name="typeImports"></a>imports | Map[`string`, [`External Type Object`](#externalTypeObject)] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
+<a name="typeImports"></a>imports | Map[`string`, [ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 <a name="typeDefinitions"></a>definitions | [`Type Definitions Object`](#definedTypesObject) | The types specified in this definition.
 
 
-## <a name="externalTypeObject"></a>External Type Object
+## <a name="externalTypeObject"></a>ExternalTypeDefinition
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
 
 Field Name | Type | Description
