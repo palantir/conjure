@@ -24,7 +24,7 @@ import com.palantir.conjure.parser.types.names.TypeName;
 import java.util.Map;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableConjureDefinition.class)
+@JsonDeserialize(as = ImmutableConjureSourceFile.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ConjureSourceFile {
@@ -40,5 +40,5 @@ public interface ConjureSourceFile {
         return new Builder();
     }
 
-    class Builder extends ImmutableConjureDefinition.Builder {}
+    class Builder extends ImmutableConjureSourceFile.Builder {}
 }
