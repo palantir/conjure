@@ -1,216 +1,130 @@
-Conjure Wire Format
--------------------
+# Conjure Wire Specification
 
-This document explains the JSON serialization format for Conjure-defined types. Every Conjure object (including
-primitives, complex objects, containers, etc.) is representable as a JSON object such that, intuitively,
-`deserialize(serialize(object)) == object`.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
+14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
+[RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
+
+## Introduction
+
+The Conjure Wire Specification defines the serialization format of Conjure defined types.
+
+## Table of Contents
+- [Specification](#specification)
+    - [Formats](#format)
+        - [Json Format](#jsonFormat)
+        - [Plain Format](#plainFormat)
+        - [Canonical Format](#canonicalFormat)
+    - [Data Types](#dataTypes)
+        - [Primitive Data Types](#primitiveDataTypes)
+        - [Collection Data Types](#collectionDataTypes)
+        - [Complex Data Types](#complexDataTypes)
+
+## Specification
+
+### Formats
+
+#### JSON Format
+
+The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations
+of Conjure clients/servers MUST expect all HTTP requests and responses, and header parameters to be represented in this way.
+The data types in the Conjure Specification are based on the types supported by the [JSON Schema Specification Wright
+Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2).
+
+#### Plain Format
+
+The Plain format defines the raw representation of Conjure primitives. There is no raw representation of
+Conjure-defined types and collections. Implementations of Conjure clients/servers MUST expect all path and query
+parameters to be represented in this way.
+
+#### Canonical Format
+
+The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
+when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
+MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
+
+### Data Types
+
+#### <a name="primitiveDataTypes"></a>Primitive Data Types
+
+The primitive data types defined by the Conjure Specification are:
+
+Conjure Name | JSON Type |     Plain Type    | Canonical Representation | Comments |
+------------ | --------- | ----------------- | ------------------------ | -------- |
+bearertoken  | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
+binary       | `string`  | unquoted `string` | No ambiguity             | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
+boolean      | `boolean` | `boolean`         | No ambiguity             |
+datetime     | `string`  | unquoted `string` | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm`   | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+double       | `number` \| `string`  | `number` \| unquoted `string`          | Number with at least 1 decimal or "NaN" or "Infinity" or "-Infinity"  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+integer      | `integer` | `number`          | No ambiguity             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+rid          | `string`  | unquoted `string` | No ambiguity             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
+safelong     | `integer` | `number`          | No ambiguity             | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
+string       | `string`  | unquoted `string` | No ambiguity             |
+uuid         | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
+any          | N/A       | N/A               | N/A                      | May be any of the above types or an `object` with any fields.
+
+Example format conversions to canonical format:
+
+Conjure Name |     JSON Representation     |    Plain Representation    |  Canonical Representation   |
+------------ | --------------------------- | -------------------------- | --------------------------- |
+datetime     | "2018-07-19T08:11:21Z"      | 2018-07-19T08:11:21Z       | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00  | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T08:11:21-00:00" | 2018-07-19T08:11:21-00:00  | "2018-07-19T08:11:21+00:00"
+datetime     | "20180719T081121Z"          | 20180719T081121Z           | "2018-07-19T08:11:21+00:00"
+datetime     | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  | "2018-07-19T05:11:21+03:00"
+double       | 1                           | 1                          | 1.0
+double       | 1.00000                     | 1.000000                   | 1.0
+double       | 1.2345678                   | 1.2345678                  | 1.2345678
+double       | 1.23456780                  | 1.23456780                 | 1.2345678
+double       | "NaN"                       | NaN                        | "NaN"
+double       | "Infinity"                  | Infinity                   | "Infinity"
+double       | "-Infinity"                 | -Infinity                  | "-Infinity"
+
+#### <a name="collectionDataTypes"></a>Collection Data Types
+
+Collections can be omitted if they are empty or in the case of optionals absent. The collection data types defined by
+the Conjure Specification are:
+
+Conjure Name |  JSON Type  | Canonical Representation | Comments
+------------ | ----------- | ------------------------ | --------
+list\<V>     | Array[V]    | No ambiguity             | An array where all the elements are of type V. If the associated field is omitted then the value is an empty list.
+set\<V>      | Array[V]    | No ambiguity             | An array where all elements are of type V and are unique. The order the elements appear in the list does not impact equality.
+map\<K, V>   | Map[K,V]   | No ambiguity             | A map where all keys are of type K  and all values are of type V. K MUST be a Conjure primitive type or an alias of a Conjure primitive type. If the type is non-string, then it is serialized into a quoted version of its plain reprehension.
+optional\<V> | V or `null` | `null` if absent otherwise the value | The value is considered absent if it is null or its associated field is omitted.
+
+#### <a name="complexDataTypes"></a>Complex Data Types
+
+The complex data types defined by the Conjure Specification are:
+
+Conjure Name | JSON Type | Canonical Representation | Comments
+------------ | --------- | ------------------------ | --------
+alias        |  -        | No ambiguity             | An Alias is a type that is a shorthand name for another type. An Alias MUST be serialized in the same way the aliased type would be.
+enum         | `string`  | No ambiguity             | An Enum is a type that represents a fixed set of `string` values.
+error        | `object`  | No ambiguity             | An Error is a type that represents a structured, non-successful response. It includes three required fields: `errorCode`, `errorName`, `errorInstanceId`, and an optional field `parameters`.
+object       | `object`  | No ambiguity             | An Object is a type that represents an `object` with a predefined set of fields with associated types.
+union        | `object`  | No ambiguity             | A Union is a type that represents a possibility from a fixed set of Objects. A Union is a JSON object with two fields: a `type` field which specifies the name of the variant, and a field which is the name of the variant which contains the payload.
 
 
-## Recursive definition of the JSON serialization format
-
-The JSON format `json(o)` for a Conjure object `o` can be recursively defined as follows:
-- If `o` is a primitive Conjure type, then `json(o)` is the corresponding primitive JSON type:
-  - Conjure `string` → JSON `string`
-  - Conjure `rid` → JSON `string`
-  - Conjure `bearertoken` → JSON `string`
-  - Conjure `uuid`  → JSON `string`, the canonical `8-4-4-4-12` textual UUID representation
-  - Conjure `integer` → JSON `number`
-  - Conjure `safelong` → JSON `number`
-  - Conjure `double` → JSON `number` | JSON `string` literal "NaN"
-  - Conjure `boolean` → JSON `boolean`.
-- If `o` is a Conjure `object`, then `json(o)` is a JSON `object` whose keys and values are obtained from `o`'s keys and
-  values using `json(·)`. For any key with Conjure type `optional<?>`, the key/value pair may be omitted from the JSON map
-  if the value is absent in `o`; alternatively, the value may be serialized using the serialization definition of
-  `optional`, see below.
-- If `o` is a Conjure `union` object `Union[<name>: <value>]` (where <name> is the name of one of the variants and
-<value> is the corresponding value), then `json(o)` is the JSON `object`
-  `{ "type" : "<name>", "<name>" : json(<value>) }` (with slight abuse of notation).
-- If `o` is a Conjure `map`, then `json(o)` is a JSON `object` whose keys and values are serialized using `json(·)`
-- If `o` is a Conjure collection (`list`, `set`), then `json(o)` is a JSON `array` whose elements are serialized using
-  `json(.)`
-- If `o` is a Conjure `alias` object `alias[v]`, then `json(o) = json(v)`
-- If `o` is a Conjure `optional` object `optional[v]`, then `json(o)` is JSON `null` if `v` is absent, and `json(v)`
-  otherwise
-- If `o` is a Conjure `binary` object `binary[d]`, then `json(o)` is the Base64-encoded JSON `string` representation
-  of the binary data `d`
-- If `o` is a Conjure `datetime`, then `json(o)` is the ISO-8601-formatted JSON `string` representation of the date
-- If `o` is a Conjure `enum`, then `json(o)` is the JSON `string` representing the enum value
-- If `o` is a Conjure `any` object, then the serialization format is undefined. Implementations should strive to
-  serialize nested or complex `any` objects as naturally corresponding JSON `objects`.
-
-
-## Edge cases considered
-
-The following is a non-exhaustive list of serialization/deserialization edge cases.
-
-### Empty or null `optional`, `map`, `set` and `list` deserialize without error.
-
-given:
-```yaml
-Obj:
-  fields:
-    ex: optional<string>
-```
-
-when any:
+####
+An example error type would be serialized as follows:
 ```json
-{}
-{"ex": null}
+{
+  "errorCode": "INVALID_ARGUMENT",
+  "errorName": "MyApplication:DatasetNotFound",
+  "errorInstanceId": "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
+  "parameters": {
+    "datasetId": "123abc",
+    "userName": "yourUserName"
+  }
+}
 ```
 
-then:
-```
-Obj[ex: empty]
-```
-
-### Primitives may not be null.
-
-given:
-```yaml
-Obj:
-  fields:
-    ex: string
-```
-
-when any:
+An example union type would be serialized as follows:
 ```json
-{}
-{"ex": null}
+{
+  "type": "serviceLog",
+  "serviceLog": {
+    // fields of ServiceLog object
+  }
+}
 ```
-
-then:
-```
-err
-```
-
-### Binary fields serialized as base64, deserialized from base64.
-given:
-```yaml
-Obj:
-  fields:
-    ex: binary
-```
-
-then:
-```
-Obj[ex: 0x00 0x01 0x02] -> {"ex": "AAEC"}
-{"ex": "AAEC"} -> Obj[ex: 0x00 0x01 0x02]
-```
-
-### Objects that implement equality must implement deep equality.
-Objects must, in particular, be well behaved for any nested Conjure types.
-- binary
-- optional, map, set list
-- primitives
-
-given:
-```yaml
-A:
-  fields:
-    ex: set<B>
-B:
-  fields:
-    op: optional<string>
-C:
-  fields:
-    bin: optional<binary>
-```
-
-then, for `A`s:
-```json
-{"ex": []} == {}
-{"ex": [{"op": null}]} == {[{}]}
-{"ex": [{"op": "a"}]} == {"ex": [{"op": "a"}]}
-{"ex": [{"op": "a"}, {"op": "b"}]} == {"ex": [{"op": "a"}, {"op": "b"}]}
-{"ex": [{"op": "a"}]} != {"ex": [{"op": "b"}]}
-{"ex": [{"op": "a"}]} != {"ex": [{"op": "a"}, {"op": "b"}]}
-```
-
-then, for `C`s:
-```json
-{"bin": "AAEC"} == {"bin": "AAEC"}
-```
-
-### Warning: `NaN` doesn't implement equality
-
-Note, [Java specifies `NaN != NaN`](https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html), so any Conjure object containing a `NaN` value will not be equal after
-round-trip serialization.
-
-### Objects that implement hashCode must implement deep hashCode.
-Objects must, in particular, be well behaved for any nested Conjure types. For any
-two objects defined as equal, implemented hashCode must also be equal.
-
-### (Java) ignoreUnknownProperties ignores properties during deserialization.
-given:
-```yaml
-Obj:
-  fields:
-    ex: optional<string>
-```
-
-when:
-```json    
-{"unk": "data"}
-```
-
-then:
-```
-Obj[ex: empty]
-```
-
-### Enumerations of any case deserialize correctly.
-given:
-```yaml
-Enum:
-  values:
-    - AAA
-    - BBB
-```
-
-when any of:
-```json
-"AAA"
-"aaa"
-"aAa"
-"Aaa"
-```
-
-then:
-```
-Enum[AAA]
-```
-
-### (Java) ignoreUnknownEnumValues saves unknown enumeration values during deserialization and serializes original value.
-given:
-```yaml
-Enum:
-  values:
-    - AAA
-    - BBB
-```
-
-when:
-```json
-"CCC"
-```
-
-then:
-```
-Enum[CCC]
-```
-
-and then, when serialized, again:
-```json
-"CCC"
-```
-
-### (Java) alias types are equal when content is equal.
-given:
-```yaml
-Alias:
-  alias: string
-```
-
-then:
-```
-"AAA" == "AAA"
