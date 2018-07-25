@@ -24,10 +24,13 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
     - [ServiceDefinition][]
       - [AuthDefinition][]
       - [EndpointDefinition][]
-      - [Argument Object](#argumentObject)
+      - [ArgumentObject][]
       - [Param Type Field](#paramTypeField)
     - [Markdown Docs Fields][]
 
+<!-- These are not rendered, they just allow us to specify the hash URL in one place. -->
+
+[ArgumentObject]: #argumentobject
 [AliasDefinition]: #aliasdefinition
 [AuthDefinition]: #authdefinition
 [ConjureSourceFile]: #conjuresourcefile
@@ -269,11 +272,11 @@ Field | Type | Description
 <a name="endpointMarker"></a>markers | List[[FieldDefinitions](#fieldDefinitions) or `string`] | List of types that serve as additional metadata for the endpoint. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 <a name="endpointAuth"></a>auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [Service Object](#serviceObject).
 <a name="endpointReturns"></a>returns | `string` | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
-<a name="endpointArgs"></a>args | Map[`string`,&nbsp;[Argument Object](#argumentObject) or `string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [Param Type Field](#paramTypeField).
+<a name="endpointArgs"></a>args | Map[`string`, [ArgumentObject][]&nbsp;or&nbsp;`string`] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [Param Type Field](#paramTypeField).
 <a name="endpointDocs"></a>docs | `string` | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
-## <a name="argumentObject"></a>Argument Object
+## ArgumentObject
 An object representing an argument to an endpoint.
 
 Field | Type | Description
