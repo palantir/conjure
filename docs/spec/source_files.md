@@ -18,7 +18,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
         - [ObjectTypeDefinition][]
         - [FieldDefinition][]
         - [UnionTypeDefinition][]
-        - [Enum Definition](#enumDefinition)
+        - [EnumTypeDefinition][]
       - [Error Definition](#errorDefinition)
       - [Error Code Field](#errorCodeField)
     - [ServiceDefinition][]
@@ -41,6 +41,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
 [UnionTypeDefinition]: #uniontypedefinition
+[EnumTypeDefinition]: #enumtypedefinition
 
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
@@ -96,7 +97,7 @@ The object specifies the types that are defined in the Conjure definition.
 Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
-<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectTypeDefinition](#errorDefinition) or [UnionTypeDefinition][] or [Enum Definition](#enumDefinition)] | A map between type names and type definitions.
+<a name="typeDefinitions"></a>definitions | Map[`string`,&nbsp;[AliasDefinition][] or [ObjectTypeDefinition](#errorDefinition) or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
 <a name="typeErrors"></a>errors | Map[`string`,&nbsp;[Error Definition](#errorDefinition)] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
@@ -168,12 +169,12 @@ Payload:
 ```
 
 
-## <a name="enumDefinition"></a>Enum Definition
+## EnumTypeDefinition
 Definition for an enum complex data type.
 
 Field | Type | Description
 ---|:---:|---
-<a name="enumValues"></a>values | Array[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
+<a name="enumValues"></a>values | List[`string`] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 <a name="enumDocs"></a>docs | `string` | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="enumPackage"></a>package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
