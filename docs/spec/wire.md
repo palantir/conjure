@@ -8,11 +8,11 @@ This document describes how endpoints and types defined in a Conjure IR file sho
 
 TODO link to some official HTTP spec.
 
-- **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
+1. **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
 
-- **HTTP Methods** - Conjure clients MUST send requests using the HTTP Method specified in the IR.
+1. **HTTP Methods** - Conjure clients MUST send requests using the HTTP Method specified in the IR.
 
-- **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters. Values must be serialized using the PLAIN format and also _URL encoded_ (TODO link) to ensure special characters don't break.
+1. **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters. Values must be serialized using the PLAIN format and also _URL encoded_ (TODO link) to ensure special characters don't break.
 
   ```
   /some/url/{owner}/{repo}/pulls/{id}/{file}/{line}
@@ -20,37 +20,37 @@ TODO link to some official HTTP spec.
   /some/url/joe/recipe-server/pulls/123/var%2Fconf%2Finstall.yml/53
   ```
 
-- **Headers** - Conjure endpoints which define 'headers' must be translated to HTTP Headers (TODO link). Header names are case insensitive.  Header values must be serialized using the PLAIN format. Header values which are `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
+1. **Headers** - Conjure endpoints which define 'headers' must be translated to HTTP Headers (TODO link). Header names are case insensitive.  Header values must be serialized using the PLAIN format. Header values which are `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
 
-- **User-agent** - Requests MUST include a `User-Agent` header. (TODO specify an exact format????)
+1. **User-agent** - Requests MUST include a `User-Agent` header. (TODO specify an exact format????)
 
-- **Authorization** - If an endpoint's `auth` field is present, clients must behave as follows:
+1. **Authorization** - If an endpoint's `auth` field is present, clients must behave as follows:
   - `HeaderAuthType` - Clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
   - `CookieAuthType` - Clients MUST send a cookie header with name `cookie` and value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
-- **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already defined in the IR.
+1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already defined in the IR.
 
-- **Query parameters** - If an endpoint specifies one or more parameters of type `query`, then a client MUST add a query string to the outgoing URL as per the HTTP spec (TODO link). If any value of type `optional<T>` is not present, then the query key must be omitted.  Otherwise, it must be serialized as `PLAIN(T)` and url encoded (TODO link). TODO clarify if lists/sets/maps/binary are allowed.
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, then a client MUST add a query string to the outgoing URL as per the HTTP spec (TODO link). If any value of type `optional<T>` is not present, then the query key must be omitted.  Otherwise, it must be serialized as `PLAIN(T)` and url encoded (TODO link). TODO clarify if lists/sets/maps/binary are allowed.
 
   ```
   /some/url/search?string=foo%20bar&offset=60&limit=20
   ```
 
-- **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
+1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
 
 ## HTTP Responses
 
-- **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` where `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
+1. **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` where `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
 
-- **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
+1. **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
 
-- **Content-type** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type. TODO(double check text/plain content type)
+1. **Content-type** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type. TODO(double check text/plain content type)
   ```
     binary -> "application/octet-stream"
     alias<binary> -> "application/octet-stream"
     <everything else> -> "aplication/json;charset=utf-8"
   ```
-- **Errors** - If Conjure servers return errors, they MUST serialize the erorrs using the `JSON` encoding scheme defined below. In addition, the servers MUST send a http status code correponding the error codes defined in the IR.
+1. **Errors** - If Conjure servers return errors, they MUST serialize the erorrs using the `JSON` encoding scheme defined below. In addition, the servers MUST send a http status code correponding the error codes defined in the IR.
   ```
   PERMISSION_DENIED (403)
   INVALID_ARGUMENT(400)
@@ -65,23 +65,23 @@ TODO link to some official HTTP spec.
   ```
 
 ## Behavior
-- **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
+1. **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
 
-- **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
+1. **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
 
-- **Servers reject unknown fields** Servers MUST requst reject all unknown JSON fields. This helps developers notice bugs/mistakes. (TODO, make this more convincing)
+1. **Servers reject unknown fields** Servers MUST requst reject all unknown JSON fields. This helps developers notice bugs/mistakes. (TODO, make this more convincing)
 
-- **Servers tolerate extra headers** Servers MUST tolerate extra headers not defined by the endpoints. This is important because proxies frequently append extra headers to the incoming requests.
+1. **Servers tolerate extra headers** Servers MUST tolerate extra headers not defined by the endpoints. This is important because proxies frequently append extra headers to the incoming requests.
 
-- **Set and map key equality** TODO mention canonical form and byte equality
+1. **Set and map key equality** TODO mention canonical form and byte equality
 
-- **Round-trip of unknown variants** TODO ask Mark.
+1. **Round-trip of unknown variants** TODO ask Mark.
 
-- **GZIP compression** It is recommended that servers and clients support gzip compression as it is often more performant. TODO add motivation.
+1. **GZIP compression** It is recommended that servers and clients support gzip compression as it is often more performant. TODO add motivation.
 
-- **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add acccess-control-allowed-headers. TODO: refer to INFO sec quip doc.
+1. **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add acccess-control-allowed-headers. TODO: refer to INFO sec quip doc.
 
-- **HTTP/2** It is recommended that clients and servers both support HTTP/2. Clients and Servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
+1. **HTTP/2** It is recommended that clients and servers both support HTTP/2. Clients and Servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
 
 
 - Formats
@@ -106,45 +106,6 @@ TODO
 
 
 -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
