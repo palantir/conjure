@@ -2,7 +2,7 @@
 
 _This document defines how Conjure clients and servers should make and receive network requests and reponses over HTTP._
 
-TODO Introduce IR
+This document describes how endpoints and types defined in a Conjure IR file should result in network requests/response.
 
 ## HTTP Requests
 
@@ -28,10 +28,13 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 - **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already defined in the IR.
 
+- **Query parameters** - If an endpoint specifies one or more parameters of type `query`, then a client MUST add a query string to the outgoing URL as per the HTTP spec (TODO link). If any value of type `optional<T>` is not present, then the query key must be omitted.  Otherwise, it must be serialized as `PLAIN(T)` and url encoded (TODO link). TODO clarify if lists/sets/maps/binary are allowed.
 
+  ```
+  /some/url/search?string=foo%20bar&offset=60&limit=20
+  ```
 
 <!--
-    - query params, how optional empty can be omitted (refer to 'PLAIN' below)
     - Servers allow extra headers / cookies / query params
     - cookies
     - binary body type streaming upload
