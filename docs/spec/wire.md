@@ -6,7 +6,7 @@ This document describes how endpoints and types defined in a Conjure IR file sho
 
 ## HTTP Requests
 
-TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
+TODO link to some official HTTP spec.
 
 - **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
 
@@ -64,22 +64,25 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
   CUSTOM_SERVER (500)
   ```
 
-## Client Behavior
-- **Forward compatibility** Clients MUST tolerate extra headers and unknown fields in JSON responses. This ensures that old clients will continue to work with new servers.
+## Behavior
+- **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
+
 - **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
 
+- **Servers reject unknown fields** Servers MUST requst reject all unknown JSON fields. This helps developers notice bugs/mistakes. (TODO, make this more convincing)
 
-## Server Behavior
+- **Servers tolerate extra headers** Servers MUST tolerate extra headers not defined by the endpoints. This is important because proxies frequently append extra headers to the incoming requests.
 
-- Behaviour
-  - Server-side MUST reject unknown fields in JSON format (TODO explain motivation - avoids silent failures, #failfast)
-  - Server-side MUST NOT reject extra extra headers, MAY reject extra query-params
-  - set equality using canonical formats (double, )
-  - round-trip reserialization of unknown enum/union variants
-  - server GZIP compression
-  - server OPTIONS http method for browser compatibility
-  - server CORS headers???
-  - server http 1/2
+- **Set and map key equality** TODO mention canonical form and byte equality
+
+- **Round-trip of unknown variants** TODO ask Mark.
+
+- **GZIP compression** It is recommended that servers and clients support gzip compression as it is often more performant. TODO add motivation.
+
+- **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add acccess-control-allowed-headers. TODO: refer to INFO sec quip doc.
+
+- **HTTP/2** It is recommended that clients and servers both support HTTP/2. Clients and Servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
+
 
 - Formats
   - PLAIN
