@@ -54,16 +54,16 @@ public final class ConjureParser {
 
     private ConjureParser() {}
 
-    /** Deserializes a {@link ConjureDefinition} from its YAML representation in the given file. */
-    public static ConjureDefinition parse(File file) {
+    /** Deserializes a {@link ConjureSourceFile} from its YAML representation in the given file. */
+    public static ConjureSourceFile parse(File file) {
         RecursiveParser parser = new RecursiveParser();
-        ConjureDefinition conjureDef = parser.parse(file);
+        ConjureSourceFile conjureDef = parser.parse(file);
         ConjureMetrics.recordMetrics(conjureDef);
         return conjureDef;
     }
 
     private static final class RecursiveParser {
-        private final Map<String, ConjureDefinition> cache;
+        private final Map<String, ConjureSourceFile> cache;
         private final Set<String> currentDepthFirstPath;
 
         private RecursiveParser() {
@@ -71,12 +71,12 @@ public final class ConjureParser {
             this.currentDepthFirstPath = new LinkedHashSet<>(); // maintain order so we can print the cycle
         }
 
-        ConjureDefinition parse(File file) {
+        ConjureSourceFile parse(File file) {
             // HashMap.computeIfAbsent does not work with recursion; the size of the map gets corrupted,
             // and if the map gets resized during the recursion, some of the new nodes can be put in wrong
             // buckets. Therefore don't use computeIfAbsent in parse/parseInternal
             // See https://bugs.java.com/view_bug.do?bug_id=JDK-8071667
-            ConjureDefinition result = cache.get(file.getAbsolutePath());
+            ConjureSourceFile result = cache.get(file.getAbsolutePath());
             if (result != null) {
                 return result;
             }
@@ -92,8 +92,8 @@ public final class ConjureParser {
             return result;
         }
 
-        private ConjureDefinition parseInternal(File file) {
-            // Note(rfink): The mechanism of parsing the ConjureDefinition and the imports separately isn't pretty,
+        private ConjureSourceFile parseInternal(File file) {
+            // Note(rfink): The mechanism of parsing the ConjureSourceFile and the imports separately isn't pretty,
             // but it's better than the previous implementation where ConjureImports types were passed around all
             // over the place. Main obstacle to simpler parsing is that Jackson parsers don't have context, i.e., it's
             // impossible to know the base-path w.r.t. which the imported file is declared.
@@ -102,10 +102,10 @@ public final class ConjureParser {
             }
 
             try {
-                ConjureDefinition definition = MAPPER.readValue(file, ConjureDefinition.class);
+                ConjureSourceFile definition = MAPPER.readValue(file, ConjureSourceFile.class);
                 Map<Namespace, ConjureImports> imports =
                         parseImports(definition.types().conjureImports(), file.toPath().getParent());
-                return ConjureDefinition.builder()
+                return ConjureSourceFile.builder()
                         .from(definition)
                         .types(TypesDefinition.builder()
                                 .from(definition.types())
@@ -125,7 +125,7 @@ public final class ConjureParser {
                 Map<Namespace, ConjureImports> declaredImports, Path baseDir) {
             return declaredImports.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 String importedFile = entry.getValue().file();
-                ConjureDefinition importedConjure = parse(baseDir.resolve(importedFile).toFile());
+                ConjureSourceFile importedConjure = parse(baseDir.resolve(importedFile).toFile());
                 return ConjureImports.withResolvedImports(importedFile, importedConjure);
             }));
         }

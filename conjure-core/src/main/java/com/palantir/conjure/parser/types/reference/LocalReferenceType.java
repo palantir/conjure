@@ -17,7 +17,7 @@
 package com.palantir.conjure.parser.types.reference;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.ConjureDefinition;
+import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.types.ConjureTypeVisitor;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 /**
- * Represents a reference to a builtin type or a type defined local to the containing {@link ConjureDefinition} (as
+ * Represents a reference to a builtin type or a type defined local to the containing {@link ConjureSourceFile} (as
  * opposed to a {@link ForeignReferenceType} which references a type defined in an {@link
  * com.palantir.conjure.parser.types.TypesDefinition#conjureImports imported type}).
  */

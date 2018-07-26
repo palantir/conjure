@@ -26,7 +26,7 @@ public class RequestLineDefinitionTest {
     @Test
     public void round_trip_serialization() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        RequestLineDefinition original = RequestLineDefinition.of("GET", PathDefinition.of("/path"));
+        RequestLineDefinition original = RequestLineDefinition.of("GET", PathString.of("/path"));
         String string = mapper.writeValueAsString(original);
 
         assertThat(mapper.readValue(string, RequestLineDefinition.class))

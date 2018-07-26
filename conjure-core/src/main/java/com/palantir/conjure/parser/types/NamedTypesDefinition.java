@@ -14,32 +14,35 @@
  * limitations under the License.
  */
 
-package com.palantir.conjure.parser;
+package com.palantir.conjure.parser.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.services.ServiceDefinition;
-import com.palantir.conjure.parser.types.TypesDefinition;
+import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
+import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.names.TypeName;
 import java.util.Map;
+import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableConjureDefinition.class)
+@JsonDeserialize(as = ImmutableNamedTypesDefinition.class)
+@JsonSerialize(as = ImmutableNamedTypesDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface ConjureDefinition {
+public interface NamedTypesDefinition {
 
-    @Value.Default
-    default TypesDefinition types() {
-        return TypesDefinition.builder().build();
-    }
+    @JsonProperty("default-package")
+    Optional<ConjurePackage> defaultConjurePackage();
 
-    Map<TypeName, ServiceDefinition> services();
+    Map<TypeName, BaseObjectTypeDefinition> objects();
+
+    Map<TypeName, ErrorTypeDefinition> errors();
 
     static Builder builder() {
         return new Builder();
     }
 
-    class Builder extends ImmutableConjureDefinition.Builder {}
-
+    class Builder extends ImmutableNamedTypesDefinition.Builder {}
 }

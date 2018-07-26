@@ -32,7 +32,7 @@ import org.immutables.value.Value;
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
 @Value.Immutable
 @ConjureImmutablesStyle
-public abstract class PathDefinition {
+public abstract class PathString {
 
     /** Returns the well-formed path associated with this path definition. */
     public abstract Path path();
@@ -98,8 +98,8 @@ public abstract class PathDefinition {
      * Returns this path "concatenated" with the given other path. For example, {@code "/abc".resolve("/def")} is the
      * path {@code /abc/def}.
      */
-    public PathDefinition resolve(
-            PathDefinition other) {
+    public PathString resolve(
+            PathString other) {
         final Path newPath;
         if (other.path().equals(Path.ROOT_PATH)) {
             // special-case since Path#relativize() only works on proper prefixes
@@ -107,14 +107,14 @@ public abstract class PathDefinition {
         } else {
             newPath = path().resolve(Path.ROOT_PATH.relativize(other.path()));
         }
-        return ImmutablePathDefinition.builder().path(newPath).build();
+        return ImmutablePathString.builder().path(newPath).build();
     }
 
-    /** Creates a new {@link PathDefinition} from the given string, or throws an exception if it fails to validate. */
+    /** Creates a new {@link PathString} from the given string, or throws an exception if it fails to validate. */
     @JsonCreator
-    public static PathDefinition of(String path) {
+    public static PathString of(String path) {
         Path parsed = Paths.get(path);
-        return ImmutablePathDefinition.builder().path(parsed).build();
+        return ImmutablePathString.builder().path(parsed).build();
     }
 
     @Override

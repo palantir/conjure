@@ -23,10 +23,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
-import com.palantir.conjure.parser.ConjureDefinition;
 import com.palantir.conjure.parser.ConjureParser;
+import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
-import com.palantir.conjure.parser.types.ObjectsDefinition;
+import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.collect.MapType;
@@ -69,7 +69,7 @@ public final class ServiceDefinitionTests {
     public void testEndpointDefinition_optionals() throws IOException {
         assertThat(mapper.readValue("http: GET /", EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
-                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/")))
+                        .http(RequestLineDefinition.of("GET", PathString.of("/")))
                         .build());
     }
 
@@ -88,7 +88,7 @@ public final class ServiceDefinitionTests {
                 "docs: |",
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
-                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/{foo}")))
+                        .http(RequestLineDefinition.of("GET", PathString.of("/{foo}")))
                         .auth(AuthDefinition.header())
                         .args(ImmutableMap.of(
                                 ParameterName.of("arg"), ArgumentDefinition.builder()
@@ -171,13 +171,13 @@ public final class ServiceDefinitionTests {
     @Test
     @SuppressWarnings("deprecation")
     public void testParseConjureFile() throws IOException {
-        ConjureDefinition def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
+        ConjureSourceFile def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def).isEqualTo(
-                ConjureDefinition.builder()
+                ConjureSourceFile.builder()
                         .types(TypesDefinition.builder()
                                 .putImports(TypeName.of("ResourceIdentifier"),
                                         ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
-                                .definitions(ObjectsDefinition.builder()
+                                .definitions(NamedTypesDefinition.builder()
                                         .defaultConjurePackage(ConjurePackage.of("test.api"))
                                         .putObjects(TypeName.of("SimpleObject"), ObjectTypeDefinition.builder()
                                                 .putFields(FieldName.of("stringField"),
@@ -192,10 +192,10 @@ public final class ServiceDefinitionTests {
                                 .doNotUseName("Test Service")
                                 .conjurePackage(ConjurePackage.of("test.api"))
                                 .putEndpoints("get", EndpointDefinition.builder()
-                                        .http(RequestLineDefinition.of("GET", PathDefinition.of("/get")))
+                                        .http(RequestLineDefinition.of("GET", PathString.of("/get")))
                                         .build())
                                 .putEndpoints("post", EndpointDefinition.builder()
-                                        .http(RequestLineDefinition.of("POST", PathDefinition.of("/post")))
+                                        .http(RequestLineDefinition.of("POST", PathString.of("/post")))
                                         .args(ImmutableMap.of(ParameterName.of("foo"), ArgumentDefinition.builder()
                                                 .paramType(ArgumentDefinition.ParamType.HEADER)
                                                 .type(LocalReferenceType.of(TypeName.of("StringAlias")))

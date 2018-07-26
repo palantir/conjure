@@ -52,8 +52,8 @@ public interface ServiceDefinition {
 
     @JsonProperty("base-path")
     @Value.Default
-    default PathDefinition basePath() {
-        return PathDefinition.of("/");
+    default PathString basePath() {
+        return PathString.of("/");
     }
 
     Map<String, EndpointDefinition> endpoints();

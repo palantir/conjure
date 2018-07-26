@@ -30,6 +30,9 @@ import com.palantir.conjure.defs.validator.PackageValidator;
 import com.palantir.conjure.defs.validator.ServiceDefinitionValidator;
 import com.palantir.conjure.defs.validator.TypeNameValidator;
 import com.palantir.conjure.defs.validator.UnionDefinitionValidator;
+import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.conjure.parser.services.PathString;
+import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -179,7 +182,7 @@ public final class ConjureParserUtils {
         return type;
     }
 
-    static ConjureDefinition parseConjureDef(Collection<com.palantir.conjure.parser.ConjureDefinition> parsedDefs) {
+    static ConjureDefinition parseConjureDef(Collection<ConjureSourceFile> parsedDefs) {
         ImmutableList.Builder<ServiceDefinition> servicesBuilder = ImmutableList.builder();
         ImmutableList.Builder<ErrorDefinition> errorsBuilder = ImmutableList.builder();
         ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
@@ -247,7 +250,7 @@ public final class ConjureParserUtils {
     }
 
     static List<ErrorDefinition> parseErrors(
-            com.palantir.conjure.parser.types.ObjectsDefinition defs,
+            NamedTypesDefinition defs,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage = defs.defaultConjurePackage().map(p -> p.name());
         ImmutableList.Builder<ErrorDefinition> errorsBuidler = ImmutableList.builder();
@@ -294,7 +297,7 @@ public final class ConjureParserUtils {
     private static EndpointDefinition parseEndpoint(
             String name,
             com.palantir.conjure.parser.services.EndpointDefinition def,
-            com.palantir.conjure.parser.services.PathDefinition basePath,
+            PathString basePath,
             Optional<AuthType> defaultAuth,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
 
@@ -317,7 +320,7 @@ public final class ConjureParserUtils {
 
     private static HttpPath parseHttpPath(
             com.palantir.conjure.parser.services.EndpointDefinition def,
-            com.palantir.conjure.parser.services.PathDefinition basePath) {
+            PathString basePath) {
         HttpPath httpPath = HttpPath.of(basePath.resolve(def.http().path()).toString());
         HttpPathValidator.validate(httpPath);
         return httpPath;

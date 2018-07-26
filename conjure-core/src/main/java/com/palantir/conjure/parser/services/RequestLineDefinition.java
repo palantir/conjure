@@ -30,9 +30,9 @@ public interface RequestLineDefinition {
 
     String method();
 
-    PathDefinition path();
+    PathString path();
 
-    static RequestLineDefinition of(String method, PathDefinition path) {
+    static RequestLineDefinition of(String method, PathString path) {
         return ImmutableRequestLineDefinition.builder().method(method).path(path).build();
     }
 
@@ -43,7 +43,7 @@ public interface RequestLineDefinition {
                 "Request line must be of the form: [METHOD] [PATH], instead was '%s'",
                 oneline);
         ConjureMetrics.incrementCounter(RequestLineDefinition.class, "method", parts[0]);
-        return of(parts[0], PathDefinition.of(parts[1]));
+        return of(parts[0], PathString.of(parts[1]));
     }
 
     @JsonValue

@@ -45,8 +45,8 @@ public interface TypesDefinition {
     Map<Namespace, ConjureImports> conjureImports();
 
     @Value.Default
-    default ObjectsDefinition definitions() {
-        return ObjectsDefinition.builder().build();
+    default NamedTypesDefinition definitions() {
+        return NamedTypesDefinition.builder().build();
     }
 
     static Builder builder() {

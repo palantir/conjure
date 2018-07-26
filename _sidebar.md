@@ -2,10 +2,10 @@
 - **Getting started**
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
-- **Reference**
-    - [Language specification](docs/specification.md)
-    - [Intermediate representation (IR)](docs/intermediate_representation.md)
-    - [Wire specification](docs/wire.md)
+- **[Reference](reference.md)**
+    - [Source files](docs/spec/source_files.md)
+    - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
+    - [Wire specification](docs/spec/wire.md)
 - **RFCs**
     - [001 Naming](docs/rfc/001-naming.md)
     - [002 Contract for Conjure generators](docs/rfc/002-contract-for-conjure-generators.md)

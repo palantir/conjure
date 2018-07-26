@@ -21,12 +21,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.types.ObjectsDefinition;
+import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
 /**
- * Represents the name of a conjure {@link ObjectsDefinition#objects() object}.
+ * Represents the name of a conjure {@link NamedTypesDefinition#objects() object}.
  */
 @com.google.errorprone.annotations.Immutable
 @Value.Immutable
