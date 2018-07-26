@@ -94,19 +94,23 @@ TODO link to some official HTTP spec.
 This format maps all Conjure types to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
 **Serialization:**
-```
-any -> ??? TODO figure it out at runtime
-bearertoken -> JSON string
-binary -> JSON string # Base64 encoded
-boolean -> JSON boolean
-datetime -> JSON string
-double -> JSON number or string "NaN" or string "Infinity" or string "-Infinity"
-integer -> JSON number
-rid -> JSON string
-safelong -> JSON number
-string -> JSON string
-uuid -> JSON string
 
+Conjure&nbsp;Type | JSON Type                                            | Comments |
+----------------- | ---------------------------------------------------- | -------- |
+bearertoken       | `string`                                             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
+binary            | `string`                                             | Represented as a [Base64]() encoded string.
+boolean           | `boolean`                                            |
+datetime          | `string`                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+double            | `number` or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+integer           | `integer`                                            | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+rid               | `string`                                             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
+safelong          | `integer`                                            | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
+string            | `string`                                             | UTF-8 string
+uuid              | `string`                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
+any               | N/A                                                  | May be any of the above types or an `object` with any fields.
+
+
+```
 optional<T> ->
 list<T> ->
 set<T> ->
