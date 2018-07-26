@@ -112,17 +112,18 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 
 Conjure&nbsp;Type | JSON&nbsp;Type                                                          | Comments |
 ----------------- | ----------------------------------------------------------------------- | -------- |
-`optional<T>`     |                                                                         | If present, serializes as the JSON representation of `T`, otherwise field should be omitted
-`list<T>`         | Array                                                                   | Each element, e, of the list is serialized using JSON(e). Order must be maintained.
-`set<T>`          | Array                                                                   | Each element, e, of the set is serialized using JSON(e). Order is unimportant.
-`map<K, V>`       | Object                                                                  | A key k is serialized as PLAIN(k). Values are serialized using JSON(v). For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
+`optional<T>`     |                                                                         | If present, serializes as the JSON representation of `T`, otherwise field should be omitted.
+`list<T>`         | Array                                                                   | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
+`set<T>`          | Array                                                                   | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant.
+`map<K, V>`       | Object                                                                  | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 
-```
-object ->
-enum ->
-union ->
-alias of T ->
-```
+Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
+----------------- | ---------------| -------- |
+_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
+_Enum_            | String         | String representation of the enum value
+_Union_           | Object         | (See union JSON format below)
+_Alias(of x)_     | `JSON(x)`      | An Alias of any Conjure type is serialized in exactly the same way as that Conjure type.
+
 
 TODO explain why optional<optional<T>> is banned
 TODO strings are UTF8
