@@ -55,7 +55,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes also be NaN, +/-Infinity and signed zero.
   - `integer` - a signed 32-bit integer value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
   - `rid` - a [Resource Identifier](https://github.com/palantir/resource-identifier), e.g. `ri.recipes.main.ingredient.1234`
-  - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> to 2<sup>53</sup> - 1
+  - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1
   - `string` - a sequence of UTF-8 characters
   - `uuid` - a 128-bit number: [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid)
 
