@@ -57,7 +57,7 @@ public class ConjureParserTest {
 
     @Test
     public void testConjureExternalImports() {
-        ConjureDefinition conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
         assertThat(conjure.types().imports().get(TypeName.of("ExampleAnyImport")).baseType())
                 .isEqualTo(PrimitiveType.fromString("any"));
     }
