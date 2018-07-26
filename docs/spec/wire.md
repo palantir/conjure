@@ -1,6 +1,115 @@
 # Conjure Wire Specification
 
-_This document defines the serialization format of Conjure defined types._
+_This document defines how Conjure clients and servers should make and receive network requests and reponses over HTTP._
+
+
+## HTTP Requests
+
+TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
+
+- **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
+
+
+<!--
+  - Requests
+    - path parameters and encoding
+    - headers
+      - User-agent required,
+      - fetch-user-agent ??
+      - tracing (example)
+
+    - query params, how optional empty can be omitted (refer to 'PLAIN' below)
+    - Servers allow extra headers / cookies / query params
+    - cookies
+    - binary body type streaming upload
+    - reject unknown fields
+    - body serialization (refers to JSON below)
+-->
+
+## HTTP Responses
+<!--
+  - Responses
+    - status codes
+    - Clients tolerate extra headers / cookies
+    - binary return type streaming download, describe optional<binary>... also empty binary, also content-length headers
+    - errors (incl status codes)
+    - tolerate unknown fields
+    - body serialization (refers to JSON below)
+-->
+
+- Formats
+  - PLAIN
+  - JSON
+    - coerce null/abent -> Optional.empty(), empty list, empty set
+    - explain why optional<optional<T>> is banned
+    - strings are UTF8
+    - caveats for double Infinity NaN
+
+
+- Behaviour
+  - set equality using canonical formats (double, )
+  - round-trip reserialization of unknown enum/union variants
+  - server GZIP compression
+  - server OPTIONS http method for browser compatibility
+  - server CORS headers???
+  - server http 1/2
+
+<!--
+TODO
+
+- strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
+
+- key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
+
+
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
 RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
