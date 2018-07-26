@@ -95,27 +95,29 @@ This format maps all Conjure types to JSON types defined in [RFC 7159](https://t
 
 **Serialization:**
 
-Conjure&nbsp;Type | JSON Type                                            | Comments |
------------------ | ---------------------------------------------------- | -------- |
-bearertoken       | `string`                                             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-binary            | `string`                                             | Represented as a [Base64]() encoded string.
-boolean           | `boolean`                                            |
-datetime          | `string`                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-double            | `number` or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
-integer           | `integer`                                            | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
-rid               | `string`                                             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
-safelong          | `integer`                                            | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
-string            | `string`                                             | UTF-8 string
-uuid              | `string`                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
-any               | N/A                                                  | May be any of the above types or an `object` with any fields.
+Conjure&nbsp;Type | JSON Type                                          | Comments |
+----------------- | ---------------------------------------------------| -------- |
+`bearertoken`     | String                                             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
+`binary`          | String                                             | Represented as a [Base64]() encoded string.
+`boolean`         | Boolean                                            |
+`datetime`        | String                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+`double`          | Number or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+`integer`         | Number                                             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+`rid`             | String                                             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
+`safelong`        | Number                                             | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
+`string`          | String                                             | UTF-8 string
+`uuid`            | String                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
+`any`             | N/A                                                | May be any of the above types or an `object` with any fields.
 
+
+Conjure&nbsp;Type | JSON&nbsp;Type                                                          | Comments |
+----------------- | ----------------------------------------------------------------------- | -------- |
+`optional<T>`     |                                                                         | If present, serializes as the JSON representation of `T`, otherwise field should be omitted
+`list<T>`         | Array                                                                   | Each element, e, of the list is serialized using JSON(e). Order must be maintained.
+`set<T>`          | Array                                                                   | Each element, e, of the set is serialized using JSON(e). Order is unimportant.
+`map<K, V>`       | Object                                                                  | A key k is serialized as PLAIN(k). Values are serialized using JSON(v). For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 
 ```
-optional<T> ->
-list<T> ->
-set<T> ->
-map<K, V> ->
-
 object ->
 enum ->
 union ->
@@ -143,7 +145,7 @@ bearertoken -> unquoted string
 binary -> unquoted base64 string
 boolean -> raw boolean
 datetime -> unquoted string
-double -> raw number
+double -> raw number or Infinity or
 integer -> raw number
 rid -> unquoted string
 safelong -> raw number
