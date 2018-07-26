@@ -2,6 +2,7 @@
 
 _This document defines how Conjure clients and servers should make and receive network requests and reponses over HTTP._
 
+TODO Introduce IR
 
 ## HTTP Requests
 
@@ -19,17 +20,17 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 - **Headers** - Conjure endpoints which define 'headers' must be translated to HTTP Headers (TODO link). Header names are case insensitive.  Header values must be serialized using the PLAIN format. Header values which are `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
 
-- **Authorization** - IR contains `optional<AuthType>`
+- **User-agent** - Requests MUST include a `User-Agent` header. (TODO specify an exact format????)
+
+- **Authorization** - If an endpoint's `auth` field is present, clients must behave as follows:
   - `HeaderAuthType` - Clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
-  - `CookieAuthType` - Clients MUST send a cookie with name specified by the `cookieName` IR field, and a user-provided value.
+  - `CookieAuthType` - Clients MUST send a cookie header with name `cookie` and value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+
+- **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already defined in the IR.
+
 
 
 <!--
-    - headers
-      - User-agent required,
-      - fetch-user-agent ??
-      - tracing (example)
-
     - query params, how optional empty can be omitted (refer to 'PLAIN' below)
     - Servers allow extra headers / cookies / query params
     - cookies
