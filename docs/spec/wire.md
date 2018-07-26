@@ -7,11 +7,18 @@ _This document defines how Conjure clients and servers should make and receive n
 
 TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
+
 - **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
 
+- **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters, using the PLAIN format below.
+
+  ```
+  /some/url/{owner}/{repo}/pulls/{id}/{file}
+  ->
+  /some/url/joe/recipe-server/pulls/123/var%2Fconf%2Finstall.yml
+  ```
 
 <!--
-  - Requests
     - path parameters and encoding
     - headers
       - User-agent required,
@@ -27,6 +34,9 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 -->
 
 ## HTTP Responses
+
+- **HTTP Methods** - servers must support Conjure's four HTTP methods: `GET`, `POST`, `PUT` and `DELETE` ([RFC7231](https://tools.ietf.org/html/rfc7231#section-4)).  Other verbs are intentionally not supported (TODO why?).
+
 <!--
   - Responses
     - status codes
@@ -47,6 +57,7 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 
 - Behaviour
+  - client base url
   - set equality using canonical formats (double, )
   - round-trip reserialization of unknown enum/union variants
   - server GZIP compression
@@ -56,6 +67,8 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 <!--
 TODO
+
+- should we mention CIPHERS????
 
 - strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
 
