@@ -91,7 +91,7 @@ TODO link to some official HTTP spec.
 
 ## JSON format
 
-This format maps all Conjure types to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
+This format defines a recursive function `JSON(t)` which maps all Conjure types, `t`, to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
 **Built-in types:**
 
@@ -111,12 +111,12 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 
 **Container types:**
 
-Conjure&nbsp;Type | JSON&nbsp;Type                                                          | Comments |
------------------ | ----------------------------------------------------------------------- | -------- |
-`optional<T>`     |                                                                         | If present, serializes as the JSON representation of `T`, otherwise field should be omitted.
-`list<T>`         | Array                                                                   | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
-`set<T>`          | Array                                                                   | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant.
-`map<K, V>`       | Object                                                                  | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
+Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
+----------------- | -------------- | -------- |
+`optional<T>`     |                | If present, serializes as the JSON representation of `T`, otherwise field should be omitted.
+`list<T>`         | Array          | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
+`set<T>`          | Array          | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
+`map<K, V>`       | Object         | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object must not contain duplicate keys (as defined by the canonical format below).
 
 
 **Named types:**
@@ -160,9 +160,6 @@ types:
 }
 ```
 
-TODO explain why optional<optional<T>> is banned
-TODO strings are UTF8
-
 **Deserialization**
 TODO: `any` may not deserialize into null
 TODO: coerce nulls and absent to empties (for optional, list, set, map)
@@ -170,6 +167,7 @@ TODO: set & map key deduping using canonical equality.
 TODO: Explicitly disallow casting nulls -> primitives,
 TODO: Explicitly do not allow casting between types
 TODO: Explicitly require fields to be present
+TODO explain why optional<optional<T>> is banned
 
 ## PLAIN format
 
