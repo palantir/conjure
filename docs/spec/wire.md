@@ -64,6 +64,23 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
   CUSTOM_SERVER (500)
   ```
 
+## Client Behavior
+- **Forward compatibility** Clients MUST tolerate extra headers and unknown fields in JSON responses. This ensures that old clients will continue to work with new servers.
+- **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
+
+
+## Server Behavior
+
+- Behaviour
+  - Server-side MUST reject unknown fields in JSON format (TODO explain motivation - avoids silent failures, #failfast)
+  - Server-side MUST NOT reject extra extra headers, MAY reject extra query-params
+  - set equality using canonical formats (double, )
+  - round-trip reserialization of unknown enum/union variants
+  - server GZIP compression
+  - server OPTIONS http method for browser compatibility
+  - server CORS headers???
+  - server http 1/2
+
 - Formats
   - PLAIN
   - JSON
@@ -73,17 +90,6 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
     - caveats for double Infinity NaN
 
 
-- Behaviour
-  - Server-side MUST reject unknown fields in JSON format (TODO explain motivation - avoids silent failures, #failfast)
-  - Clients MUST tolerate extra headers / cookies and unknown fields.
-  - Server-side MUST NOT reject extra extra headers, MAY reject extra query-params
-  - client base url
-  - set equality using canonical formats (double, )
-  - round-trip reserialization of unknown enum/union variants
-  - server GZIP compression
-  - server OPTIONS http method for browser compatibility
-  - server CORS headers???
-  - server http 1/2
 
 <!--
 TODO
