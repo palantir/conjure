@@ -161,7 +161,7 @@ Code generators
 
 - [conjure-java](https://github.com/palantir/conjure-java)
 - [conjure-typescript](https://github.com/palantir/conjure-typescript)
-- conjure-python (coming)
+- [conjure-python](https://github.com/palantir/conjure-python)
 - conjure-go (coming soon)
 - conjure-rust (coming soon)
 
