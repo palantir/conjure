@@ -7,19 +7,24 @@ _This document defines how Conjure clients and servers should make and receive n
 
 TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
-
 - **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
 
-- **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters, using the PLAIN format below.
+- **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters. Values must be serialized using the PLAIN format and also _URL encoded_ (TODO link) to ensure special characters don't break.
 
   ```
-  /some/url/{owner}/{repo}/pulls/{id}/{file}
+  /some/url/{owner}/{repo}/pulls/{id}/{file}/{line}
   ->
-  /some/url/joe/recipe-server/pulls/123/var%2Fconf%2Finstall.yml
+  /some/url/joe/recipe-server/pulls/123/var%2Fconf%2Finstall.yml/53
   ```
+
+- **Headers** - Conjure endpoints which define 'headers' must be translated to HTTP Headers (TODO link). Header names are case insensitive.  Header values must be serialized using the PLAIN format. Header values which are `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
+
+- **Authorization** - IR contains `optional<AuthType>`
+  - `HeaderAuthType` - Clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+  - `CookieAuthType` - Clients MUST send a cookie with name specified by the `cookieName` IR field, and a user-provided value.
+
 
 <!--
-    - path parameters and encoding
     - headers
       - User-agent required,
       - fetch-user-agent ??
