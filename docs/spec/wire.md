@@ -180,7 +180,7 @@ TODO explain why optional<optional<T>> is banned
 
 
 ## PLAIN format
-This format describes an unquoted representation of _some_ Conjure types, suitable for usage in path parameters, query parameters and header parameters.
+This format describes an unquoted representation of a _subset_ of Conjure types, suitable for usage in path parameters, query parameters and header parameters.
 
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
@@ -206,6 +206,9 @@ _Union_           | UNSUPPORTED
 
 
 ## CANONICAL Format
+
+<!-- TODO explain more how equality is important for set items and map keys -->
+
 The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
 when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
 MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
@@ -224,8 +227,7 @@ string       | No ambiguity                                       |
 uuid         | No ambiguity                                       | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 any          | N/A                                                | May be any of the above types or an `object` with any fields.
 
-Examples
-
+**Examples:**
 ```
 Conjure Type |     JSON representation     |  CANONICAL representation   |    PLAIN representation    |
 ------------ | --------------------------- | --------------------------- | -------------------------- |
@@ -242,6 +244,10 @@ double       | "NaN"                       | "NaN"                       | NaN  
 double       | "Infinity"                  | "Infinity"                  | Infinity                   |
 double       | "-Infinity"                 | "-Infinity"                 | -Infinity                  |
 ```
+
+
+<!-- TODO clean up everything below this line -->
+
 
 ### <a name="collectionDataTypes"></a>Collection Data Types
 
