@@ -1,5 +1,15 @@
 # Conjure Wire Specification
 
+<!--
+TODO
+
+- should we mention CIPHERS????
+
+- strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
+
+- key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
+-->
+
 _This document defines how Conjure clients and servers should make and receive network requests and reponses over HTTP._
 
 This document describes how endpoints and types defined in a Conjure IR file should result in network requests/response.
@@ -9,8 +19,8 @@ RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as de
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
-## HTTP Requests
 
+## HTTP Requests
 TODO link to some official HTTP spec.
 
 1. **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
@@ -43,8 +53,8 @@ TODO link to some official HTTP spec.
 
 1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
 
-## HTTP Responses
 
+## HTTP Responses
 1. **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` where `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
 
 1. **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
@@ -69,7 +79,8 @@ TODO link to some official HTTP spec.
   CUSTOM_SERVER (500)
   ```
 
-## Behavior
+
+## Behaviour
 1. **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
 
 1. **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
@@ -90,7 +101,6 @@ TODO link to some official HTTP spec.
 
 
 ## JSON format
-
 This format defines a recursive function `JSON(t)` which maps all Conjure types, `t`, to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
 **Built-in types:**
@@ -117,7 +127,6 @@ Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 `list<T>`         | Array          | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
 `set<T>`          | Array          | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
 `map<K, V>`       | Object         | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object must not contain duplicate keys (as defined by the canonical format below).
-
 
 **Named types:**
 
@@ -169,62 +178,46 @@ TODO: Explicitly do not allow casting between types
 TODO: Explicitly require fields to be present
 TODO explain why optional<optional<T>> is banned
 
-## PLAIN format
 
+## PLAIN format
 This format describes an unquoted representation of _some_ Conjure types, suitable for usage in path parameters, query parameters and header parameters.
 
-```
-any -> ???
-bearertoken -> unquoted string
-binary -> unquoted base64 string
-boolean -> raw boolean
-datetime -> unquoted string
-double -> raw number or Infinity or
-integer -> raw number
-rid -> unquoted string
-safelong -> raw number
-string -> unquoted string
-uuid -> unquoted string
+Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
+----------------- | ----------------------------------------------|
+`bearertoken`     | unquoted String
+`binary`          | unquoted base64 String
+`boolean`         | Boolean
+`datetime`        | unquoted String
+`double`          | Number or `NaN` or `Infinity` or `-Infinity`
+`integer`         | Number
+`rid`             | unquoted String
+`safelong`        | Number
+`string`          | unquoted String
+`uuid`            | unquoted String
+_Enum_            | unquoted variant name
+_Alias_ of T      | `PLAIN(T)`
+`any`             | UNSUPPORTED
+`optional<T>`     | UNSUPPORTED
+`list<T>`         | UNSUPPORTED
+`set<T>`          | UNSUPPORTED
+`map<K, V>`       | UNSUPPORTED
+_Object_          | UNSUPPORTED
+_Union_           | UNSUPPORTED
 
-optional<T> -> UNSUPPORTED
-list<T> -> UNSUPPORTED
-set<T> -> UNSUPPORTED
-map<K, V> -> UNSUPPORTED
 
-object -> UNSUPPORTED
-enum -> raw variant name
-union -> UNSUPPORTED
-alias of T -> PLAIN(T)
-```
-
-<!--
-TODO
-
-- should we mention CIPHERS????
-
-- strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
-
-- key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
--->
-
-- [Formats](#format)
-    - [Json Format](#jsonFormat)
-    - [Plain Format](#plainFormat)
-    - [Canonical Format](#canonicalFormat)
-- [Data Types](#dataTypes)
-    - [Primitive Data Types](#primitiveDataTypes)
-    - [Collection Data Types](#collectionDataTypes)
-    - [Complex Data Types](#complexDataTypes)
-
-### Plain Format
-
-### Canonical Format
-
+## CANONICAL Format
 The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
 when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
 MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
 
-## Data Types
+
+
+
+
+
+---------
+
+
 
 ### <a name="primitiveDataTypes"></a>Primitive Data Types
 
