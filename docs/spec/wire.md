@@ -10,6 +10,8 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 - **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
 
+- **HTTP Methods** - Conjure clients MUST send requests using the HTTP Method specified in the IR.
+
 - **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters. Values must be serialized using the PLAIN format and also _URL encoded_ (TODO link) to ensure special characters don't break.
 
   ```
@@ -38,11 +40,21 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 ## HTTP Responses
 
-- **HTTP Methods** - servers must support Conjure's four HTTP methods: `GET`, `POST`, `PUT` and `DELETE` ([RFC7231](https://tools.ietf.org/html/rfc7231#section-4)).  Other verbs are intentionally not supported (TODO why?).
+- **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` where `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
+
+- **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body.
+
+- **Content-type** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type. TODO(double check text/plain content type)
+  ```
+    binary -> "application/octet-stream"
+    alias<binary> -> "application/octet-stream"
+    <everything else> -> "aplication/json;charset=utf-8"
+  ```
+
+TODO define (optional<binary> where binary is empty or not, optional.empty )
 
 <!--
   - Responses
-    - status codes
     - Clients tolerate extra headers / cookies
     - binary return type streaming download, describe optional<binary>... also empty binary, also content-length headers
     - errors (incl status codes)
