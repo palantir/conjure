@@ -34,13 +34,7 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
   /some/url/search?string=foo%20bar&offset=60&limit=20
   ```
 
-<!--
-    - Servers allow extra headers / cookies / query params
-    - cookies
-    - binary body type streaming upload
-    - reject unknown fields
-    - body serialization (refers to JSON below)
--->
+- **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
 
 ## HTTP Responses
 
@@ -66,6 +60,8 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 
 - Behaviour
+  - Server-side MUST reject unknown fields in JSON format (TODO explain motivation - avoids silent failures, #failfast)
+  - Server-side MUST NOT reject extra extra headers, MAY reject extra query-params
   - client base url
   - set equality using canonical formats (double, )
   - round-trip reserialization of unknown enum/union variants
