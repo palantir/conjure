@@ -93,7 +93,7 @@ TODO link to some official HTTP spec.
 
 This format maps all Conjure types to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
-**Serialization:**
+**Built-in types:**
 
 Conjure&nbsp;Type | JSON Type                                          | Comments |
 ----------------- | ---------------------------------------------------| -------- |
@@ -109,6 +109,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 `uuid`            | String                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 `any`             | N/A                                                | May be any of the above types or an `object` with any fields.
 
+**Container types:**
 
 Conjure&nbsp;Type | JSON&nbsp;Type                                                          | Comments |
 ----------------- | ----------------------------------------------------------------------- | -------- |
@@ -117,6 +118,9 @@ Conjure&nbsp;Type | JSON&nbsp;Type                                              
 `set<T>`          | Array                                                                   | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant.
 `map<K, V>`       | Object                                                                  | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 
+
+**Named types:**
+
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | ---------------| -------- |
 _Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
@@ -124,6 +128,37 @@ _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
 _Alias(of x)_     | `JSON(x)`      | An Alias of any Conjure type is serialized in exactly the same way as that Conjure type.
 
+**Union JSON format:**
+
+Conjure Union types are serialized as a JSON Object with exactly two keys:
+
+1. `type` key - this determines the variant of the union, e.g. `foo`
+1. `{{variant}}` key - this key must match the variant determined above, and the value is `JSON(v)`.
+
+```yaml
+types:
+  definitions:
+    objects:
+
+      MyUnion:
+        union:
+          foo: boolean
+          bar: list<string>
+```
+
+```js
+// In this example the variant is `foo` and the inner type is a Conjure `boolean`.
+{
+  "type": "foo",
+  "foo": true
+}
+
+// In this example, the variant is `bar` and the inner type is a Conjure `list<string>`
+{
+  "type": "bar",
+  "bar": ["Hello", "world"]
+}
+```
 
 TODO explain why optional<optional<T>> is banned
 TODO strings are UTF8
