@@ -42,7 +42,7 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
 
 - **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` where `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
 
-- **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body.
+- **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
 
 - **Content-type** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type. TODO(double check text/plain content type)
   ```
@@ -50,17 +50,19 @@ TODO link to some official HTTP spec, define HTTP 1 / 1.1 / 2.
     alias<binary> -> "application/octet-stream"
     <everything else> -> "aplication/json;charset=utf-8"
   ```
-
-TODO define (optional<binary> where binary is empty or not, optional.empty )
-
-<!--
-  - Responses
-    - Clients tolerate extra headers / cookies
-    - binary return type streaming download, describe optional<binary>... also empty binary, also content-length headers
-    - errors (incl status codes)
-    - tolerate unknown fields
-    - body serialization (refers to JSON below)
--->
+- **Errors** - If Conjure servers return errors, they MUST serialize the erorrs using the `JSON` encoding scheme defined below. In addition, the servers MUST send a http status code correponding the error codes defined in the IR.
+  ```
+  PERMISSION_DENIED (403)
+  INVALID_ARGUMENT(400)
+  NOT_FOUND (404)
+  CONFLICT (409)
+  REQUEST_ENTITY_TOO_LARGE (413)
+  FAILED_PRECONDITION (500)
+  INTERNAL (500)
+  TIMEOUT (500)
+  CUSTOM_CLIENT (400)
+  CUSTOM_SERVER (500)
+  ```
 
 - Formats
   - PLAIN
@@ -73,6 +75,7 @@ TODO define (optional<binary> where binary is empty or not, optional.empty )
 
 - Behaviour
   - Server-side MUST reject unknown fields in JSON format (TODO explain motivation - avoids silent failures, #failfast)
+  - Clients MUST tolerate extra headers / cookies and unknown fields.
   - Server-side MUST NOT reject extra extra headers, MAY reject extra query-params
   - client base url
   - set equality using canonical formats (double, )
