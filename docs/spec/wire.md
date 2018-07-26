@@ -4,6 +4,11 @@ _This document defines how Conjure clients and servers should make and receive n
 
 This document describes how endpoints and types defined in a Conjure IR file should result in network requests/response.
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
+14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
+[RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
+
 ## HTTP Requests
 
 TODO link to some official HTTP spec.
@@ -84,15 +89,73 @@ TODO link to some official HTTP spec.
 1. **HTTP/2** It is recommended that clients and servers both support HTTP/2. Clients and Servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
 
 
-- Formats
-  - PLAIN
-  - JSON
-    - coerce null/abent -> Optional.empty(), empty list, empty set
-    - explain why optional<optional<T>> is banned
-    - strings are UTF8
-    - caveats for double Infinity NaN
+## JSON format
 
+This format maps all Conjure types to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
 
+**Serialization:**
+```
+any -> ??? TODO figure it out at runtime
+bearertoken -> JSON string
+binary -> JSON string # Base64 encoded
+boolean -> JSON boolean
+datetime -> JSON string
+double -> JSON number or string "NaN" or string "Infinity" or string "-Infinity"
+integer -> JSON number
+rid -> JSON string
+safelong -> JSON number
+string -> JSON string
+uuid -> JSON string
+
+optional<T> ->
+list<T> ->
+set<T> ->
+map<K, V> ->
+
+object ->
+enum ->
+union ->
+alias of T ->
+```
+
+TODO explain why optional<optional<T>> is banned
+TODO strings are UTF8
+
+**Deserialization**
+TODO: `any` may not deserialize into null
+TODO: coerce nulls and absent to empties (for optional, list, set, map)
+TODO: set & map key deduping using canonical equality.
+TODO: Explicitly disallow casting nulls -> primitives,
+TODO: Explicitly do not allow casting between types
+TODO: Explicitly require fields to be present
+
+## PLAIN format
+
+This format describes an unquoted representation of _some_ Conjure types, suitable for usage in path parameters, query parameters and header parameters.
+
+```
+any -> ???
+bearertoken -> unquoted string
+binary -> unquoted base64 string
+boolean -> raw boolean
+datetime -> unquoted string
+double -> raw number
+integer -> raw number
+rid -> unquoted string
+safelong -> raw number
+string -> unquoted string
+uuid -> unquoted string
+
+optional<T> -> UNSUPPORTED
+list<T> -> UNSUPPORTED
+set<T> -> UNSUPPORTED
+map<K, V> -> UNSUPPORTED
+
+object -> UNSUPPORTED
+enum -> raw variant name
+union -> UNSUPPORTED
+alias of T -> PLAIN(T)
+```
 
 <!--
 TODO
@@ -102,22 +165,7 @@ TODO
 - strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
 
 - key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
-
-
-
 -->
-
-
-
-
-
-
-
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
-RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
-14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
-[RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
 - [Formats](#format)
     - [Json Format](#jsonFormat)
@@ -128,20 +176,7 @@ RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as de
     - [Collection Data Types](#collectionDataTypes)
     - [Complex Data Types](#complexDataTypes)
 
-## Formats
-
-### JSON Format
-
-The JSON format defines the JSON representation of Conjure-defined types, collections and primitives. Implementations
-of Conjure clients/servers MUST expect all HTTP requests and responses, and header parameters to be represented in this way.
-The data types in the Conjure Specification are based on the types supported by the [JSON Schema Specification Wright
-Draft 00](https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2).
-
 ### Plain Format
-
-The Plain format defines the raw representation of Conjure primitives. There is no raw representation of
-Conjure-defined types and collections. Implementations of Conjure clients/servers MUST expect all path and query
-parameters to be represented in this way.
 
 ### Canonical Format
 
