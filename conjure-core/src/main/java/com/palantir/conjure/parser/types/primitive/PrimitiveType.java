@@ -37,7 +37,8 @@ public enum PrimitiveType implements LocalReferenceType {
     SAFELONG(TypeName.of("safelong")),
     RID(TypeName.of("rid")),
     BEARERTOKEN(TypeName.of("bearertoken")),
-    UUID(TypeName.of("uuid"));
+    UUID(TypeName.of("uuid")),
+    ANY(TypeName.of("any"));
 
     private static final Map<TypeName, PrimitiveType> types =
             EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(
