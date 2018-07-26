@@ -210,49 +210,38 @@ The Canonical format defines an additional representation of Conjure-defined typ
 when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
 MUST convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
 
+Conjure Type | Canonical Representation                           | Comments |
+------------ | ------------------------                           | -------- |
+bearertoken  | No ambiguity                                       | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
+binary       | No ambiguity                                       | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
+boolean      | No ambiguity                                       |
+datetime     | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm` | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+double       | No ambiguity                                       | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+integer      | No ambiguity                                       | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+rid          | No ambiguity                                       | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
+safelong     | No ambiguity                                       | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
+string       | No ambiguity                                       |
+uuid         | No ambiguity                                       | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
+any          | N/A                                                | May be any of the above types or an `object` with any fields.
 
+Examples
 
-
-
-
----------
-
-
-
-### <a name="primitiveDataTypes"></a>Primitive Data Types
-
-The primitive data types defined by the Conjure Specification are:
-
-Conjure Name | JSON Type |     Plain Type    | Canonical Representation | Comments |
------------- | --------- | ----------------- | ------------------------ | -------- |
-bearertoken  | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-binary       | `string`  | unquoted `string` | No ambiguity             | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
-boolean      | `boolean` | `boolean`         | No ambiguity             |
-datetime     | `string`  | unquoted `string` | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm`   | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-double       | `number` \| `string`  | `number` \| unquoted `string`          | Number with at least 1 decimal or "NaN" or "Infinity" or "-Infinity"  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
-integer      | `integer` | `number`          | No ambiguity             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
-rid          | `string`  | unquoted `string` | No ambiguity             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
-safelong     | `integer` | `number`          | No ambiguity             | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
-string       | `string`  | unquoted `string` | No ambiguity             |
-uuid         | `string`  | unquoted `string` | No ambiguity             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
-any          | N/A       | N/A               | N/A                      | May be any of the above types or an `object` with any fields.
-
-Example format conversions to canonical format:
-
-Conjure Name |     JSON Representation     |    Plain Representation    |  Canonical Representation   |
------------- | --------------------------- | -------------------------- | --------------------------- |
-datetime     | "2018-07-19T08:11:21Z"      | 2018-07-19T08:11:21Z       | "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00  | "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T08:11:21-00:00" | 2018-07-19T08:11:21-00:00  | "2018-07-19T08:11:21+00:00"
-datetime     | "20180719T081121Z"          | 20180719T081121Z           | "2018-07-19T08:11:21+00:00"
-datetime     | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  | "2018-07-19T05:11:21+03:00"
-double       | 1                           | 1                          | 1.0
-double       | 1.00000                     | 1.000000                   | 1.0
-double       | 1.2345678                   | 1.2345678                  | 1.2345678
-double       | 1.23456780                  | 1.23456780                 | 1.2345678
-double       | "NaN"                       | NaN                        | "NaN"
-double       | "Infinity"                  | Infinity                   | "Infinity"
-double       | "-Infinity"                 | -Infinity                  | "-Infinity"
+```
+Conjure Type |     JSON representation     |  CANONICAL representation   |    PLAIN representation    |
+------------ | --------------------------- | --------------------------- | -------------------------- |
+datetime     | "2018-07-19T08:11:21Z"      | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21Z       |
+datetime     | "2018-07-19T08:11:21+00:00" | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00  |
+datetime     | "2018-07-19T08:11:21-00:00" | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21-00:00  |
+datetime     | "20180719T081121Z"          | "2018-07-19T08:11:21+00:00" | 20180719T081121Z           |
+datetime     | "2018-07-19T05:11:21+03:00" | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  |
+double       | 1                           | 1.0                         | 1                          |
+double       | 1.00000                     | 1.0                         | 1.000000                   |
+double       | 1.2345678                   | 1.2345678                   | 1.2345678                  |
+double       | 1.23456780                  | 1.2345678                   | 1.23456780                 |
+double       | "NaN"                       | "NaN"                       | NaN                        |
+double       | "Infinity"                  | "Infinity"                  | Infinity                   |
+double       | "-Infinity"                 | "-Infinity"                 | -Infinity                  |
+```
 
 ### <a name="collectionDataTypes"></a>Collection Data Types
 
