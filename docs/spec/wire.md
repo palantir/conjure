@@ -71,7 +71,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   /recipes
   ```
 
-1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
+1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the [JSON format][]. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
 
 
 ## HTTP responses
