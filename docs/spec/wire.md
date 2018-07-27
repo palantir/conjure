@@ -89,12 +89,13 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
   In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
+
 ## HTTP responses
-1. **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` and `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
+1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. `binary` return types or aliases of `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
 
-1. **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
+1. **Status codes** - Conjure servers MUST respond with HTTP status code `200` for all successful requests UNLESS the JSON format of the return type is `null` (e.g. for `optional<T>` or aliases of optionals).  For a return type t where `JSON(t)` is `null`, the server MUST respond with `204`. For empty `map`, `list` and `set` return types or aliases of these, servers are RECOMMENDED to respond with `204`, although they MAY send `200` if the HTTP body is `[]` or `{}`. Clients SHOULD tolerate both of these options.
 
-1. **Content-type** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type.
+1. **Content-Type header** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type.
   ```
     binary -> "application/octet-stream"
     alias<binary> -> "application/octet-stream"
