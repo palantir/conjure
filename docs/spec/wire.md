@@ -8,51 +8,73 @@ TODO
 - key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
 -->
 
-_This document defines how Conjure clients and servers should make and receive network requests and responses over HTTP._
-
-This document describes how endpoints and types defined in a Conjure IR file should result in network requests/response.
+_This document defines how clients and servers should behave based on endpoints and types defined in a Conjure IR file._
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
 RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
+<!-- these are just markdown link definitions, they do not get rendered -->
+[JSON format]: #json-format
+[PLAIN format]: #plain-format
+[CANONICAL format]: #canonical-format
 
-## HTTP Requests
-TODO link to some official HTTP spec.
+## HTTP requests
+This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616).
 
-1. **SSL/TLS** - Conjure clients MUST support requests using TLS (HTTPS) (TODO versions) and MAY optionally support insecure HTTP requests.
+1. **SSL/TLS** - Conjure clients MUST support requests using Transport Layer Security (TLS) and MAY optionally support HTTP requests.
 
-1. **HTTP Methods** - Conjure clients MUST send requests using the HTTP Method specified in the IR.
+1. **HTTP Methods** - Conjure clients MUST support the following HTTP methods: `GET`, `POST`, `PUT`, `DELETE`.
 
-1. **Path parameters** - For Conjure endpoints which have user-defined path parameters, the client MUST interpolate values for each of these path parameters. Values must be serialized using the PLAIN format and also _URL encoded_ (TODO link) to ensure special characters don't break.
+1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and must also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
 
+  For example, the following Conjure endpoint contains several path parameters of different types:
+  ```yaml
+  demoEndpoint:
+    http: GET /demo/{file}/rev/{revision}
+    args:
+      file: string
+      revision: integer
   ```
-  /some/url/{owner}/{repo}/pulls/{id}/{file}/{line}
-  ->
-  /some/url/joe/recipe-server/pulls/123/var%2Fconf%2Finstall.yml/53
+
+  In this example, the `file` argument with value `var/conf/install.yml` is percent encoded:
+  ```
+  /demo/var%2Fconf%2Finstall.yml/rev/53
   ```
 
-1. **Headers** - Conjure endpoints that define `header` parameters require them to be translated to HTTP Headers (TODO link). Header names are case insensitive.  Header values must be serialized using the PLAIN format. Header values which are `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
+1. **Headers** - For Conjure endpoints that define `header` parameters, clients must translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values must be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
 
-1. **User-agent** - Requests MUST include a `User-Agent` header. (TODO specify an exact format????)
+1. **User-agent** - Requests MUST include a `User-Agent` header.
 
-1. **Authorization** - If an endpoint's `auth` field is present, clients must behave as follows:
-  - `HeaderAuthType` - Clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
-  - `CookieAuthType` - Clients MUST send a cookie header with name `cookie` and value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
 
-1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already defined in the IR.
+1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
-1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, then a client MUST add a query string to the outgoing URL as per the HTTP spec (TODO link). If any value of type `optional<T>` is not present, then the query key must be omitted.  Otherwise, it MUST be serialized as `PLAIN(T)` and url encoded (TODO link). TODO clarify if lists/sets/maps/binary are allowed.
+1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
 
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the value MUST be serialized as `PLAIN(T)` and any reserved characters percent encoded.
+
+  For example, the following Conjure endpoints contains two query parameters:
+  ```yaml
+  demoEndpoint:
+    http: GET /recipes
+    args:
+      filter: optional<string>
+      limit: optional<integer>
   ```
-  /some/url/search?string=foo%20bar&offset=60&limit=20
+
+  These examples illustrate how an `optional<T>` value should be omitted if the value is not present
+  ```
+  /recipes?filter=Hello%20World&limit=10
+  /recipes?filter=Hello%20World
+  /recipes
   ```
 
 1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the `JSON` encoding scheme defined below. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
 
 
-## HTTP Responses
+## HTTP responses
 1. **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` and `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
 
 1. **Response body** - Conjure servers MUST serialize return values using the `JSON` encoding scheme defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. Return type `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
