@@ -45,6 +45,10 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Headers** - For Conjure endpoints that define `header` parameters, clients must translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values must be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
 
+1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients must send `Content-Type: application/json`.
+
+<!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
+
 1. **User-agent** - Requests MUST include a `User-Agent` header.
 
 1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
@@ -55,7 +59,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the value MUST be serialized as `PLAIN(T)` and any reserved characters percent encoded.
 
-  For example, the following Conjure endpoints contains two query parameters:
+  For example, the following Conjure endpoint contains two query parameters:
   ```yaml
   demoEndpoint:
     http: GET /recipes
@@ -71,8 +75,19 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   /recipes
   ```
 
-1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the [JSON format][]. TODO content-length ??? TODO binary streaming upload ??, TODO string examples. TODO empty containers. TODO nulls.
+1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the [JSON format][]. If the argument has type `optional<T>` and the value is not present it is RECOMMENDED to send an empty request body, althought clients MAY alternatively send the JSON value `null`. It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
+  For example, the following Conjure endpoint defines a request body:
+  ```yaml
+  demoEndpoint:
+    http: POST /names
+    args:
+      newName:
+        type: optional<string>
+        param-type: body
+  ```
+
+  In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond with `204` status code if an endpoint returns `optional<T>` and `<T>` is not present. Servers MUST respond with `200` status code for all other successful requests, including empty maps, sets, and lists.
