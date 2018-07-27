@@ -15,6 +15,13 @@ RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as de
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
+For convenience, we define a _de-alias_ function which recursively collapses the Conjure _Alias_ type and is an identity function otherwise.
+
+```
+de-alias(Alias of t) -> de-alias(t)
+de-alias(t) -> t
+```
+
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #json-format
 [PLAIN format]: #plain-format
@@ -91,29 +98,39 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 
 ## HTTP responses
-1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below. The body MUST be omitted if the return type is `optional<T>` and `T` is not present. `binary` return types or aliases of `binary` must be written directly to the body. TODO define (optional<binary> where binary is empty or not, optional.empty) and content length.
+1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
 
-1. **Status codes** - Conjure servers MUST respond with HTTP status code `200` for all successful requests UNLESS the JSON format of the return type is `null` (e.g. for `optional<T>` or aliases of optionals).  For a return type t where `JSON(t)` is `null`, the server MUST respond with `204`. For empty `map`, `list` and `set` return types or aliases of these, servers are RECOMMENDED to respond with `204`, although they MAY send `200` if the HTTP body is `[]` or `{}`. Clients SHOULD tolerate both of these options.
+  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
+  - the de-aliased return type is a `map`, `list` or `set`: it is RECOMMENDED to send `204` but servers MAY send `200` if the HTTP body is `[]` or `{}`.
 
-1. **Content-Type header** - Conjure servers MUST respond to requests with the `Content-Type` header corresponding to the endpoint's return type.
-  ```
-    binary -> "application/octet-stream"
-    alias<binary> -> "application/octet-stream"
-    <everything else> -> "application/json;charset=utf-8"
-  ```
-1. **Errors** - If Conjure servers return errors, they MUST serialize the errors using the `JSON` encoding scheme defined below. In addition, the servers MUST send a http status code corresponding to the error codes defined in the IR.
-  ```
-  PERMISSION_DENIED (403)
-  INVALID_ARGUMENT(400)
-  NOT_FOUND (404)
-  CONFLICT (409)
-  REQUEST_ENTITY_TOO_LARGE (413)
-  FAILED_PRECONDITION (500)
-  INTERNAL (500)
-  TIMEOUT (500)
-  CUSTOM_CLIENT (400)
-  CUSTOM_SERVER (500)
-  ```
+  Using `204` in this way ensures that clients calling a Conjure endpoint with `optional<binary>` return type can differentiate between a non-present optional (`204`) and a present binary value containing zero bytes (`200`).
+
+  Further non-successful status codes are defined in the Conjure errors section below.
+
+1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below, UNLESS:
+
+  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
+  - the de-aliased return type is `binary`: servers must write the binary bytes directly to the HTTP body.
+
+1. **Content-Type header** - Conjure servers MUST send a `Content-Type` header according to the endpoint's return type:
+
+  - if the de-aliased return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
+  - otherwise, servers MUST send `Content-Type: application/json;charset=utf-8`.
+
+1. **Conjure errors** - In order to send a Conjure error, servers MUST serialize the error using the [JSON format][]. In addition, servers MUST send a http status code corresponding to the error's code.
+
+Conjure Error type         | HTTP Status code |
+-------------------------- | ---------------- |
+PERMISSION_DENIED          | 403
+INVALID_ARGUMENT           | 400
+NOT_FOUND                  | 404
+CONFLICT                   | 409
+REQUEST_ENTITY_TOO_LARGE   | 413
+FAILED_PRECONDITION        | 500
+INTERNAL                   | 500
+TIMEOUT                    | 500
+CUSTOM_CLIENT              | 400
+CUSTOM_SERVER              | 500
 
 
 ## Behaviour
@@ -204,6 +221,8 @@ types:
   "bar": ["Hello", "world"]
 }
 ```
+
+<!-- TODO: define JSON format for errors -->
 
 **Deserialization**
 TODO: `any` may not deserialize into null
