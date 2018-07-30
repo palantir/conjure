@@ -23,7 +23,6 @@ For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
   de-alias(T) -> T
   ```
 1. _json_ - recursively maps all conjure types to JSON types using [JSON format][]
-
 1. _plain_ - serializes a subset of Conjure types to their unquoted representation using [PLAIN format][] or throws error for unsupported Conjure types.
 
 <!-- these are just markdown link definitions, they do not get rendered -->
@@ -34,11 +33,9 @@ For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
 ## HTTP requests
 This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616).
 
-1. **SSL/TLS** - Conjure clients MUST support requests using Transport Layer Security (TLS) and MAY optionally support HTTP requests.
-
 1. **HTTP Methods** - Conjure clients MUST support the following HTTP methods: `GET`, `POST`, `PUT`, `DELETE`.
 
-1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
+1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized as `plain(T)` and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
 
   For example, the following Conjure endpoint contains several path parameters of different types:
   ```yaml
@@ -54,23 +51,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   /demo/var%2Fconf%2Finstall.yml/rev/53
   ```
 
-1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
-
-TODO: http/2 requires lower case.
-
-1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`. 
-
-<!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
-
-1. **User-agent** - Requests MUST include a `User-Agent` header.
-
-1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
-
-1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
-
-1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
-
-1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `plain(T)` and any reserved characters percent encoded.
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of `de-alias`ed type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `plain(T)` and any reserved characters percent encoded.
 
   For example, the following Conjure endpoint contains two query parameters:
   ```yaml
@@ -88,7 +69,10 @@ TODO: http/2 requires lower case.
   /recipes
   ```
 
-1. **Body serialization** - If an endpoint defines an argument of type `body` clients MUST serialize the user-provided value using the [JSON format][]. If the argument has type `optional<T>` and the value is not present it is RECOMMENDED to send an empty request body, althought clients MAY alternatively send the JSON value `null`. It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
+1. **Body parameter** - If an endpoint defines an argument of type `body`, clients MUST serialize the user-provided value using the [JSON format][], UNLESS:
+  - the `de-alias` of the argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
+  - the `de-alias` of the argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`. 
+It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
   For example, the following Conjure endpoint defines a request body:
   ```yaml
@@ -102,6 +86,20 @@ TODO: http/2 requires lower case.
 
   In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
+
+1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
+
+1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
+
+<!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
+
+1. **User-agent** - Requests MUST include a `User-Agent` header.
+
+1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+
+1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+
+1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
 
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
@@ -142,7 +140,7 @@ CUSTOM_SERVER              | 500
 ## Behaviour
 1. **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
 
-1. **Client base URL** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
+1. **Client base URL** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base URL.
 
 1. **Servers reject unknown fields** Servers MUST request reject all unknown JSON fields. This helps developers notice bugs/mistakes instead of silent failures. (TODO, make this more convincing)
 
@@ -165,7 +163,7 @@ This format describes the JSON representation defined in [RFC 7159](https://tool
 Conjure&nbsp;Type | JSON Type                                          | Comments |
 ----------------- | ---------------------------------------------------| -------- |
 `bearertoken`     | String                                             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-`binary`          | String                                             | Represented as a [Base64]() encoded string.
+`binary`          | String                                             | Represented as a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4).
 `boolean`         | Boolean                                            |
 `datetime`        | String                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 `double`          | Number or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
@@ -246,7 +244,7 @@ This format describes an unquoted representation of a _subset_ of Conjure types,
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
 `bearertoken`     | unquoted String
-`binary`          | unquoted base64 String
+`binary`          | unquoted a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4)
 `boolean`         | Boolean
 `datetime`        | unquoted String
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`
@@ -277,7 +275,7 @@ MUST convert types (even if implicitly) from their JSON/Plain format to their ca
 Conjure Type | Canonical Representation                           | Comments |
 ------------ | ------------------------                           | -------- |
 bearertoken  | No ambiguity                                       | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-binary       | No ambiguity                                       | Represented as a [Base64]() encoded string, except for when it is a request/response body where it is raw binary.
+binary       | No ambiguity                                       | Represented as a [Base64](https://tools.ietf.org/html/rfc4648#section-4) encoded string, except for when it is a request/response body where it is raw binary.
 boolean      | No ambiguity                                       |
 datetime     | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm` | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 double       | No ambiguity                                       | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
