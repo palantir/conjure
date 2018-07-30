@@ -22,8 +22,14 @@ For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
   de-alias(Alias of T) -> de-alias(T)
   de-alias(T) -> T
   ```
-1. _json_ - recursively maps all conjure types to JSON types using [JSON format][]
-1. _plain_ - serializes a subset of Conjure types to their unquoted representation using [PLAIN format][] or throws error for unsupported Conjure types.
+1. _json_ - recursively de-aliases and maps all Conjure types to JSON types using [JSON format][].
+  ```
+  json(Alias of T) -> json(T)
+  ```
+1. _plain_ - de-aliases and serializes Conjure types to their unquoted representation using [PLAIN format][]. This only to a subset of Conjure Types.
+  ```
+  plain(Alias of T) -> plain(T)
+  ```
 
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #json-format
@@ -182,8 +188,6 @@ Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 `list<T>`         | Array          | Each element, e, of the list is serialized using `json(e)` and the order of the elements MUST be maintained.
 `set<T>`          | Array          | Each element, e, of the set is serialized using `json(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
 `map<K, V>`       | Object         | A key k is serialized as `plain(k)`. Values are serialized using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object MUST not contain duplicate keys (as defined by the canonical format below).
-
-TODO: address rob's comment on collection
 
 **Named types:**
 
