@@ -51,8 +51,9 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   ```
 
 1. **Headers** - For Conjure endpoints that define `header` parameters, clients must translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values must be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
+1. **Headers** - For Conjure endpoints that define `header` parameters, clients MUST translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values MUST be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
 
-1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients must send `Content-Type: application/json`.
+1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
 
 <!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
 
@@ -64,7 +65,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
 
-1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the value MUST be serialized as `PLAIN(T)` and any reserved characters percent encoded.
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `PLAIN(T)` and any reserved characters percent encoded.
 
   For example, the following Conjure endpoint contains two query parameters:
   ```yaml
@@ -110,7 +111,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below, UNLESS:
 
   - the de-aliased return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
-  - the de-aliased return type is `binary`: servers must write the binary bytes directly to the HTTP body.
+  - the de-aliased return type is `binary`: servers MUST write the binary bytes directly to the HTTP body.
 
 1. **Content-Type header** - Conjure servers MUST send a `Content-Type` header according to the endpoint's return type:
 
@@ -136,7 +137,7 @@ CUSTOM_SERVER              | 500
 ## Behaviour
 1. **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
 
-1. **Client base url** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
+1. **Client base URL** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base url.
 
 1. **Servers reject unknown fields** Servers MUST request reject all unknown JSON fields. This helps developers notice bugs/mistakes instead of silent failures. (TODO, make this more convincing)
 
@@ -146,11 +147,11 @@ CUSTOM_SERVER              | 500
 
 1. **Round-trip of unknown variants** TODO ask Mark.
 
-1. **GZIP compression** It is recommended that servers and clients support gzip compression as it is often more performant.
+1. **GZIP compression** It is RECOMMENDED that servers and clients support gzip compression as it is often more performant.
 
 1. **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add access-control-allowed-headers. TODO: refer to INFO sec quip doc.
 
-1. **HTTP/2** It is recommended that clients and servers both support HTTP/2. Clients and servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
+1. **HTTP/2** It is RECOMMENDED that clients and servers both support HTTP/2. Clients and servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
 
 
 ## JSON format
@@ -176,10 +177,10 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | -------------- | -------- |
-`optional<T>`     |                | If present, serializes as the JSON representation of `T`, otherwise field should be omitted.
-`list<T>`         | Array          | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
+`optional<T>`     |                | If present, serializes as the JSON representation of `T`, otherwise field SHOULD be omitted.
+`list<T>`         | Array          | Each element, e, of the list is serialized using `JSON(e)`. Order MUST be maintained.
 `set<T>`          | Array          | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
-`map<K, V>`       | Object         | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object must not contain duplicate keys (as defined by the canonical format below).
+`map<K, V>`       | Object         | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object MUST not contain duplicate keys (as defined by the canonical format below).
 
 **Named types:**
 
@@ -195,7 +196,7 @@ _Alias(of x)_     | `JSON(x)`      | An Alias of any Conjure type is serialized 
 Conjure Union types are serialized as a JSON Object with exactly two keys:
 
 1. `type` key - this determines the variant of the union, e.g. `foo`
-1. `{{variant}}` key - this key must match the variant determined above, and the value is `JSON(v)`.
+1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `JSON(v)`.
 
 ```yaml
 types:
