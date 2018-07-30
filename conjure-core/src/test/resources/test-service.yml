@@ -5,9 +5,9 @@ types:
       external:
         java: com.palantir.ri.ResourceIdentifier
 
-  definitions: 
+  definitions:
     default-package: test.api
-    objects:     
+    objects:
       SimpleObject:
         fields:
           stringField: string
@@ -30,3 +30,4 @@ services:
           foo:
             type: StringAlias
             param-type: header
+            param-id: Abc-Abc

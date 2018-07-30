@@ -15,12 +15,16 @@ RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as de
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
-For convenience, we define a _de-alias_ function which recursively collapses the Conjure _Alias_ type and is an identity function otherwise.
+For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
 
-```
-de-alias(Alias of t) -> de-alias(t)
-de-alias(t) -> t
-```
+1. _de-alias_ - recursively collapses the Conjure _Alias_ type and is an identity function otherwise
+  ```
+  de-alias(Alias of T) -> de-alias(T)
+  de-alias(T) -> T
+  ```
+1. _json_ - recursively maps all conjure types to JSON types using [JSON format][]
+
+1. _plain_ - serializes a subset of Conjure types to their unquoted representation using [PLAIN format][] or throws error for unsupported Conjure types.
 
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #json-format
@@ -34,7 +38,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **HTTP Methods** - Conjure clients MUST support the following HTTP methods: `GET`, `POST`, `PUT`, `DELETE`.
 
-1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and must also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
+1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
 
   For example, the following Conjure endpoint contains several path parameters of different types:
   ```yaml
@@ -50,10 +54,11 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   /demo/var%2Fconf%2Finstall.yml/rev/53
   ```
 
-1. **Headers** - For Conjure endpoints that define `header` parameters, clients must translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values must be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
-1. **Headers** - For Conjure endpoints that define `header` parameters, clients MUST translate these to [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Header values MUST be serialized using the [PLAIN format][]. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `PLAIN(T)`.
+1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
 
-1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
+TODO: http/2 requires lower case.
+
+1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`. 
 
 <!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
 
@@ -65,7 +70,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
 
-1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `PLAIN(T)` and any reserved characters percent encoded.
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If any value of type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `plain(T)` and any reserved characters percent encoded.
 
   For example, the following Conjure endpoint contains two query parameters:
   ```yaml
@@ -101,8 +106,8 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
 
-  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
-  - the de-aliased return type is a `map`, `list` or `set`: it is RECOMMENDED to send `204` but servers MAY send `200` if the HTTP body is `[]` or `{}`.
+  - the `de-alias` of the return type is `optional<T>` and the value is not present: servers MUST send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
+  - the `de-alias` of the return type is a `map`, `list` or `set`: it is RECOMMENDED to send `204` but servers MAY send `200` if the HTTP body is `[]` or `{}`.
 
   Using `204` in this way ensures that clients calling a Conjure endpoint with `optional<binary>` return type can differentiate between a non-present optional (`204`) and a present binary value containing zero bytes (`200`).
 
@@ -110,12 +115,12 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below, UNLESS:
 
-  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
-  - the de-aliased return type is `binary`: servers MUST write the binary bytes directly to the HTTP body.
+  - the `de-alias` of the return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
+  - the `de-alias` of the return type is `binary`: servers MUST write the binary bytes directly to the HTTP body.
 
 1. **Content-Type header** - Conjure servers MUST send a `Content-Type` header according to the endpoint's return type:
 
-  - if the de-aliased return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
+  - if the `de-alias` of the return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
   - otherwise, servers MUST send `Content-Type: application/json;charset=utf-8`.
 
 1. **Conjure errors** - In order to send a Conjure error, servers MUST serialize the error using the [JSON format][]. In addition, servers MUST send a http status code corresponding to the error's code.
@@ -147,15 +152,13 @@ CUSTOM_SERVER              | 500
 
 1. **Round-trip of unknown variants** TODO ask Mark.
 
-1. **GZIP compression** It is RECOMMENDED that servers and clients support gzip compression as it is often more performant.
-
 1. **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add access-control-allowed-headers. TODO: refer to INFO sec quip doc.
 
 1. **HTTP/2** It is RECOMMENDED that clients and servers both support HTTP/2. Clients and servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
 
 
 ## JSON format
-This format defines a recursive function `JSON(t)` which maps all Conjure types, `t`, to JSON types defined in [RFC 7159](https://tools.ietf.org/html/rfc7159).
+This format describes the JSON representation defined in [RFC 7159](https://tools.ietf.org/html/rfc7159) of all Conjure types.
 
 **Built-in types:**
 
@@ -178,25 +181,27 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | -------------- | -------- |
 `optional<T>`     |                | If present, serializes as the JSON representation of `T`, otherwise field SHOULD be omitted.
-`list<T>`         | Array          | Each element, e, of the list is serialized using `JSON(e)`. Order MUST be maintained.
-`set<T>`          | Array          | Each element, e, of the set is serialized using `JSON(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
-`map<K, V>`       | Object         | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object MUST not contain duplicate keys (as defined by the canonical format below).
+`list<T>`         | Array          | Each element, e, of the list is serialized using `json(e)` and the order of the elements MUST be maintained.
+`set<T>`          | Array          | Each element, e, of the set is serialized using `json(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
+`map<K, V>`       | Object         | A key k is serialized as `plain(k)`. Values are serialized using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object MUST not contain duplicate keys (as defined by the canonical format below).
+
+TODO: address rob's comment on collection
 
 **Named types:**
 
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | ---------------| -------- |
-_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
+_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
-_Alias(of x)_     | `JSON(x)`      | An Alias of any Conjure type is serialized in exactly the same way as that Conjure type.
+_Alias_(x)        | `json(x)`      | An Alias of any Conjure type is serialized in exactly the same way as that Conjure type.
 
 **Union JSON format:**
 
 Conjure Union types are serialized as a JSON Object with exactly two keys:
 
 1. `type` key - this determines the variant of the union, e.g. `foo`
-1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `JSON(v)`.
+1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `json(v)`.
 
 ```yaml
 types:
@@ -251,7 +256,7 @@ Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 `string`          | unquoted String
 `uuid`            | unquoted String
 _Enum_            | unquoted variant name
-_Alias_ of T      | `PLAIN(T)`
+_Alias_(T)        | `plain(T)`
 `any`             | UNSUPPORTED
 `optional<T>`     | UNSUPPORTED
 `list<T>`         | UNSUPPORTED
@@ -278,7 +283,7 @@ datetime     | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm` | In accordan
 double       | No ambiguity                                       | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 integer      | No ambiguity                                       | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 rid          | No ambiguity                                       | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
-safelong     | No ambiguity                                       | Integer with value rangng from -2<sup>53</sup> - 1 to 2<sup>53</sup> - 1.
+safelong     | No ambiguity                                       | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
 string       | No ambiguity                                       |
 uuid         | No ambiguity                                       | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 any          | N/A                                                | May be any of the above types or an `object` with any fields.
@@ -323,7 +328,7 @@ The complex data types defined by the Conjure Specification are:
 
 Conjure Name | JSON Type | Canonical Representation | Comments
 ------------ | --------- | ------------------------ | --------
-alias        |  -        | No ambiguity             | An Alias is a type that is a shorthand name for another type. An Alias MUST be serialized in the same way the aliased type would be.
+alias        |  -        | No ambiguity             | An Alias is a type that is a shorthand name for another type. An Alias MUST be serialized in the same way `the alias` of the type would be.
 enum         | `string`  | No ambiguity             | An Enum is a type that represents a fixed set of `string` values.
 error        | `object`  | No ambiguity             | An Error is a type that represents a structured, non-successful response. It includes three required fields: `errorCode`, `errorName`, `errorInstanceId`, and an optional field `parameters`.
 object       | `object`  | No ambiguity             | An Object is a type that represents an `object` with a predefined set of fields with associated types.

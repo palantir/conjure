@@ -54,9 +54,18 @@ positive:
           name: Unused
           package: unused
           endpoints:
-            unused:
-              http: GET /{foo}
-              args: { foo: datetime }
+            post:
+              http: POST /post
+              args:
+                abc:
+                  type: string
+                  param-type: header
+                  param-id: Abc-Abc
+                abc:
+                  type: string
+                  param-type: header
+                  param-id: Abc-Abc
+
 negative:
   disallowBearerTokenInPathParams:
     expected-error: "Path parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
