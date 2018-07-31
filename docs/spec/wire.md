@@ -1,13 +1,5 @@
 # Conjure Wire Specification
 
-<!--
-TODO
-
-- strictness / leniency - can you expect that a server or a client is already compliant, should you be defensive?? (server-side : you must be defensive and reject unknowns, client-side not as important??)
-
-- key ordering of objects / maps ??? {"foo": 1, "bar": 2} equals {"bar": 2, "foo": 1}
--->
-
 _This document defines how clients and servers should behave based on endpoints and types defined in a Conjure IR file._
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
@@ -15,23 +7,12 @@ RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as de
 14](https://tools.ietf.org/html/bcp14) [RFC2119](https://tools.ietf.org/html/rfc2119)
 [RFC8174](https://tools.ietf.org/html/rfc8174) when, and only when, they appear in all capitals, as shown here.
 
-For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
+For convenience, we define a _de-alias_ function which recursively collapses the Conjure _Alias_ type and is an identity function otherwise:
 
-1. _de-alias_ - recursively collapses the Conjure _Alias_ type and is an identity function otherwise
-  ```
-  de-alias(Alias of T) -> de-alias(T)
-  de-alias(T) -> T
-  ```
-1. _json_ - recursively de-aliases a Conjure type, `T`, and then converts it into a JSON type using [JSON format][].
-  ```
-  json(T) -> JSON presentation of the Conjure Type T
-  json(Alias of T) -> json(T)
-  ```
-1. _plain_ - de-aliases a Conjure type, T, and then and serializes it to its unquoted representation using [PLAIN format][]. This only to a subset of Conjure Types.
-  ```
-  plain(T) -> an unquoted representation of the Conjure Type T
-  plain(Alias of T) -> plain(T)
-  ```
+```
+de-alias(Alias of T) -> de-alias(T)
+de-alias(T) -> T
+```
 
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #json-format
@@ -61,7 +42,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   /demo/var%2Fconf%2Finstall.yml/rev/53
   ```
 
-1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of `de-alias`ed type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the value MUST be serialized as `plain(T)` and any reserved characters percent encoded.
+1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of de-aliased type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the inner value MUST be serialized using the [PLAIN format][] and any reserved characters percent encoded.
 
   For example, the following Conjure endpoint contains two query parameters:
   ```yaml
@@ -80,8 +61,8 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
   ```
 
 1. **Body parameter** - If an endpoint defines an argument of type `body`, clients MUST serialize the user-provided value using the [JSON format][], UNLESS:
-  - the `de-alias` of the argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
-  - the `de-alias` of the argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
+  - the de-aliased argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
+  - the de-aliased argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
 It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
   For example, the following Conjure endpoint defines a request body:
@@ -96,8 +77,7 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 
   In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
-
-1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
+1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
 
 1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
 
@@ -200,7 +180,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 _Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
-_Alias_(x)        | `json(x)`      | An Alias of any Conjure type is serialized in exactly the same way as that Conjure type.
+_Alias_(x)        | `json(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
 
 **Union JSON format:**
 
@@ -280,7 +260,7 @@ Conjure Error types are serialized as JSON objects with the following keys:
 
 
 ## PLAIN format
-This format describes an unquoted representation of a _subset_ of Conjure types.
+This format describes an unquoted representation of a _subset_ of de-aliased Conjure types.
 
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
@@ -295,7 +275,6 @@ Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 `string`          | unquoted String
 `uuid`            | unquoted String
 _Enum_            | unquoted variant name
-_Alias_(T)        | `plain(T)`
 `any`             | UNSUPPORTED
 `optional<T>`     | UNSUPPORTED
 `list<T>`         | UNSUPPORTED
