@@ -24,9 +24,9 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **SSL/TLS** - Conjure clients MUST support requests using Transport Layer Security (TLS) and MAY optionally support HTTP requests. This ensures that any Conjure client implementation will be able to interact with any Conjure server implementation.
 
-1. **HTTP Methods** - Conjure clients MUST support the following HTTP methods: `GET`, `POST`, `PUT`, `DELETE`.
+1. **HTTP Methods** - Conjure clients MUST support the following HTTP methods: `GET`, `POST`, `PUT`, and `DELETE`.
 
-1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized as `plain(T)` and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
+1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
 
   For example, the following Conjure endpoint contains several path parameters of different types:
   ```yaml
@@ -89,7 +89,7 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 
 1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
-1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already in the endpoint definition.
+1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
 
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
@@ -136,8 +136,6 @@ CUSTOM_SERVER              | 500
 
 1. **Servers tolerate extra headers** - Servers MUST tolerate extra headers not defined in the endpoint definition. This is important because proxies frequently modify requests to include additional headers, e.g. `X-Forwarded-For`.
 
-1. **Set and map key equality** - Servers SHOULD reject duplicate `map` keys or duplicate `set` items in JSON bodies. Equivalence of two items can be determined by converting the JSON value to the [CANONICAL format][] and then comparing byte equality.
-
 1. **Round-trip of unknown variants** - TODO ask Mark.
 
 1. **CORS and HTTP preflight requests** - Servers MUST support the HTTP `OPTIONS` method in order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request).
@@ -152,7 +150,7 @@ This format describes how all Conjure types are serialized into and deserialized
 
 Conjure&nbsp;Type | JSON Type                                          | Comments |
 ----------------- | ---------------------------------------------------| -------- |
-`bearertoken`     | String                                             | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
+`bearertoken`     | String                                             | In accordance with [RFC 6750](https://tools.ietf.org/html/rfc6750#section-2.1).
 `binary`          | String                                             | Represented as a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4).
 `boolean`         | Boolean                                            |
 `datetime`        | String                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
@@ -170,7 +168,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 ----------------- | ----------------------------- | -------- |
 `optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, MUST be serialized as `JSON(e)`. If the value appears inside a JSON Object, then the corresponding key SHOULD be omitted. Alternatively, the field MAY be set to `null`. Inside JSON Array, a non-present Conjure optional value MUST be serialized as JSON `null`.
 `list<T>`         | Array                         | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
-`set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is RECOMMENDED to preserve order where possible. The Array MUST not contain duplicate elements (as defined by the canonical format below).
+`set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is RECOMMENDED to preserve order where possible. The Array MUST NOT contain duplicate elements (as defined by the canonical format below).
 `map<K, V>`       | Object                        | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key SHOULD be omitted from the JSON Object if the value is absent, however, the key MAY remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
 
 **Named types:**
@@ -250,13 +248,13 @@ Conjure Error types are serialized as JSON objects with the following keys:
 - **Coercing JSON `null` / absent to Conjure types** - If a JSON key is absent or the value is `null`, two rules apply:
 
   - Conjure `optional`, `list`, `set`, `map` types MUST be initialized to their empty variants,
-  - Attempting to coerce null/absent to any other Conjure type MUST cause an error, i.e. missing JSON keys should cause an error.
+  - Attempting to coerce null/absent to any other Conjure type MUST cause an error, i.e. missing JSON keys SHOULD cause an error.
 
   _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
 - **Dedupe `set` / `map` keys using CANONICAL format** - When deserializing Conjure `set` or `map` keys, equivalence of two items can be determined by converting the JSON value to the [CANONICAL format][] and then comparing byte equality.
 
-- **No automatic casting** - Unexpected JSON types SHOULD NOT be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
+- **No automatic casting** - Unexpected JSON types SHOULD NOT be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` SHOULD NOT be accepted.
 
 
 ## PLAIN format
