@@ -146,7 +146,7 @@ CUSTOM_SERVER              | 500
 ## Behaviour
 1. **Forward compatible clients** - Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of Conjure enums and unions. This ensures that old clients will continue to work, even if a newer version of a server includes extra fields in a JSON response.
 
-1. **Client base url** - Clients MUST allow users to specify a base url for network requests because Conjure endpoint definitions only include domain-agnotic http path suffixes.
+1. **Client base URL** - Clients MUST allow users to specify a base URL for network requests because Conjure endpoint definitions only include domain-agnostic http path suffixes.
 
 1. **Servers reject unknown fields** - Servers MUST request reject all unexpected JSON fields. This helps developers notice bugs and mistakes quickly, instead of allowing silent failures.
 
@@ -252,7 +252,7 @@ Conjure Error types are serialized as JSON objects with the following keys:
   {
       "errorCode": "NOT_FOUND",
       "errorName": "Recipe:RecipeNotFound",
-      "errorInstanceId": "f5adf108-b087-45be-91d0-95b712a17134",
+      "errorInstanceId": "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
       "parameters": {
           "name": "roasted broccoli with garlic"
       }
