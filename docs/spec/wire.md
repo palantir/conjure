@@ -274,12 +274,12 @@ TODO explain why optional<optional<T>> is banned
 
 
 ## PLAIN format
-This format describes an unquoted representation of a _subset_ of Conjure types, suitable for usage in path parameters, query parameters and header parameters.
+This format describes an unquoted representation of a _subset_ of Conjure types.
 
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
 `bearertoken`     | unquoted String
-`binary`          | unquoted a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4)
+`binary`          | raw binary bytes
 `boolean`         | Boolean
 `datetime`        | unquoted String
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`
