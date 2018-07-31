@@ -166,7 +166,7 @@ CUSTOM_SERVER              | 500
 
 
 ## JSON format
-This format describes the JSON representation defined in [RFC 7159](https://tools.ietf.org/html/rfc7159) of all Conjure types.
+This format describes how all Conjure types are serialized into and deserialized from JSON ([RFC 7159](https://tools.ietf.org/html/rfc7159)).
 
 **Built-in types:**
 
