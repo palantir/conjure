@@ -22,12 +22,14 @@ For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
   de-alias(Alias of T) -> de-alias(T)
   de-alias(T) -> T
   ```
-1. _json_ - recursively de-aliases and converts a Conjure type, `T`, into JSON types using [JSON format][].
+1. _json_ - recursively de-aliases a Conjure type, `T`, and then converts it into a JSON type using [JSON format][].
   ```
+  json(T) -> JSON presentation of the Conjure Type T
   json(Alias of T) -> json(T)
   ```
-1. _plain_ - de-aliases and serializes Conjure types to their unquoted representation using [PLAIN format][]. This only to a subset of Conjure Types.
+1. _plain_ - de-aliases a Conjure type, T, and then and serializes it to its unquoted representation using [PLAIN format][]. This only to a subset of Conjure Types.
   ```
+  plain(T) -> an unquoted representation of the Conjure Type T
   plain(Alias of T) -> plain(T)
   ```
 
@@ -96,8 +98,6 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
 
 1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
-
-<!-- TODO: should clients send an 'Accept: application/json' header to allow for future format changes on the server? -->
 
 1. **User-agent** - Requests MUST include a `User-Agent` header.
 
@@ -200,37 +200,64 @@ _Alias_(x)        | `json(x)`      | An Alias of any Conjure type is serialized 
 
 **Union JSON format:**
 
-Conjure Union types are serialized as a JSON Object with exactly two keys:
+Conjure Union types are serialized as JSON objects with exactly two keys:
 
 1. `type` key - this determines the variant of the union, e.g. `foo`
 1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `json(v)`.
+  Example union type definition:  
+  ```yaml
+  types:
+    definitions:
+      objects:
 
-```yaml
-types:
-  definitions:
-    objects:
+        MyUnion:
+          union:
+            foo: boolean
+            bar: list<string>
+  ```
+  Example union type in JSON representation:
+  ```json
+  // In this example the variant is `foo` and the inner type is a Conjure `boolean`.
+  {
+    "type": "foo",
+    "foo": true
+  }
 
-      MyUnion:
-        union:
-          foo: boolean
-          bar: list<string>
-```
+  // In this example, the variant is `bar` and the inner type is a Conjure `list<string>`
+  {
+    "type": "bar",
+    "bar": ["Hello", "world"]
+  }
+  ```
 
-```js
-// In this example the variant is `foo` and the inner type is a Conjure `boolean`.
-{
-  "type": "foo",
-  "foo": true
-}
-
-// In this example, the variant is `bar` and the inner type is a Conjure `list<string>`
-{
-  "type": "bar",
-  "bar": ["Hello", "world"]
-}
-```
-
-<!-- TODO: define JSON format for errors -->
+**Error types:**
+Conjure Error types are serialized as JSON objects with the following keys:
+1. `errorCode` - this MUST match one of the Conjure error type defined above, e.g. `NOT_FOUND`. 
+1. `errorName` - this is a fixed name identifying the error, e.g. `Recipe:RecipeNotFound`.
+1. `errorInstanceId` - this provides a unique identifier, `uuid` type, for this error instance. 
+1. `parameters` - this map provides additional information regarding the nature of the error.
+  Example error type definition:
+  ```yaml
+  types:
+    definitions:
+      errors:
+        RecipeNotFound:
+          namespace: Recipe
+          code: NOT_FOUND
+          safe-args:
+            name: RecipeName
+  ```
+  Example error type in JSON presentation:
+  ```json
+  {
+      "errorCode": "NOT_FOUND",
+      "errorName": "Recipe:RecipeNotFound",
+      "errorInstanceId": "f5adf108-b087-45be-91d0-95b712a17134",
+      "parameters": {
+          "name": "roasted broccoli with garlic"
+      }
+  }
+  ```
 
 **Deserialization**
 TODO: `any` may not deserialize into null
