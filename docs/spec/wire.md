@@ -113,7 +113,7 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 
 1. **Conjure errors** - In order to send a Conjure error, servers MUST serialize the error using the [JSON format][]. In addition, servers MUST send a http status code corresponding to the error's code.
 
-Conjure Error type         | HTTP Status code |
+Conjure Error code         | HTTP Status code |
 -------------------------- | ---------------- |
 PERMISSION_DENIED          | 403
 INVALID_ARGUMENT           | 400
@@ -212,12 +212,25 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
   }
   ```
 
-**Error types:**
-Conjure Error types are serialized as JSON objects with the following keys:
-1. `errorCode` - this MUST match one of the Conjure error type defined above, e.g. `NOT_FOUND`.
+**Conjure Errors:**
+Conjure Errors are serialized as JSON objects with the following keys:
+1. `errorCode` - this MUST match one of the Conjure error code below.
+  ```
+  PERMISSION_DENIED
+  INVALID_ARGUMENT
+  NOT_FOUND
+  CONFLICT
+  REQUEST_ENTITY_TOO_LARGE
+  FAILED_PRECONDITION
+  INTERNAL
+  TIMEOUT
+  CUSTOM_CLIENT
+  CUSTOM_SERVER
+  ```
 1. `errorName` - this is a fixed name identifying the error, e.g. `Recipe:RecipeNotFound`.
 1. `errorInstanceId` - this provides a unique identifier, `uuid` type, for this error instance.
 1. `parameters` - this map provides additional information regarding the nature of the error.
+
   Example error type definition:
   ```yaml
   types:
