@@ -114,8 +114,8 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
 
-  - the `de-alias` of the return type is `optional<T>` and the value is not present: servers MUST send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
-  - the `de-alias` of the return type is a `map`, `list` or `set`: it is RECOMMENDED to send `204` but servers MAY send `200` if the HTTP body is `[]` or `{}`.
+  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
+  - the de-aliased return type is a `map`, `list` or `set`: it is RECOMMENDED to send `204` but servers MAY send `200` if the HTTP body is `[]` or `{}`.
 
   Using `204` in this way ensures that clients calling a Conjure endpoint with `optional<binary>` return type can differentiate between a non-present optional (`204`) and a present binary value containing zero bytes (`200`).
 
@@ -123,12 +123,12 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 
 1. **Response body** - Conjure servers MUST serialize return values using the [JSON format][] defined below, UNLESS:
 
-  - the `de-alias` of the return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
-  - the `de-alias` of the return type is `binary`: servers MUST write the binary bytes directly to the HTTP body.
+  - the de-aliased return type is `optional<T>` and the value is not present: servers MUST omit the HTTP body.
+  - the de-aliased return type is `binary`: servers MUST write the binary value using the [PLAIN format][].
 
 1. **Content-Type header** - Conjure servers MUST send a `Content-Type` header according to the endpoint's return type:
 
-  - if the `de-alias` of the return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
+  - if the de-aliased return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
   - otherwise, servers MUST send `Content-Type: application/json;charset=utf-8`.
 
 1. **Conjure errors** - In order to send a Conjure error, servers MUST serialize the error using the [JSON format][]. In addition, servers MUST send a http status code corresponding to the error's code.
