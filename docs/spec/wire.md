@@ -270,14 +270,13 @@ Conjure Error types are serialized as JSON objects with the following keys:
 - **Coercing JSON `null` / absent to Conjure types** - If a JSON key is absent or the value is `null`, two rules apply:
 
   - Conjure `optional`, `list`, `set`, `map` types MUST be initialized to their empty variants,
-  - Attempting to coerce null/absent to any other Conjure type MUST cause an error.
+  - Attempting to coerce null/absent to any other Conjure type MUST cause an error, i.e. missing JSON keys should cause an error.
+
+  _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
 - **Dedupe `set` / `map` keys using CANONICAL format** - When deserializing Conjure `set` or `map` keys, equivalence of two items can be determined by converting the JSON value to the [CANONICAL format][] and then comparing byte equality.
 
-
-TODO: Explicitly do not allow casting between types
-TODO: Explicitly require fields to be present
-TODO explain why optional<optional<T>> is banned
+- **No automatic casting** - Unexpected JSON types SHOULD NOT be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
 
 
 ## PLAIN format
