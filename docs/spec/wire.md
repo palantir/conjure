@@ -79,7 +79,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Body parameter** - If an endpoint defines an argument of type `body`, clients MUST serialize the user-provided value using the [JSON format][], UNLESS:
   - the `de-alias` of the argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
-  - the `de-alias` of the argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`. 
+  - the `de-alias` of the argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
 It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
   For example, the following Conjure endpoint defines a request body:
@@ -98,6 +98,8 @@ It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://t
 1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized as `plain(T)`.
 
 1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
+
+1. **Accept header** - Clients MUST send an `Accept: application/json` header for all requests UNLESS the endpoint returns binary, in which case the client MUST send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
 
 1. **User-agent** - Requests MUST include a `User-Agent` header.
 
@@ -204,7 +206,7 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
 
 1. `type` key - this determines the variant of the union, e.g. `foo`
 1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `json(v)`.
-  Example union type definition:  
+  Example union type definition:
   ```yaml
   types:
     definitions:
@@ -232,9 +234,9 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
 
 **Error types:**
 Conjure Error types are serialized as JSON objects with the following keys:
-1. `errorCode` - this MUST match one of the Conjure error type defined above, e.g. `NOT_FOUND`. 
+1. `errorCode` - this MUST match one of the Conjure error type defined above, e.g. `NOT_FOUND`.
 1. `errorName` - this is a fixed name identifying the error, e.g. `Recipe:RecipeNotFound`.
-1. `errorInstanceId` - this provides a unique identifier, `uuid` type, for this error instance. 
+1. `errorInstanceId` - this provides a unique identifier, `uuid` type, for this error instance.
 1. `parameters` - this map provides additional information regarding the nature of the error.
   Example error type definition:
   ```yaml
