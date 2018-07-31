@@ -138,7 +138,7 @@ CUSTOM_SERVER              | 500
 
 1. **Round-trip of unknown variants** - TODO ask Mark.
 
-1. **CORS and HTTP preflight requests** - Servers MUST support the HTTP `OPTIONS` method in order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request).
+1. **CORS and HTTP preflight requests** - In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers MUST support the HTTP `OPTIONS` method .
 
 1. **HTTP/2** - The Conjure wire specification is compatible with HTTP/2, but it is not required.
 
@@ -175,17 +175,17 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | ---------------| -------- |
-_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
+_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent.
 _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
-_Alias_(x)        | `json(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
+_Alias_(x)        | `JSON(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
 
 **Union JSON format:**
 
 Conjure Union types are serialized as JSON objects with exactly two keys:
 
 1. `type` key - this determines the variant of the union, e.g. `foo`
-1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `json(v)`.
+1. `{{variant}}` key - this key MUST match the variant determined above, and the value is `JSON(v)`.
   Example union type definition:
   ```yaml
   types:
