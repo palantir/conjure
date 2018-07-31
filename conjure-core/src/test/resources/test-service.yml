@@ -30,4 +30,3 @@ services:
           foo:
             type: StringAlias
             param-type: header
-            param-id: Abc-Abc

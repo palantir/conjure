@@ -22,7 +22,7 @@ For convenience, we define _de-alias_, _json_, and _plain_ functions as follows:
   de-alias(Alias of T) -> de-alias(T)
   de-alias(T) -> T
   ```
-1. _json_ - recursively de-aliases and maps all Conjure types to JSON types using [JSON format][].
+1. _json_ - recursively de-aliases and converts a Conjure type, `T`, into JSON types using [JSON format][].
   ```
   json(Alias of T) -> json(T)
   ```
@@ -144,21 +144,21 @@ CUSTOM_SERVER              | 500
 
 
 ## Behaviour
-1. **Forward compatible clients** Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of enums and unions. This ensures that old clients will continue to work with new servers.
+1. **Forward compatible clients** - Clients MUST tolerate extra headers, unknown fields in JSON objects and unknown variants of Conjure enums and unions. This ensures that old clients will continue to work, even if a newer version of a server includes extra fields in a JSON response.
 
-1. **Client base URL** Conjure endpoint definitions only specify http path suffix without scheme, host, or port. Clients MUST allow users to specify server base URL.
+1. **Client base url** - Clients MUST allow users to specify a base url for network requests because Conjure endpoint definitions only include domain-agnotic http path suffixes.
 
-1. **Servers reject unknown fields** Servers MUST request reject all unknown JSON fields. This helps developers notice bugs/mistakes instead of silent failures. (TODO, make this more convincing)
+1. **Servers reject unknown fields** - Servers MUST request reject all unexpected JSON fields. This helps developers notice bugs and mistakes quickly, instead of allowing silent failures.
 
-1. **Servers tolerate extra headers** Servers MUST tolerate extra headers not defined by the endpoints. This is important because proxies frequently append extra headers to the incoming requests.
+1. **Servers tolerate extra headers** - Servers MUST tolerate extra headers not defined in the endpoint definition. This is important because proxies frequently modify requests to include additional headers, e.g. `X-Forwarded-For`.
 
-1. **Set and map key equality** TODO mention canonical form and byte equality
+1. **Set and map key equality** - Servers SHOULD reject duplicate `map` keys or duplicate `set` items in JSON bodies. Equivalence of two items can be determined by converting the JSON value to the [CANONICAL format][] and then comparing byte equality.
 
-1. **Round-trip of unknown variants** TODO ask Mark.
+1. **Round-trip of unknown variants** - TODO ask Mark.
 
-1. **CORS and HTTP preflight requests** Browsers perform preflight requests with the `OPTIONS` http method before sending real requests. Servers MUST support this method to be browser compatible. TODO: add access-control-allowed-headers. TODO: refer to INFO sec quip doc.
+1. **CORS and HTTP preflight requests** - Servers MUST support the HTTP `OPTIONS` method in order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request).
 
-1. **HTTP/2** It is RECOMMENDED that clients and servers both support HTTP/2. Clients and servers MUST support HTTP/1 and HTTP/1.1. TODO(remove HTTP/1?)
+1. **HTTP/2** - The Conjure wire specification is compatible with HTTP/2, but it is not required.
 
 
 ## JSON format
@@ -182,12 +182,12 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 
 **Container types:**
 
-Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
------------------ | -------------- | -------- |
-`optional<T>`     |                | If present, serializes as the JSON representation of `T`, otherwise field SHOULD be omitted.
-`list<T>`         | Array          | Each element, e, of the list is serialized using `json(e)` and the order of the elements MUST be maintained.
-`set<T>`          | Array          | Each element, e, of the set is serialized using `json(e)`. Order is unimportant. The Array MUST not contain duplicate elements (as defined by the canonical format below).
-`map<K, V>`       | Object         | A key k is serialized as `plain(k)`. Values are serialized using `json(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key MUST be omitted from the JSON Object if the value is absent. The Object MUST not contain duplicate keys (as defined by the canonical format below).
+Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
+----------------- | ----------------------------- | -------- |
+`optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, MUST be serialized as `JSON(e)`. If the value appears inside a JSON Object, then the corresponding key SHOULD be omitted. Alternatively, the field MAY be set to `null`. Inside JSON Array, a non-present Conjure optional value MUST be serialized as JSON `null`.
+`list<T>`         | Array                         | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
+`set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is RECOMMENDED to preserve order where possible. The Array MUST not contain duplicate elements (as defined by the canonical format below).
+`map<K, V>`       | Object                        | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key SHOULD be omitted from the JSON Object if the value is absent, however, the key MAY remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
 
 **Named types:**
 
