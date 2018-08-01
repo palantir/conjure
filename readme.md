@@ -52,7 +52,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - `binary` - a sequence of binary.
   - `boolean` - `true` or `false`
   - `datetime` - an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) value e.g. `2018-07-25T10:20:32+01:00`
-  - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes also be NaN, +/-Infinity and signed zero.
+  - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes also NaN, +/-Infinity and signed zero.
   - `integer` - a signed 32-bit integer value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
   - `rid` - a [Resource Identifier](https://github.com/palantir/resource-identifier), e.g. `ri.recipes.main.ingredient.1234`
   - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1
