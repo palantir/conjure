@@ -7,7 +7,7 @@ Define your API once and then Conjure will generate idiomatic clients for Java, 
 
 For example in Java, Conjure interfaces allow you to build servers using existing Jersey compatible libraries like Dropwizard/Jetty.
 
-See our [getting started](./docs/getting_started.md) guide to define your first Conjure API.
+See our [getting started](docs/getting_started.md) guide to define your first Conjure API.
 
 ## Features
 - Enables teams to work together across many languages
@@ -21,7 +21,7 @@ See our [getting started](./docs/getting_started.md) guide to define your first 
 
 ## Concepts
 _Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification][]._
-[Wire specification]: (/docs/spec/wire.md)
+[Wire specification]: (docs/spec/wire.md)
 
 
 ### HTTP endpoints
