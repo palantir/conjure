@@ -47,7 +47,7 @@ jobs:
       - image: circleci/openjdk:8u171-jdk-node-browsers
     steps:
       - checkout
-      - run: sudo npm install -g markdown-link-check
+      - run: sudo npm install -g markdown-link-check@3.6.2 # pinned due to regression in '3.7.1' which just says 'No hyperlinks found!' for all documents
       - run: find . -name \*.md | xargs -n 1 markdown-link-check -c .circleci/markdown-link-check-config.json
 
 workflows:
