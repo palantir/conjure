@@ -30,3 +30,9 @@ project (':conjure-api:conjure-api-typescript') {
         file('src/.npmrc') << "//registry.npmjs.org/:_authToken=${System.env.NPM_AUTH_TOKEN}"
     }
 }
+
+conjure {
+    typescript {
+        nodeCompatibleModules = true
+    }
+}

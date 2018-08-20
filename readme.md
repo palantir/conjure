@@ -20,8 +20,7 @@ See our [getting started](docs/getting_started.md) guide to define your first Co
 
 
 ## Concepts
-_Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification][]._
-[Wire specification]: (docs/spec/wire.md)
+_Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification](./docs/spec/wire.md)._
 
 
 ### HTTP endpoints
