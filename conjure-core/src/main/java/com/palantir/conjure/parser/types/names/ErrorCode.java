@@ -22,27 +22,34 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
-import com.palantir.remoting.api.errors.ErrorType;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Auxiliary;
 
 /**
  * Represents the code of a conjure {@link ErrorTypeDefinition#code() error}. Must be the UpperCamel version of one of
- * the http-remoting {@link ErrorType.Code error codes}.
+ * the {@link com.palantir.conjure.spec.ErrorCode error codes}.
  */
 @JsonDeserialize(as = ImmutableErrorCode.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class ErrorCode {
 
-    private static final Set<String> VALID_ERROR_CODE_NAMES = Arrays.stream(ErrorType.Code.values())
-            .map(ErrorType.Code::name)
+    private static final Set<String> VALID_ERROR_CODE_NAMES =
+            Arrays.stream(com.palantir.conjure.spec.ErrorCode.Value.values())
+            .map(Enum::name)
+            .filter(code -> !code.equals("UNKNOWN"))
             .collect(Collectors.toSet());
 
     @JsonValue
     public abstract String name();
+
+    @Auxiliary
+    public final com.palantir.conjure.spec.ErrorCode asSpecErrorCode() {
+        return com.palantir.conjure.spec.ErrorCode.valueOf(name());
+    }
 
     @Value.Check
     protected final void check() {

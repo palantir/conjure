@@ -45,7 +45,6 @@ import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
-import com.palantir.conjure.spec.ErrorCode;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.ErrorNamespace;
 import com.palantir.conjure.spec.FieldDefinition;
@@ -105,7 +104,7 @@ public final class ConjureParserUtils {
         ErrorDefinition errorType = ErrorDefinition.builder()
                 .errorName(name)
                 .namespace(ErrorNamespace.of(def.namespace().name()))
-                .code(ErrorCode.valueOf(def.code().name()))
+                .code(def.code().asSpecErrorCode())
                 .safeArgs(parseField(def.safeArgs(), typeResolver))
                 .unsafeArgs(parseField(def.unsafeArgs(), typeResolver))
                 .docs(def.docs().map(Documentation::of))
