@@ -104,7 +104,7 @@ public final class ConjureParserUtils {
         ErrorDefinition errorType = ErrorDefinition.builder()
                 .errorName(name)
                 .namespace(ErrorNamespace.of(def.namespace().name()))
-                .code(def.code())
+                .code(def.code().asSpecErrorCode())
                 .safeArgs(parseField(def.safeArgs(), typeResolver))
                 .unsafeArgs(parseField(def.unsafeArgs(), typeResolver))
                 .docs(def.docs().map(Documentation::of))
