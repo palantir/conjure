@@ -84,14 +84,6 @@ client:
 * invalid JSON
 * set uniqueness, duplicate map keys
 
-## Stateful verification-server
-
-The verification-server must be stateful so that it can keep track of endpoints calls (and thereby which tests have passed/failed/never been run).
-
-In addition to all the test endpoints, it must expose a special "checkNoTestCasesHaveBeenMissed" endpoint which will return a HTTP 200 response to signify that the client has passed everything, otherwise, it must return a non 2XX response. Intentional `IgnoredTestCases` (see below) may be POSTed to this endpoint in which case the verification-server will return a successful 200 response if all non-ignored tests have passed.
-
-The server's state can be reset by restarting the server.
-
 ## Partial compliance
 
 Ideally generators should be 100% compliant, but new generators might not comply with all the edge cases from `test-cases.json`. Generators may still be usable in this state, but it is recommended to declare any ignored tests in a well-structured `ignored-test-cases.json` file so that potential users can easily evaluate degrees of completeness.
