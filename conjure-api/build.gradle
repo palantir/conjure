@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'com.palantir.conjure-publish'
+apply from: "$rootDir/gradle/publish-conjure.gradle"
 
 project (':conjure-api:conjure-api-objects') {
     apply from: "$rootDir/gradle/publish-jar.gradle"
