@@ -125,7 +125,7 @@ services:
             param-type: body
 ```
 
-_Refer to the [Conjure specification](docs/spec/source_files.md) for an exhaustive list of allowed YML parameters._
+_Refer to the [Conjure specification](/docs/spec/source_files.md) for an exhaustive list of allowed YML parameters._
 
 After running `./gradlew compileConjure`, you should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 
