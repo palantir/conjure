@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.palantir.conjure'
+apply plugin: 'com.palantir.conjure-publish'
 
 project (':conjure-api:conjure-api-objects') {
     apply from: "$rootDir/gradle/publish-jar.gradle"
