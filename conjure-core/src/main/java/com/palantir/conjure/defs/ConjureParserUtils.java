@@ -17,7 +17,6 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
@@ -75,8 +74,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -260,7 +257,7 @@ public final class ConjureParserUtils {
         return parsed.definitions().objects().entrySet().stream()
                         .map(entry -> entry.getValue().visit(
                                 new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
-                        .collect(toImmutableMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
+                        .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
     }
 
     static List<ErrorDefinition> parseErrors(
@@ -415,15 +412,4 @@ public final class ConjureParserUtils {
                 .map(m -> m.visit(new ConjureTypeParserVisitor(typeResolver)))
                 .collect(Collectors.toSet());
     }
-
-    private static <T, K, V> Collector<T, ?, ImmutableMap<K, V>> toImmutableMap(
-            Function<? super T, ? extends K> keyMapper,
-            Function<? super T, ? extends V> valueMapper) {
-        return Collector.of(
-                ImmutableMap.Builder<K, V>::new,
-                (builder, elem) -> builder.put(keyMapper.apply(elem), valueMapper.apply(elem)),
-                (b1, b2) -> b1.putAll(b2.build()),
-                ImmutableMap.Builder::build);
-    }
-
 }
