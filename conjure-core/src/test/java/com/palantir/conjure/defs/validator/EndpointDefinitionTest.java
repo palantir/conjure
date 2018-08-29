@@ -54,7 +54,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Endpoint cannot have non-body argument with type "
                         + "'Type{value: PrimitiveWrapper{value: BINARY}}'");
@@ -74,7 +74,7 @@ public final class EndpointDefinitionTest {
                 .httpPath(HttpPath.of("/a/path"));
 
         // Should not throw exception
-        EndpointDefinitionValidator.validateAll(definition.build());
+        EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
     }
 
     @Test
@@ -86,7 +86,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Endpoint cannot have multiple body parameters: [bodyArg1, bodyArg2]");
     }
@@ -111,7 +111,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
     }
@@ -130,7 +130,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
                         "Path parameters defined in endpoint but not present in path template: [paramName]");
@@ -143,7 +143,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path/{paramName}"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Path parameters defined path template but not present in endpoint: [paramName]");
     }
@@ -156,7 +156,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(String.format(
                         "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
@@ -176,7 +176,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
@@ -194,7 +194,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");

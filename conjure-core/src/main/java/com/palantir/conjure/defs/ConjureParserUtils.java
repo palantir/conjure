@@ -17,6 +17,8 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
 import com.palantir.conjure.defs.validator.EnumDefinitionValidator;
@@ -31,8 +33,10 @@ import com.palantir.conjure.defs.validator.ServiceDefinitionValidator;
 import com.palantir.conjure.defs.validator.TypeNameValidator;
 import com.palantir.conjure.defs.validator.UnionDefinitionValidator;
 import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.conjure.parser.services.ParameterName;
 import com.palantir.conjure.parser.services.PathString;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
+import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -64,12 +68,15 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
+import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -190,14 +197,20 @@ public final class ConjureParserUtils {
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
                     new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
 
+            // Resolve objects first, so we can use them in service validations
+            Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
+
+            DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(objects);
+
             parsed.services().forEach((serviceName, service) -> {
                 servicesBuilder.add(parseService(
                         service,
                         TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                        typeResolver));
+                        typeResolver,
+                        dealiasingVisitor));
             });
 
-            typesBuilder.addAll(parseObjects(parsed.types(), typeResolver));
+            typesBuilder.addAll(objects.values());
             errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
         });
 
@@ -215,11 +228,17 @@ public final class ConjureParserUtils {
     static ServiceDefinition parseService(
             com.palantir.conjure.parser.services.ServiceDefinition parsed,
             TypeName serviceName,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            ReferenceTypeResolver typeResolver,
+            DealiasingTypeVisitor dealiasingVisitor) {
         List<EndpointDefinition> endpoints = new ArrayList<>();
         parsed.endpoints().forEach((name, def) -> endpoints.add(
                 ConjureParserUtils.parseEndpoint(
-                        name, def, parsed.basePath(), parseAuthType(parsed.defaultAuth()), typeResolver)));
+                        name,
+                        def,
+                        parsed.basePath(),
+                        parseAuthType(parsed.defaultAuth()),
+                        typeResolver,
+                        dealiasingVisitor)));
         ServiceDefinition service = ServiceDefinition.builder()
                 .serviceName(serviceName)
                 .docs(parsed.docs().map(Documentation::of))
@@ -230,22 +249,18 @@ public final class ConjureParserUtils {
         return service;
     }
 
-    static List<TypeDefinition> parseObjects(
+    static Map<TypeName, TypeDefinition> parseObjects(
             com.palantir.conjure.parser.types.TypesDefinition parsed,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage =
-                parsed.definitions().defaultConjurePackage().map(p -> p.name());
-
-        ImmutableList.Builder<TypeDefinition> objectsBuilder = ImmutableList.builder();
+                parsed.definitions().defaultConjurePackage().map(ConjurePackage::name);
 
         // no need to use validator here since TypeDefinitionParserVisitor calls each TypeDefinition parser that
         // validates its type.
-        return objectsBuilder.addAll(
-                parsed.definitions().objects().entrySet().stream()
+        return parsed.definitions().objects().entrySet().stream()
                         .map(entry -> entry.getValue().visit(
                                 new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
-                .collect(Collectors.toList()))
-                .build();
+                        .collect(toImmutableMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
     }
 
     static List<ErrorDefinition> parseErrors(
@@ -298,7 +313,8 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.EndpointDefinition def,
             PathString basePath,
             Optional<AuthType> defaultAuth,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            ReferenceTypeResolver typeResolver,
+            DealiasingTypeVisitor dealiasingVisitor) {
 
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
@@ -313,7 +329,7 @@ public final class ConjureParserUtils {
                 .deprecated(def.deprecated().map(Documentation::of))
                 .build();
 
-        EndpointDefinitionValidator.validateAll(endpoint);
+        EndpointDefinitionValidator.validateAll(endpoint, dealiasingVisitor);
         return endpoint;
     }
 
@@ -341,10 +357,9 @@ public final class ConjureParserUtils {
     }
 
     private static List<ArgumentDefinition> parseArgs(
-            Map<com.palantir.conjure.parser.services.ParameterName,
-                    com.palantir.conjure.parser.services.ArgumentDefinition> args,
+            Map<ParameterName, com.palantir.conjure.parser.services.ArgumentDefinition> args,
             HttpPath httpPath,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            ReferenceTypeResolver typeResolver) {
         ImmutableList.Builder<ArgumentDefinition> resultBuilder = ImmutableList.builder();
         for (Map.Entry<com.palantir.conjure.parser.services.ParameterName,
                 com.palantir.conjure.parser.services.ArgumentDefinition> entry : args.entrySet()) {
@@ -399,6 +414,16 @@ public final class ConjureParserUtils {
         return markers.stream()
                 .map(m -> m.visit(new ConjureTypeParserVisitor(typeResolver)))
                 .collect(Collectors.toSet());
+    }
+
+    private static <T, K, V> Collector<T, ?, ImmutableMap<K, V>> toImmutableMap(
+            Function<? super T, ? extends K> keyMapper,
+            Function<? super T, ? extends V> valueMapper) {
+        return Collector.of(
+                ImmutableMap.Builder<K, V>::new,
+                (builder, elem) -> builder.put(keyMapper.apply(elem), valueMapper.apply(elem)),
+                (b1, b2) -> b1.putAll(b2.build()),
+                ImmutableMap.Builder::build);
     }
 
 }

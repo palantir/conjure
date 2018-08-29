@@ -100,7 +100,7 @@ public final class ParamIdValidatorTest {
                 .endpointName(EndpointName.of("test"))
                 .build();
 
-        EndpointDefinitionValidator.validateAll(definition);
+        EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor);
         return definition;
     }
 }

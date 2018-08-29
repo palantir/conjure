@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.palantir.conjure.defs.DealiasingTypeVisitor;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -39,7 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @com.google.errorprone.annotations.Immutable
-public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefinition> {
+public enum EndpointDefinitionValidator implements ConjureContextualValidator<EndpointDefinition> {
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
@@ -50,9 +51,9 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
 
-    public static void validateAll(EndpointDefinition definition) {
+    public static void validateAll(EndpointDefinition definition, DealiasingTypeVisitor dealiasingVisitor) {
         for (EndpointDefinitionValidator validator : values()) {
-            validator.validate(definition);
+            validator.validate(definition, dealiasingVisitor);
         }
     }
 
@@ -60,15 +61,22 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     public static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
     public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
 
-    private final ConjureValidator<EndpointDefinition> validator;
+    private final ConjureContextualValidator<EndpointDefinition> validator;
 
+    /**
+     * Simplified constructor for validators that don't need to look at the context.
+     */
     EndpointDefinitionValidator(ConjureValidator<EndpointDefinition> validator) {
+        this.validator = (definition, dealiasingTypeVisitor) -> validator.validate(definition);
+    }
+
+    EndpointDefinitionValidator(ConjureContextualValidator<EndpointDefinition> validator) {
         this.validator = validator;
     }
 
     @Override
-    public void validate(EndpointDefinition definition) {
-        validator.validate(definition);
+    public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        validator.validate(definition, dealiasingTypeVisitor);
     }
 
     @com.google.errorprone.annotations.Immutable

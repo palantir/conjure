@@ -47,7 +47,7 @@ public final class ArgumentNameValidatorTest {
     public void testInvalid() {
         for (String paramName : ImmutableList.of("AB", "123", "foo_bar", "foo-bar", "foo.bar")) {
             EndpointDefinition.Builder endpoint = createEndpoint(paramName);
-            assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build()))
+            assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build(), dealiasingVisitor))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter names in endpoint paths and service definitions must match pattern %s: %s",
                             EndpointDefinitionValidator.ANCHORED_PATTERN,
