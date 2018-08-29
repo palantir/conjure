@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.defs.DealiasingTypeVisitor;
+import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -211,4 +212,33 @@ public final class EndpointDefinitionTest {
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
     }
+
+    @Test
+    public void testReferenceToPlainHeaderObject() {
+        TypeName typeName = TypeName.of("SomeObject", "com.palantir.foo");
+        TypeName typeName2 = TypeName.of("SomeObject2", "com.palantir.foo");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("someName"))
+                        .type(Type.reference(typeName))
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("SomeId"))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
+
+        // typeName = alias(typeName2)
+        // typeName2 = alias(integer)
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName,
+                TypeDefinition.alias(AliasDefinition.of(
+                        typeName, Type.reference(typeName2), Documentation.of(""))),
+                typeName2,
+                TypeDefinition.alias(AliasDefinition.of(
+                        typeName2, Type.primitive(PrimitiveType.INTEGER), Documentation.of("")))));
+
+        // This should work because the referenced type is ultimately INTEGER
+        EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
+    }
+
 }
