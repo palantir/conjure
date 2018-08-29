@@ -33,9 +33,12 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A type visitor that resolves through any aliases and references at the outer level only. If it encounters a
- * {@link TypeDefinition} that is NOT a
- * It returns a
+ * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference Type, or
+ * a non-alias object.
+ * <p>
+ * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, then it
+ * returns {@link Optional#empty()}, otherwise it returns the de-aliased {@link Type} that will not be a
+ * {@link Type#reference}.
  */
 public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>> {
     private final Map<TypeName, TypeDefinition> objects;
