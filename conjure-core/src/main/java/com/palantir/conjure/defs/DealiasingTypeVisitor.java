@@ -36,9 +36,9 @@ import java.util.Optional;
  * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference Type, or
  * a non-alias object.
  * <p>
- * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, then it
- * returns {@link Optional#empty()}, otherwise it returns the de-aliased {@link Type} that will not be a
- * {@link Type#reference}.
+ * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, or if a reference along the way
+ * wasn't found in the given map, then it returns {@link Optional#empty()}, otherwise it returns the de-aliased
+ * {@link Type} that will not be a {@link Type#reference}.
  */
 public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>> {
     private final Map<TypeName, TypeDefinition> objects;
@@ -49,33 +49,35 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>>
 
     @Override
     public Optional<Type> visitReference(TypeName value) {
-        return objects.get(value).accept(new TypeDefinition.Visitor<Optional<Type>>() {
-            @Override
-            public Optional<Type> visitAlias(AliasDefinition value) {
-                // Recursively visit target of alias
-                return value.getAlias().accept(DealiasingTypeVisitor.this);
-            }
+        // If the reference doesn't exist in the objects, just return empty.
+        return Optional.ofNullable(objects.get(value))
+                .flatMap(typeDef -> typeDef.accept(new TypeDefinition.Visitor<Optional<Type>>() {
+                    @Override
+                    public Optional<Type> visitAlias(AliasDefinition value) {
+                        // Recursively visit target of alias
+                        return value.getAlias().accept(DealiasingTypeVisitor.this);
+                    }
 
-            @Override
-            public Optional<Type> visitEnum(EnumDefinition value) {
-                return Optional.empty();
-            }
+                    @Override
+                    public Optional<Type> visitEnum(EnumDefinition value) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public Optional<Type> visitObject(ObjectDefinition value) {
-                return Optional.empty();
-            }
+                    @Override
+                    public Optional<Type> visitObject(ObjectDefinition value) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public Optional<Type> visitUnion(UnionDefinition value) {
-                return Optional.empty();
-            }
+                    @Override
+                    public Optional<Type> visitUnion(UnionDefinition value) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public Optional<Type> visitUnknown(String unknownType) {
-                throw new IllegalStateException("Unsupported type: " + unknownType);
-            }
-        });
+                    @Override
+                    public Optional<Type> visitUnknown(String unknownType) {
+                        throw new IllegalStateException("Unsupported type: " + unknownType);
+                    }
+                }));
     }
 
     // Identity mapping for here onwards.
