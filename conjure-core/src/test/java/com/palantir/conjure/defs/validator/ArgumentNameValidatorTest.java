@@ -19,6 +19,8 @@ package com.palantir.conjure.defs.validator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.defs.DealiasingTypeVisitor;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -32,6 +34,8 @@ import com.palantir.conjure.spec.Type;
 import org.junit.Test;
 
 public final class ArgumentNameValidatorTest {
+
+    private final DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
     @Test
     @SuppressWarnings("CheckReturnValue")

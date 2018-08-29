@@ -19,6 +19,8 @@ package com.palantir.conjure.defs.validator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.defs.DealiasingTypeVisitor;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -36,6 +38,8 @@ import com.palantir.conjure.spec.TypeName;
 import org.junit.Test;
 
 public final class EndpointDefinitionTest {
+
+    private final DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
     private static final EndpointName ENDPOINT_NAME = EndpointName.of("test");
     private static final ArgumentDefinition.Builder BODY_ARG_BUILDER = ArgumentDefinition.builder()
