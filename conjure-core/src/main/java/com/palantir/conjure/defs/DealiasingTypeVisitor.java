@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.defs;
 
+import com.google.common.base.Preconditions;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
@@ -49,7 +50,11 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>>
 
     @Override
     public Optional<Type> visitReference(TypeName value) {
-        return objects.get(value).accept(new TypeDefinition.Visitor<Optional<Type>>() {
+        TypeDefinition typeDefinition = objects.get(value);
+        Preconditions.checkState(
+                typeDefinition != null,
+                "Referenced TypeDefinition not found in map of types for TypeName: %s", value);
+        return typeDefinition.accept(new TypeDefinition.Visitor<Optional<Type>>() {
             @Override
             public Optional<Type> visitAlias(AliasDefinition value) {
                 // Recursively visit target of alias
