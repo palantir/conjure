@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
@@ -31,18 +32,17 @@ import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference Type, or
- * a non-alias object. The intention of this is to prevent cycles, where a named object refers back to itself down the
- * line.
+ * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference {@link
+ * Type}, or a non-alias {@link TypeDefinition}. The intention of this is to prevent cycles, where a named object refers
+ * back to itself down the line.
  * <p>
  * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, then it
- * returns {@link Optional#empty()}, otherwise it returns the de-aliased {@link Type} that will not be a
- * {@link Type#reference}.
+ * returns {@link Either#left}, otherwise it returns the {@link Either#right} of the de-aliased {@link Type} that will
+ * not be a {@link Type#reference}.
  */
-public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>> {
+public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefinition, Type>> {
     private final Map<TypeName, TypeDefinition> objects;
 
     public DealiasingTypeVisitor(Map<TypeName, TypeDefinition> objects) {
@@ -50,35 +50,35 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>>
     }
 
     @Override
-    public Optional<Type> visitReference(TypeName value) {
+    public Either<TypeDefinition, Type> visitReference(TypeName value) {
         TypeDefinition typeDefinition = objects.get(value);
         Preconditions.checkState(
                 typeDefinition != null,
                 "Referenced TypeDefinition not found in map of types for TypeName: %s", value);
-        return typeDefinition.accept(new TypeDefinition.Visitor<Optional<Type>>() {
+        return typeDefinition.accept(new TypeDefinition.Visitor<Either<TypeDefinition, Type>>() {
             @Override
-            public Optional<Type> visitAlias(AliasDefinition value) {
+            public Either<TypeDefinition, Type> visitAlias(AliasDefinition value) {
                 // Recursively visit target of alias
                 return value.getAlias().accept(DealiasingTypeVisitor.this);
             }
 
             @Override
-            public Optional<Type> visitEnum(EnumDefinition value) {
-                return Optional.empty();
+            public Either<TypeDefinition, Type> visitEnum(EnumDefinition value) {
+                return Either.left(TypeDefinition.enum_(value));
             }
 
             @Override
-            public Optional<Type> visitObject(ObjectDefinition value) {
-                return Optional.empty();
+            public Either<TypeDefinition, Type> visitObject(ObjectDefinition value) {
+                return Either.left(TypeDefinition.object(value));
             }
 
             @Override
-            public Optional<Type> visitUnion(UnionDefinition value) {
-                return Optional.empty();
+            public Either<TypeDefinition, Type> visitUnion(UnionDefinition value) {
+                return Either.left(TypeDefinition.union(value));
             }
 
             @Override
-            public Optional<Type> visitUnknown(String unknownType) {
+            public Either<TypeDefinition, Type> visitUnknown(String unknownType) {
                 throw new IllegalStateException("Unsupported type: " + unknownType);
             }
         });
@@ -87,37 +87,37 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Optional<Type>>
     // Identity mapping for here onwards.
 
     @Override
-    public Optional<Type> visitPrimitive(PrimitiveType value) {
-        return Optional.of(Type.primitive(value));
+    public Either<TypeDefinition, Type> visitPrimitive(PrimitiveType value) {
+        return Either.right(Type.primitive(value));
     }
 
     @Override
-    public Optional<Type> visitOptional(OptionalType value) {
-        return Optional.of(Type.optional(value));
+    public Either<TypeDefinition, Type> visitOptional(OptionalType value) {
+        return Either.right(Type.optional(value));
     }
 
     @Override
-    public Optional<Type> visitList(ListType value) {
-        return Optional.of(Type.list(value));
+    public Either<TypeDefinition, Type> visitList(ListType value) {
+        return Either.right(Type.list(value));
     }
 
     @Override
-    public Optional<Type> visitSet(SetType value) {
-        return Optional.of(Type.set(value));
+    public Either<TypeDefinition, Type> visitSet(SetType value) {
+        return Either.right(Type.set(value));
     }
 
     @Override
-    public Optional<Type> visitMap(MapType value) {
-        return Optional.of(Type.map(value));
+    public Either<TypeDefinition, Type> visitMap(MapType value) {
+        return Either.right(Type.map(value));
     }
 
     @Override
-    public Optional<Type> visitExternal(ExternalReference value) {
-        return Optional.of(Type.external(value));
+    public Either<TypeDefinition, Type> visitExternal(ExternalReference value) {
+        return Either.right(Type.external(value));
     }
 
     @Override
-    public Optional<Type> visitUnknown(String unknownType) {
+    public Either<TypeDefinition, Type> visitUnknown(String unknownType) {
         throw new IllegalStateException("Unsupported type: " + unknownType);
     }
 }

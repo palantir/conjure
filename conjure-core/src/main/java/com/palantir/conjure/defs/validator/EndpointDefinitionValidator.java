@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.defs.DealiasingTypeVisitor;
+import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -30,11 +31,12 @@ import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
+import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -171,11 +173,11 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
                     .forEach(entry -> {
-                        Optional<Type> conjureType = entry.getType().accept(dealiasingTypeVisitor);
+                        Either<TypeDefinition, Type> resolvedType = entry.getType().accept(dealiasingTypeVisitor);
 
-                        Boolean isValid = conjureType
-                                .map(type -> type.accept(TypeVisitor.IS_PRIMITIVE) && !type.accept(TypeVisitor.IS_ANY))
-                                .orElse(false);
+                        Boolean isValid = resolvedType.fold(
+                                typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                                type -> type.accept(TypeVisitor.IS_PRIMITIVE) && !type.accept(TypeVisitor.IS_ANY));
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
                                 entry.getArgName());
@@ -190,21 +192,20 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
                     .forEach(entry -> {
-                        Optional<Type> conjureTypeOpt = entry.getType().accept(dealiasingTypeVisitor);
+                        Either<TypeDefinition, Type> resolvedType = entry.getType().accept(dealiasingTypeVisitor);
 
-                        boolean isValid;
-                        if (!conjureTypeOpt.isPresent()) {
-                            isValid = false;
-                        } else {
-                            Type conjureType = conjureTypeOpt.get();
-                            boolean isDefinedPrimitive = conjureType.accept(TypeVisitor.IS_PRIMITIVE)
-                                    && !conjureType.accept(TypeVisitor.IS_ANY);
-                            boolean isOptionalPrimitive = conjureType.accept(TypeVisitor.IS_OPTIONAL)
-                                    && conjureType.accept(TypeVisitor.OPTIONAL)
-                                    .getItemType()
-                                    .accept(TypeVisitor.IS_PRIMITIVE);
-                            isValid = isDefinedPrimitive || isOptionalPrimitive;
-                        }
+                        boolean isValid = resolvedType.fold(
+                                typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                                type -> {
+                                    boolean isDefinedPrimitive = type.accept(TypeVisitor.IS_PRIMITIVE)
+                                            && !type.accept(TypeVisitor.IS_ANY);
+                                    boolean isOptionalPrimitive = type.accept(TypeVisitor.IS_OPTIONAL)
+                                            && type.accept(TypeVisitor.OPTIONAL)
+                                            .getItemType()
+                                            .accept(TypeVisitor.IS_PRIMITIVE);
+                                    return isDefinedPrimitive || isOptionalPrimitive;
+                                }
+                        );
                         Preconditions.checkState(isValid,
                                 "Header parameters must be primitives, aliases or optional primitive:"
                                         + " \"%s\" is not allowed",
