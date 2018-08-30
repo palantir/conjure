@@ -19,23 +19,30 @@ package com.palantir.conjure.defs.validator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.defs.DealiasingTypeVisitor;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
+import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PathParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import org.junit.Test;
 
 public final class EndpointDefinitionTest {
+
+    private final DealiasingTypeVisitor emptyDealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
     private static final EndpointName ENDPOINT_NAME = EndpointName.of("test");
     private static final ArgumentDefinition.Builder BODY_ARG_BUILDER = ArgumentDefinition.builder()
@@ -54,7 +61,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Endpoint cannot have non-body argument with type "
                         + "'Type{value: PrimitiveWrapper{value: BINARY}}'");
@@ -74,7 +81,7 @@ public final class EndpointDefinitionTest {
                 .httpPath(HttpPath.of("/a/path"));
 
         // Should not throw exception
-        EndpointDefinitionValidator.validateAll(definition.build());
+        EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor);
     }
 
     @Test
@@ -86,7 +93,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Endpoint cannot have multiple body parameters: [bodyArg1, bodyArg2]");
     }
@@ -111,7 +118,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
     }
@@ -130,7 +137,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
                         "Path parameters defined in endpoint but not present in path template: [paramName]");
@@ -143,7 +150,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path/{paramName}"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Path parameters defined path template but not present in endpoint: [paramName]");
     }
@@ -156,7 +163,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(String.format(
                         "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
@@ -176,7 +183,7 @@ public final class EndpointDefinitionTest {
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
@@ -184,17 +191,22 @@ public final class EndpointDefinitionTest {
 
     @Test
     public void testComplexHeaderObject() {
+        TypeName typeName = TypeName.of("SomeObject", "com.palantir.foo");
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("someName"))
-                        .type(Type.reference(TypeName.of("SomeObject", "com.palantir.foo")))
-                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
+                        .type(Type.reference(typeName))
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("SomeId"))))
                         .build())
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build()))
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))
+        ));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
