@@ -57,6 +57,47 @@ positive:
             unused:
               http: GET /{foo}
               args: { foo: datetime }
+  allowEnumPathParam:
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            MyEnum:
+              values:
+                - FOO
+                - BAR
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args: { foo: MyEnum }
+  allowAliasAliasEnumPathParam:
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            Alias1:
+              alias: Alias2
+            Alias2:
+              alias: MyEnum
+            MyEnum:
+              values:
+              - FOO
+              - BAR
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args: { foo: Alias1 }
+
 negative:
   disallowBearerTokenInPathParams:
     expected-error: "Path parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
