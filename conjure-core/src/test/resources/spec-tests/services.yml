@@ -70,6 +70,20 @@ negative:
               http: GET /{foo}
               args:
                 foo: bearertoken
+  disallowBearerTokenInQueryParams:
+    expected-error: "Query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo
+              args:
+                foo:
+                  type: bearertoken
+                  param-type: query
   disallowAnyInPathParams:
     expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
     conjure:
