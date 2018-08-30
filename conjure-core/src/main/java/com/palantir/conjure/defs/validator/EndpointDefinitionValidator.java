@@ -43,7 +43,7 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
     SINGLE_BODY_PARAM(new SingleBodyParamValidator()),
     PATH_PARAM(new PathParamValidator()),
-    NO_BEARER_TOKEN_PATH_PARAMS(new NoBearerTokenPathParams()),
+    NO_BEARER_TOKEN_PATH_OR_QUERY_PARAMS(new NoBearerTokenPathOrQueryParams()),
     NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
     NO_COMPLEX_HEADER_PARAMS(new NoComplexHeaderParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
@@ -197,17 +197,18 @@ public enum EndpointDefinitionValidator implements ConjureValidator<EndpointDefi
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NoBearerTokenPathParams implements ConjureValidator<EndpointDefinition> {
+    private static final class NoBearerTokenPathOrQueryParams implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
             definition.getArgs().stream()
-                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH)
+                            || entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(entry -> {
                         Type conjureType = entry.getType();
 
                         Preconditions.checkState(!conjureType.accept(TypeVisitor.IS_PRIMITIVE)
                                 || conjureType.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN,
-                                "Path parameters of type 'bearertoken' are not allowed as this "
+                                "Path or query parameters of type 'bearertoken' are not allowed as this "
                                         + "would introduce a security vulnerability: \"%s\"",
                                 entry.getArgName());
                     });

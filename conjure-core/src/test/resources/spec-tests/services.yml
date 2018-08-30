@@ -59,7 +59,7 @@ positive:
               args: { foo: datetime }
 negative:
   disallowBearerTokenInPathParams:
-    expected-error: "Path parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
+    expected-error: "Path or query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
     conjure:
       services:
         Unused:
@@ -71,7 +71,7 @@ negative:
               args:
                 foo: bearertoken
   disallowBearerTokenInQueryParams:
-    expected-error: "Query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
+    expected-error: "Path or query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
     conjure:
       services:
         Unused:
