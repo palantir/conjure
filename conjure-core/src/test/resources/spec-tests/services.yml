@@ -97,6 +97,26 @@ positive:
             unused:
               http: GET /{foo}
               args: { foo: Alias1 }
+  allowAliasIntegerHeaderParam:
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            Alias1:
+              alias: integer
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo
+              args:
+                foo:
+                  type: Alias1
+                  param-type: header
+                  param-id: Bar
 
 negative:
   disallowBearerTokenInPathParams:
