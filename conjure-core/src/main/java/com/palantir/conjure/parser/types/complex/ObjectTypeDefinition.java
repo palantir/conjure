@@ -40,6 +40,9 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     static ObjectTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
+        if (!json.get("fields").isObject()) {
+            throw new IllegalArgumentException("Property 'fields' must contain a map.");
+        }
         return parser.getCodec().treeToValue(json, ImmutableObjectTypeDefinition.class);
     }
 

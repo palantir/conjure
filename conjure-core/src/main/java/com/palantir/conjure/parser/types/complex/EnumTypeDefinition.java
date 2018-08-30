@@ -39,6 +39,9 @@ public interface EnumTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     static EnumTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
+        if (!json.get("values").isArray()) {
+            throw new IllegalArgumentException("Property 'values' must contain a list.");
+        }
         return parser.getCodec().treeToValue(json, EnumTypeDefinition.class);
     }
 

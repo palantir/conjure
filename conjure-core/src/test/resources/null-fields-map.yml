@@ -1,0 +1,7 @@
+types:
+  definitions:
+    default-package: test.api.with.missing.fields
+    objects:
+      NoFields:
+        fields:
+        docs: This is an object with no fields

@@ -50,6 +50,12 @@ public class ConjureParserTest {
     }
 
     @Test
+    public void nullNotAllowedForEmptyMaps() throws IOException {
+        assertThatThrownBy(() -> ConjureParser.parse(new File("src/test/resources/null-fields-map.yml")))
+                .hasMessageContaining("Property 'fields' must contain a map");
+    }
+
+    @Test
     public void duplicate_keys_fail_to_parse() throws Exception {
         assertThatThrownBy(() -> ConjureParser.parse(new File("src/test/resources/duplicate-keys.yml")))
                 .hasMessageContaining("Duplicate field 'services'");

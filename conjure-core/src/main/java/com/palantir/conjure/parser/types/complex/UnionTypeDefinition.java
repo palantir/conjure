@@ -40,6 +40,9 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     static UnionTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
+        if (!json.get("union").isObject()) {
+            throw new IllegalArgumentException("Property 'union' must contain a map.");
+        }
         return parser.getCodec().treeToValue(json, UnionTypeDefinition.class);
     }
 
