@@ -173,7 +173,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
                     .forEach(entry -> {
-                        Either<TypeDefinition, Type> resolvedType = entry.getType().accept(dealiasingTypeVisitor);
+                        Either<TypeDefinition, Type> resolvedType = dealiasingTypeVisitor.dealias(entry.getType());
 
                         Boolean isValid = resolvedType.fold(
                                 typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
@@ -192,7 +192,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
                     .forEach(entry -> {
-                        Either<TypeDefinition, Type> resolvedType = entry.getType().accept(dealiasingTypeVisitor);
+                        Either<TypeDefinition, Type> resolvedType = dealiasingTypeVisitor.dealias(entry.getType());
 
                         boolean isValid = resolvedType.fold(
                                 typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),

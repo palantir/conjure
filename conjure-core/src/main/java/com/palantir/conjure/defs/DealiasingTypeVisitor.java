@@ -49,6 +49,10 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
         this.objects = objects;
     }
 
+    public Either<TypeDefinition, Type> dealias(Type type) {
+        return type.accept(this);
+    }
+
     @Override
     public Either<TypeDefinition, Type> visitReference(TypeName value) {
         TypeDefinition typeDefinition = objects.get(value);
