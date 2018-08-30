@@ -35,7 +35,8 @@ import java.util.Optional;
 
 /**
  * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference Type, or
- * a non-alias object.
+ * a non-alias object. The intention of this is to prevent cycles, where a named object refers back to itself down the
+ * line.
  * <p>
  * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, then it
  * returns {@link Optional#empty()}, otherwise it returns the de-aliased {@link Type} that will not be a
