@@ -30,10 +30,6 @@ public interface Either<L, R> {
         return ImmutableRight.of(right);
     }
 
-    <T> Either<T, R> mapLeft(Function<L, T> mapper);
-
-    <T> Either<L, T> mapRight(Function<R, T> mapper);
-
     <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> mapRight);
 
     @Immutable
@@ -41,16 +37,6 @@ public interface Either<L, R> {
 
         @Parameter
         abstract L value();
-
-        @Override
-        public <T> Either<T, R> mapLeft(Function<L, T> mapper) {
-            return Either.left(mapper.apply(value()));
-        }
-
-        @Override
-        public <T> Either<L, T> mapRight(Function<R, T> mapper) {
-            return Either.left(value());
-        }
 
         @Override
         public <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> mapRight) {
@@ -62,16 +48,6 @@ public interface Either<L, R> {
     abstract class Right<L, R> implements Either<L, R> {
         @Parameter
         abstract R value();
-
-        @Override
-        public <T> Either<L, T> mapRight(Function<R, T> mapper) {
-            return right(mapper.apply(value()));
-        }
-
-        @Override
-        public <T> Either<T, R> mapLeft(Function<L, T> mapper) {
-            return Either.right(value());
-        }
 
         @Override
         public <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> mapRight) {
