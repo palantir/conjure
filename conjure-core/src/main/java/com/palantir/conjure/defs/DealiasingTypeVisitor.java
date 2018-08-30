@@ -33,15 +33,6 @@ import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import java.util.Map;
 
-/**
- * A type visitor that resolves through any aliases and references and stops once it reaches a non-reference {@link
- * Type}, or a non-alias {@link TypeDefinition}. The intention of this is to prevent cycles, where a named object refers
- * back to itself down the line.
- * <p>
- * If it encounters a {@link TypeDefinition} that is NOT an {@link AliasDefinition}, then it
- * returns {@link Either#left}, otherwise it returns the {@link Either#right} of the de-aliased {@link Type} that will
- * not be a {@link Type#reference}.
- */
 public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefinition, Type>> {
     private final Map<TypeName, TypeDefinition> objects;
 
@@ -49,6 +40,14 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
         this.objects = objects;
     }
 
+    /**
+     * Inlines outer-level aliases and references, but not within objects or container types.
+     * <p>
+     * For example, a reference to an alias A which wraps another alias B which wraps a {@code list<integer>}, we'll
+     * return {@code list<integer>}. Note that these are outer-level references being resolved.
+     * However, if the aforementioned list's inner type was also a reference e.g. {@code list<C>}, we
+     * wouldn't unwrap that, so we'd just return the same {@code list<C>}.
+     */
     public Either<TypeDefinition, Type> dealias(Type type) {
         return type.accept(this);
     }
