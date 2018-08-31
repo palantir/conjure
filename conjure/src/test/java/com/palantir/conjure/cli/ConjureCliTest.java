@@ -111,6 +111,6 @@ public final class ConjureCliTest {
                 .build();
         assertThatThrownBy(() -> ConjureCli.generate(configuration))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("JsonMappingException");
+                .hasMessageContaining("MismatchedInputException");
     }
 }
