@@ -20,8 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import org.junit.Test;
 
 public final class KebabCaseEnforcingAnnotationInspectorTest {
@@ -56,9 +56,9 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
     @Test
     public void testSetterWithoutAnnotationIsInvalid() throws Exception {
         assertThatThrownBy(() -> mapper.readValue("{\"fooBar\": \"baz\"}", NoAnnotationInvalidTarget.class))
-                .isInstanceOf(JsonMappingException.class)
-                .hasCause(new IllegalArgumentException("All setter ({@code set*}) deserialization targets require "
-                        + "@JsonProperty annotations: setFooBar"));
+                .isInstanceOf(InvalidDefinitionException.class)
+                .hasMessageContaining("All setter ({@code set*}) deserialization targets require "
+                        + "@JsonProperty annotations: setFooBar");
     }
 
     private static class NonKebabCaseAnnotationInvalidTarget {
@@ -73,7 +73,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
     @Test
     public void testSetterWithNonKebabCaseAnnotationIsInvalid() throws Exception {
         assertThatThrownBy(() -> mapper.readValue("{\"fooBar\": \"baz\"}", NonKebabCaseAnnotationInvalidTarget.class))
-                .isInstanceOf(JsonMappingException.class)
-                .hasCause(new IllegalArgumentException("Conjure grammar requires kebab-case field names: fooBar"));
+                .isInstanceOf(InvalidDefinitionException.class)
+                .hasMessageContaining("Conjure grammar requires kebab-case field names: fooBar");
     }
 }

@@ -16,6 +16,8 @@
 
 package com.palantir.conjure.parser.types.complex;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,6 +34,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
 
+    @JsonSetter(nulls = Nulls.FAIL, contentNulls = Nulls.FAIL)
     Map<FieldName, FieldDefinition> fields();
 
     @Override
@@ -40,9 +43,6 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     static ObjectTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        if (!json.get("fields").isObject()) {
-            throw new IllegalArgumentException("Property 'fields' must contain a map.");
-        }
         return parser.getCodec().treeToValue(json, ImmutableObjectTypeDefinition.class);
     }
 

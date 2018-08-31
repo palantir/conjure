@@ -16,6 +16,8 @@
 
 package com.palantir.conjure.parser.types.complex;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,6 +34,7 @@ import org.immutables.value.Value;
 @ConjureImmutablesStyle
 public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
 
+    @JsonSetter(nulls = Nulls.FAIL, contentNulls = Nulls.FAIL)
     Map<FieldName, FieldDefinition> union();
 
     @Override
@@ -40,9 +43,6 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     static UnionTypeDefinition fromJson(JsonParser parser, TreeNode json) throws IOException {
-        if (!json.get("union").isObject()) {
-            throw new IllegalArgumentException("Property 'union' must contain a map.");
-        }
         return parser.getCodec().treeToValue(json, UnionTypeDefinition.class);
     }
 

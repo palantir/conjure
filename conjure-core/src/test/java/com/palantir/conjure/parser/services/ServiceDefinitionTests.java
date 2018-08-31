@@ -120,7 +120,7 @@ public final class ServiceDefinitionTests {
     public void testParseEnum_blank() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "values:"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'values' must contain a list");
+                .hasMessageContaining("Invalid `null` value encountered for property \"values\"");
 
     }
 
@@ -135,7 +135,7 @@ public final class ServiceDefinitionTests {
     public void testParseEnum_null() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "values: null"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'values' must contain a list");
+                .hasMessageContaining("Invalid `null` value encountered for property \"values\"");
     }
 
     @Test
@@ -171,7 +171,7 @@ public final class ServiceDefinitionTests {
     public void testParseUnion_blank() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "union:"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'union' must contain a map");
+                .hasMessageContaining("Invalid `null` value encountered for property \"union\"");
     }
 
     @Test
@@ -185,7 +185,7 @@ public final class ServiceDefinitionTests {
     public void testParseUnion_null() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "union: null"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'union' must contain a map");
+                .hasMessageContaining("Invalid `null` value encountered for property \"union\"");
     }
 
     @Test
@@ -206,7 +206,7 @@ public final class ServiceDefinitionTests {
     public void testParseType_blank() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "fields:"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'fields' must contain a map");
+                .hasMessageContaining("Invalid `null` value encountered for property \"fields\"");
     }
 
     @Test
@@ -220,7 +220,7 @@ public final class ServiceDefinitionTests {
     public void testParseType_null() {
         assertThatThrownBy(() -> mapper.readValue(multiLineString(
                 "fields:"), BaseObjectTypeDefinition.class))
-                .hasMessageContaining("Property 'fields' must contain a map");
+                .hasMessageContaining("Invalid `null` value encountered for property \"fields\"");
     }
 
     @Test
