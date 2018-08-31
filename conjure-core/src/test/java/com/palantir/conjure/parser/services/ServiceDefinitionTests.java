@@ -17,6 +17,7 @@
 package com.palantir.conjure.parser.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -34,6 +35,7 @@ import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
 import com.palantir.conjure.parser.types.complex.FieldDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.names.FieldName;
 import com.palantir.conjure.parser.types.names.TypeName;
@@ -115,10 +117,25 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
+    public void testParseEnum_blank() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "values:"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'values' must contain a list");
+
+    }
+
+    @Test
     public void testParseEnum_empty() throws IOException {
         assertThat(mapper.readValue(multiLineString(
-                "values:"), BaseObjectTypeDefinition.class))
+                "values: []"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder().build());
+    }
+
+    @Test
+    public void testParseEnum_null() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "values: null"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'values' must contain a list");
     }
 
     @Test
@@ -146,6 +163,76 @@ public final class ServiceDefinitionTests {
                 .isEqualTo(EnumTypeDefinition.builder()
                         .addValues(EnumValueDefinition.builder().value("A").docs("A docs").build())
                         .addValues(EnumValueDefinition.builder().value("B").build())
+                        .docs("Test")
+                        .build());
+    }
+
+    @Test
+    public void testParseUnion_blank() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "union:"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'union' must contain a map");
+    }
+
+    @Test
+    public void testParseUnion_empty() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "union: {}"), BaseObjectTypeDefinition.class))
+                .isEqualTo(UnionTypeDefinition.builder().build());
+    }
+
+    @Test
+    public void testParseUnion_null() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "union: null"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'union' must contain a map");
+    }
+
+    @Test
+    public void testParseUnion_withObjectDocs() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "docs: Test",
+                "union:",
+                "  stringId: string",
+                "  numberId: integer"), BaseObjectTypeDefinition.class))
+                .isEqualTo(UnionTypeDefinition.builder()
+                        .putUnion(FieldName.of("stringId"), FieldDefinition.of(PrimitiveType.STRING))
+                        .putUnion(FieldName.of("numberId"), FieldDefinition.of(PrimitiveType.INTEGER))
+                        .docs("Test")
+                        .build());
+    }
+
+    @Test
+    public void testParseType_blank() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "fields:"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'fields' must contain a map");
+    }
+
+    @Test
+    public void testParseType_empty() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "fields: {}"), BaseObjectTypeDefinition.class))
+                .isEqualTo(ObjectTypeDefinition.builder().build());
+    }
+
+    @Test
+    public void testParseType_null() {
+        assertThatThrownBy(() -> mapper.readValue(multiLineString(
+                "fields:"), BaseObjectTypeDefinition.class))
+                .hasMessageContaining("Property 'fields' must contain a map");
+    }
+
+    @Test
+    public void testParseType_withObjectDocs() throws IOException {
+        assertThat(mapper.readValue(multiLineString(
+                "docs: Test",
+                "fields:",
+                "  name: string",
+                "  age: integer"), BaseObjectTypeDefinition.class))
+                .isEqualTo(ObjectTypeDefinition.builder()
+                        .putFields(FieldName.of("name"), FieldDefinition.of(PrimitiveType.STRING))
+                        .putFields(FieldName.of("age"), FieldDefinition.of(PrimitiveType.INTEGER))
                         .docs("Test")
                         .build());
     }
