@@ -67,6 +67,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
+import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import java.util.ArrayList;
 import java.util.Collection;

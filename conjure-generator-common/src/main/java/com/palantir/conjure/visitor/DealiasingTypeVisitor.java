@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.conjure.defs;
+package com.palantir.conjure.visitor;
 
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.either.Either;
