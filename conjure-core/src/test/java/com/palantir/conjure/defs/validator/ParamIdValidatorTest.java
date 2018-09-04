@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
-import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -34,6 +33,7 @@ import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.QueryParameterType;
 import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import java.util.List;
 import org.junit.Test;
 
