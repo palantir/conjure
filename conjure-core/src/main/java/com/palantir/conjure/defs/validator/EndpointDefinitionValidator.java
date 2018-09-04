@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.palantir.conjure.defs.DealiasingTypeVisitor;
+import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;

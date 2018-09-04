@@ -16,7 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
-import com.palantir.conjure.defs.DealiasingTypeVisitor;
+import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 
 @com.google.errorprone.annotations.Immutable
 public interface ConjureContextualValidator<T> {
