@@ -28,68 +28,68 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Path parameters** - For Conjure endpoints that have user-defined path parameters, clients MUST interpolate values for each of these path parameters. Values MUST be serialized using the [PLAIN format][] and MUST also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
 
-  For example, the following Conjure endpoint contains several path parameters of different types:
-  ```yaml
-  demoEndpoint:
-    http: GET /demo/{file}/rev/{revision}
-    args:
-      file: string
-      revision: integer
-  ```
+    For example, the following Conjure endpoint contains several path parameters of different types:
+    ```yaml
+    demoEndpoint:
+      http: GET /demo/{file}/rev/{revision}
+      args:
+        file: string
+        revision: integer
+    ```
 
-  In this example, the `file` argument with value `var/conf/install.yml` is percent encoded:
-  ```
-  /demo/var%2Fconf%2Finstall.yml/rev/53
-  ```
+    In this example, the `file` argument with value `var/conf/install.yml` is percent encoded:
+    ```
+    /demo/var%2Fconf%2Finstall.yml/rev/53
+    ```
 
 1. **Query parameters** - If an endpoint specifies one or more parameters of type `query`, clients MUST convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of de-aliased type `optional<T>` is not present, then the key MUST be omitted from the query string.  Otherwise, the inner value MUST be serialized using the [PLAIN format][] and any reserved characters percent encoded.
 
-  For example, the following Conjure endpoint contains two query parameters:
-  ```yaml
-  demoEndpoint:
-    http: GET /recipes
-    args:
-      filter: optional<string>
-      limit: optional<integer>
-  ```
+    For example, the following Conjure endpoint contains two query parameters:
+    ```yaml
+    demoEndpoint:
+      http: GET /recipes
+      args:
+        filter: optional<string>
+        limit: optional<integer>
+    ```
 
-  These examples illustrate how an `optional<T>` value should be omitted if the value is not present
-  ```
-  /recipes?filter=Hello%20World&limit=10
-  /recipes?filter=Hello%20World
-  /recipes
-  ```
+    These examples illustrate how an `optional<T>` value should be omitted if the value is not present
+    ```
+    /recipes?filter=Hello%20World&limit=10
+    /recipes?filter=Hello%20World
+    /recipes
+    ```
 
 1. **Body parameter** - If an endpoint defines an argument of type `body`, clients MUST serialize the user-provided value using the [JSON format][], UNLESS:
-  - the de-aliased argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
-  - the de-aliased argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
-It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
+    - the de-aliased argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
+    - the de-aliased argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
+  It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
-  For example, the following Conjure endpoint defines a request body:
-  ```yaml
-  demoEndpoint:
-    http: POST /names
-    args:
-      newName:
-        type: optional<string>
-        param-type: body
-  ```
+    For example, the following Conjure endpoint defines a request body:
+    ```yaml
+    demoEndpoint:
+      http: POST /names
+      args:
+        newName:
+          type: optional<string>
+          param-type: body
+    ```
 
-  In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
+    In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
 1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
 
-1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
+    1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
 
-1. **Accept header** - Clients MUST send an `Accept: application/json` header for all requests UNLESS the endpoint returns binary, in which case the client MUST send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
+    1. **Accept header** - Clients MUST send an `Accept: application/json` header for all requests UNLESS the endpoint returns binary, in which case the client MUST send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
 
-1. **User-agent** - Requests MUST include a `User-Agent` header.
+    1. **User-agent** - Requests MUST include a `User-Agent` header.
 
-1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+    1. **Header Authorization** - If an endpoint defines an `auth` field of type `header`, clients MUST send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
 
-1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+    1. **Cookie Authorization** - If an endpoint defines an `auth` field of type `cookie`, clients MUST send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
-1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
+    1. **Additional headers** - Clients MAY inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
 
 ## HTTP responses
 1. **Status codes** - Conjure servers MUST respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
