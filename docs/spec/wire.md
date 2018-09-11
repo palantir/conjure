@@ -79,7 +79,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Headers** - Conjure `header` parameters MUST be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` MUST be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
 
-    1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`.
+    1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header MUST be added.  If the body is of type `binary`, the content-type `application/octet-stream` MUST be used. Otherwise, clients MUST send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
 
     1. **Accept header** - Clients MUST send an `Accept: application/json` header for all requests UNLESS the endpoint returns binary, in which case the client MUST send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
 
@@ -109,7 +109,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 1. **Content-Type header** - Conjure servers MUST send a `Content-Type` header according to the endpoint's return type:
 
     - if the de-aliased return type is `binary`, servers MUST send `Content-Type: application/octet-stream`,
-    - otherwise, servers MUST send `Content-Type: application/json;charset=utf-8`.
+    - otherwise, servers MUST send `Content-Type: application/json`.
 
 1. **Conjure errors** - In order to send a Conjure error, servers MUST serialize the error using the [JSON format][]. In addition, servers MUST send a http status code corresponding to the error's code.
 
