@@ -62,7 +62,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Body parameter** - If an endpoint defines an argument of type `body`, clients MUST serialize the user-provided value using the [JSON format][], UNLESS:
     - the de-aliased argument is type `binary`: the clients MUST write the raw binary bytes directly to the request body
-    - the de-aliased argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`.
+    - the de-aliased argument is type `optional<T>` and the value is not present: it is RECOMMENDED to send an empty request body, although clients MAY alternatively send the JSON value `null`. Note that the `Content-Type` header MUST not be set to `application/json` when sending an empty request body because content type validation for JSON will fail on empty request bodies.
   It is RECOMMENDED to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
 
     For example, the following Conjure endpoint defines a request body:
