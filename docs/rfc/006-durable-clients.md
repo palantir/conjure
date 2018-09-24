@@ -50,6 +50,14 @@ services:
 
 Previously, generated interfaces would look like:
 
+```java
+public interface TestService {
+    @POST
+    @Path("test/{name}/{type}")
+    void postEndpoint(@PathParam("name") String name, @QueryParam("type") Optional<String> type);
+}
+```
+
 ```typescript
 class TestService {
     public postEndpoint(name: string, type?: string | null): Promise<void> {}
@@ -63,6 +71,18 @@ class TestService(Service):
 ```
 
 Interfaces that follow this proposal would instead look like:
+
+```java
+public interface TestService {
+    PostEndpointBuilder postEndpoint() {}
+
+    public static final class PostEndpointBuilder {
+        public PostEndpointBuilder name(String name) {}
+        public PostEndpointBuilder type(String name) {}
+        public void call();
+    }
+}
+```
 
 ```typescript
 class TestService {
