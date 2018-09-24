@@ -12,3 +12,13 @@ types:
       base-type: string
       external:
         typescript: "@palantir/foo"
+
+  # Required otherwise imports are ignored by the compiler
+  definitions:
+    default-package: test.api.with.external.types
+    objects:
+      ComplexObjectWithImports:
+        fields:
+          anyImport: ExampleAnyImport
+          integerImport:  ExampleIntegerImport
+          typescriptImport: ExampleTypeScriptImport

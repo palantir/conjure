@@ -7,7 +7,7 @@ types:
       ComplexObjectWithImports:
         fields:
           string: string
-          imports: imported.SimpleObject
+          imports: imports.SimpleObject
 
 services:
   TestService:
@@ -19,3 +19,8 @@ services:
         http: POST /testEndpoint
         args:
           importedString: imports.SimpleObject
+
+      testImportEndpoint:
+        http: POST /testImport/{name}
+        args:
+          name: imports.StringAlias
