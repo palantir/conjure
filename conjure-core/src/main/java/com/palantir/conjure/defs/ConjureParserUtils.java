@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
@@ -36,6 +37,8 @@ import com.palantir.conjure.parser.services.ParameterName;
 import com.palantir.conjure.parser.services.PathString;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
+import com.palantir.conjure.parser.types.names.Namespace;
+import com.palantir.conjure.parser.types.reference.ConjureImports;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -123,7 +126,7 @@ public final class ConjureParserUtils {
             TypeName name,
             com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
 
-        EnumDefinition enumType =  EnumDefinition.builder()
+        EnumDefinition enumType = EnumDefinition.builder()
                 .typeName(name)
                 .values(def.values().stream().map(ConjureParserUtils::parseEnumValue).collect(Collectors.toList()))
                 .docs(def.docs().map(Documentation::of))
@@ -197,8 +200,12 @@ public final class ConjureParserUtils {
 
             // Resolve objects first, so we can use them in service validations
             Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
+            Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(parsed.types().conjureImports());
+            Map<TypeName, TypeDefinition> allObjects = Maps.newHashMap();
+            allObjects.putAll(objects);
+            allObjects.putAll(importedObjects);
 
-            DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(objects);
+            DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
 
             parsed.services().forEach((serviceName, service) -> {
                 servicesBuilder.add(parseService(
@@ -221,6 +228,22 @@ public final class ConjureParserUtils {
 
         ConjureDefinitionValidator.validateAll(definition);
         return definition;
+    }
+
+    /*
+     * Recursively resolve all imported types
+     */
+    private static Map<TypeName, TypeDefinition> parseImportObjects(Map<Namespace, ConjureImports> conjureImports) {
+        Map<TypeName, TypeDefinition> allDefinitions = Maps.newHashMap();
+        conjureImports.values().forEach(conjureImport -> {
+            ConjureSourceFile conjureDef = conjureImport.conjure();
+            ReferenceTypeResolver importTypeResolver =
+                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(conjureDef.types());
+            allDefinitions.putAll(parseImportObjects(conjureDef.types().conjureImports()));
+            allDefinitions.putAll(parseObjects(conjureDef.types(), importTypeResolver));
+        });
+
+        return allDefinitions;
     }
 
     static ServiceDefinition parseService(
