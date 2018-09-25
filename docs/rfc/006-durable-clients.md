@@ -38,7 +38,7 @@ services:
 
     endpoints:
       postEndpoint:
-        http: POST /test/{name}/{type}
+        http: POST /test/{name}
         args:
           name:
             type: string
@@ -76,7 +76,7 @@ Interfaces that follow this proposal would instead look like:
 public interface TestService {
     PostEndpointBuilder postEndpoint() {}
 
-    public static final class PostEndpointBuilder {
+    public interface PostEndpointBuilder {
         public PostEndpointBuilder name(String name) {}
         public PostEndpointBuilder type(String name) {}
         public void call();
@@ -115,15 +115,3 @@ For example, consider the path segment `/foo/bar/{baz}` then `{baz}` is segment 
 referenced as such by the consumer.
 
 This approach was not chosen, because of the negative impact such a model would have on consumers of the interfaces.
-
-
-
-
-
-
-
-
-
-
-
-
