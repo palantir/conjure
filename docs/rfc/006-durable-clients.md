@@ -53,7 +53,7 @@ Previously, generated interfaces would look like:
 ```java
 public interface TestService {
     @POST
-    @Path("test/{name}/{type}")
+    @Path("test/{name}")
     void postEndpoint(@PathParam("name") String name, @QueryParam("type") Optional<String> type);
 }
 ```
@@ -104,8 +104,8 @@ still susceptible to breaks caused by parameter renaming. To avoid such breaks, 
 more complicated interfaces which model parameters differently based on their type. 
 
 Query and header parameters may be modeled as mappings from names to typed value since the name is part of the wire
-format. Body parameters can simply be handled since there is at most 1 per request, but path parameters be differently
-since names are simply syntactic sugar. 
+format. Body parameters can simply be handled since there is at most 1 per request, but path parameters must be 
+handled differently since names are simply syntactic sugar. 
 
 Path parameters would be treated as a mapping from the index of the path segment to a typed value. This would allow for 
 renaming of the parameter as well as the unconventional, but technically valid, case where a constant segment
