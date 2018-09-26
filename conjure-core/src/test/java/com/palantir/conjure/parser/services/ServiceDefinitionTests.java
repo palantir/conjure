@@ -263,7 +263,8 @@ public final class ServiceDefinitionTests {
                 ConjureSourceFile.builder()
                         .types(TypesDefinition.builder()
                                 .putImports(TypeName.of("ResourceIdentifier"),
-                                        ExternalTypeDefinition.javaType("com.palantir.ri.ResourceIdentifier"))
+                                        ExternalTypeDefinition.javaType(
+                                                "com.palantir.ri.ResourceIdentifier", PrimitiveType.STRING))
                                 .definitions(NamedTypesDefinition.builder()
                                         .defaultConjurePackage(ConjurePackage.of("test.api"))
                                         .putObjects(TypeName.of("SimpleObject"), ObjectTypeDefinition.builder()
