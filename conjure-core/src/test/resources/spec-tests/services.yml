@@ -117,6 +117,44 @@ positive:
                   type: Alias1
                   param-type: header
                   param-id: Bar
+  allowImportAsQueryParam:
+    conjure:
+      types:
+        imports:
+          Long:
+            base-type: string
+            external:
+              java: java.lang.Long
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo
+              args:
+                bar:
+                  type: Long
+                  param-type: query
+  allowImportAsPathParam:
+    conjure:
+      types:
+        imports:
+          Long:
+            base-type: string
+            external:
+              java: java.lang.Long
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo/{baz}
+              args:
+                baz:
+                  type: Long
+                  param-type: path
 
 negative:
   disallowBearerTokenInPathParams:

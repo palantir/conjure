@@ -116,7 +116,7 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
 
     @Override
     public Either<TypeDefinition, Type> visitExternal(ExternalReference value) {
-        return Either.right(Type.external(value));
+        return dealias(value.getFallback());
     }
 
     @Override
