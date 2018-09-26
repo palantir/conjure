@@ -103,7 +103,7 @@ References to types that are not defined within Conjure.
 
 Field | Type | Description
 ---|:---:|---
-java | string | The fully qualified Java type
+java | string | The fully qualified Java type.
 
 
 ## NamedTypesDefinition
