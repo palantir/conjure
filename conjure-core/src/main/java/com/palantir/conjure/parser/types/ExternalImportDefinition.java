@@ -14,30 +14,20 @@
  * limitations under the License.
  */
 
-package com.palantir.conjure.parser.types.reference;
+package com.palantir.conjure.parser.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.types.ExternalImportDefinition;
-import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import org.immutables.value.Value;
 
-@JsonDeserialize(as = ImmutableExternalTypeDefinition.class)
+@JsonDeserialize(as = ImmutableExternalImportDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface ExternalTypeDefinition {
+public interface ExternalImportDefinition {
 
-    ExternalImportDefinition external();
+    String java();
 
-    @JsonProperty("base-type")
-    @Value.Default
-    default PrimitiveType baseType() {
-        return PrimitiveType.STRING;
+    static ExternalImportDefinition of(String external) {
+        return ImmutableExternalImportDefinition.builder().java(external).build();
     }
-
-    static ExternalTypeDefinition javaType(String external) {
-        return ImmutableExternalTypeDefinition.builder().external(ExternalImportDefinition.of(external)).build();
-    }
-
 }

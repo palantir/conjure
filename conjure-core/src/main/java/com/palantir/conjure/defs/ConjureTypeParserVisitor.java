@@ -79,16 +79,11 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                     throw new IllegalStateException("Unknown LocalReferenceType: " + name);
                 }
 
-                // External import
-                Optional<String> externalPath = maybeExternalDef.external().values().stream().findFirst();
 
-                if (!externalPath.isPresent()) {
-                    throw new IllegalStateException("Unknown export type: " + name);
-                }
-
-                int lastIndex = externalPath.get().lastIndexOf(".");
-                conjurePackage = externalPath.get().substring(0, lastIndex);
-                typeName = externalPath.get().substring(lastIndex + 1);
+                String externalPath = maybeExternalDef.external().java();
+                int lastIndex = externalPath.lastIndexOf(".");
+                conjurePackage = externalPath.substring(0, lastIndex);
+                typeName = externalPath.substring(lastIndex + 1);
 
                 return Type.external(ExternalReference.builder()
                         .externalReference(TypeName.of(typeName, conjurePackage))
