@@ -87,9 +87,7 @@ A type that is not defined within Conjure. Usage of external types is not recomm
 Field | Type | Description
 ---|:---:|---
 base&#8209;type | [ConjureType][] | A `base-type` is provided as a hint to generators for how to handle this type when no external type reference is provided. Note that the serialization format of the `base-type` fallback should match the format of the imported type. If the imported type is a non-primitive JSON object, then a `base-type` of any should be used.
-external | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a language name and its associated fully qualified type.
-
-Each generator specifies what key they will consume within the `external` map.
+external | [ExternalImportDefinition][] | The external types to reference.
 
 **Example:**
 ```yaml
@@ -98,8 +96,14 @@ imports:
     base-type: string
     external:
       java: com.palantir.package.someDataType
-      typescript: @palantir/package
 ```
+
+## ExternalImportDefinition
+References to types that are not defined within Conjure.
+
+Field | Type | Description
+---|:---:|---
+java | string | The fully qualified Java type
 
 
 ## NamedTypesDefinition
