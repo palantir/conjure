@@ -8,10 +8,6 @@ types:
       base-type: string
       external:
         java: com.palantir.example.ExternalIntegerImport
-    ExampleTypeScriptImport:
-      base-type: string
-      external:
-        typescript: "@palantir/foo"
 
   # Required otherwise imports are ignored by the compiler
   definitions:
@@ -21,4 +17,3 @@ types:
         fields:
           anyImport: ExampleAnyImport
           integerImport:  ExampleIntegerImport
-          typescriptImport: ExampleTypeScriptImport
