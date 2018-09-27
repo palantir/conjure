@@ -33,11 +33,14 @@ public interface ExternalTypeDefinition {
     @JsonProperty("base-type")
     @Value.Default
     default PrimitiveType baseType() {
-        return PrimitiveType.STRING;
+        return PrimitiveType.ANY;
     }
 
-    static ExternalTypeDefinition javaType(String external) {
-        return ImmutableExternalTypeDefinition.builder().putExternal("java", external).build();
+    static ExternalTypeDefinition javaType(String external, PrimitiveType baseType) {
+        return ImmutableExternalTypeDefinition.builder()
+                .putExternal("java", external)
+                .baseType(baseType)
+                .build();
     }
 
 }
