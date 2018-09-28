@@ -22,6 +22,7 @@ dependencies {
     compile project(':conjure-core')
     compile 'commons-cli:commons-cli'
     compile 'commons-io:commons-io'
+    runtime 'org.slf4j:slf4j-simple'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
