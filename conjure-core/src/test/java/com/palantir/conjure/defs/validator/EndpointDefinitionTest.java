@@ -26,10 +26,12 @@ import com.palantir.conjure.spec.BodyParameterType;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.OptionalType;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PathParameterType;
@@ -211,4 +213,47 @@ public final class EndpointDefinitionTest {
                 .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
     }
+
+    @Test
+    public void testExternalTypeDealiased() {
+        TypeName typeName = TypeName.of("SomeObject", "com.palantir.foo");
+        Type external = Type.external(ExternalReference.of(typeName, Type.primitive(PrimitiveType.STRING)));
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("someName"))
+                        .type(external)
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("SomeId"))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))
+        ));
+        EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
+    }
+
+    @Test
+    public void testOptionalExternalTypeDealiased() {
+        TypeName typeName = TypeName.of("SomeObject", "com.palantir.foo");
+        Type optionalExternal = Type.optional(OptionalType.of(
+                Type.external(ExternalReference.of(typeName, Type.primitive(PrimitiveType.STRING)))));
+
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("someName"))
+                        .type(optionalExternal)
+                        .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("SomeId"))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/a/path"));
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))
+        ));
+        EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
+    }
+
 }
