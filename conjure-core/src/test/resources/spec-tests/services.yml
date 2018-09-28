@@ -155,6 +155,25 @@ positive:
                 baz:
                   type: Long
                   param-type: path
+  allowOptionalImportAsQueryParam:
+    conjure:
+      types:
+        imports:
+          Long:
+            base-type: string
+            external:
+              java: optional<java.lang.Long>
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /fee/foo
+              args:
+                bar:
+                  type: Long
+                  param-type: query
 
 negative:
   disallowBearerTokenInPathParams:

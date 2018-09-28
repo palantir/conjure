@@ -87,16 +87,26 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
         });
     }
 
+    @Override
+    public Either<TypeDefinition, Type> visitExternal(ExternalReference value) {
+        return dealias(value.getFallback());
+    }
+
+    @Override
+    public Either<TypeDefinition, Type> visitOptional(OptionalType value) {
+        Either<TypeDefinition, Type> innerType = value.getItemType().accept(this);
+        return Either.right(innerType.fold(
+                typeDefinition -> {
+                    throw new IllegalStateException("cannot be an optional of type definition");
+                },
+                type -> Type.optional(OptionalType.of(type))));
+    }
+
     // Identity mapping for here onwards.
 
     @Override
     public Either<TypeDefinition, Type> visitPrimitive(PrimitiveType value) {
         return Either.right(Type.primitive(value));
-    }
-
-    @Override
-    public Either<TypeDefinition, Type> visitOptional(OptionalType value) {
-        return Either.right(Type.optional(value));
     }
 
     @Override
@@ -112,11 +122,6 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
     @Override
     public Either<TypeDefinition, Type> visitMap(MapType value) {
         return Either.right(Type.map(value));
-    }
-
-    @Override
-    public Either<TypeDefinition, Type> visitExternal(ExternalReference value) {
-        return dealias(value.getFallback());
     }
 
     @Override
