@@ -200,9 +200,13 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                     boolean isDefinedPrimitive = type.accept(TypeVisitor.IS_PRIMITIVE)
                                             && !type.accept(TypeVisitor.IS_ANY);
                                     boolean isOptionalPrimitive = type.accept(TypeVisitor.IS_OPTIONAL)
-                                            && type.accept(TypeVisitor.OPTIONAL)
-                                            .getItemType()
-                                            .accept(TypeVisitor.IS_PRIMITIVE);
+                                            && dealiasingTypeVisitor
+                                            .dealias(type.accept(TypeVisitor.OPTIONAL).getItemType())
+                                            .fold(
+                                                    typeDefinition ->
+                                                            typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                                                    subType -> subType.accept(TypeVisitor.IS_PRIMITIVE)
+                                                            && !subType.accept(TypeVisitor.IS_ANY));
                                     return isDefinedPrimitive || isOptionalPrimitive;
                                 }
                         );
@@ -225,7 +229,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         Type conjureType = entry.getType();
 
                         Preconditions.checkState(!conjureType.accept(TypeVisitor.IS_PRIMITIVE)
-                                || conjureType.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN,
+                                        || conjureType.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN,
                                 "Path or query parameters of type 'bearertoken' are not allowed as this "
                                         + "would introduce a security vulnerability: \"%s\"",
                                 entry.getArgName());
