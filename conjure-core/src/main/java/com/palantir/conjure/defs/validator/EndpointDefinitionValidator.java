@@ -194,7 +194,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .forEach(headerArgDefinition -> {
                         boolean isValid = recursivelyValidate(headerArgDefinition.getType(), dealiasingTypeVisitor);
                         Preconditions.checkState(isValid,
-                                "Header parameters must be primitives, aliases or optional primitive:"
+                                "Header parameters must be enums, primitives, aliases or optional primitive:"
                                         + " \"%s\" is not allowed",
                                 headerArgDefinition.getArgName());
                     });
