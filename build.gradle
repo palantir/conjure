@@ -16,6 +16,7 @@
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url 'https://dl.bintray.com/palantir/releases/'
@@ -35,6 +36,7 @@ buildscript {
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
+        classpath 'com.palantir.graal:gradle-graal:0.1.1-25-g8fbf38d'
     }
 }
 
@@ -73,7 +75,7 @@ configure(subprojects - project(':conjure-api')) {
     apply plugin: 'com.palantir.baseline-eclipse'
     apply plugin: 'com.palantir.baseline-error-prone'
     apply plugin: 'com.palantir.baseline-idea'
-    apply plugin: 'java-library'
+    apply plugin: 'java'
     apply plugin: 'org.inferred.processors'
 
     sourceCompatibility = 1.8

@@ -17,18 +17,13 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
-import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.glassfish.jersey.uri.UriTemplate;
-import org.glassfish.jersey.uri.internal.UriTemplateParser;
 
 public final class HttpPathValidator {
 
@@ -46,11 +41,12 @@ public final class HttpPathValidator {
      * returns path arguments of the http path.
      */
     public static Set<ArgumentName> pathArgs(String httpPath) {
-        UriTemplate uriTemplate = new UriTemplate(httpPath);
-        return uriTemplate.getTemplateVariables()
-                .stream()
-                .map(ArgumentName::of)
-                .collect(Collectors.toSet());
+        return Collections.emptySet();
+//        UriTemplate uriTemplate = new UriTemplate(httpPath);
+//        return uriTemplate.getTemplateVariables()
+//                .stream()
+//                .map(ArgumentName::of)
+//                .collect(Collectors.toSet());
     }
 
     /** validates if a new instance has the correct syntax. */
@@ -72,36 +68,38 @@ public final class HttpPathValidator {
         }
 
         // verify that path template variables are unique
-        Set<String> templateVars = new HashSet<>();
-        new UriTemplate(path.toString()).getTemplateVariables().stream().forEach(var -> {
-            Preconditions.checkState(!templateVars.contains(var),
-                    "Path parameter %s appears more than once in path %s", var, path);
-            templateVars.add(var);
-        });
-        ConjureMetrics.histogram(templateVars.size(), HttpPathValidator.class, "template-vars");
+//        Set<String> templateVars = new HashSet<>();
+        throw new RuntimeException("FOO");
 
-        UriTemplateParser uriTemplateParser = new UriTemplateParser(path.toString());
-        Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();
-        String[] segments = uriTemplateParser.getNormalizedTemplate().split("/");
-        for (int i = 0; i < segments.length; i++) {
-            if (!(segments[i].startsWith("{") && segments[i].endsWith("}"))) {
-                // path literal
-                continue;
-            }
-
-            // variable
-            Pattern varPattern = nameToPattern.get(segments[i].substring(1, segments[i].length() - 1));
-            if (varPattern.equals(UriTemplateParser.TEMPLATE_VALUE_PATTERN)) {
-                // no regular expression specified -- OK
-                continue;
-            }
-
-            // if regular expression was specified, it must be ".+" or ".*" based on invariant previously enforced
-            Preconditions.checkState(i == segments.length - 1 || !varPattern.pattern().equals(".*"),
-                    "Path parameter %s in path %s specifies regular expression %s, but this regular "
-                            + "expression is only permitted if the path parameter is the last segment", segments[i],
-                    path, varPattern);
-        }
+        //        new UriTemplate(path.toString()).getTemplateVariables().stream().forEach(var -> {
+//            Preconditions.checkState(!templateVars.contains(var),
+//                    "Path parameter %s appears more than once in path %s", var, path);
+//            templateVars.add(var);
+//        });
+//        ConjureMetrics.histogram(templateVars.size(), HttpPathValidator.class, "template-vars");
+//
+//        UriTemplateParser uriTemplateParser = new UriTemplateParser(path.toString());
+//        Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();
+//        String[] segments = uriTemplateParser.getNormalizedTemplate().split("/");
+//        for (int i = 0; i < segments.length; i++) {
+//            if (!(segments[i].startsWith("{") && segments[i].endsWith("}"))) {
+//                // path literal
+//                continue;
+//            }
+//
+//            // variable
+//            Pattern varPattern = nameToPattern.get(segments[i].substring(1, segments[i].length() - 1));
+//            if (varPattern.equals(UriTemplateParser.TEMPLATE_VALUE_PATTERN)) {
+//                // no regular expression specified -- OK
+//                continue;
+//            }
+//
+//            // if regular expression was specified, it must be ".+" or ".*" based on invariant previously enforced
+//            Preconditions.checkState(i == segments.length - 1 || !varPattern.pattern().equals(".*"),
+//                    "Path parameter %s in path %s specifies regular expression %s, but this regular "
+//                            + "expression is only permitted if the path parameter is the last segment", segments[i],
+//                    path, varPattern);
+//        }
     }
 
     public static String withoutLeadingSlash(String httpPath) {
