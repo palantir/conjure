@@ -249,8 +249,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .forEach(headerArgDefinition -> {
                         boolean isValid = recursivelyValidate(headerArgDefinition.getType(), dealiasingTypeVisitor);
                         Preconditions.checkState(isValid,
-                                "Query parameters must be enums, primitives, aliases, list, sets or optional of primitive:"
-                                        + " \"%s\" is not allowed",
+                                "Query parameters must be enums, primitives, aliases, list, sets "
+                                        + "or optional of primitive: \"%s\" is not allowed",
                                 headerArgDefinition.getArgName());
                     });
         }
@@ -284,7 +284,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                             return false;
                         }
 
-                        // The cases below will not be hit since they are implicitly handled by the DeialistingTypeVisitor above
+                        // The cases below should not be handled here, since they implicitly handled by the
+                        // DealiasingTypeVisitor above
                         @Override
                         public Boolean visitReference(TypeName value) {
                             throw new RuntimeException("Unexpected type when validating query parameters");
