@@ -25,12 +25,18 @@ import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
@@ -50,6 +56,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_BEARER_TOKEN_PATH_OR_QUERY_PARAMS(new NoBearerTokenPathOrQueryParams()),
     NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
     NO_COMPLEX_HEADER_PARAMS(new NoComplexHeaderParamValidator()),
+    NO_COMPLEX_QUERY_PARAMS(new NoComplexQueryParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
@@ -211,6 +218,88 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                         + " \"%s\" is not allowed",
                                 entry.getArgName());
                     });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexQueryParams implements ConjureContextualValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            definition.getArgs().stream()
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
+                    .forEach(entry -> {
+                        Either<TypeDefinition, Type> resolvedType = dealiasingTypeVisitor.dealias(entry.getType());
+                        Boolean isValid = resolvedType.fold(
+                                typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                                type -> type.accept(TypeVisitor.IS_PRIMITIVE) && !type.accept(TypeVisitor.IS_ANY));
+                        Preconditions.checkState(isValid,
+                                "Path parameters must be primitives or aliases: \"%s\" is not allowed",
+                                entry.getArgName());
+                    });
+        }
+    }
+
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexQueryParamValidator implements ConjureContextualValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            definition.getArgs().stream()
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
+                    .forEach(headerArgDefinition -> {
+                        boolean isValid = recursivelyValidate(headerArgDefinition.getType(), dealiasingTypeVisitor);
+                        Preconditions.checkState(isValid,
+                                "Query parameters must be enums, primitives, aliases, list, sets or optional of primitive:"
+                                        + " \"%s\" is not allowed",
+                                headerArgDefinition.getArgName());
+                    });
+        }
+
+        private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor) {
+            return visitor.dealias(type).fold(
+                    typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                    subType -> subType.accept(new Type.Visitor<Boolean>() {
+                        @Override
+                        public Boolean visitPrimitive(PrimitiveType value) {
+                            return value.get() != PrimitiveType.Value.ANY;
+                        }
+
+                        @Override
+                        public Boolean visitOptional(OptionalType value) {
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitList(ListType value) {
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitSet(SetType value) {
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitMap(MapType value) {
+                            return false;
+                        }
+
+                        // The cases below will not be hit since they are implicitly handled by the DeialistingTypeVisitor above
+                        @Override
+                        public Boolean visitReference(TypeName value) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+
+                        @Override
+                        public Boolean visitExternal(ExternalReference value) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+
+                        @Override
+                        public Boolean visitUnknown(String unknownType) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+                    }));
         }
     }
 
