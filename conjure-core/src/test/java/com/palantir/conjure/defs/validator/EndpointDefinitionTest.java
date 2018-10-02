@@ -185,7 +185,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
+                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
     }
 
@@ -208,7 +208,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Header parameters must be primitives, aliases or optional primitive:"
+                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive:"
                         + " \"someName\" is not allowed");
     }
 }
