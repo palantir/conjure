@@ -47,6 +47,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @com.google.errorprone.annotations.Immutable
 public enum EndpointDefinitionValidator implements ConjureContextualValidator<EndpointDefinition> {
@@ -60,6 +62,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
+
+    private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
     public static void validateAll(EndpointDefinition definition, DealiasingTypeVisitor dealiasingVisitor) {
         for (EndpointDefinitionValidator validator : values()) {
@@ -271,11 +275,13 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                         @Override
                         public Boolean visitList(ListType value) {
+                            log.warn("Collections as query parameters are deprecated and will be removed in a future release");
                             return recursivelyValidate(value.getItemType(), visitor);
                         }
 
                         @Override
                         public Boolean visitSet(SetType value) {
+                            log.warn("Collections as query parameters are deprecated and will be removed in a future release");
                             return recursivelyValidate(value.getItemType(), visitor);
                         }
 
