@@ -351,3 +351,23 @@ negative:
                 queryName:
                   type: binary
                   param-type: query
+  disallowQueryParamWithAliasedBinary:
+    expected-error: "Non body parameters cannot be of the 'binary' type: 'queryName' is not allowed"
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            AliasedBinary:
+              alias: binary
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http: GET /myEndpoint
+              args:
+                queryName:
+                  type: AliasedBinary
+                  param-type: query
