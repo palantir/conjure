@@ -189,6 +189,24 @@ negative:
               http: GET /{foo}
               args:
                 foo: bearertoken
+  disallowAliasedBearerTokenInPathParams:
+    expected-error: "Path or query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            AliasedToken:
+              alias: bearertoken
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: AliasedToken
   disallowBearerTokenInQueryParams:
     expected-error: "Path or query parameters of type 'bearertoken' are not allowed as this would introduce a security vulnerability: \"foo\""
     conjure:
@@ -204,7 +222,7 @@ negative:
                   type: bearertoken
                   param-type: query
   disallowAnyInPathParams:
-    expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
+    expected-error: "Non body parameters cannot be of the 'binary' type: 'foo' is not allowed"
     conjure:
       services:
         Unused:
@@ -215,6 +233,24 @@ negative:
               http: GET /{foo}
               args:
                 foo: any
+  disallowAliasedAnyInPathParams:
+    expected-error: "Non body parameters cannot be of the 'binary' type: 'foo' is not allowed"
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            AliasedAny:
+              alias: any
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /{foo}
+              args:
+                foo: AliasedAny
   disallowListInPathParams:
     expected-error: 'Path parameters must be primitives or aliases: "foo" is not allowed'
     conjure:
@@ -263,7 +299,7 @@ negative:
               http: GET /{foo}
               args:
                 foo: set<string>
-  endpointPathMethodMustBeUnique:
+  disallowPathMethodMustBeUnique:
     expected-error: 'Endpoint "GET /myEndpoint" is defined by multiple endpoints: [testEndpoint, otherTestEndpoint]'
     conjure:
       services:
@@ -276,7 +312,7 @@ negative:
               http: GET /myEndpoint
             otherTestEndpoint:
               http: GET /myEndpoint
-  endpointReturnsWithNestedOptional:
+  disallowReturnsWithNestedOptional:
     expected-error: "Illegal nested optionals found in return type of endpoint testEndpoint"
     conjure:
       services:
@@ -287,7 +323,7 @@ negative:
             testEndpoint:
               http: GET /myEndpoint
               returns: optional<optional<string>>
-  endpointQueryParamWithNestedOptional:
+  disallowQueryParamWithNestedOptional:
       expected-error: "Illegal nested optionals found in one of the arguments of endpoint testEndpoint"
       conjure:
         services:
@@ -301,3 +337,17 @@ negative:
                   queryName:
                     type: optional<optional<string>>
                     param-type: query
+  disallowQueryParamWithBinary:
+    expected-error: "Non body parameters cannot be of the 'binary' type: 'queryName' is not allowed"
+    conjure:
+      services:
+        TestService:
+          name: Test Service
+          package: test.a
+          endpoints:
+            testEndpoint:
+              http: GET /myEndpoint
+              args:
+                queryName:
+                  type: binary
+                  param-type: query

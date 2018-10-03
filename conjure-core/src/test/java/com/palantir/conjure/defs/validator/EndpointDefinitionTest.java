@@ -29,6 +29,7 @@ import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
@@ -63,8 +64,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Endpoint cannot have non-body argument with type "
-                        + "'Type{value: PrimitiveWrapper{value: BINARY}}'");
+                .hasMessage("Non body parameters cannot be of the 'binary' type: 'testArg' is not allowed");
     }
 
     @Test
@@ -102,12 +102,12 @@ public final class EndpointDefinitionTest {
     public void testPathParamValidatorUniquePathParams() {
         ArgumentDefinition paramDefinition1 = ArgumentDefinition.builder()
                 .argName(ArgumentName.of("paramName"))
-                .type(Type.primitive(PrimitiveType.ANY))
+                .type(Type.primitive(PrimitiveType.STRING))
                 .paramType(ParameterType.path(PathParameterType.of()))
                 .build();
         ArgumentDefinition paramDefinition2 = ArgumentDefinition.builder()
                 .argName(ArgumentName.of("paramName"))
-                .type(Type.primitive(PrimitiveType.ANY))
+                .type(Type.primitive(PrimitiveType.STRING))
                 .paramType(ParameterType.path(PathParameterType.of()))
                 .build();
 
@@ -126,7 +126,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testPathParamValidatorExtraParams() {
         ArgumentDefinition paramDefinition = ArgumentDefinition.builder()
-                .type(Type.primitive(PrimitiveType.ANY))
+                .type(Type.primitive(PrimitiveType.STRING))
                 .argName(ArgumentName.of("paramName"))
                 .paramType(ParameterType.path(PathParameterType.of()))
                 .build();
@@ -176,7 +176,7 @@ public final class EndpointDefinitionTest {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("someName"))
-                        .type(Type.primitive(PrimitiveType.ANY))
+                        .type(Type.list(ListType.builder().itemType(Type.primitive(PrimitiveType.STRING)).build()))
                         .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
                         .build())
                 .endpointName(ENDPOINT_NAME)
