@@ -16,7 +16,7 @@ We have the following requirements for the format negotiation protocol:
 
 - A *version* is a non-zero integer
 - A *Conjure format identifier* is a string of the `application/<format>; v=<version>` where `<format>` is a
-  non-empty string over `[a-z]` (e.g., `json`) and `<version>` is a version string (as above)
+  non-empty string over `[a-z-]` (e.g., `json`) and `<version>` is a version string (as above)
 - A *Conjure format list* is a comma-separated, ordered list of Conjure format identifiers
 - The `Accept` and `Content-Type` HTTP headers are defined as per the
   [HTTP 1.1 spec](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html). Note that `Accept: <format list>` is a
