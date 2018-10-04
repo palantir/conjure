@@ -14,9 +14,9 @@ We have the following requirements for the format negotiation protocol:
 
 ### Definitions
 
-- A *version* is a string of the form `x.y` where x and y are positive integers
-- A *Conjure format identifier* is a string of the `application/<format>+conjure; v=<version>` where `<format>` is a 
-  non-empty string over `[a-z]` and `<version>` is a version string (as above)
+- A *version* is a non-zero integer
+- A *Conjure format identifier* is a string of the `application/<format>; v=<version>` where `<format>` is a
+  non-empty string over `[a-z]` (e.g., `json`) and `<version>` is a version string (as above)
 - A *Conjure format list* is a comma-separated, ordered list of Conjure format identifiers
 - The `Accept` and `Content-Type` HTTP headers are defined as per the
   [HTTP 1.1 spec](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html). Note that `Accept: <format list>` is a
@@ -25,7 +25,7 @@ We have the following requirements for the format negotiation protocol:
 ### Wire format versioning
 
 We propose that every revision of the Conjure wire format be labelled with a format identifier.
-The current PLAIN+JSON format shall be labelled `application/json+conjure; v=1.0`.
+The current PLAIN+JSON format shall be labelled `application/json; v=1`.
 
 ### Format capabilities
 
@@ -38,12 +38,13 @@ We assume that clients and servers implement both serialization and deserializat
 
 **Requests.** 
 Clients send the format identifier used to encode the request as a Content-Type header, and a format list as an Accept 
-header. The format indicates the preference-ordered list of formats that the client supports.
+header. The format indicates the preference-ordered list of formats that the client supports. The supported formats
+must include the format use to encode the request, i.e., the format specified in the Content-Type request header.
 
 **Responses.**
-Servers that do not support the request format respond with a suitable error code. Otherwise, they use the
-most-preferred (as per Accept request header) format to encode the response and advertise the chosen format in the
-response Content-Type header. 
+Servers that do not support the request format respond with Conjure error UNSUPPORTED/415. Otherwise, if the server
+does supported the request format, it uses the most-preferred (as per Accept request header) format to encode the
+response and advertise the chosen format in the response Content-Type header. 
 
 Every response (including non-success responses) must send a preference-ordered format list of supported formats as
 Accept response header. (Note that this is a non-standard header for HTTP 1.1 responses.)
@@ -55,8 +56,35 @@ responses with non-error responses.
 
 At the beginning of a session, clients have no knowledge of the list of formats supported by the server. Clients may
 update the list of formats supported by a given server or service as per the formats advertised in the Accept headers of
-responses in the session. To bootstrap the negotiation, client shall assume that servers support a "recent" variant of
-the `application/json+conjure` format and thus choose the latest supported format from this family.
+responses in the session. Typically, a client will pick its most preferred format that is advertised by the server
+in the previous response of the session. To bootstrap the negotiation, clients shall assume that servers support the
+most recent variant of the `application/json` format known to the client, and use this version for the first request of
+every session.
+
+**Example.** The following sequence of two requests and corresponding responses are between a client that supports 
+CBOR v=2, CBOR v=1, and JSON v=1, and that prefers formats in that order, and a server that supports CBOR v=1 and 
+JSON v=1. To bootstrap the session, the client encodes the first request with the latest known JSON format, v=1. The
+servers encodes the response with the format most preferred by the client that it also supports itself, CBOR v=1. The
+second request is encoded with the format most preferred by the client that the server supports, CBOR v=1.
+
+
+```text
+Client ---------> Server
+Content-Type: application/json; v=1
+Accept: application/cbor; v=2, application/cbor; v=1, application/json; v=1
+
+Client <--------- Server
+Content-Type: application/cbor; v=1
+Accept: application/cbor; v=1, application/json; v=1
+
+Client ---------> Server
+Content-Type: application/cbor; v=1
+Accept: application/cbor; v=2, application/cbor; v=1, application/json; v=1
+
+Client <--------- Server
+Content-Type: application/cbor; v=1
+Accept: application/cbor; v=1, application/json; v=1
+```
 
 In the rare case that server does not support the bootstrap format, the error response will carry a list of supported
 formats (see above) from which the client can choose when retrying the request.
