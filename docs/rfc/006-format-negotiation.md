@@ -43,7 +43,7 @@ must include the format use to encode the request, i.e., the format specified in
 
 **Responses.**
 Servers that do not support the request format respond with Conjure error UNSUPPORTED/415. Otherwise, if the server
-does supported the request format, it uses the most-preferred (as per Accept request header) format to encode the
+does support the request format, it uses the most-preferred (as per Accept request header) format to encode the
 response and advertise the chosen format in the response Content-Type header. 
 
 Every response (including non-success responses) must send a preference-ordered format list of supported formats as
