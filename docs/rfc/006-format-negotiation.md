@@ -14,8 +14,8 @@ We have the following requirements for the format negotiation protocol:
 
 ### Definitions
 
-- A *version* is a non-zero integer
-- A *Conjure format identifier* is a string of the `application/<format>; v=<version>` where `<format>` is a
+- A *version* is a positive integer
+- A *Conjure format identifier* is a string of the `application/<format>; conjure=<version>` where `<format>` is a
   non-empty string over `[a-z-]` (e.g., `json`) and `<version>` is a version string (as above)
 - A *Conjure format list* is a comma-separated, ordered list of Conjure format identifiers
 - The `Accept` and `Content-Type` HTTP headers are defined as per the
@@ -25,7 +25,7 @@ We have the following requirements for the format negotiation protocol:
 ### Wire format versioning
 
 We propose that every revision of the Conjure wire format be labelled with a format identifier.
-The current PLAIN+JSON format shall be labelled `application/json; v=1`.
+The current PLAIN+JSON format shall be labelled `application/json; conjure=1`.
 
 ### Format capabilities
 
@@ -61,29 +61,30 @@ in the previous response of the session. To bootstrap the negotiation, clients s
 most recent variant of the `application/json` format known to the client, and use this version for the first request of
 every session.
 
-**Example.** The following sequence of two requests and corresponding responses are between a client that supports 
-CBOR v=2, CBOR v=1, and JSON v=1, and that prefers formats in that order, and a server that supports CBOR v=1 and 
-JSON v=1. To bootstrap the session, the client encodes the first request with the latest known JSON format, v=1. The
-servers encodes the response with the format most preferred by the client that it also supports itself, CBOR v=1. The
-second request is encoded with the format most preferred by the client that the server supports, CBOR v=1.
+**Example.** The following sequence of two requests and corresponding responses are between a client that supports CBOR
+version 2, CBOR version 1, and JSON version 1, and that prefers formats in that order, and a server that supports CBOR
+version 1 and JSON version 1. To bootstrap the session, the client encodes the first request with the latest known JSON
+format, version 1. The servers encodes the response with the format most preferred by the client that it also supports
+itself, CBOR version 1. The second request is encoded with the format most preferred by the client that the server
+supports, CBOR version 1.
 
 
 ```text
 Client ---------> Server
-Content-Type: application/json; v=1
-Accept: application/cbor; v=2, application/cbor; v=1, application/json; v=1
+Content-Type: application/json; conjure=1
+Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
 
 Client <--------- Server
-Content-Type: application/cbor; v=1
-Accept: application/cbor; v=1, application/json; v=1
+Content-Type: application/cbor; conjure=1
+Accept: application/cbor; conjure=1, application/json; conjure=1
 
 Client ---------> Server
-Content-Type: application/cbor; v=1
-Accept: application/cbor; v=2, application/cbor; v=1, application/json; v=1
+Content-Type: application/cbor; conjure=1
+Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
 
 Client <--------- Server
-Content-Type: application/cbor; v=1
-Accept: application/cbor; v=1, application/json; v=1
+Content-Type: application/cbor; conjure=1
+Accept: application/cbor; conjure=1, application/json; conjure=1
 ```
 
 In the rare case that server does not support the bootstrap format, the error response will carry a list of supported
