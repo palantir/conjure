@@ -24,8 +24,10 @@ We have the following requirements for the format negotiation protocol:
 
 ### Wire format versioning
 
-We propose that every revision of the Conjure wire format be labelled with a format identifier.
-The current PLAIN+JSON format shall be labelled `application/json; conjure=1`.
+We propose that every revision of the Conjure wire format be labelled with a format identifier.  The current PLAIN+JSON
+format shall be labelled `application/json; conjure=1`. For allow for backwards compatibility, clients and servers
+should interpret a `application/json` header without a `conjure=<version>` parameter as the `application/json;
+conjure=1` format.
 
 ### Format capabilities
 
