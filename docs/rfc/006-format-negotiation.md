@@ -57,7 +57,14 @@ clients may choose to repeat the request encoded with a more widely supported (i
 accordance with the wire spec, a request carrying binary data in the request body must include a `Content-Type:
 application/octet-stream` request header, and a server returning a `binary` response must include a `Content-Type:
 application/octet-stream` response header. Further, when calling endpoints returning a `binary` response, clients must
-include `application/octet-stream` in the `Accept` format list.
+include in the `Accept` format list:
+
+- `application/octet-stream`
+- the list of supported Conjure formats and versions (e.g., `application/json; version=2`)
+
+The rationale for including both the `octet-stream` and the `json` (or `cbor`, etc.) formats is that the former is used
+when returning binary data and the later for returning structured Conjure errors. The `application/octet-stream` format
+is not versioned.
 
 
 ### Discussion
@@ -134,4 +141,30 @@ Request
 Response
   Content-Type: application/json
   # Clients may assume that application/json is the version 1 JSON format
+```
+
+**Example: JSON request, binary response.** A request to an endpoint returning `binary` data must include
+both the `octet-stream` and a standard Conjure format list in the `Accept` header.
+
+```text
+Request
+  Content-Type: application/json; conjure=2
+  Accept: application/octet-stream, application/json; conjure=2
+
+Response
+  Content-Type: application/octet-stream
+```
+
+In case the server returns a structured Conjure error, it formats the error according to the most prefered of the
+accepted Conjure formats.
+
+```text
+Request
+  Content-Type: application/json; conjure=2
+  Accept: application/octet-stream, application/json; conjure=2
+
+Response
+  Content-Type: application/json; conjure=2
+  Status: 4xx or 5xx
+  # body contains Conjure error in JSON version 2 format
 ```
