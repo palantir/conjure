@@ -24,8 +24,11 @@ We have the following requirements for the format negotiation protocol:
 
 ### Wire format versioning
 
-We propose that every revision of the Conjure wire format be labelled with a format identifier.  The current PLAIN+JSON
-format shall be labelled `application/json; conjure=1`. For allow for backwards compatibility, clients and servers
+A Conjure wire format comprises specifications for Conjure parameters and return values. Today, the canonical format
+uses JSON objects for `body` request and response objects and PLAIN for all other parameters.
+
+We propose that every revision of a Conjure wire format be labelled with a format identifier. The current PLAIN+JSON
+format shall be labelled `application/json; conjure=1`. To allow for backwards compatibility, clients and servers
 should interpret a `application/json` header without a `conjure=<version>` parameter as the `application/json;
 conjure=1` format.
 
@@ -39,55 +42,96 @@ We assume that clients and servers implement both serialization and deserializat
 ### Negotiation protocol
 
 **Requests.** 
-Clients send the format identifier used to encode the request as a Content-Type header, and a format list as an Accept 
-header. The format indicates the preference-ordered list of formats that the client supports. The supported formats
-must include the format use to encode the request, i.e., the format specified in the Content-Type request header.
+Clients send the format identifier used to encode the request as a `Content-Type` header, and a format list as an
+`Accept` header. The format indicates the preference-ordered list of formats that the client supports. The supported
+formats must include the format use to encode the request, i.e., the format specified in the `Content-Type` request
+header.
 
 **Responses.**
-Servers that do not support the request format respond with Conjure error UNSUPPORTED/415. Otherwise, if the server
-does support the request format, it uses the most-preferred (as per Accept request header) format to encode the
-response and advertise the chosen format in the response Content-Type header. 
+Servers that do not support the request format respond with HTTP status code `415 Unsupported Media Type`. Otherwise, if
+the server does support the request format, it uses the most-preferred (as per `Accept` request header) format to encode
+the response and advertise the chosen format in the response `Content-Type` header. Upon receiving a `415` response,
+clients may choose to repeat the request encoded with a more widely supported (i.e., typically older) format.
 
-Every response (including non-success responses) must send a preference-ordered format list of supported formats as
-Accept response header. (Note that this is a non-standard header for HTTP 1.1 responses.)
+**Binary data** Conjure supports endpoints accepting `binary` request parameters or returning `binary` responses. In
+accordance with the wire spec, a request carrying binary data in the request body must include a `Content-Type:
+application/octet-stream` request header, and a server returning a `binary` response must include a `Content-Type:
+application/octet-stream` response header. Further, when calling endpoints returning a `binary` response, clients must
+include `application/octet-stream` in the `Accept` format list.
 
-**Negotiation.**
-Format negotiation takes place in the context of a "session" of subsequent requests made by a client to a server (or
-service). A client may assume, loosely, that a session is active to a given server or service as long as it receives
-responses with non-error responses.
 
-At the beginning of a session, clients have no knowledge of the list of formats supported by the server. Clients may
-update the list of formats supported by a given server or service as per the formats advertised in the Accept headers of
-responses in the session. Typically, a client will pick its most preferred format that is advertised by the server
-in the previous response of the session. To bootstrap the negotiation, clients shall assume that servers support the
-most recent variant of the `application/json` format known to the client, and use this version for the first request of
-every session.
+### Discussion
 
-**Example.** The following sequence of two requests and corresponding responses are between a client that supports CBOR
-version 2, CBOR version 1, and JSON version 1, and that prefers formats in that order, and a server that supports CBOR
-version 1 and JSON version 1. To bootstrap the session, the client encodes the first request with the latest known JSON
-format, version 1. The servers encodes the response with the format most preferred by the client that it also supports
-itself, CBOR version 1. The second request is encoded with the format most preferred by the client that the server
-supports, CBOR version 1.
+**Clients in control.** Clients are in control of the format negotiation in the sense that rank the list of acceptable
+protocols based on their preference and let the server merely "chooses" based on its support for the most preferred
+formats. Further, clients are in control of the trade-off between choosing the newest or most preferred versus an older
+or more widely supported format. The former approach unlocks new formats and features more quickly, but may result in an
+additional round-trip when the client has to reissue the request encoded with a more widely supported format.
 
+**OPTIONS.** This RFC does not propose to make the set of server-supported formats available as through an OPTIONS
+request. A client receiving a `415` error from a server can instead retry the request with the maximal list of
+client-supports formats and let the server pick the most preferred one.
+
+**Blue/green, server vs service.** This RFC does not propose any explicit mechanism for distinguishing between the
+different servers making up a remote service. For example, a service undergoing a blue/green migration between versions
+that support different sets of formats may pick different response formats depending on which server handles the
+request. We submit that this will rarely cause issues since clients and servers would still be able to agree on a format
+and even switching between different formats for subsequent requests would be acceptable.
+
+**Example: Conservative client.** The following sequence of two requests and corresponding responses are between a client
+that supports CBOR version 2, CBOR version 1, and JSON version 1, and that prefers formats in that order, and a server
+that supports CBOR version 1 and JSON version 1. To bootstrap a session, the client makes conservative assumptions about
+the server's capabilities and encodes the first request with a widely supported JSON format, version 1. The servers
+encodes the response with the format most preferred by the client that it also supports itself, CBOR version 1. The
+second request is encoded with the format most preferred by the client that the server supports, CBOR version 1.
 
 ```text
-Client ---------> Server
-Content-Type: application/json; conjure=1
-Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
+Request
+  Content-Type: application/json; conjure=1
+  Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
 
-Client <--------- Server
-Content-Type: application/cbor; conjure=1
-Accept: application/cbor; conjure=1, application/json; conjure=1
+Response
+  Content-Type: application/cbor; conjure=1
 
-Client ---------> Server
-Content-Type: application/cbor; conjure=1
-Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
+Request
+  Content-Type: application/cbor; conjure=1
+  Accept: application/cbor; conjure=2, application/cbor; conjure=1, application/json; conjure=1
 
-Client <--------- Server
-Content-Type: application/cbor; conjure=1
-Accept: application/cbor; conjure=1, application/json; conjure=1
+Response
+  Content-Type: application/cbor; conjure=1
 ```
 
-In the rare case that server does not support the bootstrap format, the error response will carry a list of supported
-formats (see above) from which the client can choose when retrying the request.
+**Example: Cutting edge client.** If a client accepts only the most cutting edge version of a format, an older server
+may not be able to pick a supported format. The client may choose to error, or can alternatively retry the request
+with an older format.
+
+```text
+Request
+  Content-Type: application/json; conjure=2
+  Accept: application/json; conjure=2
+
+Response
+  Status: 415
+
+Request
+  Content-Type: application/json; conjure=1
+  Accept: application/json; conjure=1
+
+Response
+  Content-Type: application/json; conjure=1
+```
+
+**Example: Old server.** A server that predates this RFC may ignore the format instructions and decode the request
+w.r.t. the canonical JSON format (i.e., `application/json; conjure=1`). The response should carry the appropriate
+content type as per the wire spec.
+
+```text
+Request
+  Content-Type: application/json; conjure=2
+  Accept: application/json; conjure=2
+  # Note that the server will interpret the version 2 request as if it were version 1
+
+Response
+  Content-Type: application/json
+  # Clients may assume that application/json is the version 1 JSON format
+```
