@@ -51,7 +51,7 @@ header.
 Servers that do not support the request format respond with HTTP status code `415 Unsupported Media Type`. Otherwise, if
 the server does support the request format, it uses the most-preferred (as per `Accept` request header) format to encode
 the response and advertise the chosen format in the response `Content-Type` header. Upon receiving a `415` response,
-clients may choose to repeat the request encoded with a more widely supported (i.e., typically older) format.
+clients may choose to repeat the request encoded with a different (i.e., typically older) format.
 
 **Binary data** Conjure supports endpoints accepting `binary` request parameters or returning `binary` responses. In
 accordance with the wire spec, a request carrying binary data in the request body must include a `Content-Type:
@@ -73,7 +73,9 @@ is not versioned.
 protocols based on their preference and let the server merely "chooses" based on its support for the most preferred
 formats. Further, clients are in control of the trade-off between choosing the newest or most preferred versus an older
 or more widely supported format. The former approach unlocks new formats and features more quickly, but may result in an
-additional round-trip when the client has to reissue the request encoded with a more widely supported format.
+additional round-trip when the client has to reissue the request encoded with a different und hopefully supported
+format. A more complex negotiation mechanism (e.g., based on OPTIONS endpoints or `Accept-Post` response headers) is
+possible, but outside the scope of this RFC.
 
 **OPTIONS.** This RFC does not propose to make the set of server-supported formats available as through an OPTIONS
 request. A client receiving a `415` error from a server can instead retry the request with the maximal list of
