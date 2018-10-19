@@ -73,7 +73,7 @@ is not versioned.
 protocols based on their preference and let the server merely "chooses" based on its support for the most preferred
 formats. Further, clients are in control of the trade-off between choosing the newest or most preferred versus an older
 or more widely supported format. The former approach unlocks new formats and features more quickly, but may result in an
-additional round-trip when the client has to reissue the request encoded with a different und hopefully supported
+additional round-trip when the client has to reissue the request encoded with a different and hopefully supported
 format. A more complex negotiation mechanism (e.g., based on OPTIONS endpoints or `Accept-Post` response headers) is
 possible, but outside the scope of this RFC.
 
