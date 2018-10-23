@@ -25,12 +25,18 @@ import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
+import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
@@ -41,6 +47,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @com.google.errorprone.annotations.Immutable
 public enum EndpointDefinitionValidator implements ConjureContextualValidator<EndpointDefinition> {
@@ -50,9 +58,12 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_BEARER_TOKEN_PATH_OR_QUERY_PARAMS(new NoBearerTokenPathOrQueryParams()),
     NO_COMPLEX_PATH_PARAMS(new NoComplexPathParamValidator()),
     NO_COMPLEX_HEADER_PARAMS(new NoComplexHeaderParamValidator()),
+    NO_COMPLEX_QUERY_PARAMS(new NoComplexQueryParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
+
+    private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
     public static void validateAll(EndpointDefinition definition, DealiasingTypeVisitor dealiasingVisitor) {
         for (EndpointDefinitionValidator validator : values()) {
@@ -212,6 +223,74 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                         return definedPrimitive || optionalPrimitive;
                     });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoComplexQueryParamValidator implements ConjureContextualValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            definition.getArgs().stream()
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
+                    .forEach(argDefinition -> {
+                        boolean isValid = recursivelyValidate(argDefinition.getType(), dealiasingTypeVisitor);
+                        Preconditions.checkState(isValid,
+                                "Query parameters must be enums, primitives, aliases, list, sets "
+                                        + "or optional of primitive: \"%s\" is not allowed",
+                                argDefinition.getArgName());
+                    });
+        }
+
+        private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor) {
+            return visitor.dealias(type).fold(
+                    typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                    subType -> subType.accept(new Type.Visitor<Boolean>() {
+                        @Override
+                        public Boolean visitPrimitive(PrimitiveType value) {
+                            return value.get() != PrimitiveType.Value.ANY;
+                        }
+
+                        @Override
+                        public Boolean visitOptional(OptionalType value) {
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitList(ListType value) {
+                            log.warn("Collections as query parameters are deprecated and will "
+                                    + "be removed in a future release");
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitSet(SetType value) {
+                            log.warn("Collections as query parameters are deprecated and will "
+                                    + "be removed in a future release");
+                            return recursivelyValidate(value.getItemType(), visitor);
+                        }
+
+                        @Override
+                        public Boolean visitMap(MapType value) {
+                            return false;
+                        }
+
+                        // The cases below should not be handled here, since they implicitly handled by the
+                        // DealiasingTypeVisitor above
+                        @Override
+                        public Boolean visitReference(TypeName value) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+
+                        @Override
+                        public Boolean visitExternal(ExternalReference value) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+
+                        @Override
+                        public Boolean visitUnknown(String unknownType) {
+                            throw new RuntimeException("Unexpected type when validating query parameters");
+                        }
+                    }));
         }
     }
 
