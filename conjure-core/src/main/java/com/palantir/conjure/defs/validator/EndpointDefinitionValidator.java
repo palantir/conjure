@@ -275,13 +275,15 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                         @Override
                         public Boolean visitList(ListType value) {
-                            log.warn("Collections as query parameters are deprecated and will be removed in a future release");
+                            log.warn("Collections as query parameters are deprecated and will "
+                                    + "be removed in a future release");
                             return recursivelyValidate(value.getItemType(), visitor);
                         }
 
                         @Override
                         public Boolean visitSet(SetType value) {
-                            log.warn("Collections as query parameters are deprecated and will be removed in a future release");
+                            log.warn("Collections as query parameters are deprecated and will "
+                                    + "be removed in a future release");
                             return recursivelyValidate(value.getItemType(), visitor);
                         }
 
