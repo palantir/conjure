@@ -202,25 +202,26 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
-                    .forEach(entry -> {
-                        Either<TypeDefinition, Type> resolvedType = dealiasingTypeVisitor.dealias(entry.getType());
-
-                        boolean isValid = resolvedType.fold(
-                                typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
-                                type -> {
-                                    boolean isDefinedPrimitive = type.accept(TypeVisitor.IS_PRIMITIVE)
-                                            && !type.accept(TypeVisitor.IS_ANY);
-                                    boolean isOptionalPrimitive = type.accept(TypeVisitor.IS_OPTIONAL)
-                                            && type.accept(TypeVisitor.OPTIONAL)
-                                            .getItemType()
-                                            .accept(TypeVisitor.IS_PRIMITIVE);
-                                    return isDefinedPrimitive || isOptionalPrimitive;
-                                }
-                        );
+                    .forEach(headerArgDefinition -> {
+                        boolean isValid = recursivelyValidate(headerArgDefinition.getType(), dealiasingTypeVisitor);
                         Preconditions.checkState(isValid,
-                                "Header parameters must be primitives, aliases or optional primitive:"
+                                "Header parameters must be enums, primitives, aliases or optional primitive:"
                                         + " \"%s\" is not allowed",
-                                entry.getArgName());
+                                headerArgDefinition.getArgName());
+                    });
+        }
+
+        private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor) {
+            return visitor.dealias(type).fold(
+                    typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                    subType -> {
+                        boolean definedPrimitive =
+                                subType.accept(TypeVisitor.IS_PRIMITIVE) && !subType.accept(TypeVisitor.IS_ANY);
+
+                        boolean optionalPrimitive = subType.accept(TypeVisitor.IS_OPTIONAL)
+                                && recursivelyValidate(subType.accept(TypeVisitor.OPTIONAL).getItemType(), visitor);
+
+                        return definedPrimitive || optionalPrimitive;
                     });
         }
     }

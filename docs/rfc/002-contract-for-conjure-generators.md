@@ -46,7 +46,7 @@ conjure-typescript --version="0.1.0" --goFastMode
 
 Ideally, Conjure generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain author, license and version fields (otherwise it would be very inconvenient to publish), but these clearly need to be specified by the user.
 
-Conjure generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be rejected.
+Conjure generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be ignored.
 
 Flags such as `--foo` may also be passed to switch on some functionality, or `--foo=false` to switch it off.
 

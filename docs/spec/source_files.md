@@ -23,6 +23,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
         - [FieldDefinition][]
         - [UnionTypeDefinition][]
         - [EnumTypeDefinition][]
+        - [EnumValueDefinition][]
       - [ErrorDefinition][]
       - [ErrorCode][]
     - [ServiceDefinition][]
@@ -47,6 +48,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 [DocString]: #docstring
 [EndpointDefinition]: #endpointdefinition
 [EnumTypeDefinition]: #enumtypedefinition
+[EnumValueDefinition]: #enumvaluedefinition
 [ErrorCode]: #errorcode
 [ErrorDefinition]: #errordefinition
 [ExternalTypeDefinition]: #externaltypedefinition
@@ -227,7 +229,7 @@ Definition for an enum complex data type.
 
 Field | Type | Description
 ---|:---:|---
-values | List[[ConjureType][]] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
+values | List[string or [EnumValueDefinition][]] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -239,6 +241,14 @@ LoadState:
     - LOADED
     - ERROR
 ```
+
+## EnumValueDefinition
+Definition for a single value within an enumeration.
+
+Field | Type | Description
+---|:---:|---
+value | string | **REQUIRED**. The enumeration value. Value MUST be unique and be UPPERCASE.
+docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
 ## ErrorDefinition
@@ -329,7 +339,7 @@ An object representing an argument to an endpoint.
 
 Field | Type | Description
 ---|:---:|---
-type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. The type MUST be a primitive if the argument is a path parameter, primitive or optional of primitive if the argument is header or primitive, optional, set or list of primitive if the argument is a query parameter.
+type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type. If the param-type is `path`, `header` or `query` then the de-aliased type MUST be an enum, a primitive or an optional of one of these. Additionally, the type MUST NOT be `bearertoken` when the param-type is `header` or `query`.
 markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
