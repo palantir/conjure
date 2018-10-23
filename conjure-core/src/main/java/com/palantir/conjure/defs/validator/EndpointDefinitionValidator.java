@@ -227,25 +227,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NoComplexQueryParams implements ConjureContextualValidator<EndpointDefinition> {
-        @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
-            definition.getArgs().stream()
-                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
-                    .forEach(entry -> {
-                        Either<TypeDefinition, Type> resolvedType = dealiasingTypeVisitor.dealias(entry.getType());
-                        Boolean isValid = resolvedType.fold(
-                                typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
-                                type -> type.accept(TypeVisitor.IS_PRIMITIVE) && !type.accept(TypeVisitor.IS_ANY));
-                        Preconditions.checkState(isValid,
-                                "Path parameters must be primitives or aliases: \"%s\" is not allowed",
-                                entry.getArgName());
-                    });
-        }
-    }
-
-
-    @com.google.errorprone.annotations.Immutable
     private static final class NoComplexQueryParamValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
