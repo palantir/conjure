@@ -98,11 +98,7 @@ public class ConjureSourceFileValidatorTest {
     }
 
     private FieldDefinition field(FieldName name, String type) {
-        return FieldDefinition.builder()
-                .fieldName(name)
-                .type(Type.reference(TypeName.of(type, PACKAGE)))
-                .docs(DOCS)
-                .build();
+        return field(name, Type.reference(TypeName.of(type, PACKAGE)));
     }
 
     private FieldDefinition field(FieldName name, Type type) {
