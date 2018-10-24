@@ -70,7 +70,8 @@ Example alias definition:
 An enum definition must have a "typeName" key describing the package and name of the type. It must also have a "values"
 key referring to a list of possible values for the enum. Each item in the list must have a "value" key
 corresponding to the string representation of the value. Each item in the list may have a "docs" key containing
-string documentation for the enum value.
+string documentation for the enum value. Each item in the list may have a "deprecated" key containing string
+documentation for why the enum value is deprecated.
 
 An enum definition may have a "docs" key containing string documentation for the enum type.
 
@@ -106,7 +107,8 @@ An object definition must have a "typeName" key describing the package and name 
 "fields" key referring to a list of field definitions. Each field definition must have a "fieldName" key with a string
 value, and a "type" key with a value that is a representation of the field type (see
 [Representation of Conjure Types](#representation-of-conjure-types)). Each field definition may have a "docs" key
-containing string documentation for the field.
+containing string documentation for the field. Each field definition may have a "deprecated" key containing string
+documentation for why the field is deprecated.
 
 An object definition may have a "docs" key containing string documentation for the object.
 

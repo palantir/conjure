@@ -45,7 +45,7 @@ public class ConjureSourceFileValidatorTest {
                 ImmutableList.of(TypeDefinition.object(
                         ObjectDefinition.builder()
                                 .typeName(FOO)
-                                .fields(FieldDefinition.of(FieldName.of("self"), Type.reference(FOO), DOCS))
+                                .fields(field(FieldName.of("self"), Type.reference(FOO)))
                                 .build())
                 )).build();
 
@@ -62,15 +62,15 @@ public class ConjureSourceFileValidatorTest {
                         ObjectDefinition.builder()
                                 .typeName(TypeName.of("Foo", "bar"))
                                 .addAllFields(ImmutableList.of(
-                                        FieldDefinition.of(FieldName.of("selfOptional"),
-                                                Type.optional(OptionalType.of(Type.reference(FOO))), DOCS),
-                                        FieldDefinition.of(FieldName.of("selfMap"),
-                                                Type.map(MapType.of(referenceType, referenceType)), DOCS),
-                                        FieldDefinition.of(FieldName.of("selfSet"),
-                                                Type.set(SetType.of(referenceType)), DOCS),
-                                        FieldDefinition.of(FieldName.of("selfList"),
-                                                Type.list(ListType.of(referenceType)), DOCS)
-                                )).build())
+                                        field(FieldName.of("selfOptional"),
+                                                Type.optional(OptionalType.of(Type.reference(FOO)))),
+                                        field(FieldName.of("selfMap"),
+                                                Type.map(MapType.of(referenceType, referenceType))),
+                                        field(FieldName.of("selfSet"),
+                                                Type.set(SetType.of(referenceType))),
+                                        field(FieldName.of("selfList"),
+                                                Type.list(ListType.of(referenceType))
+                                ))).build())
                 )).build();
 
         ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef);
@@ -98,6 +98,18 @@ public class ConjureSourceFileValidatorTest {
     }
 
     private FieldDefinition field(FieldName name, String type) {
-        return FieldDefinition.of(name, Type.reference(TypeName.of(type, PACKAGE)), DOCS);
+        return FieldDefinition.builder()
+                .fieldName(name)
+                .type(Type.reference(TypeName.of(type, PACKAGE)))
+                .docs(DOCS)
+                .build();
+    }
+
+    private FieldDefinition field(FieldName name, Type type) {
+        return FieldDefinition.builder()
+                .fieldName(name)
+                .type(type)
+                .docs(DOCS)
+                .build();
     }
 }

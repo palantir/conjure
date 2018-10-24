@@ -37,6 +37,8 @@ public interface FieldDefinition {
 
     Optional<String> docs();
 
+    Optional<String> deprecated();
+
     static FieldDefinition of(ConjureType type) {
         return ImmutableFieldDefinition.builder().type(type).build();
     }

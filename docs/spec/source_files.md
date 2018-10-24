@@ -201,7 +201,7 @@ Field | Type | Description
 ---|:---:|---
 type | [ConjureType][] | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-
+deprecated | `string` | Documentation for why this field is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 ## UnionTypeDefinition
 Definition for a union complex data type.
@@ -249,7 +249,7 @@ Field | Type | Description
 ---|:---:|---
 value | string | **REQUIRED**. The enumeration value. Value MUST be unique and be UPPERCASE.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-
+deprecated | `string` | Documentation for why this enum value is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 ## ErrorDefinition
 Definition for an error type.

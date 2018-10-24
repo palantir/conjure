@@ -35,6 +35,8 @@ public interface EnumValueDefinition {
 
     Optional<String> docs();
 
+    Optional<String> deprecated();
+
     static EnumValueDefinition.Builder builder() {
         return new Builder();
     }
