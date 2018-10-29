@@ -148,3 +148,6 @@ If you want to publish npm packages, you need to simulate the `npm login` comman
 +}
 ```
 
+## 5. Next steps
+
+Check out [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example) to see how these APIs can be used from a browser.
