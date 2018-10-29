@@ -1,6 +1,6 @@
 # Getting started
 
-_This guide explains how to add a Conjure-defined API to an existing gradle project.  It is recommended to define your API in the same git repo that you implement your server._
+_This guide presents a minimal example of how to add a Conjure-defined API to an existing Gradle project.  It is recommended to define your API in the same git repo that you implement your server._
 
 ## 1. Add the `com.palantir.conjure` gradle plugin
 
