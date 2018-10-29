@@ -1,10 +1,16 @@
 # Getting started
 
-_This guide presents a minimal example of how to add a Conjure-defined API to an existing Gradle project.  It is recommended to define your API in the same git repo that you implement your server. To see a finished result, check out [conjure-java-example](https://github.com/palantir/conjure-java-example)._
+_This guide presents a minimal example of how to add a Conjure-defined API to an existing Gradle project._
+
+To see a finished result, check out [conjure-java-example](https://github.com/palantir/conjure-java-example):
+
+```
+git clone https://github.com/palantir/conjure-java-example.git
+```
 
 ## 1. Add the `com.palantir.conjure` gradle plugin
 
-In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, and `-typescript` sub-projects.
+In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, and `-typescript` sub-projects. It is recommended to define your API in the same git repo that you implement your server.
 
 ```diff
  rootProject.name = 'your-project'
