@@ -32,29 +32,32 @@ buildscript {
         classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
     }
 }
-
-// conjure-generator versions must be specified explicitly so that it's clear they can be upgraded independently.
-
-// (option 1):
-subprojects {
-    configurations.all {
-        resolutionStrategy {
-            force 'com.palantir.conjure:conjure:4.0.0'
-            force 'com.palantir.conjure.java:conjure-java:1.0.0'
-            force 'com.palantir.conjure.java:conjure-lib:1.0.0'
-            force 'com.palantir.conjure.typescript:conjure-typescript:3.0.0'
-        }
-    }
-}
-
-// (option 2): nebula.dependency-recommender (see below)
 ```
 
-Then in `./your-project-api/build.gradle`, apply the plugin:
+Then in `./your-project-api/build.gradle`, apply the plugin and specify versions for each generator, ensuring they can be upgraded independently.
+
+_Check the GitHub releases page to find the latest version of [conjure](https://github.com/palantir/conjure/releases), [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
+
 
 ```groovy
 apply plugin: 'com.palantir.conjure'
+
+dependencies {
+    conjureCompiler 'com.palantir.conjure:conjure:4.0.0'
+    conjureJava 'com.palantir.conjure.java:conjure-java:2.0.0'
+    conjureTypeScript 'com.palantir.conjure.typescript:conjure-typescript:3.3.0'
+}
+
+subprojects {
+    pluginManager.withPlugin 'java', {
+        dependencies {
+            compile 'com.palantir.conjure.java:conjure-lib:2.0.0'
+        }
+    }
+}
 ```
+
+_Note: this boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](./gradle_decoupled_versions.md)._
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -70,18 +73,6 @@ compileConjureObjects - Generates Java POJOs from your Conjure definitions.
 
 ...
 ```
-
-
-### (Optional) Use `nebula.dependency-recommender`
-
-If you already use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin), you can omit the `resolutionStrategy` lines and use a properties file like `versions.props` instead:
-
-```
-com.palantir.conjure.java:* = <latest>
-com.palantir.conjure.typescript:conjure-typescript = <latest>
-```
-
-_Check the GitHub releases page to find the latest version of [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
 
 ## 2. Define your API in Conjure YML
 
