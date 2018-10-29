@@ -84,36 +84,34 @@ types:
     default-package: com.company.product
     objects:
 
-      AddPetRequest:
+      Recipe:
         fields:
-          id: integer
-          name: string
-          tags: set<Tag>
-          status: Status
+          name: RecipeName
+          steps: list<RecipeStep>
 
-      Tag:
+      RecipeStep:
+        union:
+          mix: set<Ingredient>
+          chop: Ingredient
+
+      RecipeName:
         alias: string
 
-      Status:
-        values:
-        - AVAILABLE
-        - PENDING
-        - SOLD
+      Ingredient:
+        alias: string
 
 services:
-  PetStoreService:
-    name: Pet Store Service
+  RecipeBookService:
+    name: Recipe Book
     package: com.company.product
-    default-auth: header
-
+    base-path: /recipes
     endpoints:
-      addPet:
-        docs: Add a new pet to the store
-        http: POST /pet
+      createRecipe:
+        http: POST /
         args:
-          addPetRequest:
-            type: AddPetRequest
+          createRecipeRequest:
             param-type: body
+            type: Recipe
 ```
 
 _Refer to the [Conjure specification](/docs/spec/source_files.md) for an exhaustive list of allowed YML parameters._
@@ -133,7 +131,7 @@ dependencies {
 }
 ```
 
-You can now write a `PetStoreResource` class which `implements PetStoreService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
+You can now write a `RecipeBookResource` class which `implements RecipeBookService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
 
 ## 4. Publish artifacts
 
