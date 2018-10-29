@@ -74,50 +74,49 @@ Conjure allows defining named, structured errors so that clients can expect spec
 
 
 ## Example
-The following YAML file defines a simple Pet Store API. (See [full reference](./docs/spec/source_files.md))
+The following YAML file defines a simple Recipe Book API. (See [full reference](./docs/spec/source_files.md))
 
 ```yaml
 types:
   definitions:
-    default-package: com.palantir.petstore
+    default-package: com.company.product
     objects:
 
-      AddPetRequest:
+      Recipe:
         fields:
-          id: integer
-          name: string
-          tags: set<Tag>
-          status: Status
+          name: RecipeName
+          steps: list<RecipeStep>
 
-      Tag:
+      RecipeStep:
+        union:
+          mix: set<Ingredient>
+          chop: Ingredient
+
+      RecipeName:
         alias: string
 
-      Status:
-        values:
-        - AVAILABLE
-        - PENDING
-        - SOLD
+      Ingredient:
+        alias: string
 
 services:
-  PetStoreService:
-    name: Pet Store Service
-    package: com.palantir.petstore
-    default-auth: header
-
+  RecipeBookService:
+    name: Recipe Book
+    package: com.company.product
+    base-path: /recipes
     endpoints:
-      addPet:
-        docs: Add a new pet to the store
-        http: POST /pet
+      createRecipe:
+        http: POST /
+        docs: Adds a new recipe to the store.
         args:
-          addPetRequest:
-            type: AddPetRequest
+          createRecipeRequest:
             param-type: body
+            type: Recipe
 ```
 
 The following generated Java interface can be used on the client and the server.
 
 ```java
-package com.palantir.petstore;
+package com.company.product;
 
 ...
 
@@ -125,11 +124,11 @@ package com.palantir.petstore;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/")
 @Generated("com.palantir.conjure.java.services.JerseyServiceGenerator")
-public interface PetStoreService {
-    /** Add a new pet to the store */
+public interface RecipeBookService {
+    /** Add a new recipe to the store. */
     @POST
-    @Path("pet")
-    void addPet(@HeaderParam("Authorization") AuthHeader authHeader, AddPetRequest addPetRequest);
+    @Path("recipes")
+    void createRecipe(@HeaderParam("Authorization") AuthHeader authHeader, Recipe createRecipeRequest);
 }
 ```
 
@@ -137,19 +136,23 @@ Type-safe network calls to this API can made from TypeScript as follows:
 
 ```ts
 function demo(): Promise<void> {
-    const request: IAddPetRequest = {
-        id: 1,
-        name: "Rover",
-        tags: [ "mytag" ],
-        status: Status.AVAILABLE
+    const request: IRecipe = {
+        name: "Baked chicken with sun-dried tomatoes",
+        steps: [
+            RecipeStep.chop("Tomatoes"),
+            RecipeStep.chop("Chicken"),
+            RecipeStep.chop("Potatoes")
+            RecipeStep.mix(["Herbs", "Tomatoes", "Chicken"]),
+        ]
     };
-    return new PetStoreService(bridge).addPet(request);
+    return new RecipeBookService(bridge).createRecipe(request);
 }
 ```
 
 ## Ecosystem
 
 Compiler
+
 - [conjure](https://github.com/palantir/conjure)
 
 Build tool
@@ -164,15 +167,21 @@ Code generators
 - conjure-go (coming soon)
 - conjure-rust (coming soon)
 
-Client libraries
+Client/server libraries
 
+- [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
 - [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
 - [conjure-python-client](https://github.com/palantir/conjure-python-client)
-- [http-remoting](https://github.com/palantir/http-remoting)
 
 Recommended server libraries
 
 - [dropwizard](https://github.com/dropwizard/dropwizard)
+
+Miscellaneous tools
+
+- [conjure-postman](https://github.com/palantir/conjure-postman)
+- conjure-jsonschema (coming soon)
+- conjure-backcompat (coming soon)
 
 ## Contributing
 
