@@ -34,10 +34,7 @@ buildscript {
 }
 ```
 
-Then in `./your-project-api/build.gradle`, apply the plugin and specify versions for each generator, ensuring they can be upgraded independently.
-
-_Check the GitHub releases page to find the latest version of [conjure](https://github.com/palantir/conjure/releases), [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
-
+Then in `./your-project-api/build.gradle`, apply the plugin and specify versions for each generator.
 
 ```groovy
 apply plugin: 'com.palantir.conjure'
@@ -57,7 +54,9 @@ subprojects {
 }
 ```
 
-_Note: this boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](./gradle_decoupled_versions.md)._
+_Check the GitHub releases page to find the latest version of [conjure](https://github.com/palantir/conjure/releases), [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
+
+This boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](./gradle_decoupled_versions.md).
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
