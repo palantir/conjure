@@ -25,7 +25,7 @@ In versions.props:
 ```diff
 +com.palantir.conjure:conjure = 4.0.0
 +com.palantir.conjure.java:* = 2.0.0
-+com.palantir.conjure.typescript:* = 3.2.0
++com.palantir.conjure.typescript:* = 3.3.0
 ```
 
 This ensures you don't have different version numbers across subprojects and also makes upgrades convenient.
