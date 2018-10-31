@@ -56,8 +56,10 @@ public abstract class CliConfiguration {
                         .map(Path::toFile)
                         .collect(Collectors.toList());
             }
-        } else {
+        } else if (input.isFile()) {
             inputFiles = ImmutableList.of(input);
+        } else {
+            throw new IOException("Input is not an existing file or directory: " + input);
         }
         return inputFiles;
     }
