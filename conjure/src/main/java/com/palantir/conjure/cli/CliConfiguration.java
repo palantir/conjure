@@ -36,14 +36,14 @@ public abstract class CliConfiguration {
         return new Builder();
     }
 
-    static CliConfiguration create(String target, String outputIrFile) {
-        File input = new File(target);
+    static CliConfiguration create(String input, String outputIrFile) {
+        File inputFile = new File(input);
 
         Collection<File> inputFiles;
         try {
-            inputFiles = resolveInputFiles(input);
+            inputFiles = resolveInputFiles(inputFile);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to resolve input files from " + input, e);
+            throw new RuntimeException("Failed to resolve input files from " + inputFile, e);
         }
         return new Builder().inputFiles(inputFiles).outputIrFile(new File(outputIrFile)).build();
     }
