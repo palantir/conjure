@@ -39,20 +39,17 @@ public final class ConjureCliTest {
 
     @Before
     public void before() throws IOException {
-        inputFile = folder.newFile();
+        File inputs = folder.newFolder("inputs");
+        inputFile = File.createTempFile("junit", ".yml", inputs);
         outputFile = new File(folder.getRoot(), "conjureIr.json");
     }
 
     @Test
     public void correctlyParseArguments() {
-        String[] args = {
-                "compile",
-                inputFile.getAbsolutePath(),
-                folder.getRoot().getAbsolutePath()
-        };
+        String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath()};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputIrFile(folder.getRoot())
+                .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
@@ -60,17 +57,21 @@ public final class ConjureCliTest {
 
     @Test
     public void discoversFilesInDirectory() {
-        String[] args = {
-                "compile",
-                folder.getRoot().getAbsolutePath(),
-                folder.getRoot().getAbsolutePath(),
-        };
+        String[] args = {"compile", folder.getRoot().getAbsolutePath(), outputFile.getAbsolutePath()};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputIrFile(folder.getRoot())
+                .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
+    }
+
+    @Test
+    public void throwsWhenOutputIsDirectory() {
+        String[] args = {"compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()};
+        assertThatThrownBy(() -> CommandLine.run(new ConjureCli(), args))
+                .isInstanceOf(CommandLine.ExecutionException.class)
+                .hasMessageContaining("Output IR file should not be a directory");
     }
 
     @Test
