@@ -30,24 +30,36 @@ import org.immutables.value.Value;
 public abstract class CliConfiguration {
     abstract Collection<File> inputFiles();
 
-    abstract File outputLocation();
+    abstract File outputIrFile();
 
     static Builder builder() {
         return new Builder();
     }
 
-    static CliConfiguration of(String target, String outputDirectory) throws IOException {
+    static CliConfiguration of(String target, String outputIrFile) {
         File input = new File(target);
 
-        Collection<File> inputFiles = ImmutableList.of(input);
+        Collection<File> inputFiles;
+        try {
+            inputFiles = resolveInputFiles(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to resolve input files from " + input, e);
+        }
+        return new Builder().inputFiles(inputFiles).outputIrFile(new File(outputIrFile)).build();
+    }
+
+    private static Collection<File> resolveInputFiles(File input) throws IOException {
+        final Collection<File> inputFiles;
         if (input.isDirectory()) {
             try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {
                 inputFiles = fileStream
                         .map(Path::toFile)
                         .collect(Collectors.toList());
             }
+        } else {
+            inputFiles = ImmutableList.of(input);
         }
-        return new Builder().inputFiles(inputFiles).outputLocation(new File(outputDirectory)).build();
+        return inputFiles;
     }
 
     public static final class Builder extends ImmutableCliConfiguration.Builder {}
