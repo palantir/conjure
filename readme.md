@@ -153,7 +153,7 @@ function demo(): Promise<void> {
 
 Compiler
 
-- [conjure](/docs/compiler_usage.md)
+- [conjure](./docs/compiler_usage.md)
 
 Build tool
 
