@@ -153,7 +153,7 @@ function demo(): Promise<void> {
 
 Compiler
 
-- [conjure](https://github.com/palantir/conjure)
+- [conjure](/docs/compiler_usage.md)
 
 Build tool
 
