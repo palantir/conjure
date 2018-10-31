@@ -45,7 +45,13 @@ public abstract class CliConfiguration {
         } catch (IOException e) {
             throw new RuntimeException("Failed to resolve input files from " + inputFile, e);
         }
-        return new Builder().inputFiles(inputFiles).outputIrFile(new File(outputIrFile)).build();
+
+        File outputFile = new File(outputIrFile);
+        if (outputFile.isDirectory()) {
+            throw new RuntimeException("Output IR file should not be a directory: " + outputFile);
+        }
+
+        return new Builder().inputFiles(inputFiles).outputIrFile(outputFile).build();
     }
 
     private static Collection<File> resolveInputFiles(File input) throws IOException {
