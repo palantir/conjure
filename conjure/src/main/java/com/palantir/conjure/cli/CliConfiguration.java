@@ -36,7 +36,7 @@ public abstract class CliConfiguration {
         return new Builder();
     }
 
-    static CliConfiguration of(String target, String outputIrFile) {
+    static CliConfiguration create(String target, String outputIrFile) {
         File input = new File(target);
 
         Collection<File> inputFiles;

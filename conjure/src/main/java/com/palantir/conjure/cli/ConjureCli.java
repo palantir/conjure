@@ -78,7 +78,7 @@ public final class ConjureCli implements Runnable {
 
         @VisibleForTesting
         CliConfiguration getConfiguration() {
-            return CliConfiguration.of(input, output);
+            return CliConfiguration.create(input, output);
         }
     }
 }
