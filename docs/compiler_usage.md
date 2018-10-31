@@ -8,3 +8,7 @@ The recommended way to use conjure is via a build tool like [gradle-conjure](htt
           <output>    Path to the output IR file.
       -h, --help      Show this help message and exit.
       -V, --version   Print version information and exit.
+
+This tool will output an [intermediate representation file](./spec/intermediate_representation.md) which can then be
+passed into generators to create language bindings.
+
