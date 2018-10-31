@@ -20,8 +20,8 @@ mainClassName = 'com.palantir.conjure.cli.ConjureCli'
 
 dependencies {
     compile project(':conjure-core')
-    compile 'commons-cli:commons-cli'
     compile 'commons-io:commons-io'
+    compile 'info.picocli:picocli'
     runtime 'org.slf4j:slf4j-simple'
 
     testCompile 'junit:junit'

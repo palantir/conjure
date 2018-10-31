@@ -19,47 +19,66 @@ package com.palantir.conjure.cli;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.google.common.base.Preconditions;
+import com.google.common.annotations.VisibleForTesting;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.IOException;
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import picocli.CommandLine;
 
-public final class ConjureCli {
+@CommandLine.Command(
+        name = "conjure",
+        description = "CLI to generate Conjure IR from Conjure YML definitions.",
+        mixinStandardHelpOptions = true,
+        subcommands = { ConjureCli.CompileCommand.class })
+public final class ConjureCli implements Runnable {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
 
-    private ConjureCli() {}
-
-    public static void main(String[] args) throws IOException {
-        generate(parseCliConfiguration(args));
+    public static void main(String[] args) {
+        CommandLine.run(new ConjureCli(), args);
     }
 
-    static CliConfiguration parseCliConfiguration(String[] args) {
-        CommandLineParser parser = new BasicParser();
+    @Override
+    public void run() {
+        CommandLine.usage(this, System.out);
+    }
 
-        try {
-            CommandLine cmd = parser.parse(new Options(), args, false);
-            String[] parsedArgs = cmd.getArgs();
+    @CommandLine.Command(name = "compile",
+            description = "Generate Conjure IR from Conjure YML definitions.",
+            mixinStandardHelpOptions = true,
+            usageHelpWidth = 120)
+    public static final class CompileCommand implements Runnable {
+        @CommandLine.Parameters(paramLabel = "<input>",
+                description = "Path to the input conjure YML definition file, or directory containing multiple such "
+                        + "files.",
+                index = "0")
+        private String input;
 
-            // `compile` is an unused command argument as a placeholder for other generator commands, see issues/24.
-            Preconditions.checkArgument(parsedArgs.length == 3 && "compile".equals(parsedArgs[0]),
-                    "Usage: conjure compile <target> <output>");
+        @CommandLine.Parameters(paramLabel = "<output>",
+                description = "Path to the output IR file.",
+                index = "1")
+        private String output;
 
-            return CliConfiguration.of(parsedArgs[1], parsedArgs[2]);
-        } catch (ParseException | IOException e) {
-            throw new RuntimeException(e);
+        @Override
+        public void run() {
+            CliConfiguration config = getConfiguration();
+            generate(config);
+        }
+
+        @VisibleForTesting
+        static void generate(CliConfiguration config) {
+            ConjureDefinition definition = Conjure.parse(config.inputFiles());
+            try {
+                OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputIrFile(), definition);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to serialize IR file to " + config.outputIrFile(), e);
+            }
+        }
+
+        @VisibleForTesting
+        CliConfiguration getConfiguration() {
+            return CliConfiguration.create(input, output);
         }
     }
-
-    static void generate(CliConfiguration config) throws IOException {
-        ConjureDefinition definition = Conjure.parse(config.inputFiles());
-        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputLocation(), definition);
-    }
-
 }

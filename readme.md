@@ -151,15 +151,15 @@ function demo(): Promise<void> {
 
 ## Ecosystem
 
-Compiler
+##### Compiler
 
-- [conjure](https://github.com/palantir/conjure)
+- [conjure](./docs/compiler_usage.md)
 
-Build tool
+##### Build tool
 
 - [gradle-conjure](https://github.com/palantir/gradle-conjure)
 
-Code generators
+##### Code generators
 
 - [conjure-java](https://github.com/palantir/conjure-java)
 - [conjure-typescript](https://github.com/palantir/conjure-typescript)
@@ -167,17 +167,17 @@ Code generators
 - conjure-go (coming soon)
 - conjure-rust (coming soon)
 
-Client/server libraries
+##### Client/server libraries
 
 - [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
 - [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
 - [conjure-python-client](https://github.com/palantir/conjure-python-client)
 
-Recommended server libraries
+##### Recommended server libraries
 
 - [dropwizard](https://github.com/dropwizard/dropwizard)
 
-Miscellaneous tools
+##### Miscellaneous tools
 
 - [conjure-postman](https://github.com/palantir/conjure-postman)
 - conjure-jsonschema (coming soon)
