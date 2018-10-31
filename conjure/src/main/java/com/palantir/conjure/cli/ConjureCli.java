@@ -56,7 +56,7 @@ public final class ConjureCli implements Runnable {
         private String input;
 
         @CommandLine.Parameters(paramLabel = "<output>",
-                description = "Path to the output IR file",
+                description = "Path to the output IR file.",
                 index = "1")
         private String output;
 
