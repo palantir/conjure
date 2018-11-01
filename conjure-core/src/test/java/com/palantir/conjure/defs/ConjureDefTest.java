@@ -16,7 +16,7 @@
 
 package com.palantir.conjure.defs;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.ConjureParser;
@@ -31,7 +31,7 @@ public class ConjureDefTest {
     public void resolvesImportedAliases() {
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ImmutableList.of(ConjureParser.parse(new File("src/test/resources/example-conjure-imports.yml"))));
-        assertEquals(conjureDefinition.getTypes().size(), 1);
+        assertThat(conjureDefinition.getTypes()).hasSize(1);
     }
 
     // Test currently fails as it attempts to parse a TypeScript package name as a java package

@@ -32,8 +32,8 @@ import com.palantir.parsec.parsers.ListParser;
 import com.palantir.parsec.parsers.MapParser;
 import com.palantir.parsec.parsers.QuotedStringParser;
 import com.palantir.parsec.parsers.RawStringParser;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
@@ -92,10 +92,10 @@ public final class TestUnitParsers {
 
     @Test
     public void testListParser() throws ParseException {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new ArrayList<>();
         list.add("abc");
         list.add("def");
-        assertEquals(list, new ListParser<String>(new QuotedStringParser(), Parsers.whitespace())
+        assertEquals(list, new ListParser<>(new QuotedStringParser(), Parsers.whitespace())
                 .parse(new StringParserState("\"abc\" \"def\"")));
     }
 
