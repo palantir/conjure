@@ -6,3 +6,5 @@ include 'conjure-api:conjure-api-objects'
 include 'conjure-api:conjure-api-typescript'
 include 'conjure-generator-common'
 include 'conjure-core'
+
+enableFeaturePreview('STABLE_PUBLISHING')
