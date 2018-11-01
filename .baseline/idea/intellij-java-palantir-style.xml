@@ -55,6 +55,7 @@
         <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
         <option name="METHOD_PARAMETERS_WRAP" value="1" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
+        <option name="OPTIMIZE_IMPORTS_ON_THE_FLY" value="true" />
         <option name="OTHER_INDENT_OPTIONS">
           <value>
             <option name="INDENT_SIZE" value="4" />
@@ -66,7 +67,7 @@
             <option name="LABEL_INDENT_ABSOLUTE" value="false" />
             <option name="USE_RELATIVE_INDENTS" value="false" />
           </value>
-         </option>
+        </option>
         <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
           <value />
         </option>
@@ -100,7 +101,10 @@
           <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
           <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="LINE_COMMENT_ADD_SPACE" value="true" />
           <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="OPTIMIZE_IMPORTS_ON_THE_FLY" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
           <option name="RESOURCE_LIST_WRAP" value="5" />
           <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />

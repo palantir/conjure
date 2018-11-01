@@ -17,12 +17,14 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -82,24 +84,25 @@ public final class HttpPathValidator {
 
         UriTemplateParser uriTemplateParser = new UriTemplateParser(path.toString());
         Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();
-        String[] segments = uriTemplateParser.getNormalizedTemplate().split("/");
-        for (int i = 0; i < segments.length; i++) {
-            if (!(segments[i].startsWith("{") && segments[i].endsWith("}"))) {
+        List<String> segments = Splitter.on('/').splitToList(uriTemplateParser.getNormalizedTemplate());
+        for (int i = 0; i < segments.size(); i++) {
+            String segment = segments.get(i);
+            if (!(segment.startsWith("{") && segment.endsWith("}"))) {
                 // path literal
                 continue;
             }
 
             // variable
-            Pattern varPattern = nameToPattern.get(segments[i].substring(1, segments[i].length() - 1));
+            Pattern varPattern = nameToPattern.get(segment.substring(1, segment.length() - 1));
             if (varPattern.equals(UriTemplateParser.TEMPLATE_VALUE_PATTERN)) {
                 // no regular expression specified -- OK
                 continue;
             }
 
             // if regular expression was specified, it must be ".+" or ".*" based on invariant previously enforced
-            Preconditions.checkState(i == segments.length - 1 || !varPattern.pattern().equals(".*"),
+            Preconditions.checkState(i == segments.size() - 1 || !varPattern.pattern().equals(".*"),
                     "Path parameter %s in path %s specifies regular expression %s, but this regular "
-                            + "expression is only permitted if the path parameter is the last segment", segments[i],
+                            + "expression is only permitted if the path parameter is the last segment", segment,
                     path, varPattern);
         }
     }

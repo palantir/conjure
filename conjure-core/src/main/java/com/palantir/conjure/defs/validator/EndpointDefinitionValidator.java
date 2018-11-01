@@ -107,7 +107,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition) {
             definition.getArgs()
                     .stream()
-                    .filter(arg -> !(arg.getParamType().accept(ParameterTypeVisitor.IS_BODY)))
+                    .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .map(ArgumentDefinition::getType)
                     .forEach(type -> checkArgument(
                             !isIllegal(type),

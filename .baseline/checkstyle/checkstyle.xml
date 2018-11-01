@@ -48,13 +48,13 @@
         <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
-    <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
-        <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
-        <property name="checkFormat" value="$1"/>
-    </module>
     <module name="TreeWalker">
+        <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE.OFF\: ([\w\|]+)"/>
+            <property name="onCommentFormat" value="CHECKSTYLE.ON\: ([\w\|]+)"/>
+            <property name="checkFormat" value="$1"/>
+        </module>
         <module name="AbbreviationAsWordInName"> <!-- Java Style Guide: Camel case : defined -->
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="1"/>
@@ -105,7 +105,6 @@
         <module name="EmptyStatement"/> <!-- Java Style Guide: One statement per line -->
         <module name="EqualsHashCode"/>
         <module name="FallThrough"/> <!-- Java Style Guide: Fall-through: commented -->
-        <module name="FileContentsHolder"/> <!-- Required for SuppressionCommentFilter -->
         <module name="FinalClass"/> <!-- Java Coding Guidelines: Private constructors -->
         <module name="GenericWhitespace"> <!-- Java Style Guide: Horizontal whitespace -->
             <message key="ws.followed" value="GenericWhitespace ''{0}'' is followed by whitespace."/>
@@ -124,8 +123,22 @@
             <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
         </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
-            <property name="illegalPkgs" value="sun, org.elasticsearch.common.base, jersey.repackaged.com.google.common, com.google.api.client.repackaged, org.apache.hadoop.thirdparty.guava, com.clearspring.analytics.util, org.spark_project.guava"/>
+            <property name="illegalPkgs" value="org.elasticsearch.common.base, com.clearspring.analytics.util, org.spark_project.guava"/>
             <message key="import.illegal" value="Must not import repackaged classes."/>
+        </module>
+        <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
+            <property name="illegalPkgs" value=".*\.(repackaged|shaded|thirdparty)"/>
+            <property name="regexp" value="true" />
+            <message key="import.illegal" value="Must not import repackaged classes."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="^org\.gradle\.(internal|.*\.internal)"/>
+            <property name="regexp" value="true" />
+            <message key="import.illegal" value="Do not rely on gradle internal classes as these may change in minor releases - use org.gradle.api versions instead."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="sun"/>
+            <message key="import.illegal" value="Must not use Oracle's Java implementation details. See http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html ."/>
         </module>
         <module name="IllegalImport">
             <property name="illegalPkgs" value="org.apache.commons.lang"/>
@@ -136,8 +149,13 @@
             <message key="import.illegal" value="math is deprecated, use math3 instead."/>
         </module>
         <module name="IllegalImport">
+            <property name="id" value="BanLoggingImplementations"/>
             <property name="illegalPkgs" value="org.apache.log4j, org.apache.logging.log4j, java.util.logging, ch.qos.logback"/>
             <message key="import.illegal" value="Use SLF4J instead of a logging framework directly."/>
+        </module>
+        <module name="IllegalImport">
+            <property name="illegalClasses" value="com.google.common.base.Optional, com.google.common.base.Supplier"/>
+            <message key="import.illegal" value="Use the Java8 version of Guava objects."/>
         </module>
         <module name="IllegalInstantiation"> <!-- Java Coding Guidelines: Never instantiate primitive types -->
             <property name="classes" value="java.lang.Boolean"/>
@@ -155,11 +173,17 @@
             <property name="message" value="Avoid using corresponding octal or Unicode escape."/>
         </module>
         <module name="IllegalType"> <!-- Java Coding Guide: Limit coupling on concrete classes -->
-            <property name="illegalClassNames" value="java.util.HashSet, java.util.HashMap, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap, com.google.common.collect.ArrayListMultimap, com.google.common.collect.ForwardingListMultimap, com.google.common.collect.ForwardingMultimap, com.google.common.collect.ForwardingSetMultimap, com.google.common.collect.ForwardingSortedSetMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultimap"/>
+            <property name="illegalClassNames" value="java.util.ArrayList, java.util.HashSet, java.util.HashMap, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap, com.google.common.collect.ArrayListMultimap, com.google.common.collect.ForwardingListMultimap, com.google.common.collect.ForwardingMultimap, com.google.common.collect.ForwardingSetMultimap, com.google.common.collect.ForwardingSortedSetMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultimap"/>
+        </module>
+        <module name="IllegalType">
+            <property name="id" value="BanGuavaCaches"/>
+            <property name="illegalClassNames" value="com.google.common.cache.CacheBuilder, com.google.common.cache.Cache, com.google.common.cache.LoadingCache"/>
+            <message key="illegal.type" value="Do not use Guava caches, they are outperformed by and harder to use than Caffeine caches"/>
         </module>
         <module name="ImportOrder"> <!-- Java Style Guide: Ordering and spacing -->
             <property name="groups" value="/.*/"/>
             <property name="option" value="top"/>
+            <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
         <module name="Indentation"> <!-- Java Style Guide: Block indentation: +4 spaces -->
@@ -167,9 +191,7 @@
             <property name="lineWrappingIndentation" value="8"/>
         </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
-        <module name="LeftCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
-            <property name="maxLineLength" value="120"/>
-        </module>
+        <module name="LeftCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
         <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
             <property name="max" value="120"/>
             <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
@@ -257,6 +279,11 @@
             <property name="format" value="CoreMatchers\.equalTo"/>
             <property name="message" value="Use Assert.assertEquals()."/>
         </module>
+        <module name="RegexpSinglelineJava">
+            <property name="id" value="BanJacksonFindAndRegisterModulesMethod"/>
+            <property name="format" value="findAndRegisterModules"/>
+            <property name="message" value="Use ObjectMapper#registerModule(&lt;yourModule&gt;) explicitly. ObjectMapper#findAndRegisterModules() is dangerous because it will change behaviour depending on which modules are on your classpath (including transitive dependencies)."/>
+        </module>
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Use appropriate assertion methods -->
             <property name="format" value="CoreMatchers\.notNull"/>
             <property name="message" value="Use better assertion method(s): Assert.assertEquals(), assertNull(), assertSame(), etc."/>
@@ -308,6 +335,18 @@
             <property name="ignoreComments" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
+            <property name="id" value="BanSystemOut"/>
+            <property name="format" value="System\.out\."/>
+            <property name="message" value="Logging with System.out is not allowed because it has no metadata and can't be configured at runtime. Please use an SLF4J logger instead, e.g. log.info(&quot;Message&quot;)."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="id" value="BanSystemErr"/>
+            <property name="format" value="System\.err\."/>
+            <property name="message" value="Logging with System.err is not allowed because it has no metadata and can't be configured at runtime. Please use an SLF4J logger instead, e.g. log.info(&quot;Message&quot;)."/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+        <module name="RegexpSinglelineJava">
             <property name="format" value="\bCharsets\."/>
             <property name="message" value="Use JDK StandardCharsets instead of alternatives."/>
         </module>
@@ -324,8 +363,8 @@
             <property name="message" value="Redundant ''static'' modifier."/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="(\/\/TODO)|(\/\/ TODO:)|(\/\/ TODO\(\))|(\/\/ TODO\(.*+\):[^ ])|(\/\/ TODO\(.*+\)[^:])|(\/\/ TODO\(.*[\s\(\)]+.*\):)"/>
-            <property name="message" value="TODO format: // TODO(flastname): explanation"/>
+            <property name="format" value="\/\/TODO|\/\/ TODO(?!\([^()\s]+\): )"/>
+            <property name="message" value="TODO format: // TODO(#issue): explanation"/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
@@ -384,7 +423,9 @@
             <property name="target" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
         </module>
         <module name="CyclomaticComplexity"/> <!-- Java Coding Guidelines: Reduce Cyclomatic Complexity -->
-        <module name="DesignForExtension"/> <!-- Java Coding Guidelines: Design for extension -->
+        <module name="DesignForExtension"> <!-- Java Coding Guidelines: Design for extension -->
+            <property name="ignoredAnnotations" value="Test, Before, BeforeEach, After, AfterEach, BeforeClass, BeforeAll, AfterClass, AfterAll"/>
+        </module>
         <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
             <property name="scope" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
