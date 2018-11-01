@@ -1,10 +1,7 @@
 com.fasterxml.jackson.*:jackson-* = 2.9.6
-com.fasterxml.jackson.datatype:jackson-datatype-jdk7 = 2.6.7
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.3.2
-com.google.googlejavaformat:google-java-format = 1.5
 com.google.guava:guava = 23.6.1-jre
-com.netflix.nebula:nebula-test = 6.7.0
 com.palantir.conjure:conjure = 4.0.0
 com.palantir.conjure.java:* = 1.0.0
 com.palantir.conjure.typescript:* = 3.0.0
