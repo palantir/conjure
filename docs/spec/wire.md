@@ -276,8 +276,8 @@ This format describes an unquoted representation of a _subset_ of de-aliased Con
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
 `bearertoken`     | unquoted String
-`binary`          | raw binary bytes
-`boolean`         | Boolean
+`binary`          | raw bytes
+`boolean`         | `true` or `false`
 `datetime`        | unquoted String
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`
 `integer`         | Number
@@ -303,7 +303,7 @@ MUST convert types (even if implicitly) from their JSON/Plain format to their ca
 Conjure Type | Canonical Representation                           | Comments |
 ------------ | ------------------------                           | -------- |
 bearertoken  | No ambiguity                                       | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-binary       | No ambiguity                                       | Represented as a [Base64](https://tools.ietf.org/html/rfc4648#section-4) encoded string, except for when it is a request/response body where it is raw binary.
+binary       | No ambiguity                                       | Represented as a [Base64](https://tools.ietf.org/html/rfc4648#section-4) encoded string, except for when it is a request/response body where it is sequence of bytes.
 boolean      | No ambiguity                                       |
 datetime     | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm` | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 double       | No ambiguity                                       | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
