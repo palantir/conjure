@@ -16,10 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
@@ -94,25 +91,23 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NonBodyArgumentTypeValidator implements ConjureValidator<EndpointDefinition> {
-        private static final ImmutableSet<PrimitiveType.Value> ILLEGAL_NON_BODY_ARG_TYPES
-                = ImmutableSet.of(PrimitiveType.Value.BINARY);
-
-        private static boolean isIllegal(Type type) {
-            return ILLEGAL_NON_BODY_ARG_TYPES.stream()
-                    .filter(illegalClass -> type.accept(TypeVisitor.IS_BINARY)).count() > 0;
-        }
-
+    private static final class NonBodyArgumentTypeValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
             definition.getArgs()
                     .stream()
                     .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
-                    .map(ArgumentDefinition::getType)
-                    .forEach(type -> checkArgument(
-                            !isIllegal(type),
-                            "Endpoint cannot have non-body argument with type '%s'",
-                            type));
+                    .forEach(arg -> {
+                        boolean isValid = dealiasingTypeVisitor.dealias(arg.getType())
+                                .fold(
+                                        typeDefinition -> true,
+                                        type -> !type.accept(TypeVisitor.IS_BINARY)
+                                                && !type.accept(TypeVisitor.IS_ANY)
+                                );
+                        Preconditions.checkArgument(
+                                isValid, "Non body parameters cannot be of the 'binary' type: '%s' is not allowed",
+                                arg.getArgName());
+                    });
         }
     }
 
@@ -169,8 +164,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     "Path parameters defined in endpoint but not present in path template: %s. "
                             + "Note that the `param-id` is no longer supported and the path template name is always "
                             + "used instead. So make sure the path template name matches the path parameter defined "
-                            + "in endpoint.", extraParams);
 
+                            + "in endpoint.", extraParams);
             Set<ArgumentName> missingParams = Sets.difference(pathArgs, pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
                     "Path parameters defined path template but not present in endpoint: %s", missingParams);
@@ -188,7 +183,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                         Boolean isValid = resolvedType.fold(
                                 typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
-                                type -> type.accept(TypeVisitor.IS_PRIMITIVE) && !type.accept(TypeVisitor.IS_ANY));
+                                type -> type.accept(TypeVisitor.IS_PRIMITIVE));
                         Preconditions.checkState(isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
                                 entry.getArgName());
@@ -198,6 +193,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexHeaderParamValidator implements ConjureContextualValidator<EndpointDefinition> {
+
         @Override
         public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
             definition.getArgs().stream()
@@ -215,8 +211,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             return visitor.dealias(type).fold(
                     typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
                     subType -> {
-                        boolean definedPrimitive =
-                                subType.accept(TypeVisitor.IS_PRIMITIVE) && !subType.accept(TypeVisitor.IS_ANY);
+                        boolean definedPrimitive = subType.accept(TypeVisitor.IS_PRIMITIVE);
 
                         boolean optionalPrimitive = subType.accept(TypeVisitor.IS_OPTIONAL)
                                 && recursivelyValidate(subType.accept(TypeVisitor.OPTIONAL).getItemType(), visitor);
@@ -295,17 +290,22 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NoBearerTokenPathOrQueryParams implements ConjureValidator<EndpointDefinition> {
+    private static final class NoBearerTokenPathOrQueryParams
+            implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH)
                             || entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(entry -> {
-                        Type conjureType = entry.getType();
+                        Either<TypeDefinition, Type> conjureType = dealiasingTypeVisitor.dealias(entry.getType());
+                        boolean isValid = conjureType.fold(
+                                typeDefinition -> true,
+                                type -> !type.accept(TypeVisitor.IS_PRIMITIVE)
+                                        || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN
+                        );
 
-                        Preconditions.checkState(!conjureType.accept(TypeVisitor.IS_PRIMITIVE)
-                                || conjureType.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN,
+                        Preconditions.checkState(isValid,
                                 "Path or query parameters of type 'bearertoken' are not allowed as this "
                                         + "would introduce a security vulnerability: \"%s\"",
                                 entry.getArgName());
