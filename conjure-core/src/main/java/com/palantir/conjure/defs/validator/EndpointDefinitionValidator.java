@@ -96,12 +96,12 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
             definition.getArgs()
                     .stream()
-                    .filter(arg -> !(arg.getParamType().accept(ParameterTypeVisitor.IS_BODY)))
+                    .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .forEach(arg -> {
                         boolean isValid = dealiasingTypeVisitor.dealias(arg.getType())
                                 .fold(
-                                        (typeDefinition) -> true,
-                                        (type) -> !type.accept(TypeVisitor.IS_BINARY)
+                                        typeDefinition -> true,
+                                        type -> !type.accept(TypeVisitor.IS_BINARY)
                                                 && !type.accept(TypeVisitor.IS_ANY)
                                 );
                         Preconditions.checkArgument(
