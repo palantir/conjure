@@ -353,7 +353,7 @@ negative:
                 foo:
                   type: map<string, string>
                   param-type: query
-  disallowPathMethodMustBeUnique:
+  disallowNonUniquePathMethod:
     expected-error: 'Endpoint "GET /myEndpoint" is defined by multiple endpoints: [testEndpoint, otherTestEndpoint]'
     conjure:
       services:
