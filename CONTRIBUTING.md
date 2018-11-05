@@ -10,10 +10,11 @@ If your change affects just one language or client, you'll probably just need to
 
   - [gradle-conjure](https://github.com/palantir/gradle-conjure)
   - [conjure-java](https://github.com/palantir/conjure-java)
+  - [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
   - [conjure-typescript](https://github.com/palantir/conjure-typescript)
   - [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
+  - [conjure-python](https://github.com/palantir/conjure-python)
   - [conjure-python-client](https://github.com/palantir/conjure-python-client)
-  - [http-remoting](https://github.com/palantir/http-remoting)
 
 For speculative changes, consider opening a GitHub issue to describe the problem you encountered and the motivation behind solving it.  If it affects more than one language, feel free to open the issue on this repo.
 

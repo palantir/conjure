@@ -30,24 +30,44 @@ import org.immutables.value.Value;
 public abstract class CliConfiguration {
     abstract Collection<File> inputFiles();
 
-    abstract File outputLocation();
+    abstract File outputIrFile();
 
     static Builder builder() {
         return new Builder();
     }
 
-    static CliConfiguration of(String target, String outputDirectory) throws IOException {
-        File input = new File(target);
+    static CliConfiguration create(String input, String outputIrFile) {
+        File inputFile = new File(input);
 
-        Collection<File> inputFiles = ImmutableList.of(input);
+        Collection<File> inputFiles;
+        try {
+            inputFiles = resolveInputFiles(inputFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to resolve input files from " + inputFile, e);
+        }
+
+        File outputFile = new File(outputIrFile);
+        if (outputFile.isDirectory()) {
+            throw new RuntimeException("Output IR file should not be a directory: " + outputFile);
+        }
+
+        return new Builder().inputFiles(inputFiles).outputIrFile(outputFile).build();
+    }
+
+    private static Collection<File> resolveInputFiles(File input) throws IOException {
+        final Collection<File> inputFiles;
         if (input.isDirectory()) {
             try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {
                 inputFiles = fileStream
                         .map(Path::toFile)
                         .collect(Collectors.toList());
             }
+        } else if (input.isFile()) {
+            inputFiles = ImmutableList.of(input);
+        } else {
+            throw new IOException("Input is not an existing file or directory: " + input);
         }
-        return new Builder().inputFiles(inputFiles).outputLocation(new File(outputDirectory)).build();
+        return inputFiles;
     }
 
     public static final class Builder extends ImmutableCliConfiguration.Builder {}

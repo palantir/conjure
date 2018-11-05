@@ -24,7 +24,7 @@ conjure-java-0.2.3
 
 ## Primary command
 
-Conjure generators should expect to be called with the command `generate` as the first argument. They read a single JSON file, specified by the positional argument `<input-json>` and write to the `<ouput-directory>` folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
+Conjure generators should expect to be called with the command `generate` as the first argument. They read an [intermediate representation](../spec/intermediate_representation.md) JSON file, specified by the positional argument `<input-json>` and write to the `<ouput-directory>` folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
 
 ```
 conjure-<lang> generate <input-json> <output-directory>
@@ -46,7 +46,7 @@ conjure-typescript --version="0.1.0" --goFastMode
 
 Ideally, Conjure generators should be zero-config CLIs - they should work out of the box so that users don't have to trawl through documentation in order to generate usable code.  However, some limited configurability is sometimes necessary.  For example, conjure-typescript produces a package.json file that must contain author, license and version fields (otherwise it would be very inconvenient to publish), but these clearly need to be specified by the user.
 
-Conjure generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be rejected.
+Conjure generators may expect command line options of the form `--<key>=<value>` where the key is a camelCase string that matches the regex `[a-z][a-zA-Z0-9]*`. Values may contain spaces. Generators should reject duplicate `<key>`s. Unknown keys should be ignored.
 
 Flags such as `--foo` may also be passed to switch on some functionality, or `--foo=false` to switch it off.
 

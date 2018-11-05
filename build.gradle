@@ -26,21 +26,16 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
-        classpath 'com.netflix.nebula:nebula-dependency-recommender:5.2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:7.0.12'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.20.1'
-        classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.37.4'
         classpath 'com.palantir.gradle.conjure:gradle-conjure:4.4.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
-        classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
-        classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.15'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:2.0.0'
     }
 }
 
-apply plugin: 'com.palantir.baseline-config'
-apply plugin: 'com.palantir.baseline-idea'
-apply plugin: 'com.palantir.circle.style'
+apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.git-version'
 
 allprojects {
@@ -53,13 +48,6 @@ allprojects {
             url 'https://dl.bintray.com/palantir/releases/'
         }
     }
-    apply plugin: 'com.palantir.configuration-resolver'
-    apply plugin: 'nebula.dependency-recommender'
-
-    dependencyRecommendations {
-        strategy OverrideTransitives
-        propertiesFile file: project.rootProject.file('versions.props')
-    }
 
     configurations.all {
         resolutionStrategy {
@@ -69,17 +57,13 @@ allprojects {
 }
 
 configure(subprojects - project(':conjure-api')) {
-    apply plugin: 'com.palantir.baseline-checkstyle'
-    apply plugin: 'com.palantir.baseline-eclipse'
-    apply plugin: 'com.palantir.baseline-error-prone'
-    apply plugin: 'com.palantir.baseline-idea'
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
 
     sourceCompatibility = 1.8
 
     tasks.withType(JavaCompile) {
-        options.compilerArgs += ['-XepDisableWarningsInGeneratedCode', '-Werror']
+        options.compilerArgs += ['-Werror']
     }
 
     // Run `./gradlew test -Drecreate=true` to recreate all the expected
@@ -87,8 +71,4 @@ configure(subprojects - project(':conjure-api')) {
     tasks.withType(Test) {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
     }
-}
-
-dependencies {
-    baseline 'com.palantir.baseline:gradle-baseline-java-config@zip'
 }

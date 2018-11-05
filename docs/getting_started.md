@@ -1,10 +1,16 @@
 # Getting started
 
-_This guide explains how to add a Conjure-defined API to an existing gradle project.  It is recommended to define your API in the same git repo that you implement your server._
+_This guide presents a minimal example of how to add a Conjure-defined API to an existing Gradle project._
+
+To see a finished result, check out [conjure-java-example](https://github.com/palantir/conjure-java-example):
+
+```
+git clone https://github.com/palantir/conjure-java-example.git
+```
 
 ## 1. Add the `com.palantir.conjure` gradle plugin
 
-In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, and `-typescript` sub-projects.
+In your `settings.gradle` file, add some new projects to contain your API YML and generated code. Conjure YML files will live in `:your-project-api` and generated code will be written to the `-objects`, `-jersey`, and `-typescript` sub-projects. It is recommended to define your API in the same git repo that you implement your server.
 
 ```diff
  rootProject.name = 'your-project'
@@ -32,29 +38,31 @@ buildscript {
         classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
     }
 }
-
-// conjure-generator versions must be specified explicitly so that it's clear they can be upgraded independently.
-
-// (option 1):
-subprojects {
-    configurations.all {
-        resolutionStrategy {
-            force 'com.palantir.conjure:conjure:4.0.0'
-            force 'com.palantir.conjure.java:conjure-java:1.0.0'
-            force 'com.palantir.conjure.java:conjure-lib:1.0.0'
-            force 'com.palantir.conjure.typescript:conjure-typescript:3.0.0'
-        }
-    }
-}
-
-// (option 2): nebula.dependency-recommender (see below)
 ```
 
-Then in `./your-project-api/build.gradle`, apply the plugin:
+Then in `./your-project-api/build.gradle`, apply the plugin and specify versions for each generator.
 
 ```groovy
 apply plugin: 'com.palantir.conjure'
+
+dependencies {
+    conjureCompiler 'com.palantir.conjure:conjure:4.0.0'
+    conjureJava 'com.palantir.conjure.java:conjure-java:2.0.0'
+    conjureTypeScript 'com.palantir.conjure.typescript:conjure-typescript:3.3.0'
+}
+
+subprojects {
+    pluginManager.withPlugin 'java', {
+        dependencies {
+            compile 'com.palantir.conjure.java:conjure-lib:2.0.0'
+        }
+    }
+}
 ```
+
+_Check the GitHub releases page to find the latest version of [conjure](https://github.com/palantir/conjure/releases), [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
+
+This boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](./gradle_decoupled_versions.md).
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -71,18 +79,6 @@ compileConjureObjects - Generates Java POJOs from your Conjure definitions.
 ...
 ```
 
-
-### (Optional) Use `nebula.dependency-recommender`
-
-If you already use [Nebula Dependency Recommender](https://github.com/nebula-plugins/nebula-dependency-recommender-plugin), you can omit the `resolutionStrategy` lines and use a properties file like `versions.props` instead:
-
-```
-com.palantir.conjure.java:* = <latest>
-com.palantir.conjure.typescript:conjure-typescript = <latest>
-```
-
-_Check the GitHub releases page to find the latest version of [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
-
 ## 2. Define your API in Conjure YML
 
 Create your first YML file, e.g. `./your-project-api/src/main/conjure/your-project-api.yml`.  Run `./gradlew compileConjure` frequently to validate your syntax.
@@ -93,36 +89,34 @@ types:
     default-package: com.company.product
     objects:
 
-      AddPetRequest:
+      Recipe:
         fields:
-          id: integer
-          name: string
-          tags: set<Tag>
-          status: Status
+          name: RecipeName
+          steps: list<RecipeStep>
 
-      Tag:
+      RecipeStep:
+        union:
+          mix: set<Ingredient>
+          chop: Ingredient
+
+      RecipeName:
         alias: string
 
-      Status:
-        values:
-        - AVAILABLE
-        - PENDING
-        - SOLD
+      Ingredient:
+        alias: string
 
 services:
-  PetStoreService:
-    name: Pet Store Service
+  RecipeBookService:
+    name: Recipe Book
     package: com.company.product
-    default-auth: header
-
+    base-path: /recipes
     endpoints:
-      addPet:
-        docs: Add a new pet to the store
-        http: POST /pet
+      createRecipe:
+        http: POST /
         args:
-          addPetRequest:
-            type: AddPetRequest
+          createRecipeRequest:
             param-type: body
+            type: Recipe
 ```
 
 _Refer to the [Conjure specification](/docs/spec/source_files.md) for an exhaustive list of allowed YML parameters._
@@ -142,7 +136,7 @@ dependencies {
 }
 ```
 
-You can now write a `PetStoreResource` class which `implements PetStoreService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
+You can now write a `RecipeBookResource` class which `implements RecipeBookService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
 
 ## 4. Publish artifacts
 
@@ -160,3 +154,6 @@ If you want to publish npm packages, you need to simulate the `npm login` comman
 +}
 ```
 
+## 5. Next steps
+
+Check out [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example) to see how these APIs can be used from a browser.

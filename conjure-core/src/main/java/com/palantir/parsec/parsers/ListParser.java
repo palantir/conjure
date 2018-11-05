@@ -20,7 +20,7 @@ import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
 import com.palantir.parsec.Parsers;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ListParser<T> implements Parser<List<T>> {
@@ -35,7 +35,7 @@ public final class ListParser<T> implements Parser<List<T>> {
 
     @Override
     public List<T> parse(ParserState input) throws ParseException {
-        List<T> results = new LinkedList<T>();
+        List<T> results = new ArrayList<>();
         do {
             T val = Parsers.gingerly(valueParser).parse(input);
             if (!Parsers.nullOrUnexpected(val)) {

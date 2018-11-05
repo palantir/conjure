@@ -23,6 +23,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
         - [FieldDefinition][]
         - [UnionTypeDefinition][]
         - [EnumTypeDefinition][]
+        - [EnumValueDefinition][]
       - [ErrorDefinition][]
       - [ErrorCode][]
     - [ServiceDefinition][]
@@ -47,6 +48,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 [DocString]: #docstring
 [EndpointDefinition]: #endpointdefinition
 [EnumTypeDefinition]: #enumtypedefinition
+[EnumValueDefinition]: #enumvaluedefinition
 [ErrorCode]: #errorcode
 [ErrorDefinition]: #errordefinition
 [ExternalTypeDefinition]: #externaltypedefinition
@@ -227,7 +229,7 @@ Definition for an enum complex data type.
 
 Field | Type | Description
 ---|:---:|---
-values | List[[ConjureType][]] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
+values | List[string or [EnumValueDefinition][]] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -239,6 +241,14 @@ LoadState:
     - LOADED
     - ERROR
 ```
+
+## EnumValueDefinition
+Definition for a single value within an enumeration.
+
+Field | Type | Description
+---|:---:|---
+value | string | **REQUIRED**. The enumeration value. Value MUST be unique and be UPPERCASE.
+docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
 ## ErrorDefinition

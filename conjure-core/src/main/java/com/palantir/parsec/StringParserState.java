@@ -16,13 +16,13 @@
 
 package com.palantir.parsec;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 public final class StringParserState implements ParserState {
 
     private final CharSequence seq;
-    private final Deque<Integer> marks = new LinkedList<Integer>();
+    private final Deque<Integer> marks = new ArrayDeque<>();
     private int current = 0;
 
     public StringParserState(CharSequence str) {

@@ -156,6 +156,46 @@ positive:
                 bar:
                   type: Long
                   param-type: query
+  allowOptionalImportAsQuery:
+    conjure:
+      types:
+        imports:
+          Long:
+            base-type: string
+            external:
+              java: java.lang.Long
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo
+              args:
+                bar:
+                  type: optional<Long>
+                  param-type: query
+  allowOptionalEnumAsQuery:
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          objects:
+            MyEnum:
+              values:
+              - FOO
+              - BAR
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /
+              args:
+                foo:
+                  type: optional<MyEnum>
+                  param-type: query
   allowImportAsPathParam:
     conjure:
       types:
@@ -299,6 +339,20 @@ negative:
               http: GET /{foo}
               args:
                 foo: set<string>
+  disallowMapInQueryParams:
+    expected-error: 'Query parameters must be enums, primitives, aliases, list, sets or optional of primitive: "foo" is not allowed'
+    conjure:
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /
+              args:
+                foo:
+                  type: map<string, string>
+                  param-type: query
   disallowPathMethodMustBeUnique:
     expected-error: 'Endpoint "GET /myEndpoint" is defined by multiple endpoints: [testEndpoint, otherTestEndpoint]'
     conjure:

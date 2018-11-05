@@ -26,6 +26,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import picocli.CommandLine;
+import picocli.CommandLine.PicocliException;
 
 public final class ConjureCliTest {
 
@@ -37,36 +39,39 @@ public final class ConjureCliTest {
 
     @Before
     public void before() throws IOException {
-        inputFile = folder.newFile();
+        File inputs = folder.newFolder("inputs");
+        inputFile = File.createTempFile("junit", ".yml", inputs);
         outputFile = new File(folder.getRoot(), "conjureIr.json");
     }
 
     @Test
     public void correctlyParseArguments() {
-        String[] args = {
-                "compile",
-                inputFile.getAbsolutePath(),
-                folder.getRoot().getAbsolutePath()
-        };
+        String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath()};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputLocation(folder.getRoot())
+                .outputIrFile(outputFile)
                 .build();
-        assertThat(ConjureCli.parseCliConfiguration(args)).isEqualTo(expectedConfiguration);
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
     }
 
     @Test
     public void discoversFilesInDirectory() {
-        String[] args = {
-                "compile",
-                folder.getRoot().getAbsolutePath(),
-                folder.getRoot().getAbsolutePath(),
-        };
+        String[] args = {"compile", folder.getRoot().getAbsolutePath(), outputFile.getAbsolutePath()};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputLocation(folder.getRoot())
+                .outputIrFile(outputFile)
                 .build();
-        assertThat(ConjureCli.parseCliConfiguration(args)).isEqualTo(expectedConfiguration);
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
+    }
+
+    @Test
+    public void throwsWhenOutputIsDirectory() {
+        String[] args = {"compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()};
+        assertThatThrownBy(() -> CommandLine.run(new ConjureCli(), args))
+                .isInstanceOf(CommandLine.ExecutionException.class)
+                .hasMessageContaining("Output IR file should not be a directory");
     }
 
     @Test
@@ -76,30 +81,31 @@ public final class ConjureCliTest {
                 folder.getRoot().getAbsolutePath(),
                 folder.getRoot().getAbsolutePath(),
                 };
-        assertThatThrownBy(() -> ConjureCli.parseCliConfiguration(args))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Usage: conjure compile <target> <output>");
+        assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
+                .isInstanceOf(PicocliException.class)
+                .hasMessageContaining("Unmatched arguments");
     }
 
     @Test
     public void throwsWhenUnexpectedFeature() {
         String[] args = {
+                "compile",
                 inputFile.getAbsolutePath(),
                 folder.getRoot().getAbsolutePath(),
                 "--foo"
         };
-        assertThatThrownBy(() -> ConjureCli.parseCliConfiguration(args))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Unrecognized option: --foo");
+        assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
+                .isInstanceOf(PicocliException.class)
+                .hasMessageContaining("Unknown option: --foo");
     }
 
     @Test
-    public void generatesCode() throws Exception {
+    public void generatesCode() {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(new File("src/test/resources/test-service.yml")))
-                .outputLocation(outputFile)
+                .outputIrFile(outputFile)
                 .build();
-        ConjureCli.generate(configuration);
+        ConjureCli.CompileCommand.generate(configuration);
         assertThat(outputFile.isFile()).isTrue();
     }
 
@@ -107,9 +113,9 @@ public final class ConjureCliTest {
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputLocation(folder.newFolder())
+                .outputIrFile(folder.newFolder())
                 .build();
-        assertThatThrownBy(() -> ConjureCli.generate(configuration))
+        assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("MismatchedInputException");
     }
