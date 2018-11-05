@@ -131,7 +131,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
 1. **Servers tolerate extra headers** - Servers must tolerate extra headers not defined in the endpoint definition. This is important because proxies frequently modify requests to include additional headers, e.g. `X-Forwarded-For`.
 
-1. **Round-trip of unknown variants** - TODO ask Mark.
+1. **Round-trip of unknown variants** - Clients should be able to round trip unknown variants of enums and unions.
 
 1. **CORS and HTTP preflight requests** - In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method .
 
@@ -164,7 +164,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 `optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, must be serialized as `JSON(e)`. If the value appears inside a JSON Object, then the corresponding key should be omitted. Alternatively, the field may be set to `null`. Inside JSON Array, a non-present Conjure optional value must be serialized as JSON `null`.
 `list<T>`         | Array                         | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
 `set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is recommended to preserve order where possible. The Array must not contain duplicate elements (as defined by the canonical format below).
-`map<K, V>`       | Object                        | A key k is serialized as `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
+`map<K, V>`       | Object                        | A key k is serialized as a string with contents `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
 
 **Named types:**
 
@@ -251,12 +251,10 @@ Conjure Errors are serialized as JSON objects with the following keys:
 
 **Deserialization**
 
-- **Disallow `null` for Conjure `any` type** - The JSON value `null` must not be deserialized into the Conjure type `any`.
-
 - **Coercing JSON `null` / absent to Conjure types** - If a JSON key is absent or the value is `null`, two rules apply:
 
   - Conjure `optional`, `list`, `set`, `map` types must be initialized to their empty variants,
-  - Attempting to coerce null/absent to any other Conjure type must cause an error, i.e. missing JSON keys should cause an error.
+  - Attempting to coerce null/absent to any other Conjure type must cause an error, i.e. missing JSON keys must cause an error.
 
   _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
