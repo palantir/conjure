@@ -112,7 +112,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
     -------------------------- | ---------------- |
     PERMISSION_DENIED          | 403
     INVALID_ARGUMENT           | 400
-    not_FOUND                  | 404
+    NOT_FOUND                  | 404
     CONFLICT                   | 409
     REQUEST_ENTITY_TOO_LARGE   | 413
     FAILED_PRECONDITION        | 500
