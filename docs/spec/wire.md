@@ -213,7 +213,7 @@ Conjure Errors are serialized as JSON objects with the following keys:
   ```
   PERMISSION_DENIED
   INVALID_ARGUMENT
-  not_FOUND
+  NOT_FOUND
   CONFLICT
   REQUEST_ENTITY_TOO_LARGE
   FAILED_PRECONDITION
@@ -233,14 +233,14 @@ Conjure Errors are serialized as JSON objects with the following keys:
       errors:
         RecipeNotFound:
           namespace: Recipe
-          code: not_FOUND
+          code: NOT_FOUND
           safe-args:
             name: RecipeName
   ```
   Example error type in JSON presentation:
   ```json
   {
-      "errorCode": "not_FOUND",
+      "errorCode": "NOT_FOUND",
       "errorName": "Recipe:RecipeNotFound",
       "errorInstanceId": "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
       "parameters": {
