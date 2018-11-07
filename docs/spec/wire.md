@@ -12,7 +12,7 @@ de-alias(T) -> T
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #json-format
 [PLAIN format]: #plain-format
-[CANONICAL format]: #canonical-format
+[Canonical JSON format]: #canonical-json-format
 
 ## HTTP requests
 This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616).
@@ -258,7 +258,7 @@ Conjure Errors are serialized as JSON objects with the following keys:
 
   _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
-- **Dedupe `set` / `map` keys using CANONICAL format** - When deserializing Conjure `set` or `map` keys, equivalence of two items can be determined by converting the JSON value to the [CANONICAL format][] and then comparing byte equality.
+- **Dedupe `set` / `map` keys using [Canonical JSON format][]** - When deserializing Conjure `set` or `map` keys, equivalence of two items can be determined by converting the JSON value to the Canonical JSON format and then comparing byte equality.
 
 - **No automatic casting** - Unexpected JSON types should not be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
 
@@ -307,7 +307,7 @@ The canonical JSON format of a double must conform to these constraints:
 
 **Examples**:
 
-|     JSON representation     |  CANONICAL representation   |
+|     JSON representation     |  Canonical representation   |
 | --------------------------- | --------------------------- |
 | `-0`                        | `-0.0`                      |
 | `0`                         | `0.0`                       |
@@ -326,8 +326,8 @@ The canonical JSON format of a datetime is a string formatted according to `YYYY
 
 **Examples**:
 
-|     JSON representation     |  CANONICAL representation   |
-| --------------------------- | --------------------------- |
+|     JSON representation       |  Canonical representation     |
+| ----------------------------- | ----------------------------- |
 | `"2018-07-19T08:11:21Z"`      | `"2018-07-19T08:11:21+00:00"` |
 | `"2018-07-19T08:11:21+00:00"` | `"2018-07-19T08:11:21+00:00"` |
 | `"2018-07-19T08:11:21-00:00"` | `"2018-07-19T08:11:21+00:00"` |
