@@ -55,7 +55,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
     /recipes
     ```
 
-1. **Body parameter** - If an endpoint defines an argument of type `body`, clients must serialize the user-provided value using the [JSON format][], UNLESS:
+1. **Body parameter** - If an endpoint defines an argument of type `body`, clients must serialize the user-provided value using the [JSON format][], unless:
     - the de-aliased argument is type `binary`: the clients must write the raw binary bytes directly to the request body
     - the de-aliased argument is type `optional<T>` and the value is not present: it is recommended to send an empty request body, although clients may alternatively send the JSON value `null`.
   It is recommended to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
@@ -76,7 +76,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
     1. **Content-Type header** - For Conjure endpoints that define a `body` argument, a `Content-Type` header must be added.  If the body is of type `binary`, the content-type `application/octet-stream` must be used. Otherwise, clients must send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
 
-    1. **Accept header** - Clients must send an `Accept: application/json` header for all requests UNLESS the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
+    1. **Accept header** - Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
 
     1. **User-agent** - Requests must include a `User-Agent` header.
 
@@ -87,7 +87,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
     1. **Additional headers** - Clients may inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
 
 ## HTTP responses
-1. **Status codes** - Conjure servers must respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) UNLESS:
+1. **Status codes** - Conjure servers must respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) unless:
 
     - the de-aliased return type is `optional<T>` and the value is not present: servers must send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
     - the de-aliased return type is a `map`, `list` or `set`: it is recommended to send `204` but servers may send `200` if the HTTP body is `[]` or `{}`.
@@ -96,7 +96,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 
     Further non-successful status codes are defined in the Conjure errors section below.
 
-1. **Response body** - Conjure servers must serialize return values using the [JSON format][] defined below, UNLESS:
+1. **Response body** - Conjure servers must serialize return values using the [JSON format][] defined below, unless:
 
     - the de-aliased return type is `optional<T>` and the value is not present: servers must omit the HTTP body.
     - the de-aliased return type is `binary`: servers must write the binary value using the [PLAIN format][].
