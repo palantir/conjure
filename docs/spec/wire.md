@@ -265,8 +265,8 @@ Conjure Errors are serialized as JSON objects with the following keys:
 
 ## PLAIN format
 
-The PLAIN format allows representing conjure values in an unstructured way.
-Only a subset of de-aliased Conjure types, listed below, have a PLAIN format representation.
+The PLAIN format describes an unquoted [JSON](https://tools.ietf.org/html/rfc7159) representation of a _subset_ of de-aliased conjure types.
+The types listed below have a PLAIN format representation, while those omitted do not.
 
 Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
 ----------------- | ----------------------------------------------| -------- |
