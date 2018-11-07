@@ -99,7 +99,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 1. **Response body** - Conjure servers must serialize return values using the [JSON format][] defined below, unless:
 
     - the de-aliased return type is `optional<T>` and the value is not present: servers must omit the HTTP body.
-    - the de-aliased return type is `binary`: servers must write the binary value using the [PLAIN format][].
+    - the de-aliased return type is `binary`: servers must write the raw bytes as an octet-stream.
 
 1. **Content-Type header** - Conjure servers must send a `Content-Type` header according to the endpoint's return type:
 
