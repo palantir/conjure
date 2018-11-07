@@ -264,28 +264,23 @@ Conjure Errors are serialized as JSON objects with the following keys:
 
 
 ## PLAIN format
-This format describes an unquoted representation of a _subset_ of de-aliased Conjure types.
 
-Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
------------------ | ----------------------------------------------|
-`bearertoken`     | unquoted String
-`binary`          | unquoted String of base64 encoded bytes
-`boolean`         | `true` or `false`
-`datetime`        | unquoted String
-`double`          | Number or `NaN` or `Infinity` or `-Infinity`
-`integer`         | Number
-`rid`             | unquoted String
-`safelong`        | Number
-`string`          | unquoted String
-`uuid`            | unquoted String
-_Enum_            | unquoted variant name
-`any`             | UNSUPPORTED
-`optional<T>`     | UNSUPPORTED
-`list<T>`         | UNSUPPORTED
-`set<T>`          | UNSUPPORTED
-`map<K, V>`       | UNSUPPORTED
-_Object_          | UNSUPPORTED
-_Union_           | UNSUPPORTED
+The PLAIN format allows representing conjure values in an unstructured way.
+Only a subset of de-aliased Conjure types, listed below, have a PLAIN format representation.
+
+Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
+----------------- | ----------------------------------------------| -------- |
+`bearertoken`     | unquoted String                               | In accordance with [RFC 6750](https://tools.ietf.org/html/rfc6750#section-2.1).
+`binary`          | unquoted String                               | Represented as a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4).
+`boolean`         | `true` or `false`                             |
+`datetime`        | unquoted String                               | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+`double`          | Number or `NaN` or `Infinity` or `-Infinity`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+`integer`         | Number                                        | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+`rid`             | unquoted String                               | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.                    
+`safelong`        | Number                                        | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.           
+`string`          | unquoted String                               | UTF-8 string                    
+`uuid`            | unquoted String                               | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).                    
+_Enum_            | unquoted variant name                         | UTF-8 string                          
 
 
 ## Canonical JSON Format
