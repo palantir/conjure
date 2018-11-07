@@ -141,7 +141,7 @@ This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hyper
 ## JSON format
 This format describes how all Conjure types are serialized into and deserialized from JSON ([RFC 7159](https://tools.ietf.org/html/rfc7159)).
 
-**Built-in types:**
+#### Built-in types
 
 Conjure&nbsp;Type | JSON Type                                          | Comments |
 ----------------- | ---------------------------------------------------| -------- |
@@ -157,7 +157,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 `uuid`            | String                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 `any`             | N/A                                                | May be any of the above types or an `object` with any fields.
 
-**Container types:**
+#### Container types
 
 Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 ----------------- | ----------------------------- | -------- |
@@ -166,7 +166,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 `set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is recommended to preserve order where possible. The Array must not contain duplicate elements (as defined by the canonical format below).
 `map<K, V>`       | Object                        | A key k is serialized as a string with contents `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
 
-**Named types:**
+#### Named types
 
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | ---------------| -------- |
@@ -175,7 +175,7 @@ _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
 _Alias_(x)        | `JSON(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
 
-**Union JSON format:**
+#### Union JSON format
 
 Conjure Union types are serialized as JSON objects with exactly two keys:
 
@@ -207,7 +207,7 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
   }
   ```
 
-**Conjure Errors:**
+#### Conjure Errors
 Conjure Errors are serialized as JSON objects with the following keys:
 1. `errorCode` - this must match one of the Conjure error code below.
   ```
@@ -249,7 +249,7 @@ Conjure Errors are serialized as JSON objects with the following keys:
   }
   ```
 
-**Deserialization**
+#### Deserialization
 
 - **Coercing JSON `null` / absent to Conjure types** - If a JSON key is absent or the value is `null`, two rules apply:
 
