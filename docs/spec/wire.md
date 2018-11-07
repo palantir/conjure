@@ -288,39 +288,48 @@ _Object_          | UNSUPPORTED
 _Union_           | UNSUPPORTED
 
 
-## CANONICAL Format
-The Canonical format defines an additional representation of Conjure-defined types, collections and primitives for use
-when a type has multiple valid formats that are conceptually equivalent. Implementations of Conjure clients/servers
-must convert types (even if implicitly) from their JSON/Plain format to their canonical form when determining equality.
+## Canonical JSON Format
 
-Conjure Type | Canonical Representation                           | Comments |
------------- | ------------------------                           | -------- |
-bearertoken  | No ambiguity                                       | In accordance with [RFC 7519](https://tools.ietf.org/html/rfc7519).
-binary       | No ambiguity                                       | Represented as a [Base64](https://tools.ietf.org/html/rfc4648#section-4) encoded string, except for when it is a request/response body where it is sequence of bytes.
-boolean      | No ambiguity                                       |
-datetime     | Formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm` | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-double       | No ambiguity                                       | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
-integer      | No ambiguity                                       | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
-rid          | No ambiguity                                       | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
-safelong     | No ambiguity                                       | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
-string       | No ambiguity                                       |
-uuid         | No ambiguity                                       | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
-any          | N/A                                                | May be any of the above types or an `object` with any fields.
+The Canonical JSON format is a constrained version of the [JSON format](#json-format) which disambiguates values for 
+types which have multiple distinct representations that are conceptually equivalent. 
+Implementations of Conjure clients/servers must convert types (even if implicitly) from their JSON/Plain format to 
+their canonical form when determining equality.
 
-**Examples:**
-```
-Conjure Type |     JSON representation     |  CANONICAL representation   |    PLAIN representation    |
------------- | --------------------------- | --------------------------- | -------------------------- |
-datetime     | "2018-07-19T08:11:21Z"      | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21Z       |
-datetime     | "2018-07-19T08:11:21+00:00" | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21+00:00  |
-datetime     | "2018-07-19T08:11:21-00:00" | "2018-07-19T08:11:21+00:00" | 2018-07-19T08:11:21-00:00  |
-datetime     | "20180719T081121Z"          | "2018-07-19T08:11:21+00:00" | 20180719T081121Z           |
-datetime     | "2018-07-19T05:11:21+03:00" | "2018-07-19T05:11:21+03:00" | 2018-07-19T05:11:21+03:00  |
-double       | 1                           | 1.0                         | 1                          |
-double       | 1.00000                     | 1.0                         | 1.000000                   |
-double       | 1.2345678                   | 1.2345678                   | 1.2345678                  |
-double       | 1.23456780                  | 1.2345678                   | 1.23456780                 |
-double       | "NaN"                       | "NaN"                       | NaN                        |
-double       | "Infinity"                  | "Infinity"                  | Infinity                   |
-double       | "-Infinity"                 | "-Infinity"                 | -Infinity                  |
-```
+Aside from the cases described below, the canonical representation is the same as the [JSON representation](#json-format).
+
+#### Canonical double
+
+The canonical JSON format of a double must conform to these constraints:
+
+1. Non-scientific notation must be used
+1. At least one decimal point must be used, even if it is `.0`
+1. No superfluous trailing `0` decimals outside of the above case
+
+**Examples**:
+
+|     JSON representation     |  CANONICAL representation   |
+| --------------------------- | --------------------------- |
+| `-0`                        | `-0.0`                      |
+| `0`                         | `0.0`                       |
+| `1`                         | `1.0`                       |
+| `1.00000`                   | `1.0`                       |
+| `"1e1"`                     | `10.0`                      |
+| `1.2345678`                 | `1.2345678`                 |
+| `1.23456780`                | `1.2345678`                 |
+| `"NaN"`                     | `"NaN"`                     |
+| `"Infinity"`                | `"Infinity"`                |
+| `"-Infinity"`               | `"-Infinity"`               |
+
+#### Canonical datetime
+
+The canonical JSON format of a datetime is a string formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm`, in accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+
+**Examples**:
+
+|     JSON representation     |  CANONICAL representation   |
+| --------------------------- | --------------------------- |
+| `"2018-07-19T08:11:21Z"`      | `"2018-07-19T08:11:21+00:00"` |
+| `"2018-07-19T08:11:21+00:00"` | `"2018-07-19T08:11:21+00:00"` |
+| `"2018-07-19T08:11:21-00:00"` | `"2018-07-19T08:11:21+00:00"` |
+| `"20180719T081121Z"`          | `"2018-07-19T08:11:21+00:00"` |
+| `"2018-07-19T05:11:21+03:00"` | `"2018-07-19T05:11:21+03:00"` |
