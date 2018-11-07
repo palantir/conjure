@@ -199,7 +199,8 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
     "type": "foo",
     "foo": true
   }
-
+  ```
+  ```json
   // In this example, the variant is `bar` and the inner type is a Conjure `list<string>`
   {
     "type": "bar",
