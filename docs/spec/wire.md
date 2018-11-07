@@ -286,7 +286,7 @@ _Enum_            | unquoted variant name                         | UTF-8 string
 
 ## Canonical JSON Format
 
-The Canonical JSON format is a constrained version of the [JSON format][] which disambiguates values for 
+The Canonical JSON format is a constrained version of the [JSON format][] that disambiguates values for 
 types which have multiple distinct representations that are conceptually equivalent. 
 Implementations of Conjure clients/servers must convert types (even if implicitly) from their JSON/Plain format to 
 their canonical form when determining equality.
