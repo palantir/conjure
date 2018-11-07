@@ -269,7 +269,7 @@ This format describes an unquoted representation of a _subset_ of de-aliased Con
 Conjure&nbsp;Type | PLAIN&nbsp;Type                               |
 ----------------- | ----------------------------------------------|
 `bearertoken`     | unquoted String
-`binary`          | raw bytes
+`binary`          | unquoted String of base64 encoded bytes
 `boolean`         | `true` or `false`
 `datetime`        | unquoted String
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`
