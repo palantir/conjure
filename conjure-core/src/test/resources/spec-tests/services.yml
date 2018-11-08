@@ -215,6 +215,26 @@ positive:
                 baz:
                   type: Long
                   param-type: path
+  allowOptionalExternalTypeAsHeader:
+    conjure:
+      types:
+        imports:
+          Long:
+            base-type: string
+            external:
+              java: java.lang.Long
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            unused:
+              http: GET /foo
+              args:
+                stringHeader:
+                  param-id: ParamId
+                  param-type: header
+                  type: optional<Long>
 
 negative:
   disallowBearerTokenInPathParams:
