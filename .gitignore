@@ -52,7 +52,6 @@ __init__.pyc
 **/*.egg-info/
 .cache/
 .ipynb_checkpoints/
-.vscode/
 .mypy_cache/
 .tox/
 _version.py
