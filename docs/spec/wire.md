@@ -133,7 +133,11 @@ Conjure `header` parameters must be serialized in the [PLAIN format][] and trans
 For Conjure endpoints that define a `body` argument, a `Content-Type` header must be added.  If the body is of type `binary`, the content-type `application/octet-stream` must be used. Otherwise, clients must send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
 
 #### 2.6.2. Accept header
-Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
+Clients must send an `Accept` header for all requests to ensure changes can be made to the wire format in a non-breaking way.
+
+- If the endpoint has no return type, the client must send `Accept: */*` so that the API author can add a binary or JSON return type without causing requests from old clients to fail.
+- If the endpoint's de-aliased return type is `binary`, the client must send `Accept: application/octet-stream`
+- Otherwise, the client must send `Accept: application/json`
 
 #### 2.6.3. User-agent
 Requests must include a `User-Agent` header.
