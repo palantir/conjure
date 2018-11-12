@@ -1,10 +1,7 @@
 # Conjure Wire Specification
 _This document defines how clients and servers should behave based on endpoints and types defined in a Conjure IR file._
 
-<!-- these are just markdown link definitions, they do not get rendered -->
-[JSON format]: #json-format
-[PLAIN format]: #plain-format
-[Canonical JSON format]: #canonical-json-format
+<!-- WARNING: the markdown titles below are used to derive permalinks, changing them will break links -->
 
 <!-- TOC -->
 
@@ -51,6 +48,11 @@ _This document defines how clients and servers should behave based on endpoints 
     - [7.2. Canonical datetime](#72-canonical-datetime)
 
 <!-- /TOC -->
+
+<!-- these are just markdown link definitions, they do not get rendered -->
+[JSON format]: #5-json-format
+[PLAIN format]: #6-plain-format
+[Canonical JSON format]: #7-canonical-json-format
 
 
 ## 1. Conventions
