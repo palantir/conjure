@@ -48,7 +48,7 @@ apply plugin: 'com.palantir.conjure'
 dependencies {
     conjureCompiler 'com.palantir.conjure:conjure:4.0.0'
     conjureJava 'com.palantir.conjure.java:conjure-java:2.0.0'
-    conjureTypeScript 'com.palantir.conjure.typescript:conjure-typescript:3.3.0@tgz'
+    conjureTypeScript 'com.palantir.conjure.typescript:conjure-typescript:3.4.0'
 }
 
 subprojects {
