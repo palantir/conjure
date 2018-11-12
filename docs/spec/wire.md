@@ -60,6 +60,10 @@ For convenience, we define a _de-alias_ function which recursively collapses the
 
 ```
 de-alias(Alias of T) -> de-alias(T)
+de-alias(optional<T>) -> optional<de-alias(T)>
+de-alias(list<T>) -> list<de-alias(T)>
+de-alias(set<T>) -> set<de-alias(T)>
+de-alias(map<K, V>) -> map<de-alias(K), de-alias(V)>
 de-alias(T) -> T
 ```
 
@@ -136,7 +140,7 @@ For Conjure endpoints that define a `body` argument, a `Content-Type` header mus
 Clients must send an `Accept` header for all requests to ensure changes can be made to the wire format in a non-breaking way.
 
 - If the endpoint has no return type, the client must send `Accept: */*` so that the API author can add a binary or JSON return type without causing requests from old clients to fail.
-- If the endpoint's de-aliased return type is `binary`, the client must send `Accept: application/octet-stream`
+- If the endpoint's de-aliased return type is `binary` or `optional<binary>`, the client must send `Accept: application/octet-stream`
 - Otherwise, the client must send `Accept: application/json`
 
 #### 2.6.3. User-agent
