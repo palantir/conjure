@@ -53,6 +53,7 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
 [PLAIN format]: #6-plain-format
 [Canonical JSON format]: #7-canonical-json-format
 [URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
+[Path parameters]: ./source_files.md#path-templating
 
 
 ## 1. Conventions
@@ -67,7 +68,7 @@ de-alias(T) -> T
 _This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616)._
 
 ### 2.1. Path parameters
-For Conjure endpoints that have user-defined path parameters, clients must interpolate values for each of these path parameters. Values must be serialized using the [PLAIN format][] and must also be [URL encoded][] to ensure reserved characters are transmitted unambiguously.
+[Path parameters][] are interpolated into the path string, where values are serialized using the [PLAIN format][] and must also be [URL encoded][] to ensure reserved characters are transmitted unambiguously.
 
 For example, the following Conjure endpoint contains several path parameters of different types:
 ```yaml
@@ -84,7 +85,7 @@ In this example, the `file` argument with value `var/conf/install.yml` is percen
 ```
 
 ### 2.2. Query parameters
-Parameters of type `query` are translated into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4), with the Conjure `paramId` used as the query key. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters [URL encoded][].
+Parameters of type `query` must be translated into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4), with the Conjure `paramId` used as the query key. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters [URL encoded][].
 
 For example, the following Conjure endpoint contains two query parameters:
 ```yaml
@@ -103,7 +104,7 @@ These examples illustrate how an `optional<T>` value should be omitted if the va
 ```
 
 ### 2.3. Body parameter
-If an endpoint defines an argument of type `body`, clients must serialize the user-provided value using the [JSON format][], unless:
+The endpoint `body` argument must be serialized using the [JSON format][], unless:
   - the de-aliased argument is type `binary`: the clients must write the raw binary bytes directly to the request body
   - the de-aliased argument is type `optional<T>` and the value is not present: it is recommended to send an empty request body, although clients may alternatively send the JSON value `null`.
 It is recommended to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
@@ -124,7 +125,11 @@ In this case, if `newName` is not present, then the [JSON format][] allows clien
 Conjure `header` parameters must be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
 
 #### 2.4.1. Content-Type Header
-For Conjure endpoints that define a `body` argument, a `Content-Type` header must be added.  If the body is of type `binary`, the content-type `application/octet-stream` must be used. Otherwise, clients must send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
+A `Content-Type` header must be added if the endpoint defines a `body` argument.
+- If the de-aliased body type is `binary`, the Content-Type `application/octet-stream` must be used.
+- Otherwise, clients must use `application/json`.
+
+_Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt)._
 
 #### 2.4.2. Accept header
 Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`.
@@ -157,10 +162,10 @@ Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/5
 _Note, this is more restrictive than the User-Agent definition in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-5.5.3). Requests from some browsers may not comply with these requirements as it is impossible to override browser User-Agent headers._
 
 #### 2.4.4. Header Authorization
-If an endpoint defines an `auth` field of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+For endpoints with `auth` of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
 
 #### 2.4.5. Cookie Authorization
-If an endpoint defines an `auth` field of type `cookie`, clients must send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+For endpoints with `auth` of type `cookie`, clients must send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
 #### 2.4.6. Additional headers
 Clients may inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
