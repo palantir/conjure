@@ -131,7 +131,7 @@ For Conjure endpoints that define a `body` argument, a `Content-Type` header mus
 Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`.
 
 #### 2.4.3. User-agent
-Requests must include a `User-Agent` header, defined below using [ABNF notation](https://tools.ietf.org/html/rfc5234#appendix-B.1) and regexes:
+Where possible, requests must include a `User-Agent` header defined below using [ABNF notation](https://tools.ietf.org/html/rfc5234#appendix-B.1) and regexes:
 
 ```
 User-Agent        = commented-product *( WHITESPACE commented-product )
@@ -155,7 +155,7 @@ bar/0.0.0 (nodeId:myNode)
 Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36
 ```
 
-_Note, this is more restrictive than the User-Agent definition in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-5.5.3) and requests from some browsers may not comply with these requirements._
+_Note, this is more restrictive than the User-Agent definition in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-5.5.3). Requests from some browsers may not comply with these requirements as it is impossible to override browser User-Agent headers._
 
 #### 2.4.4. Header Authorization
 If an endpoint defines an `auth` field of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
