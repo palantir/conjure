@@ -54,6 +54,7 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
 [JSON format]: #5-json-format
 [PLAIN format]: #6-plain-format
 [Canonical JSON format]: #7-canonical-json-format
+[URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
 
 
 ## 1. Conventions
@@ -68,7 +69,7 @@ de-alias(T) -> T
 _This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616)._
 
 ### 2.1. Path parameters
-For Conjure endpoints that have user-defined path parameters, clients must interpolate values for each of these path parameters. Values must be serialized using the [PLAIN format][] and must also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
+For Conjure endpoints that have user-defined path parameters, clients must interpolate values for each of these path parameters. Values must be serialized using the [PLAIN format][] and must also be [URL encoded][] to ensure reserved characters are transmitted unambiguously.
 
 For example, the following Conjure endpoint contains several path parameters of different types:
 ```yaml
@@ -85,7 +86,7 @@ In this example, the `file` argument with value `var/conf/install.yml` is percen
 ```
 
 ### 2.2. Query parameters
-If an endpoint specifies one or more parameters of type `query`, clients must convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters percent encoded.
+Parameters of type `query` are translated into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4), with the Conjure `paramId` used as the query key. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters [URL encoded][].
 
 For example, the following Conjure endpoint contains two query parameters:
 ```yaml
