@@ -27,13 +27,12 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [3.4. Conjure errors](#34-conjure-errors)
 - [4. Behaviour](#4-behaviour)
   * [4.1. Forward compatible clients](#41-forward-compatible-clients)
-  * [4.2. Client base URL](#42-client-base-url)
-  * [4.3. Servers reject unknown fields](#43-servers-reject-unknown-fields)
-  * [4.4. Servers tolerate extra headers](#44-servers-tolerate-extra-headers)
-  * [4.5. Round-trip of unknown variants](#45-round-trip-of-unknown-variants)
-  * [4.6. CORS and HTTP preflight requests](#46-cors-and-http-preflight-requests)
-  * [4.7. HTTP/2](#47-http2)
-  * [4.8. SSL/TLS](#48-ssltls)
+  * [4.2. Servers reject unknown fields](#42-servers-reject-unknown-fields)
+  * [4.3. Servers tolerate extra headers](#43-servers-tolerate-extra-headers)
+  * [4.4. Round-trip of unknown variants](#44-round-trip-of-unknown-variants)
+  * [4.5. CORS and HTTP preflight requests](#45-cors-and-http-preflight-requests)
+  * [4.6. HTTP/2](#46-http2)
+  * [4.7. SSL/TLS](#47-ssltls)
 - [5. JSON format](#5-json-format)
   * [5.1. Built-in types](#51-built-in-types)
   * [5.2. Container types](#52-container-types)
@@ -129,7 +128,7 @@ Conjure `header` parameters must be serialized in the [PLAIN format][] and trans
 For Conjure endpoints that define a `body` argument, a `Content-Type` header must be added.  If the body is of type `binary`, the content-type `application/octet-stream` must be used. Otherwise, clients must send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
 
 #### 2.4.2. Accept header
-Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
+Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`.
 
 #### 2.4.3. User-agent
 Requests must include a `User-Agent` header.
@@ -188,25 +187,22 @@ CUSTOM_SERVER              | 500
 ### 4.1. Forward compatible clients
 Clients must tolerate extra headers, unknown fields in JSON objects and unknown variants of Conjure enums and unions. This ensures that old clients will continue to work, even if a newer version of a server includes extra fields in a JSON response.
 
-### 4.2. Client base URL
-Clients must allow users to specify a base URL for network requests because Conjure endpoint definitions only include domain-agnostic http path suffixes.
-
-### 4.3. Servers reject unknown fields
+### 4.2. Servers reject unknown fields
 Servers must request reject all unexpected JSON fields. This helps developers notice bugs and mistakes quickly, instead of allowing silent failures.
 
-### 4.4. Servers tolerate extra headers
+### 4.3. Servers tolerate extra headers
 Servers must tolerate extra headers not defined in the endpoint definition. This is important because proxies frequently modify requests to include additional headers, e.g. `X-Forwarded-For`.
 
-### 4.5. Round-trip of unknown variants
+### 4.4. Round-trip of unknown variants
 Clients should be able to round trip unknown variants of enums and unions.
 
-### 4.6. CORS and HTTP preflight requests
+### 4.5. CORS and HTTP preflight requests
 In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method .
 
-### 4.7. HTTP/2
+### 4.6. HTTP/2
 The Conjure wire specification is compatible with HTTP/2, but it is not required.
 
-### 4.8. SSL/TLS
+### 4.7. SSL/TLS
 Network calls must use Transport Layer Security (TLS).
 
 
