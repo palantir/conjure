@@ -32,7 +32,6 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [4.4. Round-trip of unknown variants](#44-round-trip-of-unknown-variants)
   * [4.5. CORS and HTTP preflight requests](#45-cors-and-http-preflight-requests)
   * [4.6. HTTP/2](#46-http2)
-  * [4.7. SSL/TLS](#47-ssltls)
 - [5. JSON format](#5-json-format)
   * [5.1. Built-in types](#51-built-in-types)
   * [5.2. Container types](#52-container-types)
@@ -225,9 +224,6 @@ In order to be compatible with browser [preflight requests](https://developer.mo
 
 ### 4.6. HTTP/2
 The Conjure wire specification is compatible with HTTP/2, but it is not required.
-
-### 4.7. SSL/TLS
-Network calls must use Transport Layer Security (TLS).
 
 
 ## 5. JSON format
