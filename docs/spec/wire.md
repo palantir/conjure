@@ -225,7 +225,7 @@ Servers must tolerate extra headers not defined in the endpoint definition. This
 Clients should be able to round trip unknown variants of enums and unions.
 
 ### 4.5. CORS and HTTP preflight requests
-In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method .
+In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method.
 
 ### 4.6. HTTP/2
 The Conjure wire specification is compatible with HTTP/2, but it is not required.
