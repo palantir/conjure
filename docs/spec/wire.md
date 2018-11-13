@@ -3,56 +3,57 @@ _This document defines how clients and servers should behave based on endpoints 
 
 <!-- WARNING: the markdown titles below are used to derive permalinks, changing them will break links -->
 
+<!--
+Generated using https://github.com/jonschlinkert/markdown-toc:
+  $ markdown-toc docs/spec/wire.md --no-firsth1
+-->
 <!-- TOC -->
-
 - [1. Conventions](#1-conventions)
 - [2. HTTP requests](#2-http-requests)
-    - [2.1. SSL/TLS](#21-ssltls)
-    - [2.2. HTTP Methods](#22-http-methods)
-    - [2.3. Path parameters](#23-path-parameters)
-    - [2.4. Query parameters](#24-query-parameters)
-    - [2.5. Body parameter](#25-body-parameter)
-    - [2.6. Headers](#26-headers)
-        - [2.6.1. Content-Type Header](#261-content-type-header)
-        - [2.6.2. Accept header](#262-accept-header)
-        - [2.6.3. User-agent](#263-user-agent)
-        - [2.6.4. Header Authorization](#264-header-authorization)
-        - [2.6.5. Cookie Authorization](#265-cookie-authorization)
-        - [2.6.6. Additional headers](#266-additional-headers)
+  * [2.1. Path parameters](#21-path-parameters)
+  * [2.2. Query parameters](#22-query-parameters)
+  * [2.3. Body parameter](#23-body-parameter)
+  * [2.4. Headers](#24-headers)
+    + [2.4.1. Content-Type Header](#241-content-type-header)
+    + [2.4.2. Accept header](#242-accept-header)
+    + [2.4.3. User-agent](#243-user-agent)
+    + [2.4.4. Header Authorization](#244-header-authorization)
+    + [2.4.5. Cookie Authorization](#245-cookie-authorization)
+    + [2.4.6. Additional headers](#246-additional-headers)
 - [3. HTTP responses](#3-http-responses)
-    - [3.1. Status codes](#31-status-codes)
-    - [3.2. Response body](#32-response-body)
-    - [3.3. Content-Type header](#33-content-type-header)
-    - [3.4. Conjure errors](#34-conjure-errors)
+  * [3.1. Status codes](#31-status-codes)
+  * [3.2. Response body](#32-response-body)
+  * [3.3. Content-Type header](#33-content-type-header)
+  * [3.4. Conjure errors](#34-conjure-errors)
 - [4. Behaviour](#4-behaviour)
-    - [4.1. Forward compatible clients](#41-forward-compatible-clients)
-    - [4.2. Client base URL](#42-client-base-url)
-    - [4.3. Servers reject unknown fields](#43-servers-reject-unknown-fields)
-    - [4.4. Servers tolerate extra headers](#44-servers-tolerate-extra-headers)
-    - [4.5. Round-trip of unknown variants](#45-round-trip-of-unknown-variants)
-    - [4.6. CORS and HTTP preflight requests](#46-cors-and-http-preflight-requests)
-    - [4.7. HTTP/2](#47-http2)
+  * [4.1. Forward compatible clients](#41-forward-compatible-clients)
+  * [4.2. Servers reject unknown fields](#42-servers-reject-unknown-fields)
+  * [4.3. Servers tolerate extra headers](#43-servers-tolerate-extra-headers)
+  * [4.4. Round-trip of unknown variants](#44-round-trip-of-unknown-variants)
+  * [4.5. CORS and HTTP preflight requests](#45-cors-and-http-preflight-requests)
+  * [4.6. HTTP/2](#46-http2)
 - [5. JSON format](#5-json-format)
-    - [5.1. Built-in types](#51-built-in-types)
-    - [5.2. Container types](#52-container-types)
-    - [5.3. Named types](#53-named-types)
-    - [5.4. Union JSON format](#54-union-json-format)
-    - [5.5. Conjure Errors](#55-conjure-errors)
-    - [5.6. Deserialization](#56-deserialization)
-        - [5.6.1. Coercing JSON `null` / absent to Conjure types](#561-coercing-json-null--absent-to-conjure-types)
-        - [5.6.2. Dedupe `set` / `map` keys using Canonical JSON format](#562-dedupe-set--map-keys-using-canonical-json-format)
-        - [5.6.3. No automatic casting](#563-no-automatic-casting)
+  * [5.1. Built-in types](#51-built-in-types)
+  * [5.2. Container types](#52-container-types)
+  * [5.3. Named types](#53-named-types)
+  * [5.4. Union JSON format](#54-union-json-format)
+  * [5.5. Conjure Errors](#55-conjure-errors)
+  * [5.6. Deserialization](#56-deserialization)
+    + [5.6.1. Coercing JSON `null` / absent to Conjure types](#561-coercing-json-null--absent-to-conjure-types)
+    + [5.6.2. Dedupe `set` / `map` keys using Canonical JSON format](#562-dedupe-set--map-keys-using-canonical-json-format)
+    + [5.6.3. No automatic casting](#563-no-automatic-casting)
 - [6. PLAIN format](#6-plain-format)
 - [7. Canonical JSON Format](#7-canonical-json-format)
-    - [7.1. Canonical double](#71-canonical-double)
-    - [7.2. Canonical datetime](#72-canonical-datetime)
-
+  * [7.1. Canonical double](#71-canonical-double)
+  * [7.2. Canonical datetime](#72-canonical-datetime)
 <!-- /TOC -->
 
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #5-json-format
 [PLAIN format]: #6-plain-format
 [Canonical JSON format]: #7-canonical-json-format
+[URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
+[Path parameters]: ./source_files.md#path-templating
 
 
 ## 1. Conventions
@@ -66,14 +67,8 @@ de-alias(T) -> T
 ## 2. HTTP requests
 _This section assumes familiarity with HTTP concepts as defined in [RFC2616 Hypertext Transfer Protocol -- HTTP/1.1](https://tools.ietf.org/html/rfc2616)._
 
-### 2.1. SSL/TLS
-Conjure clients must support requests using Transport Layer Security (TLS) and may optionally support HTTP requests. This ensures that any Conjure client implementation will be able to interact with any Conjure server implementation.
-
-### 2.2. HTTP Methods
-Conjure clients must support the following HTTP methods: `GET`, `POST`, `PUT`, and `DELETE`.
-
-### 2.3. Path parameters
-For Conjure endpoints that have user-defined path parameters, clients must interpolate values for each of these path parameters. Values must be serialized using the [PLAIN format][] and must also be [URL encoded](https://tools.ietf.org/html/rfc3986#section-2.1) to ensure reserved characters are transmitted unambiguously.
+### 2.1. Path parameters
+[Path parameters][] are interpolated into the path string, where values are serialized using the [PLAIN format][] and must also be [URL encoded][] to ensure reserved characters are transmitted unambiguously.
 
 For example, the following Conjure endpoint contains several path parameters of different types:
 ```yaml
@@ -89,8 +84,8 @@ In this example, the `file` argument with value `var/conf/install.yml` is percen
 /demo/var%2Fconf%2Finstall.yml/rev/53
 ```
 
-### 2.4. Query parameters
-If an endpoint specifies one or more parameters of type `query`, clients must convert these (key,value) pairs into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4) to be appended to the request URL. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters percent encoded.
+### 2.2. Query parameters
+Parameters of type `query` must be translated into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4), with the Conjure `paramId` used as the query key. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters [URL encoded][].
 
 For example, the following Conjure endpoint contains two query parameters:
 ```yaml
@@ -108,8 +103,8 @@ These examples illustrate how an `optional<T>` value should be omitted if the va
 /recipes
 ```
 
-### 2.5. Body parameter
-If an endpoint defines an argument of type `body`, clients must serialize the user-provided value using the [JSON format][], unless:
+### 2.3. Body parameter
+The endpoint `body` argument must be serialized using the [JSON format][], unless:
   - the de-aliased argument is type `binary`: the clients must write the raw binary bytes directly to the request body
   - the de-aliased argument is type `optional<T>` and the value is not present: it is recommended to send an empty request body, although clients may alternatively send the JSON value `null`.
 It is recommended to add a `Content-Length` header for [compatibility](https://tools.ietf.org/html/rfc2616#section-4.4) with HTTP/1.0 servers.
@@ -126,25 +121,53 @@ demoEndpoint:
 
 In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
-### 2.6. Headers
+### 2.4. Headers
 Conjure `header` parameters must be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
 
-#### 2.6.1. Content-Type Header
-For Conjure endpoints that define a `body` argument, a `Content-Type` header must be added.  If the body is of type `binary`, the content-type `application/octet-stream` must be used. Otherwise, clients must send `Content-Type: application/json`. Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt).
+#### 2.4.1. Content-Type Header
+A `Content-Type` header must be added if the endpoint defines a `body` argument.
+- If the de-aliased body type is `binary`, the Content-Type `application/octet-stream` must be used.
+- Otherwise, clients must use `application/json`.
 
-#### 2.6.2. Accept header
-Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`. This ensures changes can be made to the wire format in a non-breaking way.
+_Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt)._
 
-#### 2.6.3. User-agent
-Requests must include a `User-Agent` header.
+#### 2.4.2. Accept header
+Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`.
 
-#### 2.6.4. Header Authorization
-If an endpoint defines an `auth` field of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+#### 2.4.3. User-agent
+Where possible, requests must include a `User-Agent` header defined below using [ABNF notation](https://tools.ietf.org/html/rfc5234#appendix-B.1) and regexes:
 
-#### 2.6.5. Cookie Authorization
-If an endpoint defines an `auth` field of type `cookie`, clients must send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+```
+User-Agent        = commented-product *( WHITESPACE commented-product )
+commented-product = product | product WHITESPACE paren-comments
+product           = name "/" version
+paren-comments    = "(" comments ")"
+comments          = comment-text *( delim comment-text )
+delim             = "," | ";"
 
-#### 2.6.6. Additional headers
+comment-text      = [^,;()]+
+name              = [a-zA-Z][a-zA-Z0-9\-]*
+version           = [0-9]+(\.[0-9]+)*(-rc[0-9]+)?(-[0-9]+-g[a-f0-9]+)?
+```
+
+For example, the following are valid user agents:
+
+```
+foo/1.0.0
+my-service/1.0.0-rc3-18-g773fc1b conjure-java-runtime/4.6.0 okhttp3/3.11.0
+bar/0.0.0 (nodeId:myNode)
+Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36
+```
+
+_Note, this is more restrictive than the User-Agent definition in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-5.5.3). Requests from some browsers may not comply with these requirements as it is impossible to override browser User-Agent headers._
+
+#### 2.4.4. Header Authorization
+For endpoints with `auth` of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
+
+#### 2.4.5. Cookie Authorization
+For endpoints with `auth` of type `cookie`, clients must send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
+
+#### 2.4.6. Additional headers
 Clients may inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
 
 
@@ -192,22 +215,19 @@ CUSTOM_SERVER              | 500
 ### 4.1. Forward compatible clients
 Clients must tolerate extra headers, unknown fields in JSON objects and unknown variants of Conjure enums and unions. This ensures that old clients will continue to work, even if a newer version of a server includes extra fields in a JSON response.
 
-### 4.2. Client base URL
-Clients must allow users to specify a base URL for network requests because Conjure endpoint definitions only include domain-agnostic http path suffixes.
-
-### 4.3. Servers reject unknown fields
+### 4.2. Servers reject unknown fields
 Servers must request reject all unexpected JSON fields. This helps developers notice bugs and mistakes quickly, instead of allowing silent failures.
 
-### 4.4. Servers tolerate extra headers
+### 4.3. Servers tolerate extra headers
 Servers must tolerate extra headers not defined in the endpoint definition. This is important because proxies frequently modify requests to include additional headers, e.g. `X-Forwarded-For`.
 
-### 4.5. Round-trip of unknown variants
+### 4.4. Round-trip of unknown variants
 Clients should be able to round trip unknown variants of enums and unions.
 
-### 4.6. CORS and HTTP preflight requests
-In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method .
+### 4.5. CORS and HTTP preflight requests
+In order to be compatible with browser [preflight requests](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request), servers must support the HTTP `OPTIONS` method.
 
-### 4.7. HTTP/2
+### 4.6. HTTP/2
 The Conjure wire specification is compatible with HTTP/2, but it is not required.
 
 
