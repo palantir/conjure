@@ -13,7 +13,7 @@ When deserializing Conjure `set` or `map` keys, duplicate set items / map keys (
 are not allowed. Sets or maps containing duplicates should fail to deserialize.
 
 Equivalence of two conjure values can be determined by converting their JSON values to the [Canonical JSON format][] and 
-then comparing byte equality.
+then comparing using the `compare` function defined below.
 
 ## Canonical JSON Format
 The Canonical JSON format is a constrained version of the [JSON format][] that disambiguates values for
