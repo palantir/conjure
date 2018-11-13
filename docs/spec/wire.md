@@ -40,12 +40,8 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [5.5. Conjure Errors](#55-conjure-errors)
   * [5.6. Deserialization](#56-deserialization)
     + [5.6.1. Coercing JSON `null` / absent to Conjure types](#561-coercing-json-null--absent-to-conjure-types)
-    + [5.6.2. Dedupe `set` / `map` keys using Canonical JSON format](#562-dedupe-set--map-keys-using-canonical-json-format)
-    + [5.6.3. No automatic casting](#563-no-automatic-casting)
+    + [5.6.2. No automatic casting](#562-no-automatic-casting)
 - [6. PLAIN format](#6-plain-format)
-- [7. Canonical JSON Format](#7-canonical-json-format)
-  * [7.1. Canonical double](#71-canonical-double)
-  * [7.2. Canonical datetime](#72-canonical-datetime)
 <!-- /TOC -->
 
 <!-- these are just markdown link definitions, they do not get rendered -->
@@ -348,10 +344,7 @@ If a JSON key is absent or the value is `null`, two rules apply:
 
 _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
-#### 5.6.2. Dedupe `set` / `map` keys using Canonical JSON format
-When deserializing Conjure `set` or `map` keys, equivalence of two items can be determined by converting the JSON value to the [Canonical JSON format][] and then comparing byte equality.
-
-#### 5.6.3. No automatic casting
+#### 5.6.2. No automatic casting
 Unexpected JSON types should not be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
 
 
@@ -372,47 +365,3 @@ Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
 `string`          | unquoted String                               | UTF-8 string
 `uuid`            | unquoted String                               | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
 _Enum_            | unquoted variant name                         | UTF-8 string
-
-
-## 7. Canonical JSON Format
-The Canonical JSON format is a constrained version of the [JSON format][] that disambiguates values for
-types which have multiple distinct representations that are conceptually equivalent.
-Implementations of Conjure clients/servers must convert types (even if implicitly) from their JSON/Plain format to
-their canonical form when determining equality.
-
-Aside from the cases described below, the canonical representation is the same as the [JSON representation][JSON format].
-
-### 7.1. Canonical double
-The canonical JSON format of a double must conform to these constraints:
-
-1. Non-scientific notation must be used
-1. At least one decimal point must be used, even if it is `.0`
-1. No superfluous trailing `0` decimals outside of the above case
-
-**Examples**:
-
-|     JSON representation     |  Canonical representation   |
-| --------------------------- | --------------------------- |
-| `-0`                        | `-0.0`                      |
-| `0`                         | `0.0`                       |
-| `1`                         | `1.0`                       |
-| `1.00000`                   | `1.0`                       |
-| `"1e1"`                     | `10.0`                      |
-| `1.2345678`                 | `1.2345678`                 |
-| `1.23456780`                | `1.2345678`                 |
-| `"NaN"`                     | `"NaN"`                     |
-| `"Infinity"`                | `"Infinity"`                |
-| `"-Infinity"`               | `"-Infinity"`               |
-
-### 7.2. Canonical datetime
-The canonical JSON format of a datetime is a string formatted according to `YYYY-MM-DDTHH:mm:ss±hh:mm`, in accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
-
-**Examples**:
-
-|     JSON representation       |  Canonical representation     |
-| ----------------------------- | ----------------------------- |
-| `"2018-07-19T08:11:21Z"`      | `"2018-07-19T08:11:21+00:00"` |
-| `"2018-07-19T08:11:21+00:00"` | `"2018-07-19T08:11:21+00:00"` |
-| `"2018-07-19T08:11:21-00:00"` | `"2018-07-19T08:11:21+00:00"` |
-| `"20180719T081121Z"`          | `"2018-07-19T08:11:21+00:00"` |
-| `"2018-07-19T05:11:21+03:00"` | `"2018-07-19T05:11:21+03:00"` |
