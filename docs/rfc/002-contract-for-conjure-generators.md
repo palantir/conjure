@@ -24,7 +24,7 @@ conjure-java-0.2.3
 
 ## Primary command
 
-Conjure generators should expect to be called with the command `generate` as the first argument. They read an [intermediate representation](../spec/intermediate_representation.md) JSON file, specified by the positional argument `<input-json>` and write to the `<ouput-directory>` folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
+Conjure generators should expect to be called with the command `generate` as the first argument. They read an [intermediate representation](/docs/spec/intermediate_representation.md) JSON file, specified by the positional argument `<input-json>` and write to the `<ouput-directory>` folder. They must exit 0 on success, or a non-zero code if they failed.  Errors must be written to stderr.
 
 ```
 conjure-<lang> generate <input-json> <output-directory>

@@ -23,6 +23,13 @@ For speculative changes, consider opening a GitHub issue to describe the problem
 Our docs are built using [docsify](https://docsify.js.org/) which just renders markdown documents from the `/docs` folder. You can preview the docs site locally:
 
 ```
-$ npm install -g docsify
+$ npm install -g docsify-cli
 $ docsify serve
+```
+
+Markdown links can be checked using [liche](https://github.com/raviqqe/liche):
+
+```
+$ go get -u github.com/raviqqe/liche
+$ liche -d . -r . -v
 ```

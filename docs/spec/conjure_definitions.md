@@ -1,6 +1,6 @@
-# Conjure Source Files
+# Conjure definitions
 
-A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document. Source files must end in `.yml`.  Here is a suggested structure:
+A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. Types may also be imported from other files. Source files must end in `.yml`.  Here is a suggested structure:
 
 ```
 your-project/src/main/conjure/foo.yml
@@ -13,6 +13,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
   - [ConjureSourceFile][]
     - [TypesDefinition][]
       - [ExternalTypeDefinition][]
+        - [ExternalImportDefinition][]
       - [NamedTypesDefinition][]
         - [TypeName][]
         - [ConjureType][]
@@ -35,36 +36,10 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
-<!-- These are not rendered, they just allow us to specify the hash URL in one place. -->
-
-[AliasDefinition]: #aliasdefinition
-[ArgumentDefinition.ParamType]: #argumentdefinitionparamtype
-[ArgumentDefinition]: #argumentdefinition
-[AuthDefinition]: #authdefinition
-[BuiltIn]: #builtin
-[ConjureSourceFile]: #conjuresourcefile
-[ContainerType]: #containertype
-[ConjureType]: #conjuretype
-[DocString]: #docstring
-[EndpointDefinition]: #endpointdefinition
-[EnumTypeDefinition]: #enumtypedefinition
-[EnumValueDefinition]: #enumvaluedefinition
-[ErrorCode]: #errorcode
-[ErrorDefinition]: #errordefinition
-[ExternalTypeDefinition]: #externaltypedefinition
-[FieldDefinition]: #fielddefinition
-[NamedTypesDefinition]: #namedtypesdefinition
-[ObjectTypeDefinition]: #objecttypedefinition
-[Path templating]: #path-templating
-[PathString]: #pathstring
-[ServiceDefinition]: #servicedefinition
-[TypesDefinition]: #typesdefinition
-[TypeName]: #typename
-[UnionTypeDefinition]: #uniontypedefinition
-
 <!-- This markdown document uses non-breaking dashes '&#8209;' and non-breaking spaces '&nbsp;' to ensure that table rows look nice. -->
 
 ## ConjureSourceFile
+[ConjureSourceFile]: #conjuresourcefile
 Each source file must be a YAML object with the following allowed fields:
 
 Field | Type | Description
@@ -72,19 +47,44 @@ Field | Type | Description
 types | [TypesDefinition][] | The types to be included in the definition.
 services | Map[`string`&nbsp;&rarr;&nbsp;[ServiceDefinition][]] | A  map between a service name and its definition. Service names MUST be in PascalCase.
 
-
 ## TypesDefinition
+[TypesDefinition]: #typesdefinition
 The object specifies the types available in the Conjure definition.
 
 Field | Type | Description
 ---|:---:|---
-conjure&#8209;imports | Map[[TypeName][]&nbsp;&rarr;&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
+conjure&#8209;imports | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a namespace and a relative path to a Conjure definition file. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 imports | Map[`string`&nbsp;&rarr;&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 definitions | [NamedTypesDefinition][] | The types specified in this definition.
 
+### conjure-imports
+For example, one file called `common.yml` might define a Conjure type called `ProductId`:
+
+```yaml
+types:
+  definitions:
+    default-package: com.palantir.product
+    objects:
+      ProductId:
+        alias: string
+```
+
+A separate file in the same directory, `example.yml`, can then reference types defined in `common.yml`:
+
+```yaml
+types:
+  conjure-imports:
+    common: common.yml
+  definitions:
+    default-package: com.palantir.product
+    objects:
+      SomeRequest:
+        id: common.ProductId
+```
 
 ## ExternalTypeDefinition
-A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
+[ExternalTypeDefinition]: #externaltypedefinition
+A type that is not defined within Conjure. Usage of external types is strongly discouraged because Conjure is unable to validate that external types match the serialization format of the base type. They are intended only to migrate existing APIs to Conjure.
 
 Field | Type | Description
 ---|:---:|---
@@ -93,22 +93,24 @@ external | [ExternalImportDefinition][] | The external types to reference.
 
 **Example:**
 ```yaml
-imports:
-  SomeDataType:
-    base-type: string
-    external:
-      java: com.palantir.package.someDataType
+types:
+  imports:
+    SomeDataType:
+      base-type: string
+      external:
+        java: com.palantir.package.someDataType
 ```
 
 ## ExternalImportDefinition
+[ExternalImportDefinition]: #externalimportdefinition
 References to types that are not defined within Conjure.
 
 Field | Type | Description
 ---|:---:|---
-java | string | The fully qualified Java type.
-
+java | `string` | The fully qualified Java type.
 
 ## NamedTypesDefinition
+[NamedTypesDefinition]: #namedtypesdefinition
 The object specifies the types that are defined in the Conjure definition.
 
 Field | Type | Description
@@ -121,14 +123,17 @@ Package names are used by generator implementations to determine the output loca
 
 
 ## ConjureType
+[ConjureType]: #conjuretype
 A ConjureType is either a reference to an existing [TypeName][], a [ContainerType][] or a [BuiltIn][].
 
 
 ## TypeName
+[TypeName]: #typename
 Named types must be in PascalCase and be unique within a package.
 
 
 ## ContainerType
+[ContainerType]: #containertype
 Container types like `optional<T>`, `list<T>`, `set<T>` and `map<K, V>` can be referenced using their lowercase names, where variables like `T`, `K` and `V` can be substituted for a Conjure named type, a built-in or more container types:
 
 **Examples:**
@@ -142,6 +147,7 @@ map<rid, optional<datetime>>
 
 
 ## BuiltIn
+[BuiltIn]: #builtin
 Built-in types are always lowercase, to distinguish them from user-defined types which are PascalCase.
 
 **Examples:**
@@ -159,8 +165,8 @@ string
 uuid
 ```
 
-
 ## AliasDefinition
+[AliasDefinition]: #aliasdefinition
 Definition for an alias complex data type.
 
 Field | Type | Description
@@ -171,6 +177,7 @@ package | `string` | **REQUIRED** if `default-package` is not specified. Overrid
 
 
 ## ObjectTypeDefinition
+[ObjectTypeDefinition]: #objecttypedefinition
 Definition for an object complex data type.
 
 Field | Type | Description
@@ -195,6 +202,7 @@ TypeAlias:
 
 
 ## FieldDefinition
+[FieldDefinition]: #fielddefinition
 Definition for a field in a complex data type.
 
 Field | Type | Description
@@ -204,6 +212,7 @@ docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://sp
 
 
 ## UnionTypeDefinition
+[UnionTypeDefinition]: #uniontypedefinition
 Definition for a union complex data type.
 
 Field | Type | Description
@@ -225,6 +234,7 @@ Payload:
 
 
 ## EnumTypeDefinition
+[EnumTypeDefinition]: #enumtypedefinition
 Definition for an enum complex data type.
 
 Field | Type | Description
@@ -243,6 +253,7 @@ LoadState:
 ```
 
 ## EnumValueDefinition
+[EnumValueDefinition]: #enumvaluedefinition
 Definition for a single value within an enumeration.
 
 Field | Type | Description
@@ -252,6 +263,7 @@ docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://sp
 
 
 ## ErrorDefinition
+[ErrorDefinition]: #errordefinition
 Definition for an error type.
 
 Field | Type | Description
@@ -264,40 +276,42 @@ docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://sp
 
 
 ## ErrorCode
-A field describing the error category. MUST be one of the following strings, which have associated HTTP status codes:
-* PERMISSION_DENIED (403)
-* INVALID_ARGUMENT(400)
-* NOT_FOUND (404)
-* CONFLICT (409)
-* REQUEST_ENTITY_TOO_LARGE (413)
-* FAILED_PRECONDITION(500)
-* INTERNAL (500)
-* TIMEOUT (500)
-* CUSTOM_CLIENT (400)
-* CUSTOM_SERVER (500)
+[ErrorCode]: #errorcode
+A field describing the error category. MUST be one of the following strings, with HTTP status codes defined in the [wire spec](/docs/spec/wire.md#34-conjure-errors):
+* PERMISSION_DENIED
+* INVALID_ARGUMENT
+* NOT_FOUND
+* CONFLICT
+* REQUEST_ENTITY_TOO_LARGE
+* FAILED_PRECONDITION
+* INTERNAL
+* TIMEOUT
+* CUSTOM_CLIENT
+* CUSTOM_SERVER
 
 
 ## ServiceDefinition
+[ServiceDefinition]: #servicedefinition
 A service is a collection of endpoints.
 
 Field | Type | Description
 ---|:---:|---
 name | [TypeName][] | **REQUIRED** A human readable name for the service.
 package | `string` | **REQUIRED** The package of the service.
-base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating][] is not allowed.
+base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path parameters][] are not allowed.
 default&#8209;auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 docs | [DocString][] | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 endpoints | Map[`string`&nbsp;&rarr;&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
 ## PathString
-A field describing an extendible path. A path segment MAY have [Path templating][].
+[PathString]: #pathstring
+A PathString consists of segments separated by forward slashes, `/`. Segments may be literals or path parameters (see below).
 
 When comparing multiple paths, the path with the longest concrete path should be matched first.
 
-## Path templating
-Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters. The template may include `:.+` and `:.*` regular expressions with the following semantics and limitations:
-- `:.+` A non-greedy match of one or more path segments should be performed for the parameter
-- `:.*` A non-greedy match of zero or more path segments should be performed for the parameter. `:.*` is only supported if the template is the final segment of the path
+## Path parameters
+[Path parameters]: #path-parameters
+Curly braces, `{}`, can be used to mark a section of a PathString as parameterized.
 
 **Examples:**
 Assuming the following paths, the concrete definition `/branch/foo` would be matched first.
@@ -315,6 +329,7 @@ first.
 
 
 ## AuthDefinition
+[AuthDefinition]: #authdefinition
 A field describing an authentication mechanism. It is a `string` which MUST be of the following:
 * `none`: do not apply authorization requirements
 * `header`: apply an `Authorization` header argument/requirement to every endpoint.
@@ -322,6 +337,7 @@ A field describing an authentication mechanism. It is a `string` which MUST be o
 
 
 ## EndpointDefinition
+[EndpointDefinition]: #endpointdefinition
 An object representing an endpoint. An endpoint describes a method, arguments and return type.
 
 Field | Type | Description
@@ -335,6 +351,7 @@ docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http:
 
 
 ## ArgumentDefinition
+[ArgumentDefinition]: #argumentdefinition
 An object representing an argument to an endpoint.
 
 Field | Type | Description
@@ -347,6 +364,7 @@ param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint p
 
 
 ## ArgumentDefinition.ParamType
+[ArgumentDefinition.ParamType]: #argumentdefinitionparamtype
 A field describing the type of an endpoint parameter. It is a `string` which MUST be one of the following:
 - `path`: defined as a path parameter; the argument name must appear in the request line.
 - `body`: defined as the singular body parameter.
@@ -355,5 +373,6 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 
 
 ## DocString
+[DocString]: #docstring
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
 Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).

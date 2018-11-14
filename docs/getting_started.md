@@ -62,7 +62,7 @@ subprojects {
 
 _Check the GitHub releases page to find the latest version of [conjure](https://github.com/palantir/conjure/releases), [conjure-java](https://github.com/palantir/conjure-java/releases), [conjure-typescript](https://github.com/palantir/conjure-typescript/releases)._
 
-This boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](./gradle_decoupled_versions.md).
+This boilerplate can be omitted if you supply version numbers for each dependency elsewhere. [See more](/docs/gradle_decoupled_versions.md).
 
 Running `./gradlew tasks` should now show a Conjure group with some associated tasks:
 
@@ -119,7 +119,7 @@ services:
             type: Recipe
 ```
 
-_Refer to the [Conjure specification](/docs/spec/source_files.md) for an exhaustive list of allowed YML parameters._
+_Refer to the [Conjure specification](/docs/spec/conjure_definitions.md) for an exhaustive list of allowed YML parameters._
 
 After running `./gradlew compileConjure`, you should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 

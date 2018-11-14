@@ -1,7 +1,7 @@
 Conjure Intermediate Representation
 ===================================
 
-The format described in [readme.md](../../readme.md) is for a human-friendly format that allows specification of
+The format described in [readme.md](/readme.md) is for a human-friendly format that allows specification of
 defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
 (IR).
 
@@ -460,7 +460,7 @@ Example service definition:
 ### Errors
 
 The "errors" section is a list of error definitions. Each error definition must include the following keys:
-- "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](https://github.com/palantir/conjure/blob/5da3e79ca943105bf3c48052dd501872bc62b4c6/conjure-api/src/main/conjure/conjure-api.yml#L31-L42).
+- "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](/docs/spec/conjure_definitions.md#errorcode).
 - "namespace": a string describing the namespace of the error and it must be in `UpperCamelCase`.
 - "errorName": a `TypeName` definition describing the package and name of the error.
 
@@ -471,9 +471,9 @@ for details on the field definition format.
 - "unsafeArgs": a list of unsafe arguments with a field definition as the list item type. See the [objects section](#objects)
 for details on the field definition format.
 
-Note, the difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
+Note, the difference between safe and unsafe arguments are explained in the docs of [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime#error-propagation).
 
 ### Self-describing definition
 
-See [conjure-api.yml](../../conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
+See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
 may use this definition to generate code for deserializing the IR format.
