@@ -1,6 +1,6 @@
 # Conjure Definitions
 
-A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. The file boundaries have no semantic value as the Conjure compiler will combine these into one single IR document. Source files must end in `.yml`.  Here is a suggested structure:
+A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. Definitions may span multiple files as types can be referenced from other files. Source files must end in `.yml`.  Here is a suggested structure:
 
 ```
 your-project/src/main/conjure/foo.yml
@@ -13,6 +13,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
   - [ConjureSourceFile][]
     - [TypesDefinition][]
       - [ExternalTypeDefinition][]
+        - [ExternalImportDefinition][]
       - [NamedTypesDefinition][]
         - [TypeName][]
         - [ConjureType][]
@@ -52,6 +53,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 [ErrorCode]: #errorcode
 [ErrorDefinition]: #errordefinition
 [ExternalTypeDefinition]: #externaltypedefinition
+[ExternalImportDefinition]: #externalimportdefinition
 [FieldDefinition]: #fielddefinition
 [NamedTypesDefinition]: #namedtypesdefinition
 [ObjectTypeDefinition]: #objecttypedefinition
