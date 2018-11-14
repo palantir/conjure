@@ -2,56 +2,83 @@
 
 13 Nov 2018
 
-_Recommendations for how conjure deserialization logic should treat duplicate keys in maps and sets._
+_Recommendations for how Conjure serialization and deserialization should treat duplicate keys in maps and sets._
 
 [JSON format]: ../spec/wire.md#5-json-format
-[Canonical JSON format]: #canonical-json-format
 
 ## Proposal
 
-When deserializing Conjure `set` or `map` keys, duplicate set items / map keys (according to the equivalence defined below)
-are not allowed. Sets or maps containing duplicates should fail to deserialize.
+When serializing or deserializing Conjure `set` or `map` keys, duplicate set items / map keys are not allowed.
+Client must never send these, and it's recommended that servers reject them.
 
-Equivalence of two conjure values must be determined in a way that is isomorphic to comparing using the `compare` 
-function defined below.
+Some Conjure values have multiple equivalent representations, therefore we need to define equality carefully.
+This RFC proposes an equivalence relation that languages should adhere to. 
 
-## Compare function
+## Eq function
 
-The compare function is defined as such:
+The equivalence function is defined as such:
 
-> `compare(a, b)` compares two values of the same Conjure type, returning LT, EQ or GT;
+> `eq(a, b)` compares two [JSON values][JSON format] of the same de-aliased Conjure type, returning true or false
 
 It's helpful to define a couple of other functions in terms of conjure types:
- * `sort(values: list<T>) -> list<T>` sorts the values incrementally according to `compare`.
  * `fields(obj: conjure object) -> list<string>` returns a list of the object's fields.
  * `keys(map: map<K, V>) -> list<K>` returns a list of the map's keys.
  * `length(col: collection<T>) -> integer` returns the length of the collection (which may be `list` or `set`).
  * `obj.field` returns the field named `field` of that object
  * `map[k]` returns the value at field `k` if it exists in the map, or `null` is there is no such value.
  * `collection[i]` (where collection is `set` or `list`) returns the item at position `i` (0..length(collection))
+ 
 
-If not mentioned below, `compare` for a conjure type is the result of a comparison on the raw JSON values, depending 
+
+If not mentioned below, `eq` for a conjure type is the result of a comparison on the raw JSON values, depending 
 on the JSON type.
 
-| JSON type             | Compared as |
-| --------------------- | ----------- |
-| string                | [conjure strings](#string) |
-| integer               | trivial integer comparison |
-| floating point number | [conjure doubles](#double) |
+| Conjure type          | Compared as                  |
+| --------------------- | -----------                  |
+| `any`                 | ??                             |
+| `bearertoken`         | [string_eq][]                |
+| `binary`              | ?                             |
+| `boolean`             | [boolean_eq][]                             |
+| `datetime`            | [datetime_eq][]                             |
+| `double`              | [float_eq][]                             |
+| `integer`             | [integer_eq][] |
+| `rid`                 | [string_eq][]   |
+| `safelong`            | [integer_eq][]                             |
+| `string`              | [string_eq][]                              |
+| `uuid`                | [string_eq][]   |
+| _Enum_                |                              |
+| _Object_              |                              |
+| _Union_               |                              |
+| `list<T>`             |                              |
+| `set<T>`              |                              |
+| `map<K, V>`           |                              |
+| `optional<T>`         |                              |
 
-### String
+### string_eq
 
-`compare` for string values is the result of comparing `a` and `b` alphanumerically.
+`string_eq(a, b)` returns true iff the unicode code point representations of `a` and `b` are the same.
+
+Therefore, `string_eq("\x102", "2")` should be `true`.
+
+### Integer
+
+`integer_eq(a, b)` for integer values should compare the numbers according to their byte representations as 32-bit or 64-bit numbers.
+This is safe since integer values and byte representations form a bijective relation.
+
+### Safelong
+
+`eq(a, b)` for safelong values should compare the numbers according to their byte representations.
+This is safe since long values and byte representations form a bijective relation.
 
 ### Object
 
 ```
-compare(obj1, obj2) = {
-    for field in sort(fields(obj1)) {
-        let cmp = compare(obj1[field], obj2[field])
-        match cmp {
-            EQ => continue
-            _  => return cmp
+eq(obj1, obj2) = {
+    for field in fields(obj1) {
+        let result = eq(obj1[field], obj2[field])
+        match result {
+            true   => continue
+            false  => return false
         }
     }
 }
@@ -61,32 +88,23 @@ compare(obj1, obj2) = {
 
 ```
 value(u) = u[u.type]
-compare(u1, u2) = {
-    let cmp = compare(u1.type, u2.type)
-    match cmp {
-        EQ => compare(value(u1), value(u2))
-        _  => cmp
+eq(u1, u2) = {
+    let result = eq(u1.type, u2.type)
+    match result {
+        true  => eq(value(u1), value(u2))
+        false => return false
     }
 }
 ```
 
 ### Set
 
-```
-compare(s1, s2) = {
-    let len_cmp = compare(length(s1), length(s2))
-    if len_cmp != EQ {
-        return len_cmp
-    } 
-    for i = 0..length(s1) {
-        let cmp = compare(s1[i], s2[i])
-        match cmp {
-            EQ => continue
-            _  => return cmp
-        }
-    }
-}
-```
+For two sets `a` and `b`, `eq(a, b)` is true if:
+
+* `a` and `b` contain the same number of elements
+* there exists an ordering of `b` such that `eq(a[i], b[i])` for every `i` between `0` and `length(a)` (exclusive)
+    As a consequence of the proposal (set items must be distinct), we also know that `eq(a[i], b[j])` should be false
+    for any `i != j`.
 
 ### Map
 
