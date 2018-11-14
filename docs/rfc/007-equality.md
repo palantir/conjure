@@ -12,19 +12,23 @@ _Recommendations for how conjure deserialization logic should treat duplicate ke
 When deserializing Conjure `set` or `map` keys, duplicate set items / map keys (according to the equivalence defined below)
 are not allowed. Sets or maps containing duplicates should fail to deserialize.
 
-Equivalence of two conjure values can be determined by converting their JSON values to the [Canonical JSON format][] and 
-then comparing using the `compare` function defined below.
+Equivalence of two conjure values must be determined in a way that is isomorphic to comparing using the `compare` 
+function defined below.
 
-## Canonical JSON Format
-The Canonical JSON format is a constrained version of the [JSON format][] that disambiguates values for
-types which have multiple distinct representations that are conceptually equivalent.
+## Compare function
 
-It's helpful to define a couple of functions:
- * `canonical(v)` converts a value in [JSON format][] to the canonical representation;
- * `compare(a, b)` compares two values in canonical JSON format of the same Conjure type, returning LT, EQ or GT;
- * `sort(values)` sorts the values according to `compare`.
+The compare function is defined as such:
 
-Aside from the cases described below, the canonical representation is the same as the [JSON representation][JSON format].
+> `compare(a, b)` compares two values of the same Conjure type, returning LT, EQ or GT;
+
+It's helpful to define a couple of other functions in terms of conjure types:
+ * `sort(values: list<T>) -> list<T>` sorts the values incrementally according to `compare`.
+ * `fields(obj: conjure object) -> list<string>` returns a list of the object's fields.
+ * `keys(map: map<K, V>) -> list<K>` returns a list of the map's keys.
+ * `length(col: collection<T>) -> integer` returns the length of the collection (which may be `list` or `set`).
+ * `obj.field` returns the field named `field` of that object
+ * `map[k]` returns the value at field `k` if it exists in the map, or `null` is there is no such value.
+ * `collection[i]` (where collection is `set` or `list`) returns the item at position `i` (0..length(collection))
 
 If not mentioned below, `compare` for a conjure type is the result of a comparison on the raw JSON values, depending 
 on the JSON type.
@@ -41,13 +45,9 @@ on the JSON type.
 
 ### Object
 
-The canonical representation of an object requires that the keys are ordered alphanumerically, and the values are
-formatted in the [Canonical JSON format][].
-
 ```
-canonical(obj) = {field: canonical(obj[field]) for field in sort(fields(obj))}
 compare(obj1, obj2) = {
-    for field in fields(obj1) {
+    for field in sort(fields(obj1)) {
         let cmp = compare(obj1[field], obj2[field])
         match cmp {
             EQ => continue
@@ -61,7 +61,6 @@ compare(obj1, obj2) = {
 
 ```
 value(u) = u[u.type]
-canonical(u) = {"type": u.type, u.type: canonical(value(u))}
 compare(u1, u2) = {
     let cmp = compare(u1.type, u2.type)
     match cmp {
@@ -74,7 +73,6 @@ compare(u1, u2) = {
 ### Set
 
 ```
-canonical(s) = sort([canonical(item) for item in s])
 compare(s1, s2) = {
     let len_cmp = compare(length(s1), length(s2))
     if len_cmp != EQ {
@@ -93,7 +91,6 @@ compare(s1, s2) = {
 ### Map
 
 ```
-canonical(m) = {key: canonical(m[key]) for key in sort([canonical(k) for k in keys(m)])}
 compare(m1, m2) = TODO same as object
 ```
 
