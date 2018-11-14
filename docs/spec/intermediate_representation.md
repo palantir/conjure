@@ -460,7 +460,7 @@ Example service definition:
 ### Errors
 
 The "errors" section is a list of error definitions. Each error definition must include the following keys:
-- "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](https://github.com/palantir/conjure/blob/5da3e79ca943105bf3c48052dd501872bc62b4c6/conjure-api/src/main/conjure/conjure-api.yml#L31-L42).
+- "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](/docs/spec/conjure_definitions.md#errorcode).
 - "namespace": a string describing the namespace of the error and it must be in `UpperCamelCase`.
 - "errorName": a `TypeName` definition describing the package and name of the error.
 
