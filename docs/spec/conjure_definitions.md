@@ -57,7 +57,7 @@ Note: All field names in the specification are **case sensitive**. In the follow
 [FieldDefinition]: #fielddefinition
 [NamedTypesDefinition]: #namedtypesdefinition
 [ObjectTypeDefinition]: #objecttypedefinition
-[Path templating]: #path-templating
+[Path parameters]: #path-parameters
 [PathString]: #pathstring
 [ServiceDefinition]: #servicedefinition
 [TypesDefinition]: #typesdefinition
@@ -311,20 +311,18 @@ Field | Type | Description
 ---|:---:|---
 name | [TypeName][] | **REQUIRED** A human readable name for the service.
 package | `string` | **REQUIRED** The package of the service.
-base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path templating][] is not allowed.
+base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path parameters][] are not allowed.
 default&#8209;auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
 docs | [DocString][] | Documentation for the service. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 endpoints | Map[`string`&nbsp;&rarr;&nbsp;[EndpointDefinition][]] | **REQUIRED** A map of endpoint names to endpoint definitions.
 
 ## PathString
-A field describing an extendible path. A path segment MAY have [Path templating][].
+A PathString consists of segments separated by forward slashes, `/`. Segments may be literals or path parameters (see below).
 
 When comparing multiple paths, the path with the longest concrete path should be matched first.
 
-## Path templating
-Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters. The template may include `:.+` and `:.*` regular expressions with the following semantics and limitations:
-- `:.+` A non-greedy match of one or more path segments should be performed for the parameter
-- `:.*` A non-greedy match of zero or more path segments should be performed for the parameter. `:.*` is only supported if the template is the final segment of the path
+## Path parameters
+Curly braces, `{}`, can be used to mark a section of a PathString as parameterized.
 
 **Examples:**
 Assuming the following paths, the concrete definition `/branch/foo` would be matched first.
