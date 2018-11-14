@@ -1,4 +1,4 @@
-# Conjure Definitions
+# Conjure definitions
 
 A Conjure definition is made up of one or more source [YAML](http://yaml.org/) files. Each file may define multiple _types_, _services_ and _errors_. Definitions may span multiple files as types can be referenced from other files. Source files must end in `.yml`.  Here is a suggested structure:
 

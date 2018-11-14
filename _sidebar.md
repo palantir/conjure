@@ -3,7 +3,7 @@
     - [Overview](./readme.md)
     - [Get started with `gradle-conjure`](docs/getting_started.md)
 - **[Reference](reference.md)**
-    - [Conjure Definitions](docs/spec/conjure_definitions.md)
+    - [Conjure definitions](docs/spec/conjure_definitions.md)
     - [Intermediate representation (IR)](docs/spec/intermediate_representation.md)
     - [Wire specification](docs/spec/wire.md)
 - **RFCs**

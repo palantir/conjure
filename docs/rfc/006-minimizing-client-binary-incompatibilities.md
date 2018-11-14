@@ -21,7 +21,7 @@ Note: stability should not come at the cost of ergonomic usage. Generated interf
 
 ## Example
 
-Consider the following Conjure Definition:
+Consider the following Conjure definition:
 
 ```yaml
 services:
