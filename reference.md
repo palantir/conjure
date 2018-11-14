@@ -7,6 +7,6 @@ This section describes:
 - How Conjure generators should read IR and produce generated code.
 - The [Wire specification][] that generated clients must adhere to.
 
+[Conjure Definitions]: ./docs/spec/conjure_definitions.md
 [Intermediate representation (IR)]: ./docs/spec/intermediate_representation.md
-[Source files]: ./docs/spec/source_files.md
 [Wire specification]: ./docs/spec/wire.md

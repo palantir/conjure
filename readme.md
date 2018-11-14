@@ -84,7 +84,7 @@ Conjure allows defining named, structured errors so that clients can expect spec
 
 
 ## Example
-The following YAML file defines a simple Recipe Book API. (See [full reference](./docs/spec/source_files.md))
+The following YAML file defines a simple Recipe Book API. (See [full reference](./docs/spec/conjure_definitions.md))
 
 ```yaml
 types:

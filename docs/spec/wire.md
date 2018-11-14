@@ -53,7 +53,7 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
 [PLAIN format]: #6-plain-format
 [Canonical JSON format]: #7-canonical-json-format
 [URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
-[Path parameters]: ./source_files.md#path-templating
+[Path parameters]: ./conjure_definitions.md#path-templating
 
 
 ## 1. Conventions
