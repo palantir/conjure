@@ -471,7 +471,7 @@ for details on the field definition format.
 - "unsafeArgs": a list of unsafe arguments with a field definition as the list item type. See the [objects section](#objects)
 for details on the field definition format.
 
-Note, the difference between safe and unsafe arguments are explained in the docs of [HTTP Remoting](https://github.com/palantir/http-remoting#error-propagation).
+Note, the difference between safe and unsafe arguments are explained in the docs of [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime#error-propagation).
 
 ### Self-describing definition
 
