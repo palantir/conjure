@@ -1,7 +1,7 @@
 Conjure Intermediate Representation
 ===================================
 
-The format described in [readme.md](../../readme.md) is for a human-friendly format that allows specification of
+The format described in [readme.md](/readme.md) is for a human-friendly format that allows specification of
 defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
 (IR).
 
@@ -475,5 +475,5 @@ Note, the difference between safe and unsafe arguments are explained in the docs
 
 ### Self-describing definition
 
-See [conjure-api.yml](../../conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
+See [conjure-api.yml](/conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
 may use this definition to generate code for deserializing the IR format.
