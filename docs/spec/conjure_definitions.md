@@ -110,7 +110,7 @@ types:
 ```
 
 ## ExternalTypeDefinition
-A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
+A type that is not defined within Conjure. Usage of external types is strongly discouraged because Conjure is unable to validate that external types match the serialization format of the base type. They are intended only to migrate existing APIs to Conjure.
 
 Field | Type | Description
 ---|:---:|---
