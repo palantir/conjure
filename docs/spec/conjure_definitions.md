@@ -291,17 +291,17 @@ docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://sp
 
 
 ## ErrorCode
-A field describing the error category. MUST be one of the following strings, which have associated HTTP status codes:
-* PERMISSION_DENIED (403)
-* INVALID_ARGUMENT(400)
-* NOT_FOUND (404)
-* CONFLICT (409)
-* REQUEST_ENTITY_TOO_LARGE (413)
-* FAILED_PRECONDITION(500)
-* INTERNAL (500)
-* TIMEOUT (500)
-* CUSTOM_CLIENT (400)
-* CUSTOM_SERVER (500)
+A field describing the error category. MUST be one of the following strings, with HTTP status codes defined in the [wire spec](./wire.md#34-conjure-errors):
+* PERMISSION_DENIED
+* INVALID_ARGUMENT
+* NOT_FOUND
+* CONFLICT
+* REQUEST_ENTITY_TOO_LARGE
+* FAILED_PRECONDITION
+* INTERNAL
+* TIMEOUT
+* CUSTOM_CLIENT
+* CUSTOM_SERVER
 
 
 ## ServiceDefinition

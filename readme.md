@@ -69,17 +69,7 @@ Conjure allows defining named, structured errors so that clients can expect spec
 - _Structured errors_ - have the following properties:
   - _Name_ -  a user chosen description of the error e.g. `RecipeLocked`
   - _Namespace_ - a user chosen category of the error e.g. `RecipeErrors`
-  - _Code_ - one of the following pre-defined categories
-    - PERMISSION_DENIED (403)
-    - INVALID_ARGUMENT(400)
-    - NOT_FOUND (404)
-    - CONFLICT (409)
-    - REQUEST_ENTITY_TOO_LARGE (413)
-    - FAILED_PRECONDITION(500)
-    - INTERNAL (500)
-    - TIMEOUT (500)
-    - CUSTOM_CLIENT (400)
-    - CUSTOM_SERVER (500)
+  - _Code_ - one of the pre-defined categories.
   - _Args_ - a map from string keys to Conjure types
 
 
