@@ -80,10 +80,34 @@ The object specifies the types available in the Conjure definition.
 
 Field | Type | Description
 ---|:---:|---
-conjure&#8209;imports | Map[[TypeName][]&nbsp;&rarr;&nbsp;`string`] | A map between a namespace alias and a relative path to a Conjure definition. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
+conjure&#8209;imports | Map[`string`&nbsp;&rarr;&nbsp;`string`] | A map between a namespace and a relative path to a Conjure definition file. Namespace aliases MUST match `^[_a-zA-Z][_a-zA-Z0-9]*$`
 imports | Map[`string`&nbsp;&rarr;&nbsp;[ExternalTypeDefinition][]] | A map between a type alias and its external definition. Type aliases MUST be in PascalCase.
 definitions | [NamedTypesDefinition][] | The types specified in this definition.
 
+### conjure-imports
+One file called `common.yml` might define a Conjure type called `ProductId`:
+
+```yaml
+types:
+  definitions:
+    default-package: com.palantir.product
+    objects:
+      ProductId:
+        alias: string
+```
+
+A separate file in the same directory, `example.yml`, can then reference types defined in `common.yml`:
+
+```yaml
+types:
+  conjure-imports:
+    common: common.yml
+  definitions:
+    default-package: com.palantir.product
+    objects:
+      SomeRequest:
+        id: common.ProductId
+```
 
 ## ExternalTypeDefinition
 A type that is not defined within Conjure. Usage of external types is not recommended and is intended only to migrate existing APIs to Conjure.
@@ -95,11 +119,12 @@ external | [ExternalImportDefinition][] | The external types to reference.
 
 **Example:**
 ```yaml
-imports:
-  SomeDataType:
-    base-type: string
-    external:
-      java: com.palantir.package.someDataType
+types:
+  imports:
+    SomeDataType:
+      base-type: string
+      external:
+        java: com.palantir.package.someDataType
 ```
 
 ## ExternalImportDefinition
@@ -107,7 +132,7 @@ References to types that are not defined within Conjure.
 
 Field | Type | Description
 ---|:---:|---
-java | string | The fully qualified Java type.
+java | `string` | The fully qualified Java type.
 
 
 ## NamedTypesDefinition
