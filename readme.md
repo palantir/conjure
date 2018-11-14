@@ -20,7 +20,7 @@ See our [getting started](docs/getting_started.md) guide to define your first Co
 
 
 ## Concepts
-_Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification](./docs/spec/wire.md)._
+_Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification](/docs/spec/wire.md)._
 
 
 ### HTTP endpoints
@@ -74,7 +74,7 @@ Conjure allows defining named, structured errors so that clients can expect spec
 
 
 ## Example
-The following YAML file defines a simple Recipe Book API. (See [full reference](./docs/spec/conjure_definitions.md))
+The following YAML file defines a simple Recipe Book API. (See [full reference](/docs/spec/conjure_definitions.md))
 
 ```yaml
 types:
@@ -153,7 +153,7 @@ function demo(): Promise<void> {
 
 ##### Compiler
 
-- [conjure](./docs/compiler_usage.md)
+- [conjure](/docs/compiler_usage.md)
 
 ##### Build tool
 
@@ -185,4 +185,4 @@ function demo(): Promise<void> {
 
 ## Contributing
 
-See the [CONTRIBUTING.md](./CONTRIBUTING.md) document.
+See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.

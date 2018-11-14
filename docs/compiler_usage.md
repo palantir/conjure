@@ -9,5 +9,5 @@ The recommended way to use conjure is via a build tool like [gradle-conjure](htt
       -h, --help      Show this help message and exit.
       -V, --version   Print version information and exit.
 
-This tool will output an [intermediate representation](./spec/intermediate_representation.md) JSON file which can then
-be passed into [generators](../readme.md#code-generators) to create language bindings.
+This tool will output an [intermediate representation](/docs/spec/intermediate_representation.md) JSON file which can then
+be passed into [generators](/readme.md#code-generators) to create language bindings.

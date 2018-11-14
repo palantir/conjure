@@ -299,7 +299,7 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
 
 ### 5.5. Conjure Errors
 Conjure Errors are serialized as JSON objects with the following keys:
-1. `errorCode` - the JSON string representation of one of the supported [Conjure error codes](./conjure_definitions.md#errorcode).
+1. `errorCode` - the JSON string representation of one of the supported [Conjure error codes](/docs/spec/conjure_definitions.md#errorcode).
 1. `errorName` - a JSON string identifying the error, e.g. `Recipe:RecipeNotFound`.
 1. `errorInstanceId` - a JSON string containing the unique identifier, `uuid` type, for this error instance.
 1. `parameters` - a JSON map providing additional information regarding the nature of the error.
