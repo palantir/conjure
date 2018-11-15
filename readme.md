@@ -77,10 +77,12 @@ package com.palantir.flightsearch;
 @Path("/")
 @Generated("com.palantir.conjure.java.services.JerseyServiceGenerator")
 public interface FlightSearchService {
+    /** Returns the list of flight connections matching a given from/to/time request. */
     @POST
     @Path("flights/search")
     SearchResult search(SearchRequest request);
 
+    /** Returns flights departing from the given airport on the given day. */
     @GET
     @Path("flights/list/{airport}/{time}")
     SearchResult search(Airport airport, OffsetDateTime time);
