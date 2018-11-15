@@ -29,13 +29,17 @@ In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 ```groovy
 buildscript {
     repositories {
-        maven {
-            url 'https://dl.bintray.com/palantir/releases/'
-        }
+        maven { url 'https://dl.bintray.com/palantir/releases/' }
     }
 
     dependencies {
         classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://dl.bintray.com/palantir/releases/' }
     }
 }
 ```
@@ -75,7 +79,7 @@ Conjure tasks
 -------------
 compileConjure - Generates code for your API definitions in src/main/conjure/**/*.yml
 compileConjureObjects - Generates Java POJOs from your Conjure definitions.
-
+compileConjureTypeScript - Generates TypeScript files and a package.json from your Conjure definitions.
 ...
 ```
 
@@ -119,24 +123,38 @@ services:
             type: Recipe
 ```
 
-_Refer to the [Conjure specification](/docs/spec/conjure_definitions.md) for an exhaustive list of allowed YML parameters._
+*Refer to the [Conjure specification](/docs/spec/conjure_definitions.md) for an exhaustive list of allowed YML parameters.*
 
 After running `./gradlew compileConjure`, you should see a variety of files generated in your `-api-objects`, `-api-jersey` and `-api-typescript` projects.
 
 ## 3. Implement your server
 
-In your main gradle project, you can now depend on the generated Jersey interfaces:
+In your main gradle project, you can now depend on the generated Jersey interfaces.  Assuming you're using a Jersey-compatible server like [Dropwizard](https://github.com/dropwizard/dropwizard), you'll also need to use [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime) to set up serialization correctly:
 
 ```groovy
-// ./your-project/build.gradle
+// ./your-server/build.gradle
 
 dependencies {
+    compile 'com.palantir.conjure.java.runtime:conjure-java-jersey-server:<latest>'
     compile project(':your-project-api:your-project-api-jersey')
     ...
 }
 ```
 
 You can now write a `RecipeBookResource` class which `implements RecipeBookService`.  Your implementation shouldn't need any `@Path` annotations, as these will all be inherited from the Jersey interface.
+
+```diff
+ public final class RecipeBookApplication extends Application<RecipeBookConfiguration> {
+
+     @Override
+     public void run(RecipeBookConfiguration configuration, Environment environment) {
++        environment.jersey().register(ConjureJerseyFeature.INSTANCE);
++        environment.jersey().register(new RecipeBookResource());
+     }
+ }
+```
+
+_See the [conjure-java-example](https://github.com/palantir/conjure-java-example) repo for a fully-working Dropwizard-based server._
 
 ## 4. Publish artifacts
 
