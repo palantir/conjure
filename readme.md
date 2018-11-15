@@ -102,7 +102,7 @@ function demo(): Promise<SearchResult> {
 
 ## Ecosystem
 
-The [conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
+The [Conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
 
 _Conjure generators_ read IR and produce code in the target language. The associated libraries provide client and server implementations. Each generator is distributed as a CLI that conforms to [RFC002](/docs/rfc/002-contract-for-conjure-generators.md):
 
