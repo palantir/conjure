@@ -2,7 +2,7 @@ Conjure Intermediate Representation
 ===================================
 
 The [Conjure definitions format](/docs/spec/conjure_definitions.md) is a human-friendly format that allows specification
-of defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
+of defaults and shorthand definitions. However, generators should be implemented against an intermediate representation
 (IR).
 
 This representation has been chosen to facilitate the implementation of compilers across different languages and has
