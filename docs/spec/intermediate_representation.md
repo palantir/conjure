@@ -320,8 +320,9 @@ Finally, external references can be used to refer to non-Conjure types that are 
 another language.  For example, when generating Java code, the type `com.palantir.foo.OldFooResponse` must
 be present on the classpath in order to compile.  The "fallback" should be a
 Conjure type definition which can be used to deserialize the JSON from an `com.palantir.foo.OldFooResponse`.
-Note: these external references should be used sparingly because the serialization
-behaviour of the external type cannot be guaranteed.
+
+___Note: Usage of external references is strongly discouraged because Conjure is unable to validate that external types 
+match the serialization format of the base type. They are intended only to migrate existing APIs to Conjure.___
 
 ```json
 {
