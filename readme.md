@@ -9,6 +9,7 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 
 **See our [getting started](docs/getting_started.md) guide to define your first Conjure API.**
 
+
 ## Features
 - Enables teams to work together across many languages
 - Eliminates an entire class of serialization bugs
@@ -17,6 +18,25 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 - Helps devs preserve backwards compatibility (old clients can talk to new servers)
 - Supports incremental switchover from existing JSON/HTTP servers
 - Zero config (works out of the box)
+
+
+## Ecosystem
+The [Conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
+
+_Conjure generators_ read IR and produce code in the target language. The associated libraries provide client and server implementations. Each generator is distributed as a CLI that conforms to [RFC002](/docs/rfc/002-contract-for-conjure-generators.md):
+
+| Language | Generator | Libraries | Examples |
+|--------------------|-------------------------------|-|-|
+| Java | [conjure-java](https://github.com/palantir/conjure-java) | [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime) | [conjure-java-example](https://github.com/palantir/conjure-java-example)
+| TypeScript | [conjure-typescript](https://github.com/palantir/conjure-typescript) | [conjure-typescript-runtime](https://github.com/palantir/conjure-typescript-runtime) | [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example)
+| Python | [conjure-python](https://github.com/palantir/conjure-python) | [conjure-python-runtime](https://github.com/palantir/conjure-python-runtime) | -
+
+The [gradle-conjure](https://github.com/palantir/gradle-conjure) _build tool_ is the recommended way of interacting with the Conjure ecosystem as it seamlessly orchestrates all the above tools. Alternatively, the compiler and generators may also be invoked manually as they all behave in a consistent way (specified by [RFC002](/docs/rfc/002-contract-for-conjure-generators.md)).
+
+The following tools also operate on IR:
+
+- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman](https://www.getpostman.com/) [Collections](https://www.getpostman.com/docs/v6/postman/collections/intro_to_collections) for interacting with Conjure defined APIs.
+- conjure-backcompat - an experimental type checker that compares two IR definitions to evaluate whether they are wire format compatible (not yet open-sourced).
 
 
 ## Example
@@ -102,25 +122,5 @@ function demo(): Promise<SearchResult> {
 }
 ```
 
-## Ecosystem
-
-The [Conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
-
-_Conjure generators_ read IR and produce code in the target language. The associated libraries provide client and server implementations. Each generator is distributed as a CLI that conforms to [RFC002](/docs/rfc/002-contract-for-conjure-generators.md):
-
-| Language | Generator | Libraries | Examples |
-|--------------------|-------------------------------|-|-|
-| Java | [conjure-java](https://github.com/palantir/conjure-java) | [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime) | [conjure-java-example](https://github.com/palantir/conjure-java-example)
-| TypeScript | [conjure-typescript](https://github.com/palantir/conjure-typescript) | [conjure-typescript-runtime](https://github.com/palantir/conjure-typescript-runtime) | [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example)
-| Python | [conjure-python](https://github.com/palantir/conjure-python) | [conjure-python-runtime](https://github.com/palantir/conjure-python-runtime) | -
-
-The [gradle-conjure](https://github.com/palantir/gradle-conjure) _build tool_ is the recommended way of interacting with the Conjure ecosystem as it seamlessly orchestrates all the above tools. Alternatively, the compiler and generators may also be invoked manually as they all behave in a consistent way (specified by [RFC002](/docs/rfc/002-contract-for-conjure-generators.md)).
-
-The following tools also operate on IR:
-
-- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman](https://www.getpostman.com/) [Collections](https://www.getpostman.com/docs/v6/postman/collections/intro_to_collections) for interacting with Conjure defined APIs.
-- conjure-backcompat - an experimental type checker that compares two IR definitions to evaluate whether they are wire format compatible (not yet open-sourced).
-
 ## Contributing
-
 See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
