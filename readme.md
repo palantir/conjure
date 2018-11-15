@@ -1,6 +1,7 @@
 <p align="center">
 <img src="/docs/media/conjure-flat.svg" alt="Conjure logo" height="200" width="200" id="readme-logo">
-<h1>Conjure</h1>
+
+# Conjure
 </p>
 
 _Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
