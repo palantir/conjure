@@ -20,49 +20,55 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 
 
 ## Example
-The following YAML file defines a simple Recipe Book API. (See [full reference](/docs/spec/conjure_definitions.md))
+The following YAML file defines a simple Flight Search API. (See [concepts](/docs/concepts.md))
 
 ```yaml
 types:
   definitions:
-    default-package: com.company.product
+    default-package: com.palantir.flightsearch
     objects:
-
-      Recipe:
+      Airport:
+        alias: string
+      SearchRequest:
         fields:
-          name: RecipeName
-          steps: list<RecipeStep>
-
-      RecipeStep:
-        union:
-          mix: set<Ingredient>
-          chop: Ingredient
-
-      RecipeName:
-        alias: string
-
-      Ingredient:
-        alias: string
+          from: Airport
+          to: Airport
+          time: datetime
+      SearchResult:
+        alias: list<Connection>
+      Connection:
+        fields:
+          from: Airport
+          to: Airport
+          number: string
 
 services:
-  RecipeBookService:
-    name: Recipe Book
-    package: com.company.product
-    base-path: /recipes
+  FlightSearchService:
+    name: Flight Search Service
+    package: com.palantir.flightsearch
+    base-path: /flights
     endpoints:
-      createRecipe:
-        http: POST /
-        docs: Adds a new recipe to the store.
+
+      search:
+        docs: Returns the list of flight connections matching a given from/to/time request.
+        http: POST /search
         args:
-          createRecipeRequest:
-            param-type: body
-            type: Recipe
+          request: SearchRequest
+        returns: SearchResult
+
+      list:
+        docs: Returns flights departing from the given airport on the given day.
+        http: GET /list/{airport}/{time}
+        args:
+          airport: Airport
+          time: datetime
+        returns: SearchResult
 ```
 
 The following generated Java interface can be used on the client and the server.
 
 ```java
-package com.company.product;
+package com.palantir.flightsearch;
 
 ...
 
@@ -70,28 +76,27 @@ package com.company.product;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/")
 @Generated("com.palantir.conjure.java.services.JerseyServiceGenerator")
-public interface RecipeBookService {
-    /** Add a new recipe to the store. */
+public interface FlightSearchService {
     @POST
-    @Path("recipes")
-    void createRecipe(@HeaderParam("Authorization") AuthHeader authHeader, Recipe createRecipeRequest);
+    @Path("flights/search")
+    SearchResult search(SearchRequest request);
+
+    @GET
+    @Path("flights/list/{airport}/{time}")
+    SearchResult search(Airport airport, OffsetDateTime time);
 }
 ```
 
 Type-safe network calls to this API can made from TypeScript as follows:
 
 ```ts
-function demo(): Promise<void> {
-    const request: IRecipe = {
-        name: "Baked chicken with sun-dried tomatoes",
-        steps: [
-            RecipeStep.chop("Tomatoes"),
-            RecipeStep.chop("Chicken"),
-            RecipeStep.chop("Potatoes")
-            RecipeStep.mix(["Herbs", "Tomatoes", "Chicken"]),
-        ]
+function demo(): Promise<SearchResult> {
+    const request: ISearchRequest = {
+        from: "LHR",
+        to: "JFK",
+        number: "BA117"
     };
-    return new RecipeBookService(bridge).createRecipe(request);
+    return new FlightSearchService(bridge).search(request);
 }
 ```
 
