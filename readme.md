@@ -107,7 +107,7 @@ _Conjure generators_ read IR and produce code in the target language. The associ
 | TypeScript | [conjure-typescript](https://github.com/palantir/conjure-typescript) | [conjure-typescript-runtime](https://github.com/palantir/conjure-typescript-runtime) | [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example)
 | Python | [conjure-python](https://github.com/palantir/conjure-python) | [conjure-python-runtime](https://github.com/palantir/conjure-python-runtime) | -
 
-[gradle-conjure](https://github.com/palantir/gradle-conjure) is a _build tool_ that orchestrates invoking the compiler and generators above.
+The [gradle-conjure](https://github.com/palantir/gradle-conjure) _build tool_ is the recommended way of interacting with the Conjure ecosystem as it seamlessly orchestrates all the above tools. Alternatively, the compiler and generators may also be invoked manually as they all behave in a consistent way (specified by [RFC002](/docs/rfc/002-contract-for-conjure-generators.md)).
 
 The following tools also operate on IR:
 
