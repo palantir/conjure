@@ -1,5 +1,5 @@
 <p align="center">
-<img src="/docs/media/conjure.svg" alt="Conjure logo" height="200" width="200" id="readme-logo">
+<img src="/docs/media/conjure-flat.svg" alt="Conjure logo" height="200" width="200" id="readme-logo">
 </p>
 
 # Conjure

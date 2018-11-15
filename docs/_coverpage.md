@@ -1,4 +1,4 @@
-<img src="/docs/media/conjure.svg" alt="Conjure logo" height="400" width="400">
+<img src="/docs/media/conjure.svg" alt="Conjure logo" height="300" width="300">
 
 # Conjure
 
@@ -6,5 +6,3 @@
 
 [GitHub](https://github.com/palantir/conjure/)
 [Get Started](#conjure)
-
-![color](#F5F8FA)

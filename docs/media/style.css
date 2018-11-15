@@ -1,3 +1,11 @@
+/**
+Changes based on //unpkg.com/docsify/themes/vue.css
+
+- changed the green link color to match the logo (#00306C)
+- code diffs no longer underlined (.token.inserted)
+
+*/
+
 @import url("https://fonts.googleapis.com/css?family=Roboto+Mono|Source+Sans+Pro:300,400,600");
 *{
     -webkit-font-smoothing:antialiased;
@@ -27,7 +35,7 @@ div#app:empty:before{
     vertical-align:middle
 }
 .progress{
-    background-color:var(--theme-color,#42b983);
+    background-color:var(--theme-color,#00306C);
     height:2px;
     left:0;
     position:fixed;
@@ -38,7 +46,7 @@ div#app:empty:before{
     z-index:5
 }
 .search .search-keyword,.search a:hover{
-    color:var(--theme-color,#42b983)
+    color:var(--theme-color,#00306C)
 }
 .search .search-keyword{
     font-style:normal;
@@ -107,10 +115,10 @@ li input[type=checkbox]{
     transition:color .3s
 }
 .app-nav a.active,.app-nav a:hover{
-    color:var(--theme-color,#42b983)
+    color:var(--theme-color,#00306C)
 }
 .app-nav a.active{
-    border-bottom:2px solid var(--theme-color,#42b983)
+    border-bottom:2px solid var(--theme-color,#00306C)
 }
 .app-nav li{
     display:inline-block;
@@ -167,7 +175,7 @@ li input[type=checkbox]{
 }
 .github-corner svg{
     color:#fff;
-    fill:var(--theme-color,#42b983);
+    fill:var(--theme-color,#00306C);
     height:80px;
     width:80px
 }
@@ -274,7 +282,7 @@ main.hidden{
     opacity:.4
 }
 .sidebar-toggle span{
-    background-color:var(--theme-color,#42b983);
+    background-color:var(--theme-color,#00306C);
     display:block;
     margin-bottom:4px;
     width:16px;
@@ -515,10 +523,10 @@ section.cover ul{
     padding:0
 }
 section.cover .cover-main>p:last-child a{
-    border:1px solid var(--theme-color,#42b983);
+    border:1px solid var(--theme-color,#00306C);
     border-radius:2rem;
     box-sizing:border-box;
-    color:var(--theme-color,#42b983);
+    color:var(--theme-color,#00306C);
     display:inline-block;
     font-size:1.05rem;
     letter-spacing:.1rem;
@@ -528,7 +536,7 @@ section.cover .cover-main>p:last-child a{
     transition:all .15s ease
 }
 section.cover .cover-main>p:last-child a:last-child{
-    background-color:var(--theme-color,#42b983);
+    background-color:var(--theme-color,#00306C);
     color:#fff
 }
 section.cover .cover-main>p:last-child a:last-child:hover{
@@ -539,11 +547,11 @@ section.cover .cover-main>p:last-child a:hover{
     color:inherit
 }
 section.cover blockquote>p>a{
-    border-bottom:2px solid var(--theme-color,#42b983);
+    border-bottom:2px solid var(--theme-color,#00306C);
     transition:color .3s
 }
 section.cover blockquote>p>a:hover{
-    color:var(--theme-color,#42b983)
+    color:var(--theme-color,#00306C)
 }
 .sidebar,body{
     background-color:#fff
@@ -571,7 +579,7 @@ section.cover blockquote>p>a:hover{
 }
 .sidebar ul li.active>a{
     border-right:2px solid;
-    color:var(--theme-color,#42b983);
+    color:var(--theme-color,#00306C);
     font-weight:600
 }
 .app-sub-sidebar li:before{
@@ -584,7 +592,7 @@ section.cover blockquote>p>a:hover{
     font-weight:600
 }
 .markdown-section a{
-    color:var(--theme-color,#42b983);
+    color:var(--theme-color,#00306C);
     font-weight:600
 }
 .markdown-section h1{
@@ -620,7 +628,7 @@ section.cover blockquote>p>a:hover{
     padding-left:1.5rem
 }
 .markdown-section blockquote{
-    border-left:4px solid var(--theme-color,#42b983);
+    border-left:4px solid var(--theme-color,#00306C);
     color:#858585;
     margin:2em 0;
     padding-left:20px
@@ -676,7 +684,7 @@ section.cover blockquote>p>a:hover{
     color:#2973b7
 }
 .token.string{
-    color:var(--theme-color,#42b983)
+    color:var(--theme-color,#00306C)
 }
 .token.selector{
     color:#6679cc
@@ -688,7 +696,7 @@ section.cover blockquote>p>a:hover{
     color:#22a2c9
 }
 .token.attr-value,.token.control,.token.directive,.token.unit{
-    color:var(--theme-color,#42b983)
+    color:var(--theme-color,#00306C)
 }
 .token.function,.token.keyword{
     color:#e96900
@@ -703,7 +711,6 @@ section.cover blockquote>p>a:hover{
     text-decoration:line-through
 }
 .token.inserted{
-    border-bottom:1px dotted #202746;
     text-decoration:none
 }
 .token.italic{
