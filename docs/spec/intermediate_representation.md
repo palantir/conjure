@@ -1,8 +1,8 @@
 Conjure Intermediate Representation
 ===================================
 
-The format described in [readme.md](/readme.md) is for a human-friendly format that allows specification of
-defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
+The [Conjure definitions format](/docs/spec/conjure_definitions.md) is a human-friendly format that allows specification
+of defaults and shorthand definitions. However, generators should be implemented against an intermediate representation
 (IR).
 
 This representation has been chosen to facilitate the implementation of compilers across different languages and has
@@ -12,20 +12,20 @@ references).
 2. All service and type references are fully qualified (the combination of the type/service package and the type/service
 name).
 3. No defaults are assumed. The definition for each type, service, etc is self-contained.
-4. All Conjure types (for example, "map<string, integer>") have a more structured representation to eliminate the need
+4. All Conjure types (for example, `map<string, integer>`) have a more structured representation to eliminate the need
 for parsing.
 
 The IR is expected to be in JSON format. The following describes version 1 of the IR format.
 
-## Version 1
+# Version 1
 
 Version 1 of the IR format has four top-level keys: "version", "types", "services", and "errors".
 
-### Version
+## Version
 
 The "version" key has an integer value and indicates the IR format version of the document (1 for version 1).
 
-### Types
+## Types
 
 The "types" section is a list of type definitions, which can be one of the following: an alias definition, an enum
 definition, an object definition, or an union definition. Each type definition should include two keys: "type" and one
@@ -35,7 +35,7 @@ other key that is present.
 
 The contents of the "alias", "enum", "object", and "union" keys are described below.
 
-#### Aliases
+### Aliases
 
 An alias definition must have a "typeName" key describing the package and name of the type. It must also have an "alias"
 key, with a value that is a representation of the aliased type (see
@@ -65,7 +65,7 @@ Example alias definition:
 }
 ```
 
-#### Enums
+### Enums
 
 An enum definition must have a "typeName" key describing the package and name of the type. It must also have a "values"
 key referring to a list of possible values for the enum. Each item in the list must have a "value" key
@@ -100,7 +100,7 @@ Example enum definition:
 }
 ```
 
-#### Objects
+### Objects
 
 An object definition must have a "typeName" key describing the package and name of the type. It must also have a
 "fields" key referring to a list of field definitions. Each field definition must have a "fieldName" key with a string
@@ -147,7 +147,7 @@ Example object definition:
 }
 ```
 
-#### Unions
+### Unions
 
 An union definition must have a "typeName" key describing the package and name of the type. It must also have a "union"
 key referring to list of field definitions. See the [objects section](#objects) for details on the field definition
@@ -189,7 +189,7 @@ Example union definition:
 }
 ```
 
-#### Representation of Conjure Types
+### Representation of Conjure Types
 
 The following list enumerates valid Conjure types and provides examples of their representation.
 1. primitive
@@ -320,8 +320,9 @@ Finally, external references can be used to refer to non-Conjure types that are 
 another language.  For example, when generating Java code, the type `com.palantir.foo.OldFooResponse` must
 be present on the classpath in order to compile.  The "fallback" should be a
 Conjure type definition which can be used to deserialize the JSON from an `com.palantir.foo.OldFooResponse`.
-Note: these external references should be used sparingly because the serialization
-behaviour of the external type cannot be guaranteed.
+
+___Note: Usage of external references is strongly discouraged because Conjure is unable to validate that external types 
+match the serialization format of the base type. They are intended only to migrate existing APIs to Conjure.___
 
 ```json
 {
@@ -339,7 +340,7 @@ behaviour of the external type cannot be guaranteed.
 }
 ```
 
-### Services
+## Services
 
 The "services" section is a list of service definitions. Each service definition must have a "serviceName" key
 describing the package and name of the service. It must also have an "endpoints" key, which is a list of endpoint
@@ -457,7 +458,7 @@ Example service definition:
 }
 ```
 
-### Errors
+## Errors
 
 The "errors" section is a list of error definitions. Each error definition must include the following keys:
 - "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](/docs/spec/conjure_definitions.md#errorcode).
@@ -473,7 +474,8 @@ for details on the field definition format.
 
 Note, the difference between safe and unsafe arguments are explained in the docs of [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime#error-propagation).
 
-### Self-describing definition
+## Self-describing definition
 
-See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
-may use this definition to generate code for deserializing the IR format.
+See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for
+a definition of the IR format in the IR format. After a generator has bootstrapped itself, it may use this definition
+to generate code for deserializing the IR format.
