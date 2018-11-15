@@ -5,7 +5,7 @@ If you want to publish npm packages, you need to simulate the `npm login` comman
 ```diff
  apply plugin: 'com.palantir.conjure'
 
-+project(':your-project-api:your-project-api-typescript') {
++project("${project.name}-typescript") {
 +    publishTypeScript.doFirst {
 +        file('src/.npmrc') << "//registry.npmjs.org/:_authToken=${System.env.NPM_AUTH_TOKEN}"
 +    }
