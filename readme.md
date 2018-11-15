@@ -13,7 +13,7 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 ## Features
 - Enables teams to work together across many languages
 - Eliminates an entire class of serialization bugs
-- Abstract away low-level details behind ergonomic interfaces
+- Abstracts away low-level details behind ergonomic interfaces
 - Expressive language to model your domain (enums, union types, maps, lists, sets)
 - Helps preserve backwards compatibility (old clients can talk to new servers)
 - Supports incremental switchover from existing JSON/HTTP servers
