@@ -106,7 +106,7 @@ public interface FlightSearchService {
     /** Returns flights departing from the given airport on the given day. */
     @GET
     @Path("flights/list/{airport}/{time}")
-    SearchResult search(Airport airport, OffsetDateTime time);
+    SearchResult search(@PathParameter("airport") Airport airport, @PathParameter("time") OffsetDateTime time);
 }
 ```
 
