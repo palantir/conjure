@@ -22,7 +22,7 @@ For example in Java, Conjure interfaces allow you to build servers using existin
 ## Example
 The following YAML file defines a simple Flight Search API. (See [concepts](/docs/concepts.md))
 
-```yaml
+```yaml+example1
 types:
   definitions:
     default-package: com.palantir.flightsearch
