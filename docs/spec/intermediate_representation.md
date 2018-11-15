@@ -1,8 +1,8 @@
 Conjure Intermediate Representation
 ===================================
 
-The format described in [readme.md](/readme.md) is for a human-friendly format that allows specification of
-defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
+The [Conjure definitions format](/docs/spec/conjure_definitions.md) is a human-friendly format that allows specification
+of defaults and shorthand definitions. However, compilers should be implemented against an intermediate representation
 (IR).
 
 This representation has been chosen to facilitate the implementation of compilers across different languages and has
@@ -12,7 +12,7 @@ references).
 2. All service and type references are fully qualified (the combination of the type/service package and the type/service
 name).
 3. No defaults are assumed. The definition for each type, service, etc is self-contained.
-4. All Conjure types (for example, "map<string, integer>") have a more structured representation to eliminate the need
+4. All Conjure types (for example, `map<string, integer>`) have a more structured representation to eliminate the need
 for parsing.
 
 The IR is expected to be in JSON format. The following describes version 1 of the IR format.
