@@ -17,15 +17,15 @@ for parsing.
 
 The IR is expected to be in JSON format. The following describes version 1 of the IR format.
 
-## Version 1
+# Version 1
 
 Version 1 of the IR format has four top-level keys: "version", "types", "services", and "errors".
 
-### Version
+## Version
 
 The "version" key has an integer value and indicates the IR format version of the document (1 for version 1).
 
-### Types
+## Types
 
 The "types" section is a list of type definitions, which can be one of the following: an alias definition, an enum
 definition, an object definition, or an union definition. Each type definition should include two keys: "type" and one
@@ -35,7 +35,7 @@ other key that is present.
 
 The contents of the "alias", "enum", "object", and "union" keys are described below.
 
-#### Aliases
+### Aliases
 
 An alias definition must have a "typeName" key describing the package and name of the type. It must also have an "alias"
 key, with a value that is a representation of the aliased type (see
@@ -65,7 +65,7 @@ Example alias definition:
 }
 ```
 
-#### Enums
+### Enums
 
 An enum definition must have a "typeName" key describing the package and name of the type. It must also have a "values"
 key referring to a list of possible values for the enum. Each item in the list must have a "value" key
@@ -100,7 +100,7 @@ Example enum definition:
 }
 ```
 
-#### Objects
+### Objects
 
 An object definition must have a "typeName" key describing the package and name of the type. It must also have a
 "fields" key referring to a list of field definitions. Each field definition must have a "fieldName" key with a string
@@ -147,7 +147,7 @@ Example object definition:
 }
 ```
 
-#### Unions
+### Unions
 
 An union definition must have a "typeName" key describing the package and name of the type. It must also have a "union"
 key referring to list of field definitions. See the [objects section](#objects) for details on the field definition
@@ -189,7 +189,7 @@ Example union definition:
 }
 ```
 
-#### Representation of Conjure Types
+### Representation of Conjure Types
 
 The following list enumerates valid Conjure types and provides examples of their representation.
 1. primitive
@@ -340,7 +340,7 @@ match the serialization format of the base type. They are intended only to migra
 }
 ```
 
-### Services
+## Services
 
 The "services" section is a list of service definitions. Each service definition must have a "serviceName" key
 describing the package and name of the service. It must also have an "endpoints" key, which is a list of endpoint
@@ -458,7 +458,7 @@ Example service definition:
 }
 ```
 
-### Errors
+## Errors
 
 The "errors" section is a list of error definitions. Each error definition must include the following keys:
 - "code": a string in `UPPER_UNDERSCORE_CASE` and it must be one of the [ErrorCodes defined in the API](/docs/spec/conjure_definitions.md#errorcode).
@@ -474,7 +474,7 @@ for details on the field definition format.
 
 Note, the difference between safe and unsafe arguments are explained in the docs of [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime#error-propagation).
 
-### Self-describing definition
+## Self-describing definition
 
 See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for
 a definition of the IR format in the IR format. After a generator has bootstrapped itself, it may use this definition
