@@ -475,5 +475,6 @@ Note, the difference between safe and unsafe arguments are explained in the docs
 
 ### Self-describing definition
 
-See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for a definition of the IR format in the IR format. After a compiler has bootstrapped itself, it
-may use this definition to generate code for deserializing the IR format.
+See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for
+a definition of the IR format in the IR format. After a generator has bootstrapped itself, it may use this definition
+to generate code for deserializing the IR format.
