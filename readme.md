@@ -97,37 +97,22 @@ function demo(): Promise<void> {
 
 ## Ecosystem
 
-##### Compiler
+The [conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
 
-- [conjure](/docs/compiler_usage.md)
+_Conjure generators_ read IR and produce code in the target language. The associated libraries provide client and server implementations. Each generator is distributed as a CLI that conforms to [RFC002](/docs/rfc/002-contract-for-conjure-generators.md):
 
-##### Build tool
+| Language | Generator | Libraries | Examples |
+|--------------------|-------------------------------|-|-|
+| Java | [conjure-java](https://github.com/palantir/conjure-java) | [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime) | [conjure-java-example](https://github.com/palantir/conjure-java-example)
+| TypeScript | [conjure-typescript](https://github.com/palantir/conjure-typescript) | [conjure-typescript-runtime](https://github.com/palantir/conjure-typescript-runtime) | [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example)
+| Python | [conjure-python](https://github.com/palantir/conjure-python) | [conjure-python-runtime](https://github.com/palantir/conjure-python-runtime) | -
 
-- [gradle-conjure](https://github.com/palantir/gradle-conjure)
+[gradle-conjure](https://github.com/palantir/gradle-conjure) is a _build tool_ that orchestrates invoking the compiler and generators above.
 
-##### Code generators
+The following tools also operate on IR:
 
-- [conjure-java](https://github.com/palantir/conjure-java)
-- [conjure-typescript](https://github.com/palantir/conjure-typescript)
-- [conjure-python](https://github.com/palantir/conjure-python)
-- conjure-go (coming soon)
-- conjure-rust (coming soon)
-
-##### Client/server libraries
-
-- [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
-- [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
-- [conjure-python-client](https://github.com/palantir/conjure-python-client)
-
-##### Recommended server libraries
-
-- [dropwizard](https://github.com/dropwizard/dropwizard)
-
-##### Miscellaneous tools
-
-- [conjure-postman](https://github.com/palantir/conjure-postman)
-- conjure-jsonschema (coming soon)
-- conjure-backcompat (coming soon)
+- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman](https://www.getpostman.com/) [Collections](https://www.getpostman.com/docs/v6/postman/collections/intro_to_collections) for interacting with Conjure defined APIs.
+- conjure-backcompat - an experimental type checker that compares two IR definitions to evaluate whether they are wire format compatible (not yet open-sourced).
 
 ## Contributing
 
