@@ -3,6 +3,9 @@
     - [Overview](/readme.md)
     - [Get started with `gradle-conjure`](/docs/getting_started.md)
     - [Concepts](/docs/concepts.md)
+- **How to guides**
+    - [How to connect from Java](/docs/howto/connect_from_java.md)
+    - [How to publish TypeScript to npm](/docs/howto/publish_typescript_to_npm.md)
 - **[Reference](/reference.md)**
     - [Conjure definitions](/docs/spec/conjure_definitions.md)
     - [Intermediate representation (IR)](/docs/spec/intermediate_representation.md)
