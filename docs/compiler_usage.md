@@ -1,6 +1,6 @@
-## Compiler Usage
+## Compiler usage
 
-The recommended way to use conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, there is also an executable published on [bintray](https://bintray.com/palantir/releases/conjure).
+The recommended way to use Conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, there is also an executable published on [bintray](https://bintray.com/palantir/releases/conjure).
 
     Usage: conjure compile [-hV] <input> <output>
     Generate Conjure IR from Conjure YML definitions.
@@ -10,4 +10,4 @@ The recommended way to use conjure is via a build tool like [gradle-conjure](htt
       -V, --version   Print version information and exit.
 
 This tool will output an [intermediate representation](/docs/spec/intermediate_representation.md) JSON file which can then
-be passed into [generators](/readme.md#code-generators) to create language bindings.
+be passed into [generators](/readme.md#ecosystem) to create language bindings.

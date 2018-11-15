@@ -2,7 +2,7 @@
 
 This section describes:
 
-- How the Conjure compiler interprets [Source files][].
+- How the Conjure compiler interprets [Conjure definitions][].
 - The JSON [Intermediate representation (IR)][] that the compiler produces.
 - How Conjure generators should read IR and produce generated code.
 - The [Wire specification][] that generated clients must adhere to.

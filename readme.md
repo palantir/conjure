@@ -3,120 +3,93 @@ _Conjure is a simple but opinionated toolchain for defining APIs once and magica
 
 Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
 
-Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Golang, Rust etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
+Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Python etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
 
 For example in Java, Conjure interfaces allow you to build servers using existing Jersey compatible libraries like Dropwizard/Jetty.
 
-See our [getting started](docs/getting_started.md) guide to define your first Conjure API.
+**See an [example below](#example), or check out our [getting started](docs/getting_started.md) guide to define your first Conjure API.**
+
 
 ## Features
 - Enables teams to work together across many languages
 - Eliminates an entire class of serialization bugs
-- Ergonomic interfaces abstract away low-level details
+- Abstracts away low-level details behind ergonomic interfaces
 - Expressive language to model your domain (enums, union types, maps, lists, sets)
-- Helps devs preserve backwards compatibility (old clients can talk to new servers)
+- Helps preserve backwards compatibility (old clients can talk to new servers)
 - Supports incremental switchover from existing JSON/HTTP servers
 - Zero config (works out of the box)
 
 
-## Concepts
-_Conjure offers the following abstractions to use when defining your APIs. To see the JSON representation of these types, see the [Wire specification](/docs/spec/wire.md)._
+## Ecosystem
+The [Conjure compiler](/docs/compiler_usage.md) reads API definitions written in the concise, [human-readable YML format](/docs/spec/conjure_definitions.md) and produces a JSON-based [intermediate representation](/docs/spec/intermediate_representation.md) (IR).
 
+_Conjure generators_ read IR and produce code in the target language. The associated libraries provide client and server implementations. Each generator is distributed as a CLI that conforms to [RFC002](/docs/rfc/002-contract-for-conjure-generators.md):
 
-### HTTP endpoints
-- `GET`, `PUT`, `POST`, `DELETE` - [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
-- _Query parameters_ - e.g. `https://example.com/api/something?foo=bar&baz=2`
-- _Path parameters_ - Parsed sections of URLs e.g. `https://example.com/repo/{owner}/{repo}/pulls/{id}`
-- _Headers_ - A non-case sensitive string name associated with a Conjure value (see [docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)).
-- _Cookie auth_ - A [HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), often used for authentication.
+| Language | Generator | Libraries | Examples |
+|--------------------|-------------------------------|-|-|
+| Java | [conjure-java](https://github.com/palantir/conjure-java) | [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime) | [conjure-java-example](https://github.com/palantir/conjure-java-example)
+| TypeScript | [conjure-typescript](https://github.com/palantir/conjure-typescript) | [conjure-typescript-runtime](https://github.com/palantir/conjure-typescript-runtime) | [conjure-typescript-example](https://github.com/palantir/conjure-typescript-example)
+| Python | [conjure-python](https://github.com/palantir/conjure-python) | [conjure-python-runtime](https://github.com/palantir/conjure-python-runtime) | -
 
+The [gradle-conjure](https://github.com/palantir/gradle-conjure) _build tool_ is the recommended way of interacting with the Conjure ecosystem as it seamlessly orchestrates all the above tools. Alternatively, the compiler and generators may also be invoked manually as they all behave in a consistent way (specified by [RFC002](/docs/rfc/002-contract-for-conjure-generators.md)).
 
-### Named types
-Users may define the following kinds of named types. These can be referenced by their name elsewhere in a Conjure definition.
+The following tools also operate on IR:
 
-  - _Object_ - a collection of named fields, each of which has their own Conjure type.
-  - _Enum_ - a type consisting of named string variants, e.g. "RED", "GREEN", "BLUE".
-  - _Alias_ - a named shorthand for another Conjure type, purely for readability.
-  - _Union_ - a type representing different named variants, each of which can contain differen types. (Also known as 'algebraic data types' or 'tagged unions')
-
-### Container types
-  - `list<T>` - an ordered sequence of items of type `T`.
-  - `map<K, V>` - values of type `V` each indexed by a unique key of type `K` (keys are unordered).
-  - `optional<T>` - represents a value of type `T` which is either present or not present.
-  - `set<T>` - a collection of distinct values of type `T`.
-
-### Built-in types
-  - `any` - a catch-all type which can represent arbitrary JSON including lists, maps, strings, numbers or booleans.
-  - `bearertoken` - a string [Json Web Token (JWT)](https://jwt.io/)
-  - `binary` - a sequence of binary.
-  - `boolean` - `true` or `false`
-  - `datetime` - an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) value e.g. `2018-07-25T10:20:32+01:00`
-  - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes NaN, +/-Infinity and signed zero.
-  - `integer` - a signed 32-bit integer value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
-  - `rid` - a [Resource Identifier](https://github.com/palantir/resource-identifier), e.g. `ri.recipes.main.ingredient.1234`
-  - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1
-  - `string` - a sequence of UTF-8 characters
-  - `uuid` - a 128-bit number: [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid)
-
-### Opaque types
-When migrating an existing API, it may be useful to use the following 'escape hatch' type.  These are not recommended for normal APIs because Conjure can't introspect these external types to figure out what their JSON structure will be, so they're effectively opaque.
-
-  - _External Reference_ - a reference to a non-Conjure type, with an associated fallback Conjure type
-
-### Errors
-Conjure allows defining named, structured errors so that clients can expect specific pieces of information on failure or handle entire categories of problems in one fell swoop.
-
-- _Structured errors_ - have the following properties:
-  - _Name_ -  a user chosen description of the error e.g. `RecipeLocked`
-  - _Namespace_ - a user chosen category of the error e.g. `RecipeErrors`
-  - _Code_ - one of the pre-defined categories.
-  - _Args_ - a map from string keys to Conjure types
+- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman](https://www.getpostman.com/) [Collections](https://www.getpostman.com/docs/v6/postman/collections/intro_to_collections) for interacting with Conjure defined APIs.
+- conjure-backcompat - an experimental type checker that compares two IR definitions to evaluate whether they are wire format compatible (not yet open-sourced).
 
 
 ## Example
-The following YAML file defines a simple Recipe Book API. (See [full reference](/docs/spec/conjure_definitions.md))
+The following YAML file defines a simple Flight Search API. (See [concepts](/docs/concepts.md))
 
 ```yaml
 types:
   definitions:
-    default-package: com.company.product
+    default-package: com.palantir.flightsearch
     objects:
 
-      Recipe:
+      Airport:
+        alias: string
+      SearchRequest:
         fields:
-          name: RecipeName
-          steps: list<RecipeStep>
-
-      RecipeStep:
-        union:
-          mix: set<Ingredient>
-          chop: Ingredient
-
-      RecipeName:
-        alias: string
-
-      Ingredient:
-        alias: string
+          from: Airport
+          to: Airport
+          time: datetime
+      SearchResult:
+        alias: list<Connection>
+      Connection:
+        fields:
+          from: Airport
+          to: Airport
+          number: string
 
 services:
-  RecipeBookService:
-    name: Recipe Book
-    package: com.company.product
-    base-path: /recipes
+  FlightSearchService:
+    name: Flight Search Service
+    package: com.palantir.flightsearch
+    base-path: /flights
     endpoints:
-      createRecipe:
-        http: POST /
-        docs: Adds a new recipe to the store.
+
+      search:
+        docs: Returns the list of flight connections matching a given from/to/time request.
+        http: POST /search
         args:
-          createRecipeRequest:
-            param-type: body
-            type: Recipe
+          request: SearchRequest
+        returns: SearchResult
+
+      list:
+        docs: Returns flights departing from the given airport on the given day.
+        http: GET /list/{airport}/{time}
+        args:
+          airport: Airport
+          time: datetime
+        returns: SearchResult
 ```
 
 The following generated Java interface can be used on the client and the server.
 
 ```java
-package com.company.product;
+package com.palantir.flightsearch;
 
 ...
 
@@ -124,65 +97,31 @@ package com.company.product;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/")
 @Generated("com.palantir.conjure.java.services.JerseyServiceGenerator")
-public interface RecipeBookService {
-    /** Add a new recipe to the store. */
+public interface FlightSearchService {
+    /** Returns the list of flight connections matching a given from/to/time request. */
     @POST
-    @Path("recipes")
-    void createRecipe(@HeaderParam("Authorization") AuthHeader authHeader, Recipe createRecipeRequest);
+    @Path("flights/search")
+    SearchResult search(SearchRequest request);
+
+    /** Returns flights departing from the given airport on the given day. */
+    @GET
+    @Path("flights/list/{airport}/{time}")
+    SearchResult search(Airport airport, OffsetDateTime time);
 }
 ```
 
 Type-safe network calls to this API can made from TypeScript as follows:
 
 ```ts
-function demo(): Promise<void> {
-    const request: IRecipe = {
-        name: "Baked chicken with sun-dried tomatoes",
-        steps: [
-            RecipeStep.chop("Tomatoes"),
-            RecipeStep.chop("Chicken"),
-            RecipeStep.chop("Potatoes")
-            RecipeStep.mix(["Herbs", "Tomatoes", "Chicken"]),
-        ]
+function demo(): Promise<SearchResult> {
+    const request: ISearchRequest = {
+        from: "LHR",
+        to: "JFK",
+        number: "BA117"
     };
-    return new RecipeBookService(bridge).createRecipe(request);
+    return new FlightSearchService(bridge).search(request);
 }
 ```
 
-## Ecosystem
-
-##### Compiler
-
-- [conjure](/docs/compiler_usage.md)
-
-##### Build tool
-
-- [gradle-conjure](https://github.com/palantir/gradle-conjure)
-
-##### Code generators
-
-- [conjure-java](https://github.com/palantir/conjure-java)
-- [conjure-typescript](https://github.com/palantir/conjure-typescript)
-- [conjure-python](https://github.com/palantir/conjure-python)
-- conjure-go (coming soon)
-- conjure-rust (coming soon)
-
-##### Client/server libraries
-
-- [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
-- [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
-- [conjure-python-client](https://github.com/palantir/conjure-python-client)
-
-##### Recommended server libraries
-
-- [dropwizard](https://github.com/dropwizard/dropwizard)
-
-##### Miscellaneous tools
-
-- [conjure-postman](https://github.com/palantir/conjure-postman)
-- conjure-jsonschema (coming soon)
-- conjure-backcompat (coming soon)
-
 ## Contributing
-
 See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
