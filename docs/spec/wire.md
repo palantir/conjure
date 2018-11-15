@@ -47,7 +47,6 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #5-json-format
 [PLAIN format]: #6-plain-format
-[Canonical JSON format]: #7-canonical-json-format
 [URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
 [Path parameters]: ./source_files.md#path-templating
 
@@ -250,8 +249,8 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 ----------------- | ----------------------------- | -------- |
 `optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, must be serialized as `JSON(e)`. If the value appears inside a JSON Object, then the corresponding key should be omitted. Alternatively, the field may be set to `null`. Inside JSON Array, a non-present Conjure optional value must be serialized as JSON `null`.
 `list<T>`         | Array                         | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
-`set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is recommended to preserve order where possible. The Array must not contain duplicate elements (as defined by the canonical format below).
-`map<K, V>`       | Object                        | A key k is serialized as a string with contents `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`. The Object must not contain duplicate keys (as defined by the canonical format below).
+`set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is recommended to preserve order where possible.
+`map<K, V>`       | Object                        | A key k is serialized as a string with contents `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`.
 
 ### 5.3. Named types
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
