@@ -1,8 +1,8 @@
 <p align="center">
 <img src="/docs/media/conjure-flat.svg" alt="Conjure logo" height="200" width="200" id="readme-logo">
+<h1>Conjure</h1>
 </p>
 
-# Conjure
 _Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
 
 Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
