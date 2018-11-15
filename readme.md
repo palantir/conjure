@@ -3,19 +3,19 @@ _Conjure is a simple but opinionated toolchain for defining APIs once and magica
 
 Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
 
-Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Golang, Rust etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
+Define your API once and then Conjure will generate idiomatic clients for Java, TypeScript, Python etc. The generated interfaces provide type-safe, clean abstractions so you can make network requests without worrying about the details.
 
 For example in Java, Conjure interfaces allow you to build servers using existing Jersey compatible libraries like Dropwizard/Jetty.
 
-**See our [getting started](docs/getting_started.md) guide to define your first Conjure API.**
+**See an [example below](#example), or check out our [getting started](docs/getting_started.md) guide to define your first Conjure API.**
 
 
 ## Features
 - Enables teams to work together across many languages
 - Eliminates an entire class of serialization bugs
-- Ergonomic interfaces abstract away low-level details
+- Abstract away low-level details behind ergonomic interfaces
 - Expressive language to model your domain (enums, union types, maps, lists, sets)
-- Helps devs preserve backwards compatibility (old clients can talk to new servers)
+- Helps preserve backwards compatibility (old clients can talk to new servers)
 - Supports incremental switchover from existing JSON/HTTP servers
 - Zero config (works out of the box)
 
@@ -42,11 +42,12 @@ The following tools also operate on IR:
 ## Example
 The following YAML file defines a simple Flight Search API. (See [concepts](/docs/concepts.md))
 
-```yaml+example1
+```yaml
 types:
   definitions:
     default-package: com.palantir.flightsearch
     objects:
+
       Airport:
         alias: string
       SearchRequest:

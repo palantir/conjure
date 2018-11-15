@@ -38,13 +38,13 @@ public class ReadmeTest {
     @Test
     public void prove_readme_example_is_valid_conjure() throws IOException {
         Path path = folder.getRoot().toPath().resolve("example1.yml");
-        Files.write(path, extractSnippetFromReadme("example1").getBytes(StandardCharsets.UTF_8));
+        Files.write(path, extractSnippetFromReadme().getBytes(StandardCharsets.UTF_8));
         Conjure.parse(ImmutableList.of(path.toFile()));
     }
 
-    private static String extractSnippetFromReadme(String name) throws IOException {
+    private static String extractSnippetFromReadme() throws IOException {
         String markdown = new String(Files.readAllBytes(Paths.get("..", "readme.md")), StandardCharsets.UTF_8);
-        Matcher matcher = Pattern.compile("```yaml\\+" + name + "([^`]+)```", Pattern.DOTALL).matcher(markdown);
+        Matcher matcher = Pattern.compile("```yaml([^`]+)```", Pattern.DOTALL).matcher(markdown);
         assertThat(matcher.find()).isTrue();
         return matcher.group(1);
     }
