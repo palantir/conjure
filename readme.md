@@ -1,3 +1,5 @@
+<center><img src="/docs/media/conjure.svg" alt="Conjure logo" height="200" width="200" id="readme-logo"></center>
+
 # Conjure
 _Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
 

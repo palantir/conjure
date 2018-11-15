@@ -1,14 +1,10 @@
-![logo](./docs/media/logo.png)
+<img src="/docs/media/conjure.svg" alt="Conjure logo" height="400" width="400">
 
-# Conjure 
+# Conjure
 
 > Magically generate multi-language HTTP/JSON clients and servers.
 
-
-- Enables teams to work together across many languages
-- Expressive language to model your domain 
-- Helps preserve backwards compatibility 
-- Zero config 
-
 [GitHub](https://github.com/palantir/conjure/)
-[Getting Started](#conjure)
+[Get Started](#conjure)
+
+![color](#F5F8FA)
