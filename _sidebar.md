@@ -6,6 +6,7 @@
 - **How to guides**
     - [How to connect from Java](/docs/howto/connect_from_java.md)
     - [How to publish TypeScript to npm](/docs/howto/publish_typescript_to_npm.md)
+    - [How to invoke CLIs manually](/docs/howto/invoke_clis_manually.md)
 - **[Reference](/reference.md)**
     - [Conjure definitions](/docs/spec/conjure_definitions.md)
     - [Intermediate representation (IR)](/docs/spec/intermediate_representation.md)
