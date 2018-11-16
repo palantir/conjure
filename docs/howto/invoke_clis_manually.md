@@ -73,10 +73,10 @@ Invoke the `conjure` CLI to compile your YML file into a single IR JSON file:
 
 ## 4. Generate code
 
-The `demo.conjure.json` IR JSON file can now be passed to generators, for example:
+The `demo.conjure.json` IR JSON file can now be passed to generators, which will write files to a fresh directory:
 
     $ mkdir output
-    $ conjure-typescript generate foo.conjure.json output --rawSource
+    $ conjure-typescript generate --rawSource foo.conjure.json output
     $ tree output
     output
     ├── hello
