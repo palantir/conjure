@@ -132,4 +132,4 @@ function demo(): Promise<SearchResult> {
 See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
 ## License
-This tooling is made available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
+This tooling is made available under the [Apache 2.0 License](/LICENSE).
