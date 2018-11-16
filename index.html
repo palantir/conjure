@@ -7,8 +7,42 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
+  <link rel="stylesheet" href="/docs/media/style.css">
   <link rel="stylesheet" href="//prismjs.com/themes/prism.css" />
+  <style type="text/css">
+    #readme-logo {
+      display: none;
+    }
+
+    #palantir-logo {
+      position: absolute;
+      margin-left: -30px;
+      margin-top: 90px;
+    }
+
+    section.cover.show {
+      background: #F5F8FA !important;
+    }
+
+    section.cover ul {
+      display: grid;
+      grid-column-gap: 16px;
+      grid-template-columns: repeat(2, 50%);
+      max-width: 60%;
+    }
+
+    section.cover ul li {
+      text-align: left;
+    }
+
+    section.cover ul li:nth-child(odd) {
+      text-align: right;
+    }
+
+    aside.sidebar strong>a {
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
@@ -18,6 +52,7 @@
       name: 'Conjure',
       repo: 'palantir/conjure',
       homepage: './readme.md',
+      coverpage: './docs/_coverpage.md',
       loadSidebar: true,
       subMaxLevel: 2,
       routerMode: 'hash' // prefer 'hash' over 'history' otherwise refreshing the page won't work!
