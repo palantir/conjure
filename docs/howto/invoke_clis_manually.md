@@ -1,5 +1,5 @@
 # How to invoke Conjure CLIs manually
-The recommended way to use Conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, all the Conjure ecosystems CLIs can be invoked manually - there are executables published on [bintray](https://bintray.com/palantir/releases/conjure). The conjure compiler will output an [intermediate representation](/docs/spec/intermediate_representation.md) JSON file which can then be passed into [generators](/readme.md#ecosystem) to create language bindings.
+The recommended way to use Conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, all the Conjure ecosystems CLIs can be invoked manually - there are executables published on [bintray](https://bintray.com/palantir/releases/conjure).
 
 ## 1. Install the CLIs
 
@@ -55,7 +55,7 @@ types:
 
 ## 3. Compile IR
 
-Invoke the `conjure` CLI to compile your YML file into a single IR JSON file:
+Invoke the `conjure` CLI to compile your YML file. `conjure` will output an [intermediate representation](/docs/spec/intermediate_representation.md) JSON file which can then be passed into [generators](/readme.md#ecosystem) to create language bindings:
 
     $ ./conjure-4.4.0/bin/conjure compile demo.yml demo.conjure.json
     $ cat demo.conjure.json
@@ -76,7 +76,7 @@ Invoke the `conjure` CLI to compile your YML file into a single IR JSON file:
 The `demo.conjure.json` IR JSON file can now be passed to generators, which will write files to a fresh directory:
 
     $ mkdir output
-    $ conjure-typescript generate --rawSource foo.conjure.json output
+    $ conjure-typescript generate --rawSource demo.conjure.json output
     $ tree output
     output
     ├── hello
