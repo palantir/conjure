@@ -135,7 +135,7 @@ In your main gradle project, you can now depend on the generated Jersey interfac
 // ./your-project/build.gradle
 
 dependencies {
-    compile 'com.palantir.conjure.java.runtime:conjure-java-jersey-server:<latest>'
+    compile 'com.palantir.conjure.java.runtime:conjure-java-jersey-server:latest.release'
     compile project(':your-project-api:your-project-api-jersey')
     ...
 }
