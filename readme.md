@@ -38,7 +38,7 @@ _Conjure generators_ read IR and produce code in the target language. The associ
 
 The [gradle-conjure](https://github.com/palantir/gradle-conjure) _build tool_ is the recommended way of interacting with the Conjure ecosystem as it seamlessly orchestrates all the above tools. Alternatively, the compiler and generators may also be invoked [manually](/docs/howto/invoke_clis_manually.md#how-to-invoke-conjure-clis-manually) as they all behave in a consistent way (specified by [RFC002](/docs/rfc/002-contract-for-conjure-generators.md)).
 
-The [conjure-verification](https://github.com/palantir/conjure-verification) tools allows Conjure language authors to verify that their generators and libraries produce code that complies with the [wire spec](/docs/spec/wire.md).
+The [conjure-verification](https://github.com/palantir/conjure-verification) tools allow Conjure generator authors to verify that their generators and libraries produce code that complies with the [wire spec](/docs/spec/wire.md).
 
 The following tools also operate on IR:
 
