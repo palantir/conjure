@@ -38,7 +38,7 @@ jobs:
 
       - deploy:
           command: |
-            if [[ "${CIRCLE_BRANCH}" == "develop" || "${CIRCLE_TAG}" =~ [0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)* ]]; then
+            if [[ "${CIRCLE_BRANCH}" == "master" || "${CIRCLE_TAG}" =~ [0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)* ]]; then
               ./gradlew --stacktrace --continue publish
             fi
 
