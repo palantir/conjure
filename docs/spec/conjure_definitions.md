@@ -314,7 +314,7 @@ When comparing multiple paths, the path with the longest concrete path should be
 Curly braces, `{}`, can be used to mark a section of a PathString as parameterized.
 
 **Examples:**
-Assuming the following paths, the concrete definition `/branch/foo` would be matched first.
+Assuming the following paths with request URL `branch/foo`, the concrete definition `/branch/foo` would be matched first.
 ```
 /branch/{branchPath}
 /branch/foo
