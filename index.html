@@ -5,8 +5,7 @@
   <meta charset="UTF-8">
   <title>Conjure: a code-generator for multi-language HTTP/JSON clients and servers</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
-  <base href="/conjure/">
+  <meta name="description" content="Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages.">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="docs/media/style.css">
   <link rel="stylesheet" href="//prismjs.com/themes/prism.css" />
@@ -51,11 +50,13 @@
   <script>
     window.$docsify = {
       name: 'Conjure',
+      basePath: '/conjure/',
       repo: 'palantir/conjure',
       homepage: './readme.md',
-      coverpage: './docs/_coverpage.md',
+      coverpage: './_coverpage.md',
       loadSidebar: true,
       subMaxLevel: 2,
+      auto2top: true,
       routerMode: 'hash' // prefer 'hash' over 'history' otherwise refreshing the page won't work!
     }
   </script>
