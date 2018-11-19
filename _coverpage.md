@@ -9,7 +9,7 @@
 - Helps preserve backwards compatibility
 - Zero config
 
-<img src="docs/media/palantir-logo.svg" alt="Palantir logo" height="60" width="60" id="palantir-logo">
+<a href="https://www.palantir.com/careers/"><img src="docs/media/palantir-logo.svg" alt="Palantir logo" height="60" width="60" id="palantir-logo"></a>
 
 [GitHub](https://github.com/palantir/conjure/)
 [Get started](#conjure)

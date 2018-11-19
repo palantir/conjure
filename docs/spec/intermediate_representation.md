@@ -321,7 +321,7 @@ another language.  For example, when generating Java code, the type `com.palanti
 be present on the classpath in order to compile.  The "fallback" should be a
 Conjure type definition which can be used to deserialize the JSON from an `com.palantir.foo.OldFooResponse`.
 
-___Note: Usage of external references is strongly discouraged because Conjure is unable to validate that external types 
+___Note: Usage of external references is strongly discouraged because Conjure is unable to validate that external types
 match the serialization format of the base type. They are intended only to migrate existing APIs to Conjure.___
 
 ```json
@@ -476,6 +476,6 @@ Note, the difference between safe and unsafe arguments are explained in the docs
 
 ## Self-describing definition
 
-See [conjure-api.yml](https://github.com/palantir/conjure/blob/develop/conjure-api/src/main/conjure/conjure-api.yml) for
+See [conjure-api.yml](https://github.com/palantir/conjure/blob/master/conjure-api/src/main/conjure/conjure-api.yml) for
 a definition of the IR format in the IR format. After a generator has bootstrapped itself, it may use this definition
 to generate code for deserializing the IR format.

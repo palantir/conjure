@@ -22,7 +22,7 @@ conjure-java just generates client/server interfaces, so to actually make networ
 ```diff
  dependencies {
      compile project('your-project-api:your-project-api-jersey')
-+    compile 'com.palantir.conjure.java.runtime:conjure-java-jaxrs-client:<latest>'
++    compile 'com.palantir.conjure.java.runtime:conjure-java-jaxrs-client:latest.release'
  }
 ```
 
@@ -42,6 +42,8 @@ RecipeBookService recipeBookService = JaxRsClient.create(
                .security(SslConfiguration.of(Paths.get(TRUSTSTORE_PATH)))
                .build()));
 ```
+
+*The JVM contains a JKS truststore at `$JAVA_HOME/lib/security/cacerts`, but for production usage you should make sure your truststore is minimal.*
 
 ## 4. Make a network call
 
