@@ -33,7 +33,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.0.0'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.6.2'
     }
 }
 
@@ -50,15 +50,15 @@ Then in `./your-project-api/build.gradle`, apply the plugin and specify versions
 apply plugin: 'com.palantir.conjure'
 
 dependencies {
-    conjureCompiler 'com.palantir.conjure:conjure:4.0.0'
-    conjureJava 'com.palantir.conjure.java:conjure-java:2.0.0'
+    conjureCompiler 'com.palantir.conjure:conjure:4.4.0'
+    conjureJava 'com.palantir.conjure.java:conjure-java:2.5.0'
     conjureTypeScript 'com.palantir.conjure.typescript:conjure-typescript:3.4.0'
 }
 
 subprojects {
     pluginManager.withPlugin 'java', {
         dependencies {
-            compile 'com.palantir.conjure.java:conjure-lib:2.0.0'
+            compile 'com.palantir.conjure.java:conjure-lib:2.5.0'
         }
     }
 }
