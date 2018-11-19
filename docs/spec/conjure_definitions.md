@@ -320,7 +320,7 @@ Assuming the following paths with request URL `branch/foo`, the concrete definit
 /branch/foo
 ```
 
-Assuming the following paths with request URL `path/dataset/fetch`, the path `/path/dataset/{arg}` should be matched
+Assuming the following paths with request URL `path/dataset/fetch`, the path `/path/dataset/{arg}` would be matched
 first.
 ```
 /path/{arg}/fetch
