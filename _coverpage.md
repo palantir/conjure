@@ -9,7 +9,13 @@
 - Helps preserve backwards compatibility
 - Extensible ecosystem
 
-<a href="https://www.palantir.com/careers/"><img src="docs/media/palantir-logo.svg" alt="Palantir logo" height="60" width="60" id="palantir-logo"></a>
+<p class="buttons">
+    <a href="https://github.com/palantir/conjure/" target="_blank">GitHub</a>
+    <a href="#/?id=conjure">Get started</a>
+</p>
 
-[GitHub](https://github.com/palantir/conjure/)
-[Get started](#conjure)
+<div>
+    <a href="https://www.palantir.com/careers/">
+        <img src="docs/media/palantir-logo.svg" alt="Palantir logo" height="60" width="60" id="palantir-logo">
+    </a>
+</div>
