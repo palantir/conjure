@@ -4,7 +4,7 @@
 # Conjure
 </p>
 
-_Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
+_Conjure is a simple but opinionated toolchain for defining APIs once and generating client/server interfaces in multiple languages._
 
 Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
 
@@ -134,4 +134,5 @@ function demo(): Promise<SearchResult> {
 See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
 ## License
-This tooling is made available under the [Apache 2.0 License](/LICENSE).
+This tooling is made available under the [Apache 2.0 License](https://github.com/palantir/conjure/blob/master/LICENSE).
+<!-- intentionally not using a '/LICENSE' link because docsify always appends .md which results in a 404 -->

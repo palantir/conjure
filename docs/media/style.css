@@ -3,6 +3,7 @@ Changes based on //unpkg.com/docsify/themes/vue.css
 
 - changed the green link color to match the logo (#00306C)
 - code diffs no longer underlined (.token.inserted)
+- we use ".buttons" to select "section.cover .cover-main>p:last-child a"
 
 */
 
@@ -522,7 +523,7 @@ section.cover ul{
     max-width:500px;
     padding:0
 }
-section.cover .cover-main>p:last-child a{
+section.cover .cover-main>p:last-child a, section.cover .buttons a{
     border:1px solid var(--theme-color,#00306C);
     border-radius:2rem;
     box-sizing:border-box;
@@ -535,12 +536,11 @@ section.cover .cover-main>p:last-child a{
     text-decoration:none;
     transition:all .15s ease
 }
-section.cover .cover-main>p:last-child a:last-child{
+section.cover .cover-main>p:last-child a:last-child, section.cover .buttons a:last-child {
     background-color:var(--theme-color,#00306C);
     color:#fff
 }
-section.cover .cover-main>p:last-child a:last-child:hover{
-    color:inherit;
+section.cover .cover-main>p:last-child a:last-child:hover, section.cover .buttons a:last-child:hover {
     opacity:.8
 }
 section.cover .cover-main>p:last-child a:hover{
