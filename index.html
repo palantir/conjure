@@ -19,6 +19,14 @@
     section.cover.show {
       /* docsify randomizes backgrounds */
       background: #F5F8FA !important;
+      /* coverpage content can be taller than the screen on mobile */
+      height: auto;
+      min-height: 100vh;
+    }
+
+    section.cover .cover-main {
+      /* ensures the logo doesn't get cut off on small screens */
+      margin-top: 4px;
     }
 
     section.cover ul {
@@ -28,7 +36,7 @@
     section.cover ul li {
       text-align: left;
     }
-    
+
     @media only screen and (min-width: 600px) {
       section.cover ul {
         display: grid;
