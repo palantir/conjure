@@ -4,7 +4,7 @@
 # Conjure
 </p>
 
-_Conjure is a simple but opinionated toolchain for defining APIs once and magically generating client/server interfaces in many languages._
+_Conjure is a simple but opinionated toolchain for defining APIs once and generating client/server interfaces in multiple languages._
 
 Conjure was developed to help scale Palantir's microservice architecture - it has been battle-tested across hundreds of repos and has allowed devs to be productive in many languages.
 
