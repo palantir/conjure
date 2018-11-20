@@ -134,4 +134,5 @@ function demo(): Promise<SearchResult> {
 See the [CONTRIBUTING.md](/CONTRIBUTING.md) document.
 
 ## License
-This tooling is made available under the [Apache 2.0 License](/LICENSE).
+This tooling is made available under the [Apache 2.0 License](https://github.com/palantir/conjure/blob/master/LICENSE).
+<!-- intentionally not using a '/LICENSE' link because docsify always appends .md which results in a 404 -->
