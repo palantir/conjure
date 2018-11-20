@@ -4,10 +4,10 @@
 
 > Multi-language code generator for HTTP/JSON clients and servers.
 
-- Enables teams to work together across many languages
-- Expressive language to model your domain
+- First-class browser support
+- Expressive types to model your domain
 - Helps preserve backwards compatibility
-- Zero config
+- Extensible ecosystem
 
 <a href="https://www.palantir.com/careers/"><img src="docs/media/palantir-logo.svg" alt="Palantir logo" height="60" width="60" id="palantir-logo"></a>
 
