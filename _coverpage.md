@@ -2,7 +2,7 @@
 
 <h1>Conjure</h1>
 
-> Magically generate multi-language HTTP/JSON clients and servers.
+> Multi-language code generator for HTTP/JSON clients and servers.
 
 - Enables teams to work together across many languages
 - Expressive language to model your domain
