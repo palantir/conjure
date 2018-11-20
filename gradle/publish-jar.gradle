@@ -1,8 +1,15 @@
+// This file is managed by the excavator 'consistent-publish-scripts' check, changes will be overwritten.
 apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven-publish'
 apply plugin: 'nebula.maven-publish'
-apply plugin: 'nebula.publish-verification'
+apply plugin: 'nebula.maven-resolved-dependencies'
+apply plugin: 'nebula.javadoc-jar'
 apply plugin: 'nebula.source-jar'
+
+jar {
+    manifest {
+        attributes("Implementation-Version" : project.version)
+    }
+}
 
 bintray {
     user = System.env.BINTRAY_USERNAME
