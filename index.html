@@ -22,18 +22,23 @@
     }
 
     section.cover ul {
-      display: grid;
-      grid-column-gap: 16px;
-      grid-template-columns: repeat(2, 50%);
       max-width: 60%;
     }
 
     section.cover ul li {
       text-align: left;
     }
+    
+    @media only screen and (min-width: 600px) {
+      section.cover ul {
+        display: grid;
+        grid-column-gap: 16px;
+        grid-template-columns: repeat(2, 50%);
+      }
 
-    section.cover ul li:nth-child(odd) {
-      text-align: right;
+      section.cover ul li:nth-child(odd) {
+        text-align: right;
+      }
     }
 
     aside.sidebar strong>a {
