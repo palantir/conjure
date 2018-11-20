@@ -314,14 +314,13 @@ When comparing multiple paths, the path with the longest concrete path should be
 Curly braces, `{}`, can be used to mark a section of a PathString as parameterized.
 
 **Examples:**
-Assuming the following paths, the concrete definition `/branch/foo` would be matched first.
+Given a Conjure definition with the following paths, a request with path `/branch/foo` would be matched to `/branch/foo`.
 ```
 /branch/{branchPath}
 /branch/foo
 ```
 
-Assuming the following paths with request URL `path/dataset/fetch`, the path `/path/dataset/{arg}` should be matched
-first.
+Assuming the definition contains multiple path parameters (as shown below), a request with path `path/dataset/fetch` would be matched to `/path/dataset/{arg}`.
 ```
 /path/{arg}/fetch
 /path/dataset/{arg}
