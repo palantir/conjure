@@ -87,8 +87,12 @@ For example, the following Conjure endpoint contains two query parameters:
 demoEndpoint:
   http: GET /recipes
   args:
-    filter: optional<string>
-    limit: optional<integer>
+    filter:
+      param-type: query
+      type: optional<string>
+    limit:
+      param-type: query
+      type: optional<integer>
 ```
 
 These examples illustrate how an `optional<T>` value should be omitted if the value is not present
