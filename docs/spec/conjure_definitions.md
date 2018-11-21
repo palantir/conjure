@@ -365,6 +365,7 @@ param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint p
 ## ArgumentDefinition.ParamType
 [ArgumentDefinition.ParamType]: #argumentdefinitionparamtype
 A field describing the type of an endpoint parameter. It is a `string` which MUST be one of the following:
+- `auto`: defined as the singluar body parameter or a path parameter if the name of the argument definition matches a path parameter
 - `path`: defined as a path parameter; the argument name must appear in the request line.
 - `body`: defined as the singular body parameter.
 - `header`: defined as a header parameter.
