@@ -29,6 +29,7 @@ In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 ```groovy
 buildscript {
     repositories {
+        mavenCentral()
         maven { url 'https://dl.bintray.com/palantir/releases/' }
     }
 
