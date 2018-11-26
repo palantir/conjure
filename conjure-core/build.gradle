@@ -27,6 +27,7 @@ dependencies {
     compile 'com.palantir.syntactic-paths:syntactic-paths'
     compile 'org.glassfish.jersey.core:jersey-common'
     compile 'org.slf4j:slf4j-api'
+    implementation 'org.apache.commons:commons-lang3'
     implementation 'com.google.errorprone:error_prone_annotations'
     implementation 'io.dropwizard.metrics:metrics-core'
 
