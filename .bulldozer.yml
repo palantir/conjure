@@ -7,7 +7,7 @@ merge:
   method: squash
   options:
     squash:
-      body: pull_request_body
+      body: empty_body
   delete_after_merge: true
 update:
   whitelist:
