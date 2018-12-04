@@ -97,7 +97,7 @@ negative:
               args:
                 arg: string
   regexpMustBeMatchAll:
-    expected-error: 'Segment {arg:[0-9]+} of path /path/{arg:[0-9]+} did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
+    expected-error: 'Segment {arg:[0-9]+} of path /path/{arg:[0-9]+} did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9._-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
       services:
         TestService:
@@ -169,7 +169,7 @@ negative:
               # invalid: "arg" must be defined as a parameter
               http: GET /path/{arg}
   pathTemplateParamNestedBraces:
-    expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
+    expected-error: 'Segment {{arg}} of path /path/{{arg}}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9._-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
       services:
         TestService:
@@ -182,7 +182,7 @@ negative:
               args:
                 arg: string
   pathParamUnbalancedBraces:
-    expected-error: 'Segment {{arg} of path /path/{{arg}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
+    expected-error: 'Segment {{arg} of path /path/{{arg}/trailer did not match required segment patterns ^[a-zA-Z][a-zA-Z0-9._-]*$ or parameter name patterns ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or ^\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*(\Q:.+\E|\Q:.*\E)}$'
     conjure:
       services:
         TestService:
