@@ -51,7 +51,7 @@ public final class HttpPathValidatorTest {
             assertThatThrownBy(() -> validate(currCase.path))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(String.format("Segment %s of path %s did not match required segment patterns "
-                                    + "^[a-zA-Z][a-zA-Z0-9_-]*$ or parameter name patterns "
+                                    + "^[a-zA-Z][a-zA-Z0-9._-]*$ or parameter name patterns "
                                     + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or "
                                     + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*"
                                     + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
