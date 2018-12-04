@@ -39,7 +39,7 @@ public abstract class PathString {
     /** Returns the well-formed path associated with this path definition. */
     public abstract Path path();
 
-    private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_-]*$");
+    private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9._-]*$");
     private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + ParameterName.PATTERN + "}$");
     private static final Pattern PARAM_REGEX_SEGMENT_PATTERN =
             Pattern.compile(
