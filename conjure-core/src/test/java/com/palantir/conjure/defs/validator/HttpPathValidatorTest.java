@@ -75,6 +75,7 @@ public final class HttpPathValidatorTest {
         validate("/{foo}");
         validate("/abc/{foo}/bar");
         validate("/abc/{foo:.+}");
+        validate("/abc/v1.2/{foo}");
     }
 
     private static void validate(String path) {

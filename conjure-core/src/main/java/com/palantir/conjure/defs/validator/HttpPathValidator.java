@@ -36,8 +36,8 @@ public final class HttpPathValidator {
 
     private HttpPathValidator() {}
 
-    public static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
-    private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_-]*$");
+    public static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9].+)*";
+    private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9._-]*$");
     private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + PATTERN + "}$");
     private static final Pattern PARAM_REGEX_SEGMENT_PATTERN =
             Pattern.compile(
