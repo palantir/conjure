@@ -40,7 +40,7 @@
         <property name="message" value="Whitespace at end-of-line"/>
     </module>
     <module name="RegexpMultiline"> <!-- Java Style Guide: Vertical Whitespace -->
-	<property name="fileExtensions" value="java"/>
+        <property name="fileExtensions" value="java"/>
         <property name="format" value="^\n\n$"/>
         <property name="message" value="Two consecutive blank lines are not permitted."/>
     </module>
