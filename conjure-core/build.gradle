@@ -36,5 +36,6 @@ dependencies {
     testCompile 'org.mockito:mockito-core'
     testRuntime 'org.slf4j:slf4j-simple'
 
-    processor 'org.immutables:value'
+    annotationProcessor 'org.immutables:value'
+    compileOnly 'org.immutables:value::annotations'
 }

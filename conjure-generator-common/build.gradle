@@ -24,6 +24,7 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
 
-    processor 'org.immutables:value'
+    annotationProcessor 'org.immutables:value'
+    compileOnly 'org.immutables:value::annotations'
 }
 
