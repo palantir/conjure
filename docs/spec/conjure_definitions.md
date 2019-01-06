@@ -305,7 +305,7 @@ endpoints | Map[`string`&nbsp;&rarr;&nbsp;[EndpointDefinition][]] | **REQUIRED**
 
 ## PathString
 [PathString]: #pathstring
-A PathString consists of segments separated by forward slashes, `/`. Segments may be literals or path parameters (see below).
+A PathString consists of segments separated by forward slashes, `/`. Segments may be literals (any alphanumeric string beginning with a letter and may contain the characters `.`, `_`, `-`) or path parameters (see below).
 
 When comparing multiple paths, the path with the longest concrete path should be matched first.
 

@@ -17,18 +17,9 @@
 package com.palantir.conjure.parser.services;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import org.glassfish.jersey.uri.UriTemplate;
-import org.glassfish.jersey.uri.internal.UriTemplateParser;
 import org.immutables.value.Value;
 
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
@@ -38,64 +29,6 @@ public abstract class PathString {
 
     /** Returns the well-formed path associated with this path definition. */
     public abstract Path path();
-
-    private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_-]*$");
-    private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + ParameterName.PATTERN + "}$");
-    private static final Pattern PARAM_REGEX_SEGMENT_PATTERN =
-            Pattern.compile(
-                    "^\\{" + ParameterName.PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
-                            + "}$");
-
-    /** Creates a new instance if the syntax is correct. */
-    @Value.Check
-    protected final void check() {
-        Preconditions.checkArgument(path().isAbsolute(),
-                "Conjure paths must be absolute, i.e., start with '/': %s", path());
-        Preconditions.checkArgument(path().getSegments().isEmpty() || !path().isFolder(),
-                "Conjure paths must not end with a '/': %s", path());
-
-        for (String segment : path().getSegments()) {
-            Preconditions.checkArgument(
-                    SEGMENT_PATTERN.matcher(segment).matches()
-                            || PARAM_SEGMENT_PATTERN.matcher(segment).matches()
-                            || PARAM_REGEX_SEGMENT_PATTERN.matcher(segment).matches(),
-                    "Segment %s of path %s did not match required segment patterns %s or parameter name "
-                            + "patterns %s or %s",
-                    segment, path(), SEGMENT_PATTERN, PARAM_SEGMENT_PATTERN, PARAM_REGEX_SEGMENT_PATTERN);
-        }
-
-        // verify that path template variables are unique
-        Set<String> templateVars = new HashSet<>();
-        new UriTemplate(path().toString()).getTemplateVariables().stream().forEach(var -> {
-            Preconditions.checkState(!templateVars.contains(var),
-                    "Path parameter %s appears more than once in path %s", var, path());
-            templateVars.add(var);
-        });
-
-        UriTemplateParser uriTemplateParser = new UriTemplateParser(path().toString());
-        Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();
-        List<String> segments = Splitter.on('/').splitToList(uriTemplateParser.getNormalizedTemplate());
-        for (int i = 0; i < segments.size(); i++) {
-            String segment = segments.get(i);
-            if (!(segment.startsWith("{") && segment.endsWith("}"))) {
-                // path literal
-                continue;
-            }
-
-            // variable
-            Pattern varPattern = nameToPattern.get(segment.substring(1, segment.length() - 1));
-            if (varPattern.equals(UriTemplateParser.TEMPLATE_VALUE_PATTERN)) {
-                // no regular expression specified -- OK
-                continue;
-            }
-
-            // if regular expression was specified, it must be ".+" or ".*" based on invariant previously enforced
-            Preconditions.checkState(i == segments.size() - 1 || !varPattern.pattern().equals(".*"),
-                    "Path parameter %s in path %s specifies regular expression %s, but this regular "
-                            + "expression is only permitted if the path parameter is the last segment", segment,
-                    path(), varPattern);
-        }
-    }
 
     /**
      * Returns this path "concatenated" with the given other path. For example, {@code "/abc".resolve("/def")} is the

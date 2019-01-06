@@ -78,7 +78,7 @@ public final class ServiceDefinitionTests {
     @Test
     public void testEndpointDefinition_fullySpecified() throws IOException, ParseException {
         assertThat(mapper.readValue(multiLineString(
-                "http: GET /{foo}",
+                "http: GET /{foo}/v1.2/path",
                 "auth: header",
                 "args:",
                 "  arg:",
@@ -90,7 +90,7 @@ public final class ServiceDefinitionTests {
                 "docs: |",
                 "  docs"), EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
-                        .http(RequestLineDefinition.of("GET", PathString.of("/{foo}")))
+                        .http(RequestLineDefinition.of("GET", PathString.of("/{foo}/v1.2/path")))
                         .auth(AuthDefinition.header())
                         .args(ImmutableMap.of(
                                 ParameterName.of("arg"), ArgumentDefinition.builder()
