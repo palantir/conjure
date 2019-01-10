@@ -82,7 +82,7 @@ In this example, the `file` argument with value `var/conf/install.yml` is percen
 ### 2.2. Query parameters
 Parameters of type `query` must be translated into a [query string](https://tools.ietf.org/html/rfc3986#section-3.4), with the Conjure `paramId` used as the query key. If a value of de-aliased type `optional<T>` is not present, then the key must be omitted from the query string.  Otherwise, the inner value must be serialized using the [PLAIN format][] and any reserved characters [URL encoded][].
 
-For example, the following Conjure endpoint contains two query parameters:
+For example, the following Conjure endpoint contains some query parameters:
 ```yaml
 demoEndpoint:
   http: GET /recipes
@@ -93,6 +93,9 @@ demoEndpoint:
     limit:
       param-type: query
       type: optional<integer>
+    categories:
+      param-type: query
+      type: list<string>
 ```
 
 These examples illustrate how an `optional<T>` value should be omitted if the value is not present
@@ -100,6 +103,11 @@ These examples illustrate how an `optional<T>` value should be omitted if the va
 /recipes?filter=Hello%20World&limit=10
 /recipes?filter=Hello%20World
 /recipes
+```
+
+Query params of type `list<T>` or `set<T>` should result in one `key=value` pair for each value in the list or set, e.g.:
+```
+/recipes?categories=foo&categories=bar&categories=baz
 ```
 
 ### 2.3. Body parameter
