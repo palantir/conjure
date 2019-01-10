@@ -106,7 +106,7 @@ These examples illustrate how an `optional<T>` value should be omitted if the va
 /recipes
 ```
 
-Query params of type `list<T>` or `set<T>` should result in one `key=value` pair for each value in the list or set, e.g.:
+For query parameters of type `list<T>` or `set<T>`, each value should result in one `key=value` pair, separated by `&`. Note that the order of values must be preserved for `list<T>`, but is semantically unimportant for `set<T>`. E.g.:
 ```
 /recipes?category=foo&category=bar&category=baz
 ```
