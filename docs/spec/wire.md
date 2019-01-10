@@ -94,6 +94,7 @@ demoEndpoint:
       param-type: query
       type: optional<integer>
     categories:
+      param-id: category
       param-type: query
       type: list<string>
 ```
@@ -107,7 +108,7 @@ These examples illustrate how an `optional<T>` value should be omitted if the va
 
 Query params of type `list<T>` or `set<T>` should result in one `key=value` pair for each value in the list or set, e.g.:
 ```
-/recipes?categories=foo&categories=bar&categories=baz
+/recipes?category=foo&category=bar&category=baz
 ```
 
 ### 2.3. Body parameter
