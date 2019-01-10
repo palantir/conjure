@@ -40,5 +40,6 @@ dependencies {
     compileOnly 'org.immutables:value::annotations'
 
     testAnnotationProcessor 'org.immutables:value'
+    testCompileOnly 'org.immutables:value::annotations'
     testCompile 'org.immutables:value'
 }
