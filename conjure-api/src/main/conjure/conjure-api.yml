@@ -70,7 +70,7 @@ types:
             type: Type
             docs: >
               Other language generators may use the provided fallback if the non-Conjure type is not available.
-              The ANY PrimitiveType is permissible for all external types, but a more specific definition is preferrable.
+              The ANY PrimitiveType is permissible for all external types, but a more specific definition is preferable.
       PrimitiveType:
         values:
           - STRING
