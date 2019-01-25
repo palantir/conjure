@@ -47,6 +47,11 @@
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
         <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
+    <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
+        <!-- custom-suppressions.xml allows users to specify suppresions that will not be overriden by baselineUpdateConfig -->
+        <property name="file" value="${config_loc}/custom-suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
@@ -127,6 +132,7 @@
             <message key="import.illegal" value="Must not import repackaged classes."/>
         </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
+            <property name="id" value="BanShadedClasses"/>
             <property name="illegalPkgs" value=".*\.(repackaged|shaded|thirdparty)"/>
             <property name="regexp" value="true" />
             <message key="import.illegal" value="Must not import repackaged classes."/>
