@@ -148,22 +148,31 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     @com.google.errorprone.annotations.Immutable
-    private static final class NoOptionalBinaryBodyParamValidator implements ConjureValidator<EndpointDefinition> {
+    private static final class NoOptionalBinaryBodyParamValidator
+            implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
-            boolean hasOptionalBinaryBody = definition.getArgs()
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            definition.getArgs()
                     .stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY))
-                    .map(ArgumentDefinition::getType)
-                    .filter(type -> type.accept(TypeVisitor.IS_OPTIONAL))
-                    .map(type -> type.accept(TypeVisitor.OPTIONAL))
-                    .anyMatch(type -> type.getItemType().accept(TypeVisitor.IS_BINARY));
+                    .forEach(entry -> {
+                        boolean isOptionalBinary = dealiasingTypeVisitor.dealias(entry.getType())
+                                .fold(
+                                        typeDef -> false, // typeDef cannot resolve to optional<binary>
+                                        type -> isOptionalBinary(type));
+                        Preconditions.checkState(
+                                !isOptionalBinary,
+                                "Endpoint BODY argument must not be optional<binary> or alias thereof: method: %s, "
+                                        + "path: %s",
+                                definition.getHttpMethod(),
+                                definition.getHttpPath());
+                    });
+        }
 
-            Preconditions.checkState(
-                    !hasOptionalBinaryBody,
-                    "Endpoint argument must not be optional<binary>: method: %s, path: %s",
-                    definition.getHttpMethod(),
-                    definition.getHttpPath());
+        private static boolean isOptionalBinary(Type type) {
+            return type.accept(TypeVisitor.IS_OPTIONAL)
+                    ? type.accept(TypeVisitor.OPTIONAL).getItemType().accept(TypeVisitor.IS_BINARY)
+                    : false;
         }
     }
 

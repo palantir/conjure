@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -100,19 +101,44 @@ public final class EndpointDefinitionTest {
     }
 
     @Test
-    public void testNoOptionalBinaryBodyParamValidator() {
-        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+    public void testNoOptionalBinaryBodyParamValidator_direct() {
+        EndpointDefinition definition = EndpointDefinition.builder()
                 .args(BODY_ARG_BUILDER
                         .argName(ArgumentName.of("bodyArg1"))
                         .type(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))))
                         .build())
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.POST)
-                .httpPath(HttpPath.of("/a/path"));
+                .httpPath(HttpPath.of("/a/path"))
+                .build();
 
-        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Endpoint argument must not be optional<binary>: method: POST, path: /a/path");
+                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: method: POST, "
+                        + "path: /a/path");
+    }
+
+    @Test
+    public void testNoOptionalBinaryBodyParamValidator_throughAlias() {
+        TypeName typeName = TypeName.of("OptionalBinary", "foo");
+        EndpointDefinition definition = EndpointDefinition.builder()
+                .args(BODY_ARG_BUILDER
+                        .argName(ArgumentName.of("someName"))
+                        .type(Type.reference(typeName))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.POST)
+                .httpPath(HttpPath.of("/a/path"))
+                .build();
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName, TypeDefinition.alias(AliasDefinition.of(typeName,
+                        Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))), Documentation.of("")))));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: method: POST, "
+                        + "path: /a/path");
     }
 
     @Test
