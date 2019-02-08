@@ -31,6 +31,7 @@ import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.ObjectDefinition;
+import com.palantir.conjure.spec.OptionalType;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PathParameterType;
@@ -99,6 +100,22 @@ public final class EndpointDefinitionTest {
     }
 
     @Test
+    public void testNoOptionalBinaryBodyParamValidator() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(BODY_ARG_BUILDER
+                        .argName(ArgumentName.of("bodyArg1"))
+                        .type(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))))
+                        .build())
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.POST)
+                .httpPath(HttpPath.of("/a/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Endpoint argument must not be optional<binary>: method: POST, path: /a/path");
+    }
+
+    @Test
     public void testPathParamValidatorUniquePathParams() {
         ArgumentDefinition paramDefinition1 = ArgumentDefinition.builder()
                 .argName(ArgumentName.of("paramName"))
@@ -110,7 +127,6 @@ public final class EndpointDefinitionTest {
                 .type(Type.primitive(PrimitiveType.STRING))
                 .paramType(ParameterType.path(PathParameterType.of()))
                 .build();
-
 
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ImmutableList.of(paramDefinition1, paramDefinition2))
