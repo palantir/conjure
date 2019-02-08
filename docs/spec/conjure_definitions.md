@@ -361,6 +361,8 @@ deprecated | `string` | Documentation for why this argument is deprecated. [Comm
 param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
 
+Arguments with parameter type `body` MUST NOT be of type `optional<binary>`, or, intuitively, of a type that reduces to `optional<binary>` via unfolding of alias definitions and nested `optional`.
+
 
 ## ArgumentDefinition.ParamType
 [ArgumentDefinition.ParamType]: #argumentdefinitionparamtype

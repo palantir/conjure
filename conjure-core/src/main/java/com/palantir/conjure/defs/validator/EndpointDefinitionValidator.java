@@ -57,6 +57,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_COMPLEX_HEADER_PARAMS(new NoComplexHeaderParamValidator()),
     NO_COMPLEX_QUERY_PARAMS(new NoComplexQueryParamValidator()),
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
+    NO_OPTIONAL_BINARY_BODY_PARAM_VALIDATOR(new NoOptionalBinaryBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator());
 
@@ -120,7 +121,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .collect(Collectors.toList());
 
-            Preconditions.checkState(bodyParams.size() <= 1,
+            Preconditions.checkState(
+                    bodyParams.size() <= 1,
                     "Endpoint cannot have multiple body parameters: %s",
                     bodyParams.stream().map(e -> e.getArgName()).collect(Collectors.toList()));
         }
@@ -136,11 +138,41 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         .stream()
                         .anyMatch(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY));
 
-                Preconditions.checkState(!hasBody,
+                Preconditions.checkState(
+                        !hasBody,
                         "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
                         definition.getHttpMethod(),
                         definition.getHttpPath());
             }
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoOptionalBinaryBodyParamValidator
+            implements ConjureContextualValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            definition.getArgs()
+                    .stream()
+                    .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY))
+                    .forEach(entry -> {
+                        boolean isOptionalBinary = dealiasingTypeVisitor.dealias(entry.getType())
+                                .fold(
+                                        typeDef -> false, // typeDef cannot resolve to optional<binary>
+                                        type -> isOptionalBinary(type));
+                        Preconditions.checkState(
+                                !isOptionalBinary,
+                                "Endpoint BODY argument must not be optional<binary> or alias thereof: method: %s, "
+                                        + "path: %s",
+                                definition.getHttpMethod(),
+                                definition.getHttpPath());
+                    });
+        }
+
+        private static boolean isOptionalBinary(Type type) {
+            return type.accept(TypeVisitor.IS_OPTIONAL)
+                    ? type.accept(TypeVisitor.OPTIONAL).getItemType().accept(TypeVisitor.IS_BINARY)
+                    : false;
         }
     }
 
@@ -153,7 +185,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
                     .forEach(entry -> {
                         boolean added = pathParamIds.add(entry.getArgName());
-                        Preconditions.checkState(added,
+                        Preconditions.checkState(
+                                added,
                                 "Path parameter with identifier \"%s\" is defined multiple times for endpoint",
                                 entry.getArgName().get());
                     });
@@ -184,7 +217,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         Boolean isValid = resolvedType.fold(
                                 typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
                                 type -> type.accept(TypeVisitor.IS_PRIMITIVE));
-                        Preconditions.checkState(isValid,
+                        Preconditions.checkState(
+                                isValid,
                                 "Path parameters must be primitives or aliases: \"%s\" is not allowed",
                                 entry.getArgName());
                     });
@@ -200,7 +234,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
                     .forEach(headerArgDefinition -> {
                         boolean isValid = recursivelyValidate(headerArgDefinition.getType(), dealiasingTypeVisitor);
-                        Preconditions.checkState(isValid,
+                        Preconditions.checkState(
+                                isValid,
                                 "Header parameters must be enums, primitives, aliases or optional primitive:"
                                         + " \"%s\" is not allowed",
                                 headerArgDefinition.getArgName());
@@ -229,7 +264,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(argDefinition -> {
                         boolean isValid = recursivelyValidate(argDefinition.getType(), dealiasingTypeVisitor);
-                        Preconditions.checkState(isValid,
+                        Preconditions.checkState(
+                                isValid,
                                 "Query parameters must be enums, primitives, aliases, list, sets "
                                         + "or optional of primitive: \"%s\" is not allowed",
                                 argDefinition.getArgName());
@@ -301,7 +337,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                         || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN
                         );
 
-                        Preconditions.checkState(isValid,
+                        Preconditions.checkState(
+                                isValid,
                                 "Path or query parameters of type 'bearertoken' are not allowed as this "
                                         + "would introduce a security vulnerability: \"%s\"",
                                 entry.getArgName());
@@ -315,7 +352,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition) {
             definition.getArgs().forEach(arg -> {
                 Matcher matcher = ANCHORED_PATTERN.matcher(arg.getArgName().get());
-                Preconditions.checkState(matcher.matches(),
+                Preconditions.checkState(
+                        matcher.matches(),
                         "Parameter names in endpoint paths and service definitions must match pattern %s: %s",
                         ANCHORED_PATTERN,
                         arg.getArgName().get());

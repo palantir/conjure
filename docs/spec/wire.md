@@ -193,8 +193,9 @@ Further non-successful status codes are defined in the Conjure errors section be
 ### 3.2. Response body
 Conjure servers must serialize return values using the [JSON format][] defined below, unless:
 
-  - the de-aliased return type is `optional<T>` and the value is not present: servers must omit the HTTP body.
-  - the de-aliased return type is `binary`: servers must write the raw bytes as an octet-stream.
+  - the de-aliased return type is `optional<T>` and the value is not present: servers must return an empty HTTP body
+  - the de-aliased return type is `optional<binary>` and the value is present: servers must write the raw bytes as an octet-stream
+  - the de-aliased return type is `binary`: servers must write the raw bytes as an octet-stream
 
 ### 3.3. Content-Type header
 Conjure servers must send a `Content-Type` header according to the endpoint's return type:
