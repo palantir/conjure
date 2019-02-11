@@ -12,7 +12,7 @@ bintray {
     publish = true
     pkg {
         repo = 'releases'
-        name = rootProject.name
+        name = 'conjure'
         userOrg = 'palantir'
         licenses = ['Apache-2.0']
         publications = ['dist']
