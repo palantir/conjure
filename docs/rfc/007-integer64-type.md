@@ -16,7 +16,7 @@ These cases are relatively common and often result in one of three failure scena
 New conjure `integer64` type semantics matching `integer` except for the allowed values, and JSON serialized form.
 
 For the immediate future, typescript clients may represent these values using branded strings.
-Once a serialization layer is implemented for the typescript client, they may take advantage the `integer64`
+Once a serialization layer is implemented for the typescript client, they may take advantage of the `integer64`
 type using the proposed [BigInt](https://github.com/tc39/proposal-bigint) type which is already supported by
 chrome, with a [polyfill](https://github.com/GoogleChromeLabs/jsbi) for other browsers.
 
