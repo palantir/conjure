@@ -15,13 +15,20 @@ These cases are relatively common and often result in one of three failure scena
 
 New conjure `integer64` type semantics matching `integer` except for the allowed values, and JSON serialized form.
 
+For the immediate future, typescript clients may represent these values using branded strings.
+Once a serialization layer is implemented for the typescript client, they may take advantage the `integer64`
+type using the proposed [BigInt](https://github.com/tc39/proposal-bigint) type which is already supported by
+chrome, with a [polyfill](https://github.com/GoogleChromeLabs/jsbi) for other browsers.
+
 ### Allowed values
 
 The `integer64` type supports signed 64-bit values ranging from -2<sup>63</sup> to 2<sup>63</sup> - 1.
 
 ### JSON Format
 
-The `integer64` type is encoded to JSON as a JSON string containing the base-10 value.
+The `integer64` type is encoded to JSON as a JSON string containing the base-10 value, otherwise javascript
+clients may transparently truncate numeric values. The [BigInt](https://github.com/tc39/proposal-bigint)
+specification does not modify how json is parsed, so values must use existing JSON types.
 
 For example, take a type defined as:
 
