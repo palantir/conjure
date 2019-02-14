@@ -5,6 +5,7 @@
 _The 54-bit Integer is Not Enough_
 
 Conjure currently supports three numeric types: `integer`, `double`, and `safelong`. Unfortunately for many use-cases, 2<sup>53</sup> - 1 is not large enough.
+
 These cases are relatively common and often result in one of three failure scenarios:
 1. Use safelong because it exists. We often measure nanoseconds, however a safelong can only represent three months of nanoseconds, which is long enough that it's unlikely to be caught in testing.
 1. Represent 64-bit integer values as strings in conjure. This is only as correct as the application code which sets and parses values, which is precisely the problem Conjure is built to solve. In this case the conjure definition fails to accurately describe the wire API.
