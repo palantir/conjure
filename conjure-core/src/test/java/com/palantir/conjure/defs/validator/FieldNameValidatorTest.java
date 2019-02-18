@@ -51,7 +51,6 @@ public final class FieldNameValidatorTest {
                 "snake_123_case",
                 "kebab-123-case",
                 "mixed-kebab_snake-case",
-                "x",
                 "defaultDNSName"
                 }) {
             assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of(invalid)))

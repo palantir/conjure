@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 
 public final class CaseConverter {
     public static final Pattern CAMEL_CASE_PATTERN =
-            Pattern.compile("^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])+[A-Z]?$");
+            Pattern.compile("^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])*[A-Z]?$");
     public static final Pattern KEBAB_CASE_PATTERN =
-            Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])+(-[a-z])?$");
+            Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$");
     public static final Pattern SNAKE_CASE_PATTERN =
-            Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])+(_[a-z])?$");
+            Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$");
 
     private CaseConverter() {}
 

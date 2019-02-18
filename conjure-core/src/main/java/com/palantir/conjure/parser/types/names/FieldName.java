@@ -18,12 +18,11 @@ package com.palantir.conjure.parser.types.names;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.CaseFormat;
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
@@ -38,36 +37,6 @@ public abstract class FieldName {
 
     private static final Logger log = LoggerFactory.getLogger(FieldName.class);
 
-    private static final Pattern CAMEL_CASE_PATTERN =
-            Pattern.compile("^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])*[A-Z]?$");
-    private static final Pattern KEBAB_CASE_PATTERN =
-            Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$");
-    private static final Pattern SNAKE_CASE_PATTERN =
-            Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$");
-
-    public enum Case {
-        LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN, CaseFormat.LOWER_CAMEL),
-        KEBAB_CASE(KEBAB_CASE_PATTERN, CaseFormat.LOWER_HYPHEN),
-        SNAKE_CASE(SNAKE_CASE_PATTERN, CaseFormat.LOWER_UNDERSCORE);
-
-        private final Pattern pattern;
-        private final CaseFormat format;
-
-        Case(Pattern pattern, CaseFormat format) {
-            this.pattern = pattern;
-            this.format = format;
-        }
-
-        @Override
-        public String toString() {
-            return name() + "[" + pattern + "]";
-        }
-
-        public String convertTo(FieldName fieldName, Case targetCase) {
-            return format.to(targetCase.format, fieldName.name());
-        }
-    }
-
     @JsonValue
     public abstract String name();
 
@@ -75,13 +44,13 @@ public abstract class FieldName {
     @SuppressWarnings("Slf4jLogsafeArgs")
     protected final void check() {
         Preconditions.checkArgument(
-                Case.LOWER_CAMEL_CASE.pattern.matcher(name()).matches()
-                        || Case.KEBAB_CASE.pattern.matcher(name()).matches()
-                        || Case.SNAKE_CASE.pattern.matcher(name()).matches(),
+                CaseConverter.Case.LOWER_CAMEL_CASE.getPattern().matcher(name()).matches()
+                        || CaseConverter.Case.KEBAB_CASE.getPattern().matcher(name()).matches()
+                        || CaseConverter.Case.SNAKE_CASE.getPattern().matcher(name()).matches(),
                 "FieldName \"%s\" must follow one of the following patterns: %s",
-                name(), Arrays.toString(Case.values()));
+                name(), Arrays.toString(CaseConverter.Case.values()));
 
-        if (!Case.LOWER_CAMEL_CASE.pattern.matcher(name()).matches()) {
+        if (!CaseConverter.Case.LOWER_CAMEL_CASE.getPattern().matcher(name()).matches()) {
             log.warn("{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
                     + "legacy endpoints only: {}", FieldName.class, name());
         }
@@ -89,9 +58,9 @@ public abstract class FieldName {
 
     /** Returns the case of this field name. */
     @Value.Lazy
-    protected Case nameCase() {
-        for (Case nameCase : Case.values()) {
-            if (nameCase.pattern.matcher(name()).matches()) {
+    protected CaseConverter.Case nameCase() {
+        for (CaseConverter.Case nameCase : CaseConverter.Case.values()) {
+            if (nameCase.getPattern().matcher(name()).matches()) {
                 return nameCase;
             }
         }
@@ -104,8 +73,8 @@ public abstract class FieldName {
     }
 
     /** Converts this {@link FieldName} to a {@link FieldName} with the given case. */
-    public final FieldName toCase(Case targetCase) {
-        return FieldName.of(nameCase().convertTo(this, targetCase));
+    public final FieldName toCase(CaseConverter.Case targetCase) {
+        return FieldName.of(nameCase().convertTo(this.name(), targetCase));
     }
 
     /**
