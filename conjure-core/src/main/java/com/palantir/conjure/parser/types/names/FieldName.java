@@ -46,53 +46,16 @@ public abstract class FieldName {
             Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])+(_[a-z])?$");
 
     public enum Case {
-        LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN) {
-            @Override
-            String convertTo(FieldName fieldName, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return fieldName.name();
-                    case KEBAB_CASE:
-                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, fieldName.name());
-                    case SNAKE_CASE:
-                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName.name());
-                }
-                throw new IllegalArgumentException("Unknown FieldName case, this is a bug: " + targetCase);
-            }
-        },
-        KEBAB_CASE(KEBAB_CASE_PATTERN) {
-            @Override
-            String convertTo(FieldName fieldName, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, fieldName.name());
-                    case KEBAB_CASE:
-                        return fieldName.name();
-                    case SNAKE_CASE:
-                        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, fieldName.name());
-                }
-                throw new IllegalArgumentException("Unknown FieldName case, this is a bug: " + targetCase);
-            }
-        },
-        SNAKE_CASE(SNAKE_CASE_PATTERN) {
-            @Override
-            String convertTo(FieldName fieldName, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName.name());
-                    case KEBAB_CASE:
-                        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_HYPHEN, fieldName.name());
-                    case SNAKE_CASE:
-                        return fieldName.name();
-                }
-                throw new IllegalArgumentException("Unknown FieldName case, this is a bug: " + targetCase);
-            }
-        };
+        LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN, CaseFormat.LOWER_CAMEL),
+        KEBAB_CASE(KEBAB_CASE_PATTERN, CaseFormat.LOWER_HYPHEN),
+        SNAKE_CASE(SNAKE_CASE_PATTERN, CaseFormat.LOWER_UNDERSCORE);
 
         private final Pattern pattern;
+        private final CaseFormat format;
 
-        Case(Pattern pattern) {
+        Case(Pattern pattern, CaseFormat format) {
             this.pattern = pattern;
+            this.format = format;
         }
 
         @Override
@@ -100,7 +63,9 @@ public abstract class FieldName {
             return name() + "[" + pattern + "]";
         }
 
-        abstract String convertTo(FieldName fieldName, Case targetCase);
+        public String convertTo(FieldName fieldName, Case targetCase) {
+            return format.to(targetCase.format, fieldName.name());
+        }
     }
 
     @JsonValue
