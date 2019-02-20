@@ -22,7 +22,6 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
-import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
@@ -43,14 +42,19 @@ public abstract class FieldName {
     @Value.Check
     @SuppressWarnings("Slf4jLogsafeArgs")
     protected final void check() {
-        Preconditions.checkArgument(
-                CaseConverter.Case.LOWER_CAMEL_CASE.getPattern().matcher(name()).matches()
-                        || CaseConverter.Case.KEBAB_CASE.getPattern().matcher(name()).matches()
-                        || CaseConverter.Case.SNAKE_CASE.getPattern().matcher(name()).matches(),
-                "FieldName \"%s\" must follow one of the following patterns: %s",
-                name(), Arrays.toString(CaseConverter.Case.values()));
 
-        if (!CaseConverter.Case.LOWER_CAMEL_CASE.getPattern().matcher(name()).matches()) {
+        CaseConverter.Case lowerCamelCase = CaseConverter.Case.LOWER_CAMEL_CASE;
+        CaseConverter.Case kebabCase = CaseConverter.Case.KEBAB_CASE;
+        CaseConverter.Case snakeCase = CaseConverter.Case.SNAKE_CASE;
+
+        Preconditions.checkArgument(
+                lowerCamelCase.getPattern().matcher(name()).matches()
+                        || kebabCase.getPattern().matcher(name()).matches()
+                        || snakeCase.getPattern().matcher(name()).matches(),
+                "FieldName \"%s\" must follow one of the following patterns: %s %s %s",
+                name(), lowerCamelCase, kebabCase, snakeCase);
+
+        if (!lowerCamelCase.getPattern().matcher(name()).matches()) {
             log.warn("{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
                     + "legacy endpoints only: {}", FieldName.class, name());
         }
