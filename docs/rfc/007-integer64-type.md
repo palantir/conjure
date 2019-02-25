@@ -53,6 +53,29 @@ Where each field takes the value `123`, would be serialized to json as:
 }
 ```
 
+#### The case against using JSON numeric format
+
+We use JSON numbers elsewhere in Conjure and they, by definition, better capture the integer data type. However,
+in javascript `JSON.parse` is the most common json parsing function, and it result in _incorrect data_ when
+used with numeric values beyond 52-bits. Even if we do provide a serialization layer capable of handling large
+integer values, applications are still likely to attempt usage of `JSON.parse` resulting in data loss.
+
+Secondly, many existing applications already polyfill the 64-bit integer type using string encoding with the
+following block:
+
+```yml
+types:
+  imports:
+    Long:
+      base-type: string
+      external:
+        java: java.lang.Long
+```
+
+String encoded values allow these applications to upgrade and take advantage of the new type without breaking
+existing clients. Without this implementation, it would not be possible to remove support for external type
+imports without an impossibly severe API break.
+
 ### PLAIN Format
 
 The PLAIN format of an `integer64` value is the base-10 numerical value.
@@ -73,3 +96,7 @@ difficult to guarantee correctness and compatibility with typescript clients as 
 This is not an option for non-java servers, none of which support external type imports.
 We would like to remove external type imports from conjure entirely, without a mechanism to support 64-bit integers
 many consumers will be unable to accept new versions of conjure.
+
+### Serialization using JSON Numeric encoding
+
+See [The case against using JSON numeric format](#the-case-against-using-json-numeric-format).
