@@ -57,7 +57,7 @@ Where each field takes the value `123`, would be serialized to json as:
 
 We use JSON numbers elsewhere in Conjure and they, by definition, better capture the integer data type. However,
 in javascript `JSON.parse` is the most common json parsing function, and it result in _incorrect data_ when
-used with numeric values beyond 52-bits. Even if we do provide a serialization layer capable of handling large
+used with numeric values beyond 54-bits. Even if we do provide a serialization layer capable of handling large
 integer values, applications are still likely to attempt usage of `JSON.parse` resulting in data loss.
 
 Secondly, many existing applications already polyfill the 64-bit integer type using string encoding with the
