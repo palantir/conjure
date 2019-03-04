@@ -347,6 +347,7 @@ auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overr
 returns | [ConjureType][] | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
 args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
 ## ArgumentDefinition
