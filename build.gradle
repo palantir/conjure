@@ -29,7 +29,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:9.5.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.51.1'
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.7.2'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:4.8.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.10.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:2.1.0'
     }
