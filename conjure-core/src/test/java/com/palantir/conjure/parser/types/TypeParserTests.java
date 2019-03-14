@@ -49,6 +49,12 @@ public final class TypeParserTests {
     }
 
     @Test
+    public void testParser_integer64Type() throws ParseException {
+        assertThat(TypeParser.INSTANCE.parse("integer64"))
+                .isEqualTo(PrimitiveType.INTEGER64);
+    }
+
+    @Test
     public void testParser_doubleType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("double"))
                 .isEqualTo(PrimitiveType.DOUBLE);
