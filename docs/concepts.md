@@ -37,6 +37,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - `safelong` - a signed 53-bit integer that can be safely represented by browsers without loss of precision, value ranges from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1
   - `string` - a sequence of UTF-8 characters
   - `uuid` - [Universally Unique Identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier#Versions) (aka guid) represented as a string
+  - `integer64` - a signed 64-bit integer value ranging from -2<sup>63</sup> to 2<sup>63</sup> - 1.
 
 ### Opaque types
 When migrating an existing API, it may be useful to use the following 'escape hatch' type.  These are not recommended for normal APIs because Conjure can't introspect these external types to figure out what their JSON structure will be, so they're effectively opaque.

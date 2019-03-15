@@ -252,6 +252,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 `datetime`        | String                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 `double`          | Number or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 `integer`         | Number                                             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+`integer64`       | String                                             | Signed 64 bits, value ranging from -2<sup>63</sup> to 2<sup>63</sup> - 1.
 `rid`             | String                                             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
 `safelong`        | Number                                             | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
 `string`          | String                                             | UTF-8 string
@@ -361,6 +362,7 @@ Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
 `datetime`        | unquoted String                               | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 `integer`         | Number                                        | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
+`integer64`       | Number                                        | Signed 64 bits, value ranging from -2<sup>63</sup> to 2<sup>63</sup> - 1.
 `rid`             | unquoted String                               | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
 `safelong`        | Number                                        | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
 `string`          | unquoted String                               | UTF-8 string

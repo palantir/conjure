@@ -159,6 +159,7 @@ boolean
 datetime
 double
 integer
+integer64
 rid
 safelong
 string
