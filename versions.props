@@ -17,7 +17,7 @@ org.assertj:* = 3.12.2
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.1
 org.immutables:value = 2.7.5
-org.mockito:mockito-core = 2.25.1
+org.mockito:mockito-core = 2.26.0
 org.slf4j:* = 1.7.25
 
 # conflict resolution
