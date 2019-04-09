@@ -97,7 +97,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Endpoint cannot have multiple body parameters: [bodyArg1, bodyArg2]");
+                .hasMessage("Endpoint 'test{http: GET /a/path}' cannot have multiple body parameters: "
+                        + "[bodyArg1, bodyArg2]");
     }
 
     @Test
@@ -114,8 +115,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: method: POST, "
-                        + "path: /a/path");
+                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: "
+                        + "test{http: POST /a/path}");
     }
 
     @Test
@@ -137,8 +138,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: method: POST, "
-                        + "path: /a/path");
+                .hasMessage("Endpoint BODY argument must not be optional<binary> or alias thereof: "
+                        + "test{http: POST /a/path}");
     }
 
     @Test
@@ -162,7 +163,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Path parameter with identifier \"paramName\" is defined multiple times for endpoint");
+                .hasMessage("Path parameter with identifier \"paramName\" is "
+                        + "defined multiple times for endpoint test{http: GET /a/path}");
     }
 
     @Test
@@ -194,7 +196,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Path parameters defined path template but not present in endpoint: [paramName]");
+                .hasMessage("Path parameters [paramName] defined path template but not present in endpoint: "
+                        + "test{http: GET /a/path/{paramName}}");
     }
 
     @Test
@@ -207,10 +210,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage(String.format(
-                        "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
-                        HttpMethod.GET,
-                        "/a/path"));
+                .hasMessage("Endpoint 'test{http: GET /a/path}' cannot be a GET and contain a body");
     }
 
     @Test
@@ -227,8 +227,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive:"
-                        + " \"someName\" is not allowed");
+                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive: "
+                        + "\"someName\" is not allowed on endpoint test{http: GET /a/path}");
     }
 
     @Test
@@ -250,7 +250,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive:"
-                        + " \"someName\" is not allowed");
+                .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive: "
+                        + "\"someName\" is not allowed on endpoint test{http: GET /a/path}");
     }
 }

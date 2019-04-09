@@ -53,9 +53,9 @@ public final class ArgumentNameValidatorTest {
             EndpointDefinition.Builder endpoint = createEndpoint(paramName);
             assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build(), dealiasingVisitor))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter names in endpoint paths and service definitions must match pattern %s: %s",
-                            EndpointDefinitionValidator.ANCHORED_PATTERN,
-                            paramName);
+                    .hasMessage("Parameter names in endpoint paths and service definitions "
+                                    + "must match pattern %s: %s on endpoint test{http: POST /a/path}",
+                            EndpointDefinitionValidator.ANCHORED_PATTERN, paramName);
         }
     }
 

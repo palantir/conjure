@@ -158,7 +158,7 @@ negative:
                 other: string
                 other2: string
   pathTemplateParamMissing:
-    expected-error: "Path parameters defined path template but not present in endpoint: [arg]"
+    expected-error: "Path parameters [arg] defined path template but not present in endpoint: testEndpoint{http: GET /path/{arg}}"
     conjure:
       services:
         TestService:

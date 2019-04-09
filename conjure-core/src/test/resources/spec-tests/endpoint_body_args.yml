@@ -1,7 +1,7 @@
 test-case-name: "service endpoint argument tests"
 negative:
   multipleAutoArgsThatResolveToBody:
-    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    expected-error: "Endpoint 'testEndpoint{http: GET /path}' cannot have multiple body parameters: [arg, arg2]"
     conjure:
       services:
         TestService:
@@ -15,7 +15,7 @@ negative:
                 arg: string
                 arg2: string
   multipleBodyParams:
-    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    expected-error: "Endpoint 'testEndpoint{http: GET /path}' cannot have multiple body parameters: [arg, arg2]"
     conjure:
       services:
         TestService:
@@ -33,7 +33,7 @@ negative:
                   type: string
                   param-type: body
   bodyAndAutoParam:
-    expected-error: 'Endpoint cannot have multiple body parameters: [arg, arg2]'
+    expected-error: "Endpoint 'testEndpoint{http: GET /path}' cannot have multiple body parameters: [arg, arg2]"
     conjure:
       services:
         TestService:
@@ -49,7 +49,7 @@ negative:
                   type: string
                   param-type: body
   bodyParamAndPathParam:
-    expected-error: 'Endpoint cannot be a GET and contain a body'
+    expected-error: "Endpoint 'testEndpoint{http: GET /path/{arg}}' cannot be a GET and contain a body"
     conjure:
       services:
         TestService:
