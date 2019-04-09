@@ -70,7 +70,8 @@ public final class ParamIdValidatorTest {
             ParameterType parameterType = ParameterType.query(QueryParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter ids with type %s must match pattern %s: %s",
+                    .hasMessage("Parameter ids with type %s must match pattern %s: %s "
+                                    + "on endpoint test{http: POST /a/path}",
                             parameterType,
                             EndpointDefinitionValidator.ANCHORED_PATTERN,
                             paramId);
@@ -83,7 +84,8 @@ public final class ParamIdValidatorTest {
             ParameterType parameterType = ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter ids with type %s must match pattern %s: %s",
+                    .hasMessage("Parameter ids with type %s must match pattern %s: %s "
+                                    + "on endpoint test{http: POST /a/path}",
                             parameterType,
                             EndpointDefinitionValidator.HEADER_PATTERN,
                             paramId);

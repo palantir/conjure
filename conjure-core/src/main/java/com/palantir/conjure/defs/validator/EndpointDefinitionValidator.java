@@ -123,8 +123,9 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
             Preconditions.checkState(
                     bodyParams.size() <= 1,
-                    "Endpoint cannot have multiple body parameters: %s",
-                    bodyParams.stream().map(e -> e.getArgName()).collect(Collectors.toList()));
+                    "Endpoint '%s' cannot have multiple body parameters: %s",
+                    describe(definition),
+                    bodyParams.stream().map(ArgumentDefinition::getArgName).collect(Collectors.toList()));
         }
     }
 
@@ -140,9 +141,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                 Preconditions.checkState(
                         !hasBody,
-                        "Endpoint cannot be a GET and contain a body: method: %s, path: %s",
-                        definition.getHttpMethod(),
-                        definition.getHttpPath());
+                        "Endpoint '%s' cannot be a GET and contain a body",
+                        describe(definition));
             }
         }
     }
@@ -162,10 +162,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                         type -> isOptionalBinary(type));
                         Preconditions.checkState(
                                 !isOptionalBinary,
-                                "Endpoint BODY argument must not be optional<binary> or alias thereof: method: %s, "
-                                        + "path: %s",
-                                definition.getHttpMethod(),
-                                definition.getHttpPath());
+                                "Endpoint BODY argument must not be optional<binary> or alias thereof: %s",
+                                describe(definition));
                     });
         }
 
@@ -180,6 +178,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
+            String description = describe(definition);
             Set<ArgumentName> pathParamIds = new HashSet<>();
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
@@ -187,8 +186,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         boolean added = pathParamIds.add(entry.getArgName());
                         Preconditions.checkState(
                                 added,
-                                "Path parameter with identifier \"%s\" is defined multiple times for endpoint",
-                                entry.getArgName().get());
+                                "Path parameter with identifier \"%s\" is defined multiple times for endpoint %s",
+                                entry.getArgName().get(), description);
                     });
 
             Set<ArgumentName> pathArgs = HttpPathValidator.pathArgs(definition.getHttpPath().get());
@@ -198,10 +197,11 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                             + "Note that the `param-id` is no longer supported and the path template name is always "
                             + "used instead. So make sure the path template name matches the path parameter defined "
 
-                            + "in endpoint.", extraParams);
+                            + "in endpoint %s.", extraParams, description);
             Set<ArgumentName> missingParams = Sets.difference(pathArgs, pathParamIds);
             Preconditions.checkState(missingParams.isEmpty(),
-                    "Path parameters defined path template but not present in endpoint: %s", missingParams);
+                    "Path parameters %s defined path template but not present in endpoint: %s",
+                    missingParams, description);
         }
     }
 
@@ -219,8 +219,9 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                 type -> type.accept(TypeVisitor.IS_PRIMITIVE));
                         Preconditions.checkState(
                                 isValid,
-                                "Path parameters must be primitives or aliases: \"%s\" is not allowed",
-                                entry.getArgName());
+                                "Path parameters must be primitives or aliases: \"%s\" is not allowed on endpoint %s",
+                                entry.getArgName(),
+                                describe(definition));
                     });
         }
     }
@@ -237,8 +238,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         Preconditions.checkState(
                                 isValid,
                                 "Header parameters must be enums, primitives, aliases or optional primitive:"
-                                        + " \"%s\" is not allowed",
-                                headerArgDefinition.getArgName());
+                                        + " \"%s\" is not allowed on endpoint %s",
+                                headerArgDefinition.getArgName(), describe(definition));
                     });
         }
 
@@ -267,8 +268,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         Preconditions.checkState(
                                 isValid,
                                 "Query parameters must be enums, primitives, aliases, list, sets "
-                                        + "or optional of primitive: \"%s\" is not allowed",
-                                argDefinition.getArgName());
+                                        + "or optional of primitive: \"%s\" is not allowed on endpoint %s",
+                                argDefinition.getArgName(), describe(definition));
                     });
         }
 
@@ -340,8 +341,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         Preconditions.checkState(
                                 isValid,
                                 "Path or query parameters of type 'bearertoken' are not allowed as this "
-                                        + "would introduce a security vulnerability: \"%s\"",
-                                entry.getArgName());
+                                        + "would introduce a security vulnerability: \"%s\" endpoint \"%s\"",
+                                entry.getArgName(), describe(definition));
                     });
         }
     }
@@ -354,9 +355,11 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                 Matcher matcher = ANCHORED_PATTERN.matcher(arg.getArgName().get());
                 Preconditions.checkState(
                         matcher.matches(),
-                        "Parameter names in endpoint paths and service definitions must match pattern %s: %s",
+                        "Parameter names in endpoint paths and service definitions "
+                                + "must match pattern %s: %s on endpoint %s",
                         ANCHORED_PATTERN,
-                        arg.getArgName().get());
+                        arg.getArgName().get(),
+                        describe(definition));
             });
         }
     }
@@ -381,15 +384,20 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                 if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
                     ParameterId paramId = paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
                     Preconditions.checkState(pattern.matcher(paramId.get()).matches(),
-                            "Parameter ids with type %s must match pattern %s: %s",
-                            arg.getParamType(), pattern, paramId.get());
+                            "Parameter ids with type %s must match pattern %s: %s on endpoint %s",
+                            arg.getParamType(), pattern, paramId.get(), describe(definition));
                 } else if (paramType.accept(ParameterTypeVisitor.IS_HEADER)) {
                     ParameterId paramId = paramType.accept(ParameterTypeVisitor.HEADER).getParamId();
                     Preconditions.checkState(pattern.matcher(paramId.get()).matches(),
-                            "Parameter ids with type %s must match pattern %s: %s",
-                            arg.getParamType(), pattern, paramId.get());
+                            "Parameter ids with type %s must match pattern %s: %s on endpoint %s",
+                            arg.getParamType(), pattern, paramId.get(), describe(definition));
                 }
             });
         }
+    }
+
+    private static String describe(EndpointDefinition endpoint) {
+        return String.format("%s{http: %s %s}",
+                endpoint.getEndpointName(), endpoint.getHttpMethod(), endpoint.getHttpPath());
     }
 }
