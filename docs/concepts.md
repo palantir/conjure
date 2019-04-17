@@ -17,7 +17,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - _Object_ - a collection of named fields, each of which has their own Conjure type.
   - _Enum_ - a type consisting of named string variants, e.g. "RED", "GREEN", "BLUE".
   - _Alias_ - a named shorthand for another Conjure type, purely for readability.
-  - _Union_ - a type representing different named variants, each of which can contain differen types. (Also known as 'algebraic data types' or 'tagged unions')
+  - _Union_ - a type representing different named variants, each of which can contain different types. (Also known as 'algebraic data types' or 'tagged unions')
 
 ### Container types
   - `list<T>` - an ordered sequence of items of type `T`.
