@@ -357,9 +357,9 @@ An object representing an argument to an endpoint.
 Field | Type | Description
 ---|:---:|---
 type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type. 
-If the param-type is `path` then the de-aliased type MUST be an enum or a primitive.
-If the param-type is `query` then the de-aliased type MUST be an enum or a primitive, or a container (list, set, optional) of one of these.
-If the param-type is `header` then the de-aliased type MUST be an enum or a primitive, or an optional of one of these.
+If the param-type is `path` then the de-aliased type MUST be an enum or a primitive (except binary).
+If the param-type is `query` then the de-aliased type MUST be an enum or a primitive (except binary), or a container (list, set, optional) of one of these.
+If the param-type is `header` then the de-aliased type MUST be an enum or a primitive (except binary), or an optional of one of these.
 Additionally, the type MUST NOT be `bearertoken` when the param-type is `path` or `query`.
 markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 deprecated | `string` | Documentation for why this argument is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
