@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -55,7 +56,7 @@ public final class ArgumentNameValidatorTest {
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("Parameter names in endpoint paths and service definitions "
                                     + "must match pattern %s: %s on endpoint test{http: POST /a/path}",
-                            EndpointDefinitionValidator.ANCHORED_PATTERN, paramName);
+                            CaseConverter.CAMEL_CASE_PATTERN, paramName);
         }
     }
 

@@ -18,6 +18,7 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -38,6 +39,7 @@ import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,8 +71,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    public static final String PATTERN = "[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*";
-    public static final Pattern ANCHORED_PATTERN = Pattern.compile("^" + PATTERN + "$");
     public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
 
     private final ConjureContextualValidator<EndpointDefinition> validator;
@@ -352,12 +352,12 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         @Override
         public void validate(EndpointDefinition definition) {
             definition.getArgs().forEach(arg -> {
-                Matcher matcher = ANCHORED_PATTERN.matcher(arg.getArgName().get());
+                Matcher matcher = CaseConverter.CAMEL_CASE_PATTERN.matcher(arg.getArgName().get());
                 Preconditions.checkState(
                         matcher.matches(),
                         "Parameter names in endpoint paths and service definitions "
                                 + "must match pattern %s: %s on endpoint %s",
-                        ANCHORED_PATTERN,
+                        CaseConverter.CAMEL_CASE_PATTERN,
                         arg.getArgName().get(),
                         describe(definition));
             });
@@ -367,30 +367,33 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
         @Override
+        @SuppressWarnings("Slf4jLogsafeArgs")
         public void validate(EndpointDefinition definition) {
             definition.getArgs().forEach(arg -> {
-                final Pattern pattern;
                 ParameterType paramType = arg.getParamType();
-                if (paramType.accept(ParameterTypeVisitor.IS_BODY)
-                        || paramType.accept(ParameterTypeVisitor.IS_PATH)
-                        || paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
-                    pattern = ANCHORED_PATTERN;
-                } else if (paramType.accept(ParameterTypeVisitor.IS_HEADER)) {
-                    pattern = HEADER_PATTERN;
-                } else {
-                    throw new IllegalStateException("Validation for paramType does not exist: " + arg.getParamType());
-                }
-
-                if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
-                    ParameterId paramId = paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
-                    Preconditions.checkState(pattern.matcher(paramId.get()).matches(),
-                            "Parameter ids with type %s must match pattern %s: %s on endpoint %s",
-                            arg.getParamType(), pattern, paramId.get(), describe(definition));
+                if (paramType.accept(ParameterTypeVisitor.IS_BODY) || paramType.accept(ParameterTypeVisitor.IS_PATH)) {
+                    // No validation
                 } else if (paramType.accept(ParameterTypeVisitor.IS_HEADER)) {
                     ParameterId paramId = paramType.accept(ParameterTypeVisitor.HEADER).getParamId();
-                    Preconditions.checkState(pattern.matcher(paramId.get()).matches(),
-                            "Parameter ids with type %s must match pattern %s: %s on endpoint %s",
-                            arg.getParamType(), pattern, paramId.get(), describe(definition));
+                    Preconditions.checkState(HEADER_PATTERN.matcher(paramId.get()).matches(),
+                            "Header parameter id %s on endpoint %s must match pattern %s",
+                            paramId.get(), describe(definition), HEADER_PATTERN);
+
+                } else if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
+                    ParameterId paramId = paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
+                    Preconditions.checkState(
+                            CaseConverter.CAMEL_CASE_PATTERN.matcher(paramId.get()).matches()
+                                    || CaseConverter.KEBAB_CASE_PATTERN.matcher(paramId.get()).matches()
+                                    || CaseConverter.SNAKE_CASE_PATTERN.matcher(paramId.get()).matches(),
+                            "Query param id %s on endpoint %s must match one of the following patterns: %s",
+                                    paramId.get(), describe(definition), Arrays.toString(CaseConverter.Case.values()));
+
+                    if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(paramId.get()).matches()) {
+                        log.warn("Query param ids should be camelCase. kebab-case and snake_case are supported for "
+                                + "legacy endpoints only: {} on endpoint {}", paramId.get(), describe(definition));
+                    }
+                } else {
+                    throw new IllegalStateException("Validation for paramType does not exist: " + arg.getParamType());
                 }
             });
         }
