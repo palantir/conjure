@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
+import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -44,7 +45,7 @@ public final class ParamIdValidatorTest {
     @Test
     @SuppressWarnings("CheckReturnValue")
     public void testValidNonHeader() {
-        for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234")) {
+        for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234", "foo_bar", "foo-bar")) {
             // Passes validation
             createEndpoint(ParameterType.query(QueryParameterType.of(ParameterId.of(paramId))));
         }
@@ -66,15 +67,16 @@ public final class ParamIdValidatorTest {
 
     @Test
     public void testInvalidNonHeader() {
-        for (String paramId : ImmutableList.of("AB", "123", "foo_bar", "foo-bar", "foo.bar")) {
+        for (String paramId : ImmutableList.of("AB", "123", "foo.bar")) {
             ParameterType parameterType = ParameterType.query(QueryParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter ids with type %s must match pattern %s: %s "
-                                    + "on endpoint test{http: POST /a/path}",
-                            parameterType,
-                            EndpointDefinitionValidator.ANCHORED_PATTERN,
-                            paramId);
+                    .hasMessage("Query param id %s on endpoint test{http: POST /a/path} must match one of the "
+                            + "following patterns: [LOWER_CAMEL_CASE[%s], KEBAB_CASE[%s], SNAKE_CASE[%s]]",
+                            paramId,
+                            CaseConverter.CAMEL_CASE_PATTERN,
+                            CaseConverter.KEBAB_CASE_PATTERN,
+                            CaseConverter.SNAKE_CASE_PATTERN);
         }
     }
 
@@ -84,11 +86,9 @@ public final class ParamIdValidatorTest {
             ParameterType parameterType = ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter ids with type %s must match pattern %s: %s "
-                                    + "on endpoint test{http: POST /a/path}",
-                            parameterType,
-                            EndpointDefinitionValidator.HEADER_PATTERN,
-                            paramId);
+                    .hasMessage("Header parameter id %s on endpoint test{http: POST /a/path} must match pattern %s",
+                            paramId,
+                            EndpointDefinitionValidator.HEADER_PATTERN);
         }
     }
 
