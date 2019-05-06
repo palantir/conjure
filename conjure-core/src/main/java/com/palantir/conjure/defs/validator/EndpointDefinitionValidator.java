@@ -372,7 +372,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().forEach(arg -> {
                 ParameterType paramType = arg.getParamType();
                 if (paramType.accept(ParameterTypeVisitor.IS_BODY) || paramType.accept(ParameterTypeVisitor.IS_PATH)) {
-                    // No validation
+                    // No validation for param-id of body and path parameters, as it is never (de)serialized.
                 } else if (paramType.accept(ParameterTypeVisitor.IS_HEADER)) {
                     ParameterId paramId = paramType.accept(ParameterTypeVisitor.HEADER).getParamId();
                     Preconditions.checkState(HEADER_PATTERN.matcher(paramId.get()).matches(),
