@@ -33,10 +33,8 @@ conjure-java just generates client/server interfaces, so to actually make networ
 Pass your interface as the first argument to have a client created:
 
 ```java
-RecipeBookService recipeBookService = JaxRsClient.create(
-       RecipeBookService.class,
-       UserAgent.of(Agent.of("your-server", "0.0.0")),
-       NoOpHostEventsSink.INSTANCE,
+FlightSearchService flightSearch = JaxRsClient.create(
+       FlightSearchService.class,
        ClientConfigurations.of(ServiceConfiguration.builder()
                .addUris("http://localhost:8080/examples/api/")
                .security(SslConfiguration.of(Paths.get(TRUSTSTORE_PATH)))
@@ -48,5 +46,6 @@ RecipeBookService recipeBookService = JaxRsClient.create(
 ## 4. Make a network call
 
 ```java
-Recipe recipe = recipeBookService.getRecipe("Recipe name");
+List<Connection> connections = flightSearch.search(
+  Airport.of("MUC"), Airport.of("TLV"), OffsetDateTime.now());
 ```
