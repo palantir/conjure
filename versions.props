@@ -1,4 +1,4 @@
-com.fasterxml.jackson.*:jackson-* = 2.9.8
+com.fasterxml.jackson.*:jackson-* = 2.9.9
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.3.3
 com.google.guava:guava = 23.6.1-jre
@@ -17,7 +17,7 @@ org.assertj:* = 3.12.2
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.1
 org.immutables:value = 2.7.5
-org.mockito:mockito-core = 2.27.0
+org.mockito:mockito-core = 2.28.2
 org.slf4j:* = 1.7.25
 
 # conflict resolution
