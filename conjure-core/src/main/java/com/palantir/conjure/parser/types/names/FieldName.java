@@ -42,7 +42,6 @@ public abstract class FieldName {
     @Value.Check
     @SuppressWarnings("Slf4jLogsafeArgs")
     protected final void check() {
-
         CaseConverter.Case lowerCamelCase = CaseConverter.Case.LOWER_CAMEL_CASE;
         CaseConverter.Case kebabCase = CaseConverter.Case.KEBAB_CASE;
         CaseConverter.Case snakeCase = CaseConverter.Case.SNAKE_CASE;

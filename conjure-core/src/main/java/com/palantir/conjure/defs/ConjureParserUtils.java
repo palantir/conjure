@@ -125,7 +125,6 @@ public final class ConjureParserUtils {
     public static TypeDefinition parseEnumType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
-
         EnumDefinition enumType = EnumDefinition.builder()
                 .typeName(name)
                 .values(def.values().stream().map(ConjureParserUtils::parseEnumValue).collect(Collectors.toList()))
@@ -336,7 +335,6 @@ public final class ConjureParserUtils {
             Optional<AuthType> defaultAuth,
             ReferenceTypeResolver typeResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
-
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
@@ -364,7 +362,6 @@ public final class ConjureParserUtils {
 
     private static Optional<AuthType> parseAuthType(
             com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
-
         switch (authDefinition.type()) {
             case HEADER:
                 return Optional.of(AuthType.header(HeaderAuthType.of()));
@@ -402,7 +399,6 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
             ArgumentName argName,
             HttpPath httpPath) {
-
         Set<ArgumentName> args = HttpPathValidator.pathArgs(httpPath.get());
         switch (argumentDef.paramType()) {
             case AUTO:

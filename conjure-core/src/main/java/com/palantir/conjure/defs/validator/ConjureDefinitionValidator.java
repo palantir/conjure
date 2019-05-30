@@ -221,7 +221,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
         private static void validateTypeDefinition(TypeDefinition typeDef,
                 Map<TypeName, TypeDefinition> definitionMap) {
-
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
                 public Void visitAlias(AliasDefinition value) {

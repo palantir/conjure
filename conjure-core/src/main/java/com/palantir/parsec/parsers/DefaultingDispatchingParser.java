@@ -36,7 +36,6 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
 
     public DefaultingDispatchingParser(Map<String, Parser<T>> parsers, Parser<String> directiveParser,
             Parser<?> whitespaceParser) {
-
         this.map = new HashMap<String, Parser<T>>(parsers);
         if (whitespaceParser == null) {
             inputStringParser = directiveParser;
@@ -63,7 +62,6 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
     public T parse(ParserState input) throws ParseException {
         T lastResult = null;
         while (input.curr() != -1) {
-
             input.mark();
             // Mark is now before directive.
 
