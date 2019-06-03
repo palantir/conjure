@@ -1,0 +1,83 @@
+{
+  "version" : 1,
+  "errors" : [ ],
+  "types" : [ {
+    "type" : "object",
+    "object" : {
+      "typeName" : {
+        "name" : "Object1",
+        "package" : "com.palantir.a"
+      },
+      "fields" : [ {
+        "fieldName" : "stringField",
+        "type" : {
+          "type" : "primitive",
+          "primitive" : "STRING"
+        },
+        "docs" : null
+      } ],
+      "docs" : null
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "Object2",
+        "package" : "com.palantir.b"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "STRING"
+      },
+      "docs" : null
+    }
+  }, {
+    "type" : "alias",
+    "alias" : {
+      "typeName" : {
+        "name" : "Object3",
+        "package" : "com.palantir.b"
+      },
+      "alias" : {
+        "type" : "primitive",
+        "primitive" : "STRING"
+      },
+      "docs" : null
+    }
+  } ],
+  "services" : [ {
+    "serviceName" : {
+      "name" : "TestService1",
+      "package" : "com.palantir.foo"
+    },
+    "endpoints" : [ {
+      "endpointName" : "get",
+      "httpMethod" : "GET",
+      "httpPath" : "/get",
+      "auth" : null,
+      "args" : [ ],
+      "returns" : null,
+      "docs" : null,
+      "deprecated" : null,
+      "markers" : [ ]
+    } ],
+    "docs" : null
+  }, {
+    "serviceName" : {
+      "name" : "TestService2",
+      "package" : "com.palantir.foo"
+    },
+    "endpoints" : [ {
+      "endpointName" : "get",
+      "httpMethod" : "GET",
+      "httpPath" : "/get",
+      "auth" : null,
+      "args" : [ ],
+      "returns" : null,
+      "docs" : null,
+      "deprecated" : null,
+      "markers" : [ ]
+    } ],
+    "docs" : null
+  } ]
+}

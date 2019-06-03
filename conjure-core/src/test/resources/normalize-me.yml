@@ -1,0 +1,31 @@
+types:
+  definitions:
+    default-package: com.palantir.a
+    objects:
+      Object1:
+        package: com.palantir.a
+        fields:
+          stringField: string
+
+      Object3:
+        package: com.palantir.b
+        alias: string
+
+      Object2:
+        package: com.palantir.b
+        alias: string
+
+services:
+  TestService2:
+    name: Test Service 2
+    package: com.palantir.foo
+    endpoints:
+      get:
+        http: GET /get
+
+  TestService1:
+    name: Test Service 1
+    package: com.palantir.foo
+    endpoints:
+      get:
+        http: GET /get
