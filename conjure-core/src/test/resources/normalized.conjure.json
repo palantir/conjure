@@ -1,6 +1,40 @@
 {
   "version" : 1,
-  "errors" : [ ],
+  "errors" : [ {
+    "errorName" : {
+      "name" : "Error1",
+      "package" : "com.palantir.a"
+    },
+    "docs" : null,
+    "namespace" : "Test",
+    "code" : "INVALID_ARGUMENT",
+    "safeArgs" : [ {
+      "fieldName" : "id",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "INTEGER"
+      },
+      "docs" : null
+    } ],
+    "unsafeArgs" : [ ]
+  }, {
+    "errorName" : {
+      "name" : "Error2",
+      "package" : "com.palantir.a"
+    },
+    "docs" : null,
+    "namespace" : "Test",
+    "code" : "INVALID_ARGUMENT",
+    "safeArgs" : [ {
+      "fieldName" : "id",
+      "type" : {
+        "type" : "primitive",
+        "primitive" : "INTEGER"
+      },
+      "docs" : null
+    } ],
+    "unsafeArgs" : [ ]
+  } ],
   "types" : [ {
     "type" : "object",
     "object" : {
