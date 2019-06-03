@@ -1,0 +1,44 @@
+types:
+  definitions:
+    default-package: com.palantir.a
+    objects:
+      Object1:
+        package: com.palantir.a
+        fields:
+          stringField: string
+
+      Object3:
+        package: com.palantir.b
+        alias: string
+
+      Object2:
+        package: com.palantir.b
+        alias: string
+
+    errors:
+      Error2:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+
+      Error1:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+
+services:
+  TestService2:
+    name: Test Service 2
+    package: com.palantir.foo
+    endpoints:
+      get:
+        http: GET /get
+
+  TestService1:
+    name: Test Service 1
+    package: com.palantir.foo
+    endpoints:
+      get:
+        http: GET /get
