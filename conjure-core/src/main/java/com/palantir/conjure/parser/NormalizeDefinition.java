@@ -45,8 +45,8 @@ public final class NormalizeDefinition {
     }
 
     private static List<ServiceDefinition> sortServiceDefinitions(List<ServiceDefinition> services) {
-        // we intentionally don't sort the Endpoints _within_ a ServiceDefinition, because these can be preserved
-        // from the source yml
+        // we intentionally don't sort the Endpoints _within_ a ServiceDefinition, because we want to preserve
+        // the endpoint order that the API author wrote in their source.yml
         return services.stream()
                 .sorted(Comparator.comparing(def -> typeNameToString(def.getServiceName())))
                 .collect(Collectors.toList());
