@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 
 public final class NormalizeDefinition {
 
+    private static final Comparator<TypeName> TYPE_NAME_COMPARATOR =
+            Comparator.comparing(TypeName::getPackage).thenComparing(TypeName::getName);
+
     /** Ensures the order of types, services and endpoints is sorted. */
     public static ConjureDefinition normalize(ConjureDefinition input) {
         return ConjureDefinition.builder()
@@ -40,7 +43,7 @@ public final class NormalizeDefinition {
 
     private static List<TypeDefinition> sortTypeDefinitions(List<TypeDefinition> types) {
         return types.stream()
-                .sorted(Comparator.comparing(def -> typeNameToString(def.accept(TypeDefinitionVisitor.TYPE_NAME))))
+                .sorted(Comparator.comparing(def -> def.accept(TypeDefinitionVisitor.TYPE_NAME), TYPE_NAME_COMPARATOR))
                 .collect(Collectors.toList());
     }
 
@@ -48,18 +51,14 @@ public final class NormalizeDefinition {
         // we intentionally don't sort the Endpoints _within_ a ServiceDefinition, because we want to preserve
         // the endpoint order that the API author wrote in their source.yml
         return services.stream()
-                .sorted(Comparator.comparing(def -> typeNameToString(def.getServiceName())))
+                .sorted(Comparator.comparing(ServiceDefinition::getServiceName, TYPE_NAME_COMPARATOR))
                 .collect(Collectors.toList());
     }
 
     private static List<ErrorDefinition> sortErrorDefinitions(List<ErrorDefinition> errors) {
         return errors.stream()
-                .sorted(Comparator.comparing(def -> typeNameToString(def.getErrorName())))
+                .sorted(Comparator.comparing(ErrorDefinition::getErrorName, TYPE_NAME_COMPARATOR))
                 .collect(Collectors.toList());
-    }
-
-    private static String typeNameToString(TypeName typeName) {
-        return typeName.getPackage() + "." + typeName.getName();
     }
 
     private NormalizeDefinition() {}
