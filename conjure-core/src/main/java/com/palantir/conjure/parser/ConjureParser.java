@@ -57,9 +57,7 @@ public final class ConjureParser {
     /** Deserializes a {@link ConjureSourceFile} from its YAML representation in the given file. */
     public static ConjureSourceFile parse(File file) {
         RecursiveParser parser = new RecursiveParser();
-        ConjureSourceFile conjureDef = parser.parse(file);
-        ConjureMetrics.recordMetrics(conjureDef);
-        return conjureDef;
+        return parser.parse(file);
     }
 
     private static final class RecursiveParser {

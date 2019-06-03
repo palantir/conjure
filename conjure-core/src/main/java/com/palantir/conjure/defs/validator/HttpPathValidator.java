@@ -18,7 +18,6 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.util.syntacticpath.Path;
@@ -80,7 +79,6 @@ public final class HttpPathValidator {
                     "Path parameter %s appears more than once in path %s", var, path);
             templateVars.add(var);
         });
-        ConjureMetrics.histogram(templateVars.size(), HttpPathValidator.class, "template-vars");
 
         UriTemplateParser uriTemplateParser = new UriTemplateParser(path.toString());
         Map<String, Pattern> nameToPattern = uriTemplateParser.getNameToPattern();

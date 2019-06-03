@@ -21,7 +21,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.ConjureMetrics;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -42,7 +41,6 @@ public interface RequestLineDefinition {
         checkArgument(parts.length == 2,
                 "Request line must be of the form: [METHOD] [PATH], instead was '%s'",
                 oneline);
-        ConjureMetrics.incrementCounter(RequestLineDefinition.class, "method", parts[0]);
         return of(parts[0], PathString.of(parts[1]));
     }
 
