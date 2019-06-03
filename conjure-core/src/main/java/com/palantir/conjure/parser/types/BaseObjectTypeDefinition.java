@@ -22,7 +22,6 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition.BaseObjectTypeDefinitionDeserializer;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
@@ -48,27 +47,13 @@ public interface BaseObjectTypeDefinition {
         public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
             TreeNode tree = parser.readValueAsTree();
             if (tree.get("fields") != null) {
-                ObjectTypeDefinition objectDef = ObjectTypeDefinition.fromJson(parser, tree);
-                ConjureMetrics.incrementCounter(ObjectTypeDefinition.class);
-                ConjureMetrics.histogram(objectDef.fields().size(), ObjectTypeDefinition.class, "fields");
-                return objectDef;
+                return ObjectTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("values") != null) {
-                EnumTypeDefinition enumDef = EnumTypeDefinition.fromJson(parser, tree);
-                ConjureMetrics.incrementCounter(EnumTypeDefinition.class);
-                ConjureMetrics.histogram(enumDef.values().size(), EnumTypeDefinition.class, "values");
-                return enumDef;
+                return EnumTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("alias") != null) {
-                AliasTypeDefinition aliasDef = AliasTypeDefinition.fromJson(parser, tree);
-                ConjureMetrics.incrementCounter(AliasTypeDefinition.class);
-                ConjureMetrics.incrementCounter(AliasTypeDefinition.class,
-                        "inner",
-                        aliasDef.alias().getClass().getSimpleName());
-                return aliasDef;
+                return AliasTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("union") != null) {
-                UnionTypeDefinition unionDef = UnionTypeDefinition.fromJson(parser, tree);
-                ConjureMetrics.incrementCounter(UnionTypeDefinition.class);
-                ConjureMetrics.histogram(unionDef.union().size(), UnionTypeDefinition.class, "variants");
-                return unionDef;
+                return UnionTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("namespace") != null) {
                 return ErrorTypeDefinition.fromJson(parser, tree);
             } else {

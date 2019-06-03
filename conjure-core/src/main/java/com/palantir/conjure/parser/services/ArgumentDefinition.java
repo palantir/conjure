@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.ConjureMetrics;
 import com.palantir.conjure.parser.services.ArgumentDefinition.ArgumentDefinitionDeserializer;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.parsec.ParseException;
@@ -106,14 +105,12 @@ public interface ArgumentDefinition {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 try {
-                    ConjureMetrics.incrementCounter(ArgumentDefinition.class, "oneline");
                     return of(ConjureType.fromString(candidate));
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
             }
 
-            ConjureMetrics.incrementCounter(ArgumentDefinition.class, "verbose");
             return ImmutableArgumentDefinition.fromJson(
                     parser.readValueAs(ImmutableArgumentDefinition.Json.class));
         }
