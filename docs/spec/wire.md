@@ -269,7 +269,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 ### 5.3. Named types
 Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 ----------------- | ---------------| -------- |
-_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key must be omitted from the JSON Object if the value is absent.
+_Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key should be omitted from the JSON Object if the value is absent. Alternatively, the field may be set to `null`.
 _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
 _Alias_(x)        | `JSON(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
