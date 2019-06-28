@@ -1,3 +1,7 @@
+<p align="right">
+<a href="https://autorelease.general.dmz.palantir.tech/palantir/conjure"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
+</p>
+
 <p align="center">
 <img src="docs/media/conjure-flat.svg" alt="Conjure logo" height="200" width="200" id="readme-logo">
 
