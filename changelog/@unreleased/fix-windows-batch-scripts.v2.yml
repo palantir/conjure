@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Shipped windows batch script now use classpath wildcards rather than listing out all the jars, to avoid command line length limits.
+  links:
+    - https://github.com/palantir/conjure-java/pull/438

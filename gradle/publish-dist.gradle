@@ -31,3 +31,11 @@ publishing {
         }
     }
 }
+
+tasks.withType(CreateStartScripts).configureEach { task ->
+    task.doLast {
+        String text = task.windowsScript.text
+        text = text.replaceFirst(/(set CLASSPATH=%APP_HOME%\\lib\\).*/, { "${it[1]}*" })
+        task.windowsScript.write text
+    }
+}
