@@ -6,7 +6,7 @@ com.palantir.conjure:conjure = 4.6.1
 com.palantir.conjure.java:* = 3.11.2
 com.palantir.conjure.typescript:* = 3.7.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
-com.palantir.tokens:* = 3.5.2
+com.palantir.tokens:* = 3.6.0
 commons-io:commons-io = 2.6
 info.picocli:picocli = 3.7.0
 javax.ws.rs:javax.ws.rs-api = 2.0.1
@@ -16,7 +16,7 @@ org.assertj:* = 3.12.2
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.1
 org.immutables:value = 2.7.5
-org.mockito:mockito-core = 2.28.2
+org.mockito:mockito-core = 3.0.0
 org.slf4j:* = 1.7.25
 
 # conflict resolution
