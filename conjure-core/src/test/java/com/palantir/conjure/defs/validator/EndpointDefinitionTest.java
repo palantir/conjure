@@ -245,8 +245,7 @@ public final class EndpointDefinitionTest {
                 .httpPath(HttpPath.of("/a/path"));
 
         DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
-                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))
-        ));
+                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))));
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)

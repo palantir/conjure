@@ -29,7 +29,6 @@ public final class ParseException extends Exception {
 
     @Override
     public String getMessage() {
-
         // sb is the next 100 characters of the text being parsed
         StringBuilder sb = new StringBuilder();
         int curr;

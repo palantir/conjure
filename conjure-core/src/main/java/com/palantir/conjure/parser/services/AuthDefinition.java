@@ -16,12 +16,12 @@
 
 package com.palantir.conjure.parser.services;
 
-import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.logsafe.Preconditions;
 import java.util.Locale;
 import org.immutables.value.Value;
 
@@ -81,7 +81,7 @@ public interface AuthDefinition {
                 id = "NONE";
                 break;
             case COOKIE:
-                checkArgument(parts.length == 2, "Cookie authorization type must include a cookie name");
+                Preconditions.checkArgument(parts.length == 2, "Cookie authorization type must include a cookie name");
                 id = parts[1];
                 break;
             default:

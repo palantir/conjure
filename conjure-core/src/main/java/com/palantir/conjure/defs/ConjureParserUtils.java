@@ -72,6 +72,7 @@ import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -97,7 +98,7 @@ public final class ConjureParserUtils {
             Optional<String> defaultPackage) {
         String packageName = conjurePackage
                 .map(p -> p.name())
-                .orElseGet(() -> defaultPackage.orElseThrow(() -> new IllegalArgumentException(
+                .orElseGet(() -> defaultPackage.orElseThrow(() -> new SafeIllegalArgumentException(
                         // TODO(rfink): Better errors: Can we provide context on where exactly no package was provided?
                         "Must provide default conjure package or "
                                 + "explicit conjure package for every object and service")));
@@ -125,7 +126,6 @@ public final class ConjureParserUtils {
     public static TypeDefinition parseEnumType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
-
         EnumDefinition enumType = EnumDefinition.builder()
                 .typeName(name)
                 .values(def.values().stream().map(ConjureParserUtils::parseEnumValue).collect(Collectors.toList()))
@@ -336,7 +336,6 @@ public final class ConjureParserUtils {
             Optional<AuthType> defaultAuth,
             ReferenceTypeResolver typeResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
-
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
@@ -364,7 +363,6 @@ public final class ConjureParserUtils {
 
     private static Optional<AuthType> parseAuthType(
             com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
-
         switch (authDefinition.type()) {
             case HEADER:
                 return Optional.of(AuthType.header(HeaderAuthType.of()));
@@ -373,7 +371,7 @@ public final class ConjureParserUtils {
             case NONE:
                 return Optional.empty();
             default:
-                throw new IllegalArgumentException("Unrecognized auth type.");
+                throw new SafeIllegalArgumentException("Unrecognized auth type.");
         }
     }
 
@@ -402,7 +400,6 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
             ArgumentName argName,
             HttpPath httpPath) {
-
         Set<ArgumentName> args = HttpPathValidator.pathArgs(httpPath.get());
         switch (argumentDef.paramType()) {
             case AUTO:
@@ -415,14 +412,14 @@ public final class ConjureParserUtils {
                     return ParameterType.body(BodyParameterType.of());
                 }
             case HEADER:
-                String headerParamId = argumentDef.paramId().map(id -> id.name()).orElse(argName.get());
+                String headerParamId = argumentDef.paramId().map(id -> id.name()).orElseGet(() -> argName.get());
                 return ParameterType.header(HeaderParameterType.of(ParameterId.of(headerParamId)));
             case PATH:
                 return ParameterType.path(PathParameterType.of());
             case BODY:
                 return ParameterType.body(BodyParameterType.of());
             case QUERY:
-                String queryParamId = argumentDef.paramId().map(id -> id.name()).orElse(argName.get());
+                String queryParamId = argumentDef.paramId().map(id -> id.name()).orElseGet(() -> argName.get());
                 return ParameterType.query(QueryParameterType.of(ParameterId.of(queryParamId)));
             default:
                 throw new IllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());

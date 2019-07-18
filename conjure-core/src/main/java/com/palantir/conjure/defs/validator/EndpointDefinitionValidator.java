@@ -39,6 +39,7 @@ import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -103,8 +104,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                 .fold(
                                         typeDefinition -> true,
                                         type -> !type.accept(TypeVisitor.IS_BINARY)
-                                                && !type.accept(TypeVisitor.IS_ANY)
-                                );
+                                                && !type.accept(TypeVisitor.IS_ANY));
                         Preconditions.checkArgument(
                                 isValid, "Non body parameters cannot be of the 'binary' type: '%s' is not allowed",
                                 arg.getArgName());
@@ -306,17 +306,17 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         // DealiasingTypeVisitor above
                         @Override
                         public Boolean visitReference(TypeName value) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
+                            throw new SafeRuntimeException("Unexpected type when validating query parameters");
                         }
 
                         @Override
                         public Boolean visitExternal(ExternalReference value) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
+                            throw new SafeRuntimeException("Unexpected type when validating query parameters");
                         }
 
                         @Override
                         public Boolean visitUnknown(String unknownType) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
+                            throw new SafeRuntimeException("Unexpected type when validating query parameters");
                         }
                     }));
         }
@@ -335,8 +335,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                         boolean isValid = conjureType.fold(
                                 typeDefinition -> true,
                                 type -> !type.accept(TypeVisitor.IS_PRIMITIVE)
-                                        || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN
-                        );
+                                        || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN);
 
                         Preconditions.checkState(
                                 isValid,
