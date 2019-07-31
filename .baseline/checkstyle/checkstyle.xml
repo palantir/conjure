@@ -127,6 +127,11 @@
             <property name="illegalPkgs" value="junit.framework"/>
             <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
         </module>
+        <module name="IllegalImport"> <!-- Only relevant for pre-Java 11 because javafx is gone completely in Java 11 -->
+            <property name="id" value="BanJavafx"/>
+            <property name="illegalPkgs" value="javafx"/>
+            <message key="import.illegal" value="Must not import javafx classes because some OpenJDK builds do not include javafx."/>
+        </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
             <property name="illegalPkgs" value="org.elasticsearch.common.base, com.clearspring.analytics.util, org.spark_project.guava"/>
             <message key="import.illegal" value="Must not import repackaged classes."/>
@@ -417,6 +422,7 @@
             <property name="allowEmptyMethods" value="true"/>
             <property name="allowEmptyTypes" value="true"/>
             <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
             <property name="ignoreEnhancedForColon" value="false"/>
             <message key="ws.notFollowed" value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
             <message key="ws.notPreceded" value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
@@ -430,7 +436,7 @@
         </module>
         <module name="CyclomaticComplexity"/> <!-- Java Coding Guidelines: Reduce Cyclomatic Complexity -->
         <module name="DesignForExtension"> <!-- Java Coding Guidelines: Design for extension -->
-            <property name="ignoredAnnotations" value="Test, Before, BeforeEach, After, AfterEach, BeforeClass, BeforeAll, AfterClass, AfterAll"/>
+            <property name="ignoredAnnotations" value="ParameterizedTest, Test, Before, BeforeEach, After, AfterEach, BeforeClass, BeforeAll, AfterClass, AfterAll"/>
         </module>
         <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
             <property name="scope" value="public"/>

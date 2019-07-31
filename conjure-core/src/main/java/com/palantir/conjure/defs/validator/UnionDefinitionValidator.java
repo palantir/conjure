@@ -74,7 +74,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
         @Override
         public void validate(UnionDefinition definition) {
             definition.getUnion().stream().forEach(fieldDef -> {
-                        Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.getFieldName().get()),
+                        com.palantir.logsafe.Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.getFieldName().get()),
                                 "Union member key must not be empty");
                         Preconditions.checkArgument(isValidJavaIdentifier(fieldDef.getFieldName().get()),
                                 "Union member key must be a valid Java identifier: %s",
