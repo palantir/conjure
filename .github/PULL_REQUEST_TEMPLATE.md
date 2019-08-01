@@ -1,5 +1,3 @@
-<!-- PR title should start with '[fix]', '[improvement]' or '[break]' if this PR would cause a patch, minor or major SemVer bump. Omit the prefix if this PR doesn't warrant a standalone release. -->
-
 ## Before this PR
 <!-- What's wrong with the current state of the world and why change it now? -->
 
@@ -9,3 +7,5 @@
 ==COMMIT_MSG==
 
 ## Possible downsides?
+<!-- Please describe any way users could be negatively affected by this PR. -->
+
