@@ -30,6 +30,7 @@ types:
         alias: string
       ErrorCode:
         values:
+          - UNAUTHENTICATED
           - PERMISSION_DENIED
           - INVALID_ARGUMENT
           - NOT_FOUND

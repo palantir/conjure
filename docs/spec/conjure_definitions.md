@@ -278,6 +278,7 @@ docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://sp
 ## ErrorCode
 [ErrorCode]: #errorcode
 A field describing the error category. MUST be one of the following strings, with HTTP status codes defined in the [wire spec](/docs/spec/wire.md#34-conjure-errors):
+* UNAUTHENTICATED
 * PERMISSION_DENIED
 * INVALID_ARGUMENT
 * NOT_FOUND
