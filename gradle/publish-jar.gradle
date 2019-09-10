@@ -48,3 +48,8 @@ publishing {
         }
     }
 }
+
+// Turning off module metadata so that all consumers just use regular POMs
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
