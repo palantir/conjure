@@ -30,8 +30,9 @@ types:
         alias: string
       ErrorCode:
         values:
-          - PERMISSION_DENIED
           - INVALID_ARGUMENT
+          - UNAUTHENTICATED
+          - PERMISSION_DENIED
           - NOT_FOUND
           - CONFLICT
           - REQUEST_ENTITY_TOO_LARGE

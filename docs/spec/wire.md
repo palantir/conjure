@@ -208,8 +208,9 @@ In order to send a Conjure error, servers must serialize the error using the [JS
 
 Conjure Error code         | HTTP Status code |
 -------------------------- | ---------------- |
-PERMISSION_DENIED          | 403
 INVALID_ARGUMENT           | 400
+UNAUTHENTICATED            | 401
+PERMISSION_DENIED          | 403
 NOT_FOUND                  | 404
 CONFLICT                   | 409
 REQUEST_ENTITY_TOO_LARGE   | 413
