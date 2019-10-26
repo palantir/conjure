@@ -69,7 +69,7 @@ public final class ConjureSpecTest {
     @Test
     public void testConjureSpec() {
         // test positive cases
-        testCaseDef.positive().orElse(new TreeMap<>()).entrySet().stream().forEach(entry -> {
+        testCaseDef.positive().orElseGet(() -> new TreeMap<>()).entrySet().forEach(entry -> {
             String testName = String.format("positive case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
@@ -80,16 +80,21 @@ public final class ConjureSpecTest {
         });
 
         // test negative cases
-        testCaseDef.negative().orElse(new TreeMap<>()).entrySet().stream().forEach(entry -> {
+        testCaseDef.negative().orElseGet(() -> new TreeMap<>()).entrySet().forEach(entry -> {
             String testName = String.format("negative case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
                 ConjureParserUtils.parseConjureDef(ImmutableList.of(MAPPER.readValue(yml, ConjureSourceFile.class)));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
             } catch (Exception e) {
-                Assertions.assertThat(e).withFailMessage("Failure message for case did not match expectation: "
-                        + testName + "\nMessage:\n" + e.getMessage() + "\ndid not contain:\n"
-                        + entry.getValue().expectedError()).hasMessageContaining(entry.getValue().expectedError());
+                Assertions.assertThat(e)
+                        .withFailMessage("Failure message for case did not match expectation: "
+                                + testName
+                                + "\nMessage:\n"
+                                + e.getMessage()
+                                + "\ndid not contain:\n"
+                                + entry.getValue().expectedError())
+                        .hasMessageContaining(entry.getValue().expectedError());
             }
         });
     }

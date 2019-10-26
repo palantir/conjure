@@ -81,55 +81,55 @@ public final class ParameterTypeVisitor {
 
     private static class IsParameterTypeVisitor implements ParameterType.Visitor<Boolean> {
         @Override
-        public Boolean visitBody(BodyParameterType value) {
+        public Boolean visitBody(BodyParameterType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitHeader(HeaderParameterType value) {
+        public Boolean visitHeader(HeaderParameterType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitPath(PathParameterType value) {
+        public Boolean visitPath(PathParameterType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitQuery(QueryParameterType value) {
+        public Boolean visitQuery(QueryParameterType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitUnknown(String unknownType) {
+        public Boolean visitUnknown(String _unknownType) {
             return false;
         }
     }
 
     private static class IsBodyParameterType extends IsParameterTypeVisitor {
         @Override
-        public Boolean visitBody(BodyParameterType value) {
+        public Boolean visitBody(BodyParameterType _value) {
             return true;
         }
     }
 
     private static class IsPathParameterType extends IsParameterTypeVisitor {
         @Override
-        public Boolean visitPath(PathParameterType value) {
+        public Boolean visitPath(PathParameterType _value) {
             return true;
         }
     }
 
     private static class IsHeaderParameterType extends IsParameterTypeVisitor {
         @Override
-        public Boolean visitHeader(HeaderParameterType value) {
+        public Boolean visitHeader(HeaderParameterType _value) {
             return true;
         }
     }
 
     private static class IsQueryParameterType extends IsParameterTypeVisitor {
         @Override
-        public Boolean visitQuery(QueryParameterType value) {
+        public Boolean visitQuery(QueryParameterType _value) {
             return true;
         }
     }

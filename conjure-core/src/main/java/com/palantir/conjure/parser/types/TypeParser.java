@@ -212,7 +212,7 @@ public enum TypeParser implements Parser<ConjureType> {
             return instance;
         }
 
-        public static <T> TypeFromString<T> of(String type, T instance, Class<T> metric) {
+        public static <T> TypeFromString<T> of(String type, T instance, Class<T> _metric) {
             return new TypeFromString<>(type, instance);
         }
     }

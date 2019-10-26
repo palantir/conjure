@@ -43,31 +43,31 @@ public final class AuthTypeVisitor {
 
     private static class DefaultIsAuthTypeVisitor implements AuthType.Visitor<Boolean> {
         @Override
-        public Boolean visitHeader(HeaderAuthType value) {
+        public Boolean visitHeader(HeaderAuthType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitCookie(CookieAuthType value) {
+        public Boolean visitCookie(CookieAuthType _value) {
             return false;
         }
 
         @Override
-        public Boolean visitUnknown(String unknownType) {
+        public Boolean visitUnknown(String _unknownType) {
             return false;
         }
     }
 
     private static class IsHeaderAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
         @Override
-        public Boolean visitHeader(HeaderAuthType value) {
+        public Boolean visitHeader(HeaderAuthType _value) {
             return true;
         }
     }
 
     private static class IsCookieAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
         @Override
-        public Boolean visitCookie(CookieAuthType value) {
+        public Boolean visitCookie(CookieAuthType _value) {
             return true;
         }
     }

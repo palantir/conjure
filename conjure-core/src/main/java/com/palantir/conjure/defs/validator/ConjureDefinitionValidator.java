@@ -122,10 +122,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
-            definition.getTypes().stream().forEach(type ->
-                    getReferenceType(type)
-                            .ifPresent(entry -> typeToRefFields.put(
-                                    type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
+            definition.getTypes().forEach(type -> getReferenceType(type).ifPresent(entry ->
+                    typeToRefFields.put(type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -181,14 +179,14 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             // create mapping for resolving reference types during validation
             Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
                     Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
-            definition.getTypes().stream().forEach(def -> validateTypeDefinition(def, definitionMap));
+            definition.getTypes().forEach(def -> validateTypeDefinition(def, definitionMap));
             definition.getErrors().forEach(def -> validateErrorDefinition(def, definitionMap));
             definition.getServices().forEach(def -> validateServiceDefinition(def, definitionMap));
         }
 
         private static void validateServiceDefinition(ServiceDefinition serviceDef,
                 Map<TypeName, TypeDefinition> definitionMap) {
-            serviceDef.getEndpoints().stream().forEach(endpoint -> {
+            serviceDef.getEndpoints().forEach(endpoint -> {
                 endpoint.getArgs().stream()
                         .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                         .findAny()
@@ -199,9 +197,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                         });
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindNestedOptionals(returnType, definitionMap, false)) {
-                        throw new IllegalStateException(
-                                "Illegal nested optionals found in return type of endpoint "
-                                        + endpoint.getEndpointName().get());
+                        throw new IllegalStateException("Illegal nested optionals found in return type of endpoint "
+                                + endpoint.getEndpointName().get());
                     }
                 });
             });
@@ -224,7 +221,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
-                public Void visitAlias(AliasDefinition value) {
+                public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, false)) {
                         throw new IllegalStateException(
@@ -234,42 +231,40 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
 
                 @Override
-                public Void visitObject(ObjectDefinition value) {
+                public Void visitObject(ObjectDefinition _value) {
                     ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
                     objectDefinition.getFields().stream()
-                            .filter(fieldDefinition -> recursivelyFindNestedOptionals(
-                                    fieldDefinition.getType(), definitionMap, false))
+                            .filter(fieldDefinition ->
+                                    recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(found -> {
-                                throw new IllegalStateException(
-                                        "Illegal nested optionals found in object "
-                                                + objectDefinition.getTypeName().getName());
+                                throw new IllegalStateException("Illegal nested optionals found in object "
+                                        + objectDefinition.getTypeName().getName());
                             });
                     return null;
                 }
 
                 @Override
-                public Void visitUnion(UnionDefinition value) {
+                public Void visitUnion(UnionDefinition _value) {
                     UnionDefinition unionDefinition = typeDef.accept(TypeDefinitionVisitor.UNION);
                     unionDefinition.getUnion().stream()
-                            .filter(fieldDefinition -> recursivelyFindNestedOptionals(
-                                    fieldDefinition.getType(), definitionMap, false))
+                            .filter(fieldDefinition ->
+                                    recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(found -> {
-                                throw new IllegalStateException(
-                                        "Illegal nested optionals found in union "
-                                                + unionDefinition.getTypeName().getName());
+                                throw new IllegalStateException("Illegal nested optionals found in union "
+                                        + unionDefinition.getTypeName().getName());
                             });
                     return null;
                 }
 
                 @Override
-                public Void visitEnum(EnumDefinition value) {
+                public Void visitEnum(EnumDefinition _value) {
                     return null;
                 }
 
                 @Override
-                public Void visitUnknown(String unknownType) {
+                public Void visitUnknown(String _unknownType) {
                     return null;
                 }
             });

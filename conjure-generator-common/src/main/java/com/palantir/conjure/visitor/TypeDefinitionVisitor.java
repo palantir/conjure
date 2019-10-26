@@ -112,55 +112,55 @@ public final class TypeDefinitionVisitor {
 
     private static class IsAliasDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
-        public Boolean visitAlias(AliasDefinition value) {
+        public Boolean visitAlias(AliasDefinition _value) {
             return true;
         }
     }
 
     private static class IsObjectDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
-        public Boolean visitObject(ObjectDefinition value) {
+        public Boolean visitObject(ObjectDefinition _value) {
             return true;
         }
     }
 
     private static class IsEnumDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
-        public Boolean visitEnum(EnumDefinition value) {
+        public Boolean visitEnum(EnumDefinition _value) {
             return true;
         }
     }
 
     private static class IsUnionDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
-        public Boolean visitUnion(UnionDefinition value) {
+        public Boolean visitUnion(UnionDefinition _value) {
             return true;
         }
     }
 
     private static class DefaultIsTypeDefinitionVisitor implements TypeDefinition.Visitor<Boolean> {
         @Override
-        public Boolean visitAlias(AliasDefinition value) {
+        public Boolean visitAlias(AliasDefinition _value) {
             return false;
         }
 
         @Override
-        public Boolean visitEnum(EnumDefinition value) {
+        public Boolean visitEnum(EnumDefinition _value) {
             return false;
         }
 
         @Override
-        public Boolean visitObject(ObjectDefinition value) {
+        public Boolean visitObject(ObjectDefinition _value) {
             return false;
         }
 
         @Override
-        public Boolean visitUnion(UnionDefinition value) {
+        public Boolean visitUnion(UnionDefinition _value) {
             return false;
         }
 
         @Override
-        public Boolean visitUnknown(String unknownType) {
+        public Boolean visitUnknown(String _unknownType) {
             return false;
         }
     }

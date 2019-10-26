@@ -44,8 +44,7 @@ public interface EnumValueDefinition {
     class EnumValueDeserializer extends JsonDeserializer<EnumValueDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public EnumValueDefinition deserialize(JsonParser parser, DeserializationContext ctxt)
-                throws IOException {
+        public EnumValueDefinition deserialize(JsonParser parser, DeserializationContext _ctxt) throws IOException {
             String candidate = parser.getValueAsString();
             if (candidate != null) {
                 return builder().value(candidate).build();

@@ -39,6 +39,7 @@ import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -274,51 +275,51 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
 
         private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor) {
-            return visitor.dealias(type).fold(
-                    typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
-                    subType -> subType.accept(new Type.Visitor<Boolean>() {
-                        @Override
-                        public Boolean visitPrimitive(PrimitiveType value) {
-                            return value.get() != PrimitiveType.Value.ANY;
-                        }
+            return visitor.dealias(type)
+                    .fold(typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM), subType ->
+                            subType.accept(new Type.Visitor<Boolean>() {
+                                @Override
+                                public Boolean visitPrimitive(PrimitiveType value) {
+                                    return value.get() != PrimitiveType.Value.ANY;
+                                }
 
-                        @Override
-                        public Boolean visitOptional(OptionalType value) {
-                            return recursivelyValidate(value.getItemType(), visitor);
-                        }
+                                @Override
+                                public Boolean visitOptional(OptionalType value) {
+                                    return recursivelyValidate(value.getItemType(), visitor);
+                                }
 
-                        @Override
-                        public Boolean visitList(ListType value) {
-                            return recursivelyValidate(value.getItemType(), visitor);
-                        }
+                                @Override
+                                public Boolean visitList(ListType value) {
+                                    return recursivelyValidate(value.getItemType(), visitor);
+                                }
 
-                        @Override
-                        public Boolean visitSet(SetType value) {
-                            return recursivelyValidate(value.getItemType(), visitor);
-                        }
+                                @Override
+                                public Boolean visitSet(SetType value) {
+                                    return recursivelyValidate(value.getItemType(), visitor);
+                                }
 
-                        @Override
-                        public Boolean visitMap(MapType value) {
-                            return false;
-                        }
+                                @Override
+                                public Boolean visitMap(MapType _value) {
+                                    return false;
+                                }
 
-                        // The cases below should not be handled here, since they implicitly handled by the
-                        // DealiasingTypeVisitor above
-                        @Override
-                        public Boolean visitReference(TypeName value) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
-                        }
+                                // The cases below should not be handled here, since they implicitly handled by the
+                                // DealiasingTypeVisitor above
+                                @Override
+                                public Boolean visitReference(TypeName _value) {
+                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                }
 
-                        @Override
-                        public Boolean visitExternal(ExternalReference value) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
-                        }
+                                @Override
+                                public Boolean visitExternal(ExternalReference _value) {
+                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                }
 
-                        @Override
-                        public Boolean visitUnknown(String unknownType) {
-                            throw new RuntimeException("Unexpected type when validating query parameters");
-                        }
-                    }));
+                                @Override
+                                public Boolean visitUnknown(String _unknownType) {
+                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                }
+                            }));
         }
     }
 
