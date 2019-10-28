@@ -74,9 +74,9 @@ public final class HttpPathValidator {
 
         // verify that path template variables are unique
         Set<String> templateVars = new HashSet<>();
-        new UriTemplate(path.toString()).getTemplateVariables().stream().forEach(var -> {
-            Preconditions.checkState(!templateVars.contains(var),
-                    "Path parameter %s appears more than once in path %s", var, path);
+        new UriTemplate(path.toString()).getTemplateVariables().forEach(var -> {
+            Preconditions.checkState(
+                    !templateVars.contains(var), "Path parameter %s appears more than once in path %s", var, path);
             templateVars.add(var);
         });
 

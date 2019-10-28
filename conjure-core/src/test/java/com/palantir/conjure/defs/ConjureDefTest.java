@@ -38,7 +38,7 @@ public class ConjureDefTest {
     @Test
     @Ignore
     public void handlesNonJavaExternalType() {
-        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+        ConjureParserUtils.parseConjureDef(
                 ImmutableList.of(ConjureParser.parse(new File("src/test/resources/example-external-types.yml"))));
     }
 }

@@ -39,7 +39,7 @@ public interface Either<L, R> {
         abstract L value();
 
         @Override
-        public <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> mapRight) {
+        public <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> _mapRight) {
             return mapLeft.apply(value());
         }
     }
@@ -50,7 +50,7 @@ public interface Either<L, R> {
         abstract R value();
 
         @Override
-        public <T> T fold(Function<? super L, ? extends T> mapLeft, Function<? super R, ? extends T> mapRight) {
+        public <T> T fold(Function<? super L, ? extends T> _mapLeft, Function<? super R, ? extends T> mapRight) {
             return mapRight.apply(value());
         }
     }

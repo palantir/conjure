@@ -45,7 +45,7 @@ public interface FieldDefinition {
     class FieldDefinitionDeserializer extends JsonDeserializer<FieldDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public FieldDefinition deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+        public FieldDefinition deserialize(JsonParser parser, DeserializationContext _context) throws IOException {
 
             String candidate = parser.getValueAsString();
             if (candidate != null) {

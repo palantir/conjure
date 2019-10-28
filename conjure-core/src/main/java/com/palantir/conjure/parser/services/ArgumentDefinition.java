@@ -99,7 +99,7 @@ public interface ArgumentDefinition {
     class ArgumentDefinitionDeserializer extends JsonDeserializer<ArgumentDefinition> {
         @SuppressWarnings("deprecation")
         @Override
-        public ArgumentDefinition deserialize(JsonParser parser, DeserializationContext context)
+        public ArgumentDefinition deserialize(JsonParser parser, DeserializationContext _context)
                 throws IOException, JsonProcessingException {
 
             String candidate = parser.getValueAsString();

@@ -84,11 +84,13 @@
         <module name="AvoidStarImport"/> <!-- Java Style Guide: No wildcard imports -->
         <module name="AvoidStaticImport"> <!-- Java Style Guide: No static imports -->
             <property name="excludes" value="
+                com.google.common.base.Preconditions.*,
+                com.palantir.logsafe.Preconditions.*,
                 java.util.Collections.*,
                 java.util.stream.Collectors.*,
-                com.palantir.logsafe.Preconditions.*,
-                com.google.common.base.Preconditions.*,
-                org.apache.commons.lang3.Validate.*"/>
+                org.apache.commons.lang3.Validate.*,
+                org.assertj.core.api.Assertions.*,
+                org.mockito.Mockito.*"/>
         </module>
         <module name="ClassTypeParameterName"> <!-- Java Style Guide: Type variable names -->
             <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
@@ -126,6 +128,11 @@
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Use JUnit 4-style test classes and assertions -->
             <property name="illegalPkgs" value="junit.framework"/>
             <message key="import.illegal" value="Use JUnit 4-style (org.junit.*) test classes and assertions instead of JUnit 3 (junit.framework.*)."/>
+        </module>
+        <module name="IllegalImport"> <!-- Only relevant for pre-Java 11 because javafx is gone completely in Java 11 -->
+            <property name="id" value="BanJavafx"/>
+            <property name="illegalPkgs" value="javafx"/>
+            <message key="import.illegal" value="Must not import javafx classes because some OpenJDK builds do not include javafx."/>
         </module>
         <module name="IllegalImport"> <!-- Java Coding Guidelines: Import the canonical package -->
             <property name="illegalPkgs" value="org.elasticsearch.common.base, com.clearspring.analytics.util, org.spark_project.guava"/>
@@ -417,6 +424,7 @@
             <property name="allowEmptyMethods" value="true"/>
             <property name="allowEmptyTypes" value="true"/>
             <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
             <property name="ignoreEnhancedForColon" value="false"/>
             <message key="ws.notFollowed" value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
             <message key="ws.notPreceded" value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
@@ -430,7 +438,7 @@
         </module>
         <module name="CyclomaticComplexity"/> <!-- Java Coding Guidelines: Reduce Cyclomatic Complexity -->
         <module name="DesignForExtension"> <!-- Java Coding Guidelines: Design for extension -->
-            <property name="ignoredAnnotations" value="Test, Before, BeforeEach, After, AfterEach, BeforeClass, BeforeAll, AfterClass, AfterAll"/>
+            <property name="ignoredAnnotations" value="ParameterizedTest, Test, Before, BeforeEach, After, AfterEach, BeforeClass, BeforeAll, AfterClass, AfterAll"/>
         </module>
         <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
             <property name="scope" value="public"/>
@@ -463,7 +471,7 @@
         <module name="NestedTryDepth"/> <!-- Java Coding Guide: Try/catch blocks: never nested -->
         <module name="NonEmptyAtclauseDescription"/> <!-- Java Style Guide: At-clauses -->
         <module name="ParameterName"> <!-- Java Style Guide: Parameter names -->
-            <property name="format" value="^[a-z][a-zA-Z0-9]+$"/>
+            <property name="format" value="^_?[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Parameter name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="SingleLineJavadoc"/> <!-- Java Style Guide: General form -->

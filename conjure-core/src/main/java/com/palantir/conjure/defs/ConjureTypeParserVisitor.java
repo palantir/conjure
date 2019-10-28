@@ -105,7 +105,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
     }
 
     @Override
-    public Type visitAny(AnyType type) {
+    public Type visitAny(AnyType _type) {
         return Type.primitive(com.palantir.conjure.spec.PrimitiveType.ANY);
     }
 
@@ -146,12 +146,12 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
     }
 
     @Override
-    public Type visitBinary(BinaryType type) {
+    public Type visitBinary(BinaryType _type) {
         return Type.primitive(com.palantir.conjure.spec.PrimitiveType.BINARY);
     }
 
     @Override
-    public Type visitDateTime(DateTimeType type) {
+    public Type visitDateTime(DateTimeType _type) {
         return Type.primitive(com.palantir.conjure.spec.PrimitiveType.DATETIME);
     }
 }

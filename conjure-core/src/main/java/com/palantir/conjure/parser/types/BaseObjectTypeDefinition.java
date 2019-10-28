@@ -29,6 +29,7 @@ import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -44,7 +45,8 @@ public interface BaseObjectTypeDefinition {
 
     class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
         @Override
-        public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
+        public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext _ctxt)
+                throws IOException {
             TreeNode tree = parser.readValueAsTree();
             if (tree.get("fields") != null) {
                 return ObjectTypeDefinition.fromJson(parser, tree);
@@ -57,7 +59,7 @@ public interface BaseObjectTypeDefinition {
             } else if (tree.get("namespace") != null) {
                 return ErrorTypeDefinition.fromJson(parser, tree);
             } else {
-                throw new IllegalArgumentException(
+                throw new SafeIllegalArgumentException(
                         "Unrecognized definition, types must have either fields, values or an alias defined.");
             }
         }

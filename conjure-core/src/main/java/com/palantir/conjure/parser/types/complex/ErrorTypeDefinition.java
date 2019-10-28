@@ -46,7 +46,7 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
     Map<FieldName, FieldDefinition> unsafeArgs();
 
     @Override
-    default <T> T visit(TypeDefinitionVisitor<T> visitor) {
+    default <T> T visit(TypeDefinitionVisitor<T> _visitor) {
         throw new UnsupportedOperationException();
     }
 

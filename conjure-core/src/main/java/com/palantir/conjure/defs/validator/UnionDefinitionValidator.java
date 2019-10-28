@@ -48,8 +48,9 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
 
         @Override
         public void validate(UnionDefinition definition) {
-            definition.getUnion().stream().forEach(fieldDef -> {
-                Preconditions.checkArgument(!fieldDef.getFieldName().get().endsWith("_"),
+            definition.getUnion().forEach(fieldDef -> {
+                Preconditions.checkArgument(
+                        !fieldDef.getFieldName().get().endsWith("_"),
                         "Union member key must not end with an underscore: %s",
                         fieldDef.getFieldName().get());
             });
@@ -74,10 +75,11 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
 
         @Override
         public void validate(UnionDefinition definition) {
-            definition.getUnion().stream().forEach(fieldDef -> {
-                Preconditions.checkArgument(!Strings.isNullOrEmpty(fieldDef.getFieldName().get()),
-                        "Union member key must not be empty");
-                Preconditions.checkArgument(isValidJavaIdentifier(fieldDef.getFieldName().get()),
+            definition.getUnion().forEach(fieldDef -> {
+                com.palantir.logsafe.Preconditions.checkArgument(
+                        !Strings.isNullOrEmpty(fieldDef.getFieldName().get()), "Union member key must not be empty");
+                Preconditions.checkArgument(
+                        isValidJavaIdentifier(fieldDef.getFieldName().get()),
                         "Union member key must be a valid Java identifier: %s",
                         fieldDef.getFieldName().get());
             });
@@ -89,9 +91,9 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
 
         @Override
         public void validate(UnionDefinition definition) {
-            definition.getUnion().stream().forEach(fieldDef -> {
-                Preconditions.checkArgument(!fieldDef.getFieldName().get().equals("type"),
-                        "Union member key must not be 'type'");
+            definition.getUnion().forEach(fieldDef -> {
+                com.palantir.logsafe.Preconditions.checkArgument(
+                        !fieldDef.getFieldName().get().equals("type"), "Union member key must not be 'type'");
             });
         }
     }
