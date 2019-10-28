@@ -343,7 +343,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
-                public Void visitAlias(AliasDefinition value) {
+                public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindIllegalKeys(aliasDef.getAlias(), definitionMap, false)) {
                         throw new IllegalStateException(
@@ -353,7 +353,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
 
                 @Override
-                public Void visitObject(ObjectDefinition value) {
+                public Void visitObject(ObjectDefinition _value) {
                     ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
                     objectDefinition.getFields().stream()
                             .filter(fieldDefinition -> recursivelyFindIllegalKeys(
@@ -368,7 +368,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
 
                 @Override
-                public Void visitUnion(UnionDefinition value) {
+                public Void visitUnion(UnionDefinition _value) {
                     UnionDefinition unionDefinition = typeDef.accept(TypeDefinitionVisitor.UNION);
                     unionDefinition.getUnion().stream()
                             .filter(fieldDefinition -> recursivelyFindIllegalKeys(
@@ -383,12 +383,12 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
 
                 @Override
-                public Void visitEnum(EnumDefinition value) {
+                public Void visitEnum(EnumDefinition _value) {
                     return null;
                 }
 
                 @Override
-                public Void visitUnknown(String unknownType) {
+                public Void visitUnknown(String _unknownType) {
                     return null;
                 }
             });
