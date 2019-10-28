@@ -16,17 +16,26 @@
 
 package com.palantir.conjure.defs.validator;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.Documentation;
+import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.FieldName;
+import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.HttpPath;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.ServiceDefinition;
 import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
@@ -99,6 +108,106 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal recursive data type: ");
+    }
+
+    @Test
+    public void testNoIllegalMapKeys_returns() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("name", "package"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("badEndpoint"))
+                                .httpMethod(HttpMethod.GET)
+                                .httpPath(HttpPath.of("/"))
+                                .returns(Type.map(MapType.of(
+                                        Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))),
+                                        Type.primitive(PrimitiveType.STRING))))
+                                .build())
+                        .build())
+                .build();
+
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Illegal map key found in return type of endpoint badEndpoint");
+    }
+
+    @Test
+    public void testNoIllegalMapKeys_field() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.of(FieldName.of("bad"),
+                                Type.map(MapType.of(
+                                        Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))),
+                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Illegal map key found in object Foo");
+    }
+
+    @Test
+    public void testNoIllegalMapKeys_intermediateAlias() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(TypeName.of("AliasName", "package"))
+                        .alias(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.of(FieldName.of("bad"),
+                                Type.map(MapType.of(
+                                        Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))),
+                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Illegal map key found in object Foo");
+    }
+
+    @Test
+    public void testNoIllegalMapKeys_allowsExternalImport() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.of(FieldName.of("bad"),
+                                Type.map(MapType.of(
+                                        Type.external(ExternalReference.builder()
+                                                .externalReference(TypeName.of("Foo", "package"))
+                                                .fallback(Type.primitive(PrimitiveType.STRING))
+                                                .build()),
+                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                        .build()))
+                .build();
+        assertThatCode(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .describedAs("External imports may be used as map keys provided the fallback type is valid")
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    public void testNoIllegalMapKeys_faileInvalidExternalImport() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.of(FieldName.of("bad"),
+                                Type.map(MapType.of(
+                                        Type.external(ExternalReference.builder()
+                                                .externalReference(TypeName.of("Foo", "package"))
+                                                .fallback(Type.primitive(PrimitiveType.ANY))
+                                                .build()),
+                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Illegal map key found in object Foo");
     }
 
     private FieldDefinition field(FieldName name, String type) {

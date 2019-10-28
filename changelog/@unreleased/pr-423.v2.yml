@@ -1,0 +1,12 @@
+type: improvement
+improvement:
+  description: |-
+    Validate map keys have PLAIN representation
+
+    Previously it was possible to build a conjure definition for a
+    map that was impossible to serialize as JSON. If this fails
+    on an external type import, please make sure you have
+    selected the most accurate fallback type value, the default
+    `any` is not allowed.
+  links:
+  - https://github.com/palantir/conjure/pull/423
