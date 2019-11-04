@@ -16,11 +16,11 @@
 
 package com.palantir.parsec.parsers;
 
-import com.google.common.collect.Maps;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
 import com.palantir.parsec.Parsers;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class MapParser<A, B> implements Parser<Map<A, B>> {
@@ -37,7 +37,7 @@ public final class MapParser<A, B> implements Parser<Map<A, B>> {
 
     @Override
     public Map<A, B> parse(ParserState input) throws ParseException {
-        Map<A, B> results = Maps.newHashMap();
+        Map<A, B> results = new HashMap<>();
         do {
             A key = Parsers.gingerly(keyParser).parse(input);
             if (!Parsers.nullOrUnexpected(key)) {

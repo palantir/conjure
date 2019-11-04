@@ -17,7 +17,6 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
@@ -75,6 +74,7 @@ import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -201,18 +201,19 @@ public final class ConjureParserUtils {
             // Resolve objects first, so we can use them in service validations
             Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
             Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(parsed.types().conjureImports());
-            Map<TypeName, TypeDefinition> allObjects = Maps.newHashMap();
+            Map<TypeName, TypeDefinition> allObjects = new HashMap<>();
             allObjects.putAll(objects);
             allObjects.putAll(importedObjects);
 
             DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
 
             parsed.services().forEach((serviceName, service) -> {
-                servicesBuilder.add(parseService(
-                        service,
-                        TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                        typeResolver,
-                        dealiasingVisitor));
+                servicesBuilder.add(
+                        parseService(
+                                service,
+                                TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
+                                typeResolver,
+                                dealiasingVisitor));
             });
 
             typesBuilder.addAll(objects.values());
@@ -234,7 +235,7 @@ public final class ConjureParserUtils {
      * Recursively resolve all imported types
      */
     private static Map<TypeName, TypeDefinition> parseImportObjects(Map<Namespace, ConjureImports> conjureImports) {
-        Map<TypeName, TypeDefinition> allDefinitions = Maps.newHashMap();
+        Map<TypeName, TypeDefinition> allDefinitions = new HashMap<>();
         conjureImports.values().forEach(conjureImport -> {
             ConjureSourceFile conjureDef = conjureImport.conjure();
             ReferenceTypeResolver importTypeResolver =
