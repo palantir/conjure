@@ -17,10 +17,10 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
+import java.util.HashSet;
 import java.util.Set;
 
 @com.google.errorprone.annotations.Immutable
@@ -50,7 +50,7 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
 
         @Override
         public void validate(EnumDefinition definition) {
-            Set<String> enumValues = Sets.newHashSet();
+            Set<String> enumValues = new HashSet<>();
             for (EnumValueDefinition valueDef : definition.getValues()) {
                 boolean unseen = enumValues.add(valueDef.getValue());
                 Preconditions.checkArgument(unseen, "Cannot declare a %s with duplicate enum values: %s",

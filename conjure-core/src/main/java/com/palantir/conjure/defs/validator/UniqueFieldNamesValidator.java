@@ -17,9 +17,9 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.spec.FieldName;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public final class UniqueFieldNamesValidator implements ConjureValidator<Set<Fie
 
     @Override
     public void validate(Set<FieldName> args) {
-        Map<FieldName, FieldName> seenNormalizedToOriginal = Maps.newHashMap();
+        Map<FieldName, FieldName> seenNormalizedToOriginal = new HashMap<>();
         for (FieldName argName : args) {
             FieldName normalizedName = FieldNameValidator.toCase(argName, CaseConverter.Case.LOWER_CAMEL_CASE);
             FieldName seenName = seenNormalizedToOriginal.get(normalizedName);
