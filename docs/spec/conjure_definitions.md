@@ -116,7 +116,7 @@ The object specifies the types that are defined in the Conjure definition.
 Field | Type | Description
 ---|:---:|---
 default&#8209;package | `string` |
-definitions | Map[[TypeName][] &rarr; [AliasDefinition][] or [ObjectTypeDefinition][] or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
+objects | Map[[TypeName][] &rarr; [AliasDefinition][] or [ObjectTypeDefinition][] or [UnionTypeDefinition][] or [EnumTypeDefinition][]] | A map between type names and type definitions.
 errors | Map[[TypeName][]&nbsp;&rarr;&nbsp;[ErrorDefinition][]] |A map between type names and error definitions.
 
 Package names are used by generator implementations to determine the output location and language-specific namespacing. Package names should follow the Java style naming convention: `com.example.name`.
