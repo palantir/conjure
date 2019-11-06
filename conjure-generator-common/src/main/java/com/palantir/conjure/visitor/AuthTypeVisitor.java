@@ -34,7 +34,7 @@ public final class AuthTypeVisitor {
         }
     }
 
-    private static class CookieAuthTypeVisitor extends DefaultAuthTypeVisitor<CookieAuthType> {
+    private static final class CookieAuthTypeVisitor extends DefaultAuthTypeVisitor<CookieAuthType> {
         @Override
         public CookieAuthType visitCookie(CookieAuthType value) {
             return value;
@@ -58,14 +58,14 @@ public final class AuthTypeVisitor {
         }
     }
 
-    private static class IsHeaderAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
+    private static final class IsHeaderAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
         @Override
         public Boolean visitHeader(HeaderAuthType _value) {
             return true;
         }
     }
 
-    private static class IsCookieAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
+    private static final class IsCookieAuthTypeVisitor extends DefaultIsAuthTypeVisitor {
         @Override
         public Boolean visitCookie(CookieAuthType _value) {
             return true;

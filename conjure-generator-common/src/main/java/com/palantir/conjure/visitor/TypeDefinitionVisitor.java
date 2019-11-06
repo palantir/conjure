@@ -26,7 +26,7 @@ public final class TypeDefinitionVisitor {
     public static final IsEnumDefinitionVisitor IS_ENUM = new IsEnumDefinitionVisitor();
     public static final IsUnionDefinitionVisitor IS_UNION = new IsUnionDefinitionVisitor();
 
-    private static class TypeNameVisitor implements TypeDefinition.Visitor<TypeName> {
+    private static final class TypeNameVisitor implements TypeDefinition.Visitor<TypeName> {
 
         @Override
         public TypeName visitAlias(AliasDefinition value) {
@@ -54,28 +54,28 @@ public final class TypeDefinitionVisitor {
         }
     }
 
-    private static class AliasDefinitionVisitor extends DefaultDefinitionVisitor<AliasDefinition> {
+    private static final class AliasDefinitionVisitor extends DefaultDefinitionVisitor<AliasDefinition> {
         @Override
         public AliasDefinition visitAlias(AliasDefinition value) {
             return value;
         }
     }
 
-    private static class ObjectDefinitionVisitor extends DefaultDefinitionVisitor<ObjectDefinition> {
+    private static final class ObjectDefinitionVisitor extends DefaultDefinitionVisitor<ObjectDefinition> {
         @Override
         public ObjectDefinition visitObject(ObjectDefinition value) {
             return value;
         }
     }
 
-    private static class EnumDefinitionVisitor extends DefaultDefinitionVisitor<EnumDefinition> {
+    private static final class EnumDefinitionVisitor extends DefaultDefinitionVisitor<EnumDefinition> {
         @Override
         public EnumDefinition visitEnum(EnumDefinition value) {
             return value;
         }
     }
 
-    private static class UnionDefinitionVisitor extends DefaultDefinitionVisitor<UnionDefinition> {
+    private static final class UnionDefinitionVisitor extends DefaultDefinitionVisitor<UnionDefinition> {
         @Override
         public UnionDefinition visitUnion(UnionDefinition value) {
             return value;
@@ -110,28 +110,28 @@ public final class TypeDefinitionVisitor {
         }
     }
 
-    private static class IsAliasDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
+    private static final class IsAliasDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
         public Boolean visitAlias(AliasDefinition _value) {
             return true;
         }
     }
 
-    private static class IsObjectDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
+    private static final class IsObjectDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
         public Boolean visitObject(ObjectDefinition _value) {
             return true;
         }
     }
 
-    private static class IsEnumDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
+    private static final class IsEnumDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
         public Boolean visitEnum(EnumDefinition _value) {
             return true;
         }
     }
 
-    private static class IsUnionDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
+    private static final class IsUnionDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
         @Override
         public Boolean visitUnion(UnionDefinition _value) {
             return true;

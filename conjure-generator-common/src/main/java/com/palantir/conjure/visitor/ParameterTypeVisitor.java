@@ -51,28 +51,28 @@ public final class ParameterTypeVisitor {
         }
     }
 
-    private static class QueryParameterTypeVisitor extends DefaultParameterType<QueryParameterType> {
+    private static final class QueryParameterTypeVisitor extends DefaultParameterType<QueryParameterType> {
         @Override
         public QueryParameterType visitQuery(QueryParameterType value) {
             return value;
         }
     }
 
-    private static class HeaderParameterTypeVisitor extends DefaultParameterType<HeaderParameterType> {
+    private static final class HeaderParameterTypeVisitor extends DefaultParameterType<HeaderParameterType> {
         @Override
         public HeaderParameterType visitHeader(HeaderParameterType value) {
             return value;
         }
     }
 
-    private static class BodyIsParameterType extends DefaultParameterType<BodyParameterType> {
+    private static final class BodyIsParameterType extends DefaultParameterType<BodyParameterType> {
         @Override
         public BodyParameterType visitBody(BodyParameterType value) {
             return value;
         }
     }
 
-    private static class PathIsParameterType extends DefaultParameterType<PathParameterType> {
+    private static final class PathIsParameterType extends DefaultParameterType<PathParameterType> {
         @Override
         public PathParameterType visitPath(PathParameterType value) {
             return value;
@@ -106,28 +106,28 @@ public final class ParameterTypeVisitor {
         }
     }
 
-    private static class IsBodyParameterType extends IsParameterTypeVisitor {
+    private static final class IsBodyParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitBody(BodyParameterType _value) {
             return true;
         }
     }
 
-    private static class IsPathParameterType extends IsParameterTypeVisitor {
+    private static final class IsPathParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitPath(PathParameterType _value) {
             return true;
         }
     }
 
-    private static class IsHeaderParameterType extends IsParameterTypeVisitor {
+    private static final class IsHeaderParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitHeader(HeaderParameterType _value) {
             return true;
         }
     }
 
-    private static class IsQueryParameterType extends IsParameterTypeVisitor {
+    private static final class IsQueryParameterType extends IsParameterTypeVisitor {
         @Override
         public Boolean visitQuery(QueryParameterType _value) {
             return true;

@@ -35,42 +35,42 @@ public final class TypeVisitor {
     public static final IsBinaryType IS_BINARY = new IsBinaryType();
     public static final IsAnyType IS_ANY = new IsAnyType();
 
-    private static class IsPrimitiveTypeVisitor extends IsTypeVisitor {
+    private static final class IsPrimitiveTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitPrimitive(PrimitiveType _value) {
             return true;
         }
     }
 
-    private static class IsOptionalTypeVisitor extends IsTypeVisitor {
+    private static final class IsOptionalTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitOptional(OptionalType _value) {
             return true;
         }
     }
 
-    private static class IsListTypeVisitor extends IsTypeVisitor {
+    private static final class IsListTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitList(ListType _value) {
             return true;
         }
     }
 
-    private static class IsSetTypeVisitor extends IsTypeVisitor {
+    private static final class IsSetTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitSet(SetType _value) {
             return true;
         }
     }
 
-    private static class IsMapTypeVisitor extends IsTypeVisitor {
+    private static final class IsMapTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitMap(MapType _value) {
             return true;
         }
     }
 
-    private static class IsReferenceTypeVisitor extends IsTypeVisitor {
+    private static final class IsReferenceTypeVisitor extends IsTypeVisitor {
         @Override
         public Boolean visitReference(TypeName _value) {
             return true;
@@ -82,7 +82,7 @@ public final class TypeVisitor {
         }
     }
 
-    private static class IsPrimitiveOrReferenceType extends IsTypeVisitor {
+    private static final class IsPrimitiveOrReferenceType extends IsTypeVisitor {
         @Override
         public Boolean visitPrimitive(PrimitiveType _value) {
             return true;
@@ -99,14 +99,14 @@ public final class TypeVisitor {
         }
     }
 
-    private static class IsBinaryType extends IsTypeVisitor {
+    private static final class IsBinaryType extends IsTypeVisitor {
         @Override
         public Boolean visitPrimitive(PrimitiveType value) {
             return value.get() == PrimitiveType.Value.BINARY;
         }
     }
 
-    private static class IsAnyType extends IsTypeVisitor {
+    private static final class IsAnyType extends IsTypeVisitor {
         @Override
         public Boolean visitPrimitive(PrimitiveType value) {
             return value.get() == PrimitiveType.Value.ANY;
@@ -198,14 +198,14 @@ public final class TypeVisitor {
         }
     }
 
-    private static class PrimitiveTypeVisitor extends DefaultTypeVisitor<PrimitiveType> {
+    private static final class PrimitiveTypeVisitor extends DefaultTypeVisitor<PrimitiveType> {
         @Override
         public PrimitiveType visitPrimitive(PrimitiveType value) {
             return value;
         }
     }
 
-    private static class ReferenceTypeVisitor extends DefaultTypeVisitor<TypeName> {
+    private static final class ReferenceTypeVisitor extends DefaultTypeVisitor<TypeName> {
         @Override
         public TypeName visitReference(TypeName value) {
             return value;
@@ -217,28 +217,28 @@ public final class TypeVisitor {
         }
     }
 
-    private static class MapTypeVisitor extends DefaultTypeVisitor<MapType> {
+    private static final class MapTypeVisitor extends DefaultTypeVisitor<MapType> {
         @Override
         public MapType visitMap(MapType value) {
             return value;
         }
     }
 
-    private static class ListTypeVisitor extends DefaultTypeVisitor<ListType> {
+    private static final class ListTypeVisitor extends DefaultTypeVisitor<ListType> {
         @Override
         public ListType visitList(ListType value) {
             return value;
         }
     }
 
-    private static class SetTypeVisitor extends DefaultTypeVisitor<SetType> {
+    private static final class SetTypeVisitor extends DefaultTypeVisitor<SetType> {
         @Override
         public SetType visitSet(SetType value) {
             return value;
         }
     }
 
-    private static class OptionalTypeVisitor extends DefaultTypeVisitor<OptionalType> {
+    private static final class OptionalTypeVisitor extends DefaultTypeVisitor<OptionalType> {
         @Override
         public OptionalType visitOptional(OptionalType value) {
             return value;
