@@ -163,7 +163,7 @@ public final class TestUnitParsers {
     public void testGingerlyBooleanFalse() throws ParseException {
         StringParserState state = new StringParserState("false 123");
 
-        assertThat(Parsers.gingerly(bp).parse(state)).isEqualTo(Boolean.FALSE);
+        assertThat(Parsers.gingerly(bp).parse(state)).isFalse();
         assertThat(rsp.parse(state)).isEqualTo("123");
     }
 
@@ -171,7 +171,7 @@ public final class TestUnitParsers {
     public void testGingerlyBooleanTrue() throws ParseException {
         StringParserState state = new StringParserState("true 123");
 
-        assertThat(Parsers.gingerly(bp).parse(state)).isEqualTo(Boolean.TRUE);
+        assertThat(Parsers.gingerly(bp).parse(state)).isTrue();
         assertThat(rsp.parse(state)).isEqualTo("123");
     }
 
