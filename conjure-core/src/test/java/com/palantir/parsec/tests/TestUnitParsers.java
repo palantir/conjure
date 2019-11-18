@@ -42,9 +42,12 @@ public final class TestUnitParsers {
     @Test
     public void testQuotedStringParser() throws ParseException {
         assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test 123\""))).isEqualTo("Test 123");
-        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \\\"123\""))).isEqualTo("Test \"123");
-        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \n\n123\""))).isEqualTo("Test 123");
-        assertThat(new QuotedStringParser(true).parse(new StringParserState("\"Test \n\n123\""))).isEqualTo("Test \n\n123");
+        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \\\"123\"")))
+                .isEqualTo("Test \"123");
+        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \n\n123\"")))
+                .isEqualTo("Test 123");
+        assertThat(new QuotedStringParser(true).parse(new StringParserState("\"Test \n\n123\"")))
+                .isEqualTo("Test \n\n123");
     }
 
     @Test
@@ -70,9 +73,12 @@ public final class TestUnitParsers {
 
     @Test
     public void testExpectantParser() {
-        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcdef"))).isEqualTo(ExpectationResult.CORRECT);
-        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcde"))).isEqualTo(ExpectationResult.INCORRECT);
-        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcdeg"))).isEqualTo(ExpectationResult.INCORRECT);
+        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcdef")))
+                .isEqualTo(ExpectationResult.CORRECT);
+        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcde")))
+                .isEqualTo(ExpectationResult.INCORRECT);
+        assertThat(new ExpectantParser("abcdef").parse(new StringParserState("abcdeg")))
+                .isEqualTo(ExpectationResult.INCORRECT);
     }
 
     @Test
@@ -144,8 +150,10 @@ public final class TestUnitParsers {
             }
         });
 
-        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("abcdef"))).isEqualTo("abcdef");
-        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("\"abcdef\""))).isEqualTo("abcdef");
+        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("abcdef")))
+                .isEqualTo("abcdef");
+        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("\"abcdef\"")))
+                .isEqualTo("abcdef");
     }
 
     private static final Parser<String> rsp = Parsers.prefix(Parsers.whitespace(), new RawStringParser());
