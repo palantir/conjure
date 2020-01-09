@@ -256,7 +256,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 `safelong`        | Number                                             | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
 `string`          | String                                             | UTF-8 string
 `uuid`            | String                                             | In accordance with [RFC 4122](https://tools.ietf.org/html/rfc4122).
-`any`             | N/A                                                | May be any of the above types or an `object` with any fields.
+`any`             | N/A                                                | May be any of the above types, an `object` with `any` fields, or a `list` with `any` elements.
 
 ### 5.2. Container types
 Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
