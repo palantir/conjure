@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Enum values, fields, and union values support deprecation documentation.
+  links:
+  - https://github.com/palantir/conjure/pull/494
