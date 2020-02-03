@@ -79,12 +79,12 @@ public class ConjureParserTest {
                 .get(TypeName.of("BeanWithDeprecatedField"))
                 .visit(new TypeDefinitionVisitor<ObjectTypeDefinition>() {
                     @Override
-                    public ObjectTypeDefinition visit(AliasTypeDefinition def) {
+                    public ObjectTypeDefinition visit(AliasTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
                     }
 
                     @Override
-                    public ObjectTypeDefinition visit(EnumTypeDefinition def) {
+                    public ObjectTypeDefinition visit(EnumTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
                     }
 
@@ -94,7 +94,7 @@ public class ConjureParserTest {
                     }
 
                     @Override
-                    public ObjectTypeDefinition visit(UnionTypeDefinition def) {
+                    public ObjectTypeDefinition visit(UnionTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
                     }
                 });
@@ -110,7 +110,7 @@ public class ConjureParserTest {
                 .get(TypeName.of("EnumWithDeprecatedValues"))
                 .visit(new TypeDefinitionVisitor<EnumTypeDefinition>() {
                     @Override
-                    public EnumTypeDefinition visit(AliasTypeDefinition def) {
+                    public EnumTypeDefinition visit(AliasTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 
@@ -120,12 +120,12 @@ public class ConjureParserTest {
                     }
 
                     @Override
-                    public EnumTypeDefinition visit(ObjectTypeDefinition def) {
+                    public EnumTypeDefinition visit(ObjectTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 
                     @Override
-                    public EnumTypeDefinition visit(UnionTypeDefinition def) {
+                    public EnumTypeDefinition visit(UnionTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
                 });
@@ -146,17 +146,17 @@ public class ConjureParserTest {
                 .get(TypeName.of("UnionWithDeprecatedTypes"))
                 .visit(new TypeDefinitionVisitor<UnionTypeDefinition>() {
                     @Override
-                    public UnionTypeDefinition visit(AliasTypeDefinition def) {
+                    public UnionTypeDefinition visit(AliasTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 
                     @Override
-                    public UnionTypeDefinition visit(EnumTypeDefinition def) {
+                    public UnionTypeDefinition visit(EnumTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 
                     @Override
-                    public UnionTypeDefinition visit(ObjectTypeDefinition def) {
+                    public UnionTypeDefinition visit(ObjectTypeDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 

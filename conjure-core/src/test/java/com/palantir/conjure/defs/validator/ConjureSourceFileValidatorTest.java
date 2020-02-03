@@ -55,7 +55,11 @@ public class ConjureSourceFileValidatorTest {
                 .types(ImmutableList.of(TypeDefinition.object(
                         ObjectDefinition.builder()
                                 .typeName(FOO)
-                                .fields(FieldDefinition.builder().fieldName(FieldName.of("self")).type(Type.reference(FOO)).docs(DOCS).build())
+                                .fields(FieldDefinition.builder()
+                                        .fieldName(FieldName.of("self"))
+                                        .type(Type.reference(FOO))
+                                        .docs(DOCS)
+                                        .build())
                                 .build())))
                 .build();
 
@@ -211,6 +215,10 @@ public class ConjureSourceFileValidatorTest {
     }
 
     private FieldDefinition field(FieldName name, String type) {
-        return FieldDefinition.builder().fieldName(name).type(Type.reference(TypeName.of(type, PACKAGE))).docs(DOCS).build();
+        return FieldDefinition.builder()
+                .fieldName(name)
+                .type(Type.reference(TypeName.of(type, PACKAGE)))
+                .docs(DOCS)
+                .build();
     }
 }
