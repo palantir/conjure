@@ -1,0 +1,21 @@
+types:
+  definitions:
+    default-package: com.palantir.deprecation
+    objects:
+      BeanWithDeprecatedField:
+        fields:
+          id: rid
+          old:
+            type: string
+            deprecated: Test deprecated.
+      EnumWithDeprecatedValues:
+        values:
+          - ONE
+          - value: TWO
+            deprecated: Prefer ONE.
+      UnionWithDeprecatedTypes:
+        union:
+          first: string
+          second:
+            type: string
+            deprecated: Use 'first'.

@@ -209,6 +209,7 @@ Field | Type | Description
 ---|:---:|---
 type | [ConjureType][] | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+deprecated | [DocString][] | Documentation for why this field is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
 ## UnionTypeDefinition
@@ -219,6 +220,7 @@ Field | Type | Description
 ---------- | ---- | -----------
 union | Map[`string` &rarr; [FieldDefinition][] or [ConjureType][]] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+deprecated | [DocString][] | Documentation for why this value is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 It is common for a generator to also generate a visitor interface for each union, to facilitate consumption and customization of behavior depending on the wrapped type. The interface includes a visit() method for each wrapped type, as well as a visitUnknown(String unknownType) method which is executed when the wrapped object does not match any of the known member types.
@@ -241,6 +243,7 @@ Field | Type | Description
 ---|:---:|---
 values | List[string or [EnumValueDefinition][]] | **REQUIRED**. A list of enumeration values. All elements in the list MUST be unique and be UPPERCASE.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+deprecated | [DocString][] | Documentation for why this value is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 **Example:**
