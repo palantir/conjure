@@ -14,7 +14,8 @@
         "type" : "primitive",
         "primitive" : "INTEGER"
       },
-      "docs" : null
+      "docs" : null,
+      "deprecated" : null
     } ],
     "unsafeArgs" : [ ]
   }, {
@@ -31,7 +32,8 @@
         "type" : "primitive",
         "primitive" : "INTEGER"
       },
-      "docs" : null
+      "docs" : null,
+      "deprecated" : null
     } ],
     "unsafeArgs" : [ ]
   } ],
@@ -48,7 +50,8 @@
           "type" : "primitive",
           "primitive" : "STRING"
         },
-        "docs" : null
+        "docs" : null,
+        "deprecated" : null
       } ],
       "docs" : null
     }
