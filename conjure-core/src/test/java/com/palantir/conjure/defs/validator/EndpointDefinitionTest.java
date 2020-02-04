@@ -68,7 +68,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Non body parameters cannot be of the 'binary' type: 'testArg' is not allowed");
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'testArg' from endpoint 'test{http: GET /a/path}' violates this constraint.");
     }
 
     @Test
@@ -183,7 +183,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Non body parameters cannot be of the 'binary' type: 'paramName' is not allowed");
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' from endpoint 'test{http: GET /path}' violates this constraint.");
     }
 
     @Test
@@ -217,7 +217,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Non body parameters cannot be of the 'binary' type: 'paramName' is not allowed");
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' from endpoint 'test{http: GET /path}' violates this constraint.");
     }
 
     @Test
@@ -234,7 +234,7 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Non body parameters cannot be of the 'binary' type: 'paramName' is not allowed");
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' from endpoint 'test{http: GET /path}' violates this constraint.");
     }
 
     @Test

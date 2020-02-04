@@ -102,8 +102,10 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .forEach(arg -> Preconditions.checkArgument(
                             validateType(arg.getType(), dealiasingTypeVisitor),
-                            "Non body parameters cannot be of the 'binary' type: '%s' is not allowed",
-                            arg.getArgName()));
+                            "Non body parameters cannot contain the 'binary' type. "
+                                    + "Parameter '%s' from endpoint '%s' violates this constraint.",
+                            arg.getArgName(),
+                            describe(definition)));
         }
 
         private static boolean validateType(Type input, DealiasingTypeVisitor dealiasingTypeVisitor) {
