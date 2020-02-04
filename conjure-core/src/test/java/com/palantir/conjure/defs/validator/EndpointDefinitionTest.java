@@ -187,6 +187,23 @@ public final class EndpointDefinitionTest {
     }
 
     @Test
+    public void testQueryParamValidatorBearerTokenParamInContainer() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(ListType.of(Type.primitive(PrimitiveType.BEARERTOKEN))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Path or query parameters of type 'bearertoken' are not allowed");
+    }
+
+    @Test
     public void testQueryParamValidatorBinaryParamInContainer_set() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ImmutableList.of(ArgumentDefinition.builder()
