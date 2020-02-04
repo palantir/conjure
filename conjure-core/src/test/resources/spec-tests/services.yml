@@ -282,7 +282,7 @@ negative:
                   type: bearertoken
                   param-type: query
   disallowAnyInPathParams:
-    expected-error: "Non body parameters cannot be of the 'binary' type: 'foo' is not allowed"
+    expected-error: "Non body parameters cannot contain the 'binary' type. Parameter 'foo' from endpoint 'unused{http: GET /{foo}}' violates this constraint."
     conjure:
       services:
         Unused:
@@ -294,7 +294,7 @@ negative:
               args:
                 foo: any
   disallowAliasedAnyInPathParams:
-    expected-error: "Non body parameters cannot be of the 'binary' type: 'foo' is not allowed"
+    expected-error: "Non body parameters cannot contain the 'binary' type. Parameter 'foo' from endpoint 'unused{http: GET /{foo}}' violates this constraint."
     conjure:
       types:
         definitions:
@@ -412,7 +412,7 @@ negative:
                     type: optional<optional<string>>
                     param-type: query
   disallowQueryParamWithBinary:
-    expected-error: "Non body parameters cannot be of the 'binary' type: 'queryName' is not allowed"
+    expected-error: "Non body parameters cannot contain the 'binary' type. Parameter 'queryName' from endpoint 'testEndpoint{http: GET /myEndpoint}' violates this constraint."
     conjure:
       services:
         TestService:
@@ -426,7 +426,7 @@ negative:
                   type: binary
                   param-type: query
   disallowQueryParamWithAliasedBinary:
-    expected-error: "Non body parameters cannot be of the 'binary' type: 'queryName' is not allowed"
+    expected-error: "Non body parameters cannot contain the 'binary' type. Parameter 'queryName' from endpoint 'testEndpoint{http: GET /myEndpoint}' violates this constraint."
     conjure:
       types:
         definitions:
