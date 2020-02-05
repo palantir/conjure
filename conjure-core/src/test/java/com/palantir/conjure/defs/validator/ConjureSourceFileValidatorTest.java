@@ -55,7 +55,11 @@ public class ConjureSourceFileValidatorTest {
                 .types(ImmutableList.of(TypeDefinition.object(
                         ObjectDefinition.builder()
                                 .typeName(FOO)
-                                .fields(FieldDefinition.of(FieldName.of("self"), Type.reference(FOO), DOCS))
+                                .fields(FieldDefinition.builder()
+                                        .fieldName(FieldName.of("self"))
+                                        .type(Type.reference(FOO))
+                                        .docs(DOCS)
+                                        .build())
                                 .build())))
                 .build();
 
@@ -71,14 +75,14 @@ public class ConjureSourceFileValidatorTest {
                 ObjectDefinition.builder()
                         .typeName(TypeName.of("Foo", "bar"))
                         .addAllFields(ImmutableList.of(
-                                FieldDefinition.of(FieldName.of("selfOptional"),
-                                        Type.optional(OptionalType.of(Type.reference(FOO))), DOCS),
-                                FieldDefinition.of(FieldName.of("selfMap"),
-                                        Type.map(MapType.of(referenceType, referenceType)), DOCS),
-                                FieldDefinition.of(FieldName.of("selfSet"),
-                                        Type.set(SetType.of(referenceType)), DOCS),
-                                FieldDefinition.of(FieldName.of("selfList"),
-                                        Type.list(ListType.of(referenceType)), DOCS)))
+                                FieldDefinition.builder().fieldName(FieldName.of("selfOptional")).type(
+                                        Type.optional(OptionalType.of(Type.reference(FOO)))).docs(DOCS).build(),
+                                FieldDefinition.builder().fieldName(FieldName.of("selfMap"))
+                                        .type(Type.map(MapType.of(referenceType, referenceType))).docs(DOCS).build(),
+                                FieldDefinition.builder().fieldName(FieldName.of("selfSet"))
+                                        .type(Type.set(SetType.of(referenceType))).docs(DOCS).build(),
+                                FieldDefinition.builder().fieldName(FieldName.of("selfList"))
+                                        .type(Type.list(ListType.of(referenceType))).docs(DOCS).build()))
                         .build());
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
@@ -138,10 +142,10 @@ public class ConjureSourceFileValidatorTest {
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
-                        .fields(FieldDefinition.of(FieldName.of("bad"),
-                                Type.map(MapType.of(
+                        .fields(FieldDefinition.builder().fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
                                         Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))),
-                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                                        Type.primitive(PrimitiveType.STRING)))).docs(DOCS).build())
                         .build()))
                 .build();
         assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
@@ -159,10 +163,10 @@ public class ConjureSourceFileValidatorTest {
                         .build()))
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
-                        .fields(FieldDefinition.of(FieldName.of("bad"),
-                                Type.map(MapType.of(
+                        .fields(FieldDefinition.builder().fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
                                         Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))),
-                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                                        Type.primitive(PrimitiveType.STRING)))).docs(DOCS).build())
                         .build()))
                 .build();
         assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
@@ -176,13 +180,13 @@ public class ConjureSourceFileValidatorTest {
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
-                        .fields(FieldDefinition.of(FieldName.of("bad"),
-                                Type.map(MapType.of(
+                        .fields(FieldDefinition.builder().fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
                                         Type.external(ExternalReference.builder()
                                                 .externalReference(TypeName.of("Foo", "package"))
                                                 .fallback(Type.primitive(PrimitiveType.STRING))
                                                 .build()),
-                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                                        Type.primitive(PrimitiveType.STRING)))).docs(DOCS).build())
                         .build()))
                 .build();
         assertThatCode(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
@@ -196,13 +200,13 @@ public class ConjureSourceFileValidatorTest {
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
-                        .fields(FieldDefinition.of(FieldName.of("bad"),
-                                Type.map(MapType.of(
+                        .fields(FieldDefinition.builder().fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
                                         Type.external(ExternalReference.builder()
                                                 .externalReference(TypeName.of("Foo", "package"))
                                                 .fallback(Type.primitive(PrimitiveType.ANY))
                                                 .build()),
-                                        Type.primitive(PrimitiveType.STRING))), DOCS))
+                                        Type.primitive(PrimitiveType.STRING)))).docs(DOCS).build())
                         .build()))
                 .build();
         assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
@@ -211,6 +215,10 @@ public class ConjureSourceFileValidatorTest {
     }
 
     private FieldDefinition field(FieldName name, String type) {
-        return FieldDefinition.of(name, Type.reference(TypeName.of(type, PACKAGE)), DOCS);
+        return FieldDefinition.builder()
+                .fieldName(name)
+                .type(Type.reference(TypeName.of(type, PACKAGE)))
+                .docs(DOCS)
+                .build();
     }
 }

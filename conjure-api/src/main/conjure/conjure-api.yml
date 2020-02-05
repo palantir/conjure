@@ -129,11 +129,13 @@ types:
         fields:
           value: string
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       FieldDefinition:
         fields:
           fieldName: FieldName
           type: Type
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       FieldName:
         alias: string
         docs: Should be in lowerCamelCase, but kebab-case and snake_case are also permitted.

@@ -21,9 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
+import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
+import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
+import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
+import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
+import com.palantir.conjure.parser.types.names.FieldName;
 import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
+import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,6 +68,105 @@ public class ConjureParserTest {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
         assertThat(conjure.types().imports().get(TypeName.of("ExampleAnyImport")).baseType())
                 .isEqualTo(PrimitiveType.fromString("any"));
+    }
+
+    @Test
+    public void testConjureFieldDeprecation() {
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-deprecation.yml"));
+        ObjectTypeDefinition object = conjure.types()
+                .definitions()
+                .objects()
+                .get(TypeName.of("BeanWithDeprecatedField"))
+                .visit(new TypeDefinitionVisitor<ObjectTypeDefinition>() {
+                    @Override
+                    public ObjectTypeDefinition visit(AliasTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                    }
+
+                    @Override
+                    public ObjectTypeDefinition visit(EnumTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                    }
+
+                    @Override
+                    public ObjectTypeDefinition visit(ObjectTypeDefinition def) {
+                        return def;
+                    }
+
+                    @Override
+                    public ObjectTypeDefinition visit(UnionTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                    }
+                });
+        assertThat(object.fields().get(FieldName.of("old")).deprecated()).hasValue("Test deprecated.");
+    }
+
+    @Test
+    public void testConjureEnumValueDeprecation() {
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-deprecation.yml"));
+        EnumTypeDefinition enumType = conjure.types()
+                .definitions()
+                .objects()
+                .get(TypeName.of("EnumWithDeprecatedValues"))
+                .visit(new TypeDefinitionVisitor<EnumTypeDefinition>() {
+                    @Override
+                    public EnumTypeDefinition visit(AliasTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public EnumTypeDefinition visit(EnumTypeDefinition def) {
+                        return def;
+                    }
+
+                    @Override
+                    public EnumTypeDefinition visit(ObjectTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public EnumTypeDefinition visit(UnionTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+                });
+        EnumValueDefinition one = enumType.values().get(0);
+        EnumValueDefinition two = enumType.values().get(1);
+        assertThat(one.value()).isEqualTo("ONE");
+        assertThat(one.deprecated()).isNotPresent();
+        assertThat(two.value()).isEqualTo("TWO");
+        assertThat(two.deprecated()).hasValue("Prefer ONE.");
+    }
+
+    @Test
+    public void testConjureUnionTypeDeprecation() {
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-deprecation.yml"));
+        UnionTypeDefinition union = conjure.types()
+                .definitions()
+                .objects()
+                .get(TypeName.of("UnionWithDeprecatedTypes"))
+                .visit(new TypeDefinitionVisitor<UnionTypeDefinition>() {
+                    @Override
+                    public UnionTypeDefinition visit(AliasTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public UnionTypeDefinition visit(EnumTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public UnionTypeDefinition visit(ObjectTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public UnionTypeDefinition visit(UnionTypeDefinition def) {
+                        return def;
+                    }
+                });
+        assertThat(union.union().get(FieldName.of("first")).deprecated()).isNotPresent();
+        assertThat(union.union().get(FieldName.of("second")).deprecated()).hasValue("Use 'first'.");
     }
 
     @Test

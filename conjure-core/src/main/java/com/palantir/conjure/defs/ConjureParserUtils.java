@@ -303,6 +303,7 @@ public final class ConjureParserUtils {
         EnumValueDefinition enumValue = EnumValueDefinition.builder()
                 .value(def.value())
                 .docs(def.docs().map(Documentation::of))
+                .deprecated(def.deprecated().map(Documentation::of))
                 .build();
 
         EnumValueDefinitionValidator.validateAll(enumValue);
@@ -317,7 +318,9 @@ public final class ConjureParserUtils {
             FieldDefinition fieldDefinition = FieldDefinition.builder()
                     .fieldName(parseFieldName(entry.getKey()))
                     .type(entry.getValue().type().visit(new ConjureTypeParserVisitor(typeResolver)))
-                    .docs(entry.getValue().docs().map(Documentation::of)).build();
+                    .docs(entry.getValue().docs().map(Documentation::of))
+                    .deprecated(entry.getValue().deprecated().map(Documentation::of))
+                    .build();
             FieldDefinitionValidator.validate(fieldDefinition);
             return fieldDefinition;
         }).collect(Collectors.toList());
