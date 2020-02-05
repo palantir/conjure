@@ -43,6 +43,7 @@ import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,17 +100,32 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs()
                     .stream()
                     .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
-                    .forEach(arg -> {
-                        boolean isValid = dealiasingTypeVisitor.dealias(arg.getType())
-                                .fold(
-                                        typeDefinition -> true,
-                                        type -> !type.accept(TypeVisitor.IS_BINARY)
-                                                && !type.accept(TypeVisitor.IS_ANY)
-                                );
-                        Preconditions.checkArgument(
-                                isValid, "Non body parameters cannot be of the 'binary' type: '%s' is not allowed",
-                                arg.getArgName());
-                    });
+                    .forEach(arg -> Preconditions.checkArgument(
+                            validateType(arg.getType(), dealiasingTypeVisitor),
+                            "Non body parameters cannot contain the 'binary' type. "
+                                    + "Parameter '%s' from endpoint '%s' violates this constraint.",
+                            arg.getArgName(),
+                            describe(definition)));
+        }
+
+        private static boolean validateType(Type input, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            Optional<Type> dealiased = dealiasingTypeVisitor.dealias(input)
+                    .fold(typeDefinition -> Optional.empty(), Optional::of);
+            // typeDef isn't binary
+            if (!dealiased.isPresent()) {
+                return true;
+            }
+            Type type = dealiased.get();
+            if (input.accept(TypeVisitor.IS_OPTIONAL)) {
+                return validateType(input.accept(TypeVisitor.OPTIONAL).getItemType(), dealiasingTypeVisitor);
+            }
+            if (input.accept(TypeVisitor.IS_LIST)) {
+                return validateType(input.accept(TypeVisitor.LIST).getItemType(), dealiasingTypeVisitor);
+            }
+            if (input.accept(TypeVisitor.IS_SET)) {
+                return validateType(input.accept(TypeVisitor.SET).getItemType(), dealiasingTypeVisitor);
+            }
+            return !type.accept(TypeVisitor.IS_BINARY) && !type.accept(TypeVisitor.IS_ANY);
         }
     }
 
@@ -331,20 +347,32 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH)
                             || entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
-                    .forEach(entry -> {
-                        Either<TypeDefinition, Type> conjureType = dealiasingTypeVisitor.dealias(entry.getType());
-                        boolean isValid = conjureType.fold(
-                                typeDefinition -> true,
-                                type -> !type.accept(TypeVisitor.IS_PRIMITIVE)
-                                        || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN
-                        );
+                    .forEach(entry -> Preconditions.checkState(
+                            validateType(entry.getType(), dealiasingTypeVisitor),
+                            "Path or query parameters of type 'bearertoken' are not allowed as this "
+                                    + "would introduce a security vulnerability: \"%s\" endpoint \"%s\"",
+                            entry.getArgName(), describe(definition)));
+        }
 
-                        Preconditions.checkState(
-                                isValid,
-                                "Path or query parameters of type 'bearertoken' are not allowed as this "
-                                        + "would introduce a security vulnerability: \"%s\" endpoint \"%s\"",
-                                entry.getArgName(), describe(definition));
-                    });
+        private static boolean validateType(Type input, DealiasingTypeVisitor dealiasingTypeVisitor) {
+            Optional<Type> dealiased = dealiasingTypeVisitor.dealias(input)
+                    .fold(typeDefinition -> Optional.empty(), Optional::of);
+            // typeDef isn't bearertoken
+            if (!dealiased.isPresent()) {
+                return true;
+            }
+            Type type = dealiased.get();
+            if (input.accept(TypeVisitor.IS_OPTIONAL)) {
+                return validateType(input.accept(TypeVisitor.OPTIONAL).getItemType(), dealiasingTypeVisitor);
+            }
+            if (input.accept(TypeVisitor.IS_LIST)) {
+                return validateType(input.accept(TypeVisitor.LIST).getItemType(), dealiasingTypeVisitor);
+            }
+            if (input.accept(TypeVisitor.IS_SET)) {
+                return validateType(input.accept(TypeVisitor.SET).getItemType(), dealiasingTypeVisitor);
+            }
+            return !type.accept(TypeVisitor.IS_PRIMITIVE)
+                    || type.accept(TypeVisitor.PRIMITIVE).get() != PrimitiveType.Value.BEARERTOKEN;
         }
     }
 

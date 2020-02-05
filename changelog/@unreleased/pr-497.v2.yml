@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Validate against binary data in non-body container parameters.
+  links:
+  - https://github.com/palantir/conjure/pull/497

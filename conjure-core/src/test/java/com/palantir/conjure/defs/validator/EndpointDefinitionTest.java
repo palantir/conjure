@@ -37,6 +37,8 @@ import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PathParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.QueryParameterType;
+import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
@@ -66,7 +68,8 @@ public final class EndpointDefinitionTest {
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Non body parameters cannot be of the 'binary' type: 'testArg' is not allowed");
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'testArg' "
+                        + "from endpoint 'test{http: GET /a/path}' violates this constraint.");
     }
 
     @Test
@@ -165,6 +168,77 @@ public final class EndpointDefinitionTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Path parameter with identifier \"paramName\" is "
                         + "defined multiple times for endpoint test{http: GET /a/path}");
+    }
+
+    @Test
+    public void testQueryParamValidatorBinaryParamInContainer_list() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(ListType.of(Type.primitive(PrimitiveType.BINARY))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' "
+                        + "from endpoint 'test{http: GET /path}' violates this constraint.");
+    }
+
+    @Test
+    public void testQueryParamValidatorBearerTokenParamInContainer() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(ListType.of(Type.primitive(PrimitiveType.BEARERTOKEN))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Path or query parameters of type 'bearertoken' are not allowed");
+    }
+
+    @Test
+    public void testQueryParamValidatorBinaryParamInContainer_set() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.set(SetType.of(Type.primitive(PrimitiveType.BINARY))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' "
+                        + "from endpoint 'test{http: GET /path}' violates this constraint.");
+    }
+
+    @Test
+    public void testQueryParamValidatorBinaryParamInContainer_optional() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' "
+                        + "from endpoint 'test{http: GET /path}' violates this constraint.");
     }
 
     @Test
