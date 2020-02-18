@@ -26,7 +26,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.netflix.nebula:gradle-info-plugin:7.0.0'
+        classpath 'com.netflix.nebula:gradle-info-plugin:7.1.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:17.0.5'
         classpath 'com.palantir.baseline:gradle-baseline-java:2.37.0'
