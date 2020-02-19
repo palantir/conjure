@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Conjure CLI will log and ignore any unknown options that are provided
+  links:
+  - https://github.com/palantir/conjure/pull/533
