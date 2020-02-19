@@ -22,12 +22,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.ConjureDefinition;
-import com.palantir.logsafe.SafeArg;
 import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -54,8 +51,6 @@ public final class ConjureCli implements Runnable {
             mixinStandardHelpOptions = true,
             usageHelpWidth = 120)
     public static final class CompileCommand implements Runnable {
-        private static final Logger log = LoggerFactory.getLogger(CompileCommand.class);
-
         @CommandLine.Parameters(paramLabel = "<input>",
                 description = "Path to the input conjure YML definition file, or directory containing multiple such "
                         + "files.",
@@ -71,10 +66,11 @@ public final class ConjureCli implements Runnable {
         @Nullable
         private List<String> unmatchedOptions;
 
+        @SuppressWarnings("BanSystemErr")
         @Override
         public void run() {
             if (unmatchedOptions != null && !unmatchedOptions.isEmpty()) {
-                log.warn("Ignoring unknown options", SafeArg.of("unknown options", unmatchedOptions));
+                System.err.println("Ignoring unknown options: " + unmatchedOptions);
             }
             CliConfiguration config = getConfiguration();
             generate(config);
