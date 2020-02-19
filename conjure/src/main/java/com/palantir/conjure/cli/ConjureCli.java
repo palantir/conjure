@@ -23,6 +23,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.IOException;
+import java.util.List;
+import javax.annotation.Nullable;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -60,8 +62,16 @@ public final class ConjureCli implements Runnable {
                 index = "1")
         private String output;
 
+        @CommandLine.Unmatched
+        @Nullable
+        private List<String> unmatchedOptions;
+
+        @SuppressWarnings("BanSystemErr")
         @Override
         public void run() {
+            if (unmatchedOptions != null && !unmatchedOptions.isEmpty()) {
+                System.err.println("Ignoring unknown options: " + unmatchedOptions);
+            }
             CliConfiguration config = getConfiguration();
             generate(config);
         }
