@@ -478,11 +478,11 @@ Note, the difference between safe and unsafe arguments are explained in the docs
 
 ## Extensions
 
-The "extensions" section is a map of named user defined extensions. The structure of each extension is user defined and
+The "extensions" section is a map of named extensions. The structure of each extension is user defined and
 any consumer of an extension should treat its presence as optional and be tolerant of unknown fields. Extensions must
-not modify the semantics of a definitions and are intended only for annotating definitions with metadata.
+not modify the semantics of definitions and are intended only for conveying metadata about the definition.
 
-Example extensions definition:
+Example extension definition:
 ```json
 {
   "extensions": {
