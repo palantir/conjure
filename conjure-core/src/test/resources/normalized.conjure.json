@@ -1,6 +1,5 @@
 {
   "version" : 1,
-  "extensions" : { },
   "errors" : [ {
     "errorName" : {
       "name" : "Error1",
@@ -117,5 +116,6 @@
       "markers" : [ ]
     } ],
     "docs" : null
-  } ]
+  } ],
+  "extensions" : { }
 }
