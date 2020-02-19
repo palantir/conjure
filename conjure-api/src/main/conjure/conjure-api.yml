@@ -5,6 +5,7 @@ types:
       ConjureDefinition:
         fields:
           version: integer
+          extensions: map<string, any>
           errors: list<ErrorDefinition>
           types: list<TypeDefinition>
           services: list<ServiceDefinition>
