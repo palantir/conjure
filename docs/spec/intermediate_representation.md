@@ -19,7 +19,7 @@ The IR is expected to be in JSON format. The following describes version 1 of th
 
 # Version 1
 
-Version 1 of the IR format has four top-level keys: "version", "types", "services", and "errors".
+Version 1 of the IR format has four top-level keys: "version", "types", "services", "errors" and "extensions".
 
 ## Version
 
@@ -475,6 +475,27 @@ for details on the field definition format.
 for details on the field definition format.
 
 Note, the difference between safe and unsafe arguments are explained in the docs of [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime#error-propagation).
+
+## Extensions
+
+The "extensions" section is a map of named user defined extensions. The structure of each extension is user defined and
+any consumer of an extension should treat its presence as optional and be tolerant of unknown fields. Extensions must
+not modify the semantics of a definitions and are intended only for annotating definitions with metadata.
+
+Example extensions definition:
+```json
+{
+  "extensions": {
+    "product-dependencies": [
+      {
+        "minimum-version": "1.0.0",
+        "recommended-version": "1.1.0",
+        "maximum-version": "1.x.x"
+      }
+    ] 
+  }
+}
+```
 
 ## Self-describing definition
 
