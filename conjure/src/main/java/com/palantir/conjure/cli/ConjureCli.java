@@ -26,6 +26,7 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -72,8 +73,16 @@ public final class ConjureCli implements Runnable {
         @Nullable
         private String extensions;
 
+        @CommandLine.Unmatched
+        @Nullable
+        private List<String> unmatchedOptions;
+
+        @SuppressWarnings("BanSystemErr")
         @Override
         public void run() {
+            if (unmatchedOptions != null && !unmatchedOptions.isEmpty()) {
+                System.err.println("Ignoring unknown options: " + unmatchedOptions);
+            }
             CliConfiguration config = getConfiguration();
             generate(config);
         }

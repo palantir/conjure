@@ -93,16 +93,14 @@ public final class ConjureCliTest {
     }
 
     @Test
-    public void throwsWhenUnexpectedFeature() {
+    public void doesNotThrowWhenUnexpectedFeature() {
         String[] args = {
                 "compile",
                 inputFile.getAbsolutePath(),
                 folder.getRoot().getAbsolutePath(),
                 "--foo"
         };
-        assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
-                .isInstanceOf(PicocliException.class)
-                .hasMessageContaining("Unknown option: --foo");
+        CommandLine.populateCommand(new ConjureCli(), args);
     }
 
     @Test
