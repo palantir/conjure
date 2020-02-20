@@ -32,6 +32,7 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [4.4. Round-trip of unknown variants](#44-round-trip-of-unknown-variants)
   * [4.5. CORS and HTTP preflight requests](#45-cors-and-http-preflight-requests)
   * [4.6. HTTP/2](#46-http2)
+  * [4.7. Clients tolerate void endpoints returning JSON](#47-clients-tolerate-void-endpoints-returning-json)
 - [5. JSON format](#5-json-format)
   * [5.1. Built-in types](#51-built-in-types)
   * [5.2. Container types](#52-container-types)
@@ -183,6 +184,7 @@ Clients may inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-A
 ### 3.1. Status codes
 Conjure servers must respond to successful requests with HTTP status [`200 OK`](https://tools.ietf.org/html/rfc2616#section-10.2.1) unless:
 
+  - the endpoint does not return a value: servers must send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
   - the de-aliased return type is `optional<T>` and the value is not present: servers must send [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5).
   - the de-aliased return type is a `map`, `list` or `set`: it is recommended to send `204` but servers may send `200` if the HTTP body is `[]` or `{}`.
 
@@ -198,8 +200,9 @@ Conjure servers must serialize return values using the [JSON format][] defined b
   - the de-aliased return type is `binary`: servers must write the raw bytes as an octet-stream
 
 ### 3.3. Content-Type header
-Conjure servers must send a `Content-Type` header according to the endpoint's return type:
+Conjure servers must send a `Content-Type` header according to the endpoint's return value:
 
+  - if the endpoint returns [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5), servers must send no `Content-Type` header.
   - if the de-aliased return type is `binary`, servers must send `Content-Type: application/octet-stream`,
   - otherwise, servers must send `Content-Type: application/json`.
 
@@ -239,6 +242,8 @@ In order to be compatible with browser [preflight requests](https://developer.mo
 ### 4.6. HTTP/2
 The Conjure wire specification is compatible with HTTP/2, but it is not required.
 
+### 4.7. Clients tolerate void endpoints returning JSON
+Clients must tolerate an endpoint that is expected to return no value to return an arbitrary JSON value.
 
 ## 5. JSON format
 This format describes how all Conjure types are serialized into and deserialized from JSON ([RFC 7159](https://tools.ietf.org/html/rfc7159)).
