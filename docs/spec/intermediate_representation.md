@@ -486,13 +486,7 @@ Example extension definition:
 ```json
 {
   "extensions": {
-    "product-dependencies": [
-      {
-        "minimum-version": "1.0.0",
-        "recommended-version": "1.1.0",
-        "maximum-version": "1.x.x"
-      }
-    ] 
+    "productVersion": "1.0.0"
   }
 }
 ```
