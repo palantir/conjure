@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.immutables.value.Value;
@@ -32,11 +33,13 @@ public abstract class CliConfiguration {
 
     abstract File outputIrFile();
 
+    abstract Map<String, Object> extensions();
+
     static Builder builder() {
         return new Builder();
     }
 
-    static CliConfiguration create(String input, String outputIrFile) {
+    static CliConfiguration create(String input, String outputIrFile, Map<String, Object> extensions) {
         File inputFile = new File(input);
 
         Collection<File> inputFiles;
@@ -51,7 +54,7 @@ public abstract class CliConfiguration {
             throw new RuntimeException("Output IR file should not be a directory: " + outputFile);
         }
 
-        return new Builder().inputFiles(inputFiles).outputIrFile(outputFile).build();
+        return new Builder().inputFiles(inputFiles).outputIrFile(outputFile).extensions(extensions).build();
     }
 
     private static Collection<File> resolveInputFiles(File input) throws IOException {

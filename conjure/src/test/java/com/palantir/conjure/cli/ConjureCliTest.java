@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Before;
@@ -46,10 +47,15 @@ public final class ConjureCliTest {
 
     @Test
     public void correctlyParseArguments() {
-        String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath()};
+        String[] args = {
+                "compile",
+                inputFile.getAbsolutePath(),
+                outputFile.getAbsolutePath(),
+                "--extensions", "{\"foo\": \"bar\"}"};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
+                .putExtensions("foo", "bar")
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
@@ -95,6 +101,15 @@ public final class ConjureCliTest {
                 "--foo"
         };
         CommandLine.populateCommand(new ConjureCli(), args);
+    }
+
+    @Test
+    public void throwsWhenInvalidExtensions() {
+        String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), "--extensions", "foo"};
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        assertThatThrownBy(cmd::getConfiguration)
+                .isInstanceOf(SafeIllegalArgumentException.class)
+                .hasMessage("Failed to parse extensions");
     }
 
     @Test

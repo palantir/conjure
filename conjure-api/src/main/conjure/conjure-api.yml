@@ -8,6 +8,7 @@ types:
           errors: list<ErrorDefinition>
           types: list<TypeDefinition>
           services: list<ServiceDefinition>
+          extensions: map<string, any>
       TypeName:
         fields:
           name:

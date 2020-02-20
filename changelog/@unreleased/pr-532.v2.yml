@@ -1,0 +1,8 @@
+type: feature
+feature:
+  description: "Add `extensions` field to conjure definition which stores metadata
+    about the definition itself. \n\nImportantly, the fields stored in metadata should
+    not impact the semantics of the API. Expected usage would be things like origin,
+    version, product dependencies etc."
+  links:
+  - https://github.com/palantir/conjure/pull/532

@@ -17,13 +17,18 @@
 package com.palantir.conjure.cli;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import picocli.CommandLine;
 
@@ -62,6 +67,12 @@ public final class ConjureCli implements Runnable {
                 index = "1")
         private String output;
 
+        @CommandLine.Option(
+                names = "--extensions",
+                description = "")
+        @Nullable
+        private String extensions;
+
         @CommandLine.Unmatched
         @Nullable
         private List<String> unmatchedOptions;
@@ -78,7 +89,10 @@ public final class ConjureCli implements Runnable {
 
         @VisibleForTesting
         static void generate(CliConfiguration config) {
-            ConjureDefinition definition = Conjure.parse(config.inputFiles());
+            ConjureDefinition definition = ConjureDefinition.builder()
+                    .from(Conjure.parse(config.inputFiles()))
+                    .extensions(config.extensions())
+                    .build();
             try {
                 OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputIrFile(), definition);
             } catch (IOException e) {
@@ -88,7 +102,20 @@ public final class ConjureCli implements Runnable {
 
         @VisibleForTesting
         CliConfiguration getConfiguration() {
-            return CliConfiguration.create(input, output);
+            return CliConfiguration.create(
+                    input,
+                    output,
+                    Optional.ofNullable(extensions)
+                            .map(ConjureCli::parseExtensions)
+                            .orElseGet(Collections::emptyMap));
+        }
+    }
+
+    static Map<String, Object> parseExtensions(String extensions) {
+        try {
+            return OBJECT_MAPPER.readValue(extensions, new TypeReference<Map<String, Object>>() {});
+        } catch (IOException e) {
+            throw new SafeIllegalArgumentException("Failed to parse extensions", e);
         }
     }
 }
