@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
@@ -88,7 +89,7 @@ public final class ConjureSpecTest {
                 ConjureParserUtils.parseConjureDef(annotatedConjureDefFrom(yml));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
             } catch (Exception e) {
-                Assertions.assertThat(e.getCause())
+                Assertions.assertThat(Throwables.getRootCause(e))
                         .withFailMessage("Failure message for case did not match expectation: "
                                 + testName
                                 + "\nMessage:\n"
