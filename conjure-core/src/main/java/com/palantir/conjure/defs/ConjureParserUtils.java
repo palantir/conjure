@@ -291,7 +291,6 @@ public final class ConjureParserUtils {
                         .map(entry -> entry.getValue().visit(
                                 new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
                         .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
-                .map(entry -> entry.getValue().visit(
     }
 
     static List<ErrorDefinition> parseErrors(
