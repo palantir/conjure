@@ -29,8 +29,8 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesImportedAliases() {
-        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
-                ImmutableList.of(ConjureParser.parse(new File("src/test/resources/example-conjure-imports.yml"))));
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(ImmutableList.of(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml"))));
         assertThat(conjureDefinition.getTypes()).hasSize(1);
     }
 
@@ -38,7 +38,7 @@ public class ConjureDefTest {
     @Test
     @Ignore
     public void handlesNonJavaExternalType() {
-        ConjureParserUtils.parseConjureDef(
-                ImmutableList.of(ConjureParser.parse(new File("src/test/resources/example-external-types.yml"))));
+        ConjureParserUtils.parseConjureDef(ImmutableList.of(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml"))));
     }
 }

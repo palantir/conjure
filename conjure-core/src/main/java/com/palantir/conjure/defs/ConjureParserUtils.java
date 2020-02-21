@@ -31,6 +31,7 @@ import com.palantir.conjure.defs.validator.PackageValidator;
 import com.palantir.conjure.defs.validator.ServiceDefinitionValidator;
 import com.palantir.conjure.defs.validator.TypeNameValidator;
 import com.palantir.conjure.defs.validator.UnionDefinitionValidator;
+import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.services.ParameterName;
 import com.palantir.conjure.parser.services.PathString;
@@ -189,35 +190,42 @@ public final class ConjureParserUtils {
         return type;
     }
 
-    static ConjureDefinition parseConjureDef(Collection<ConjureSourceFile> parsedDefs) {
+    static ConjureDefinition parseConjureDef(Collection<AnnotatedConjureSourceFile> annotatedParsedDefs) {
         ImmutableList.Builder<ServiceDefinition> servicesBuilder = ImmutableList.builder();
         ImmutableList.Builder<ErrorDefinition> errorsBuilder = ImmutableList.builder();
         ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
 
-        parsedDefs.forEach(parsed -> {
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
-                    new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
+        annotatedParsedDefs.forEach(annotatedParsed -> {
+            ConjureSourceFile parsed = annotatedParsed.conjureSourceFile();
 
-            // Resolve objects first, so we can use them in service validations
-            Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
-            Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(parsed.types().conjureImports());
-            Map<TypeName, TypeDefinition> allObjects = new HashMap<>();
-            allObjects.putAll(objects);
-            allObjects.putAll(importedObjects);
+            try {
+                ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
+                        new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(parsed.types());
 
-            DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
+                // Resolve objects first, so we can use them in service validations
+                Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
+                Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(parsed.types().conjureImports());
+                Map<TypeName, TypeDefinition> allObjects = new HashMap<>();
+                allObjects.putAll(objects);
+                allObjects.putAll(importedObjects);
 
-            parsed.services().forEach((serviceName, service) -> {
-                servicesBuilder.add(
-                        parseService(
-                                service,
-                                TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                                typeResolver,
-                                dealiasingVisitor));
-            });
+                DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
 
-            typesBuilder.addAll(objects.values());
-            errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
+                parsed.services().forEach((serviceName, service) -> {
+                    servicesBuilder.add(
+                            parseService(
+                                    service,
+                                    TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
+                                    typeResolver,
+                                    dealiasingVisitor));
+                });
+
+                typesBuilder.addAll(objects.values());
+                errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
+            } catch (RuntimeException e) {
+                throw new RuntimeException(
+                        String.format("Encountered error trying to parse file '%s'", annotatedParsed.sourceFile()), e);
+            }
         });
 
         ConjureDefinition definition = ConjureDefinition.builder()
@@ -283,6 +291,7 @@ public final class ConjureParserUtils {
                         .map(entry -> entry.getValue().visit(
                                 new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
                         .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
+                .map(entry -> entry.getValue().visit(
     }
 
     static List<ErrorDefinition> parseErrors(

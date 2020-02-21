@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +74,7 @@ public final class ConjureSpecTest {
             String testName = String.format("positive case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                ConjureParserUtils.parseConjureDef(ImmutableList.of(MAPPER.readValue(yml, ConjureSourceFile.class)));
+                ConjureParserUtils.parseConjureDef(annotatedConjureDefFrom(yml));
             } catch (Exception e) {
                 Assertions.fail("Conjure for case should be valid according to the spec: " + testName, e);
             }
@@ -84,10 +85,10 @@ public final class ConjureSpecTest {
             String testName = String.format("negative case %s", entry.getKey());
             String yml = getYmlAsString(testName, entry.getValue().conjure());
             try {
-                ConjureParserUtils.parseConjureDef(ImmutableList.of(MAPPER.readValue(yml, ConjureSourceFile.class)));
+                ConjureParserUtils.parseConjureDef(annotatedConjureDefFrom(yml));
                 Assertions.fail("Conjure for case should be invalid according to the spec: " + testName);
             } catch (Exception e) {
-                Assertions.assertThat(e)
+                Assertions.assertThat(e.getCause())
                         .withFailMessage("Failure message for case did not match expectation: "
                                 + testName
                                 + "\nMessage:\n"
@@ -97,6 +98,14 @@ public final class ConjureSpecTest {
                         .hasMessageContaining(entry.getValue().expectedError());
             }
         });
+    }
+
+    private ImmutableList<AnnotatedConjureSourceFile> annotatedConjureDefFrom(String yml)
+            throws JsonProcessingException {
+        return ImmutableList.of(AnnotatedConjureSourceFile.builder()
+                .conjureSourceFile(MAPPER.readValue(yml, ConjureSourceFile.class))
+                .sourceFile(new File("test"))
+                .build());
     }
 
     private static String getYmlAsString(String testName, Object obj) {

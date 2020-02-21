@@ -60,6 +60,13 @@ public final class ConjureParser {
         return parser.parse(file);
     }
 
+    public static AnnotatedConjureSourceFile parseAnnotated(File file) {
+        return AnnotatedConjureSourceFile.builder()
+                .conjureSourceFile(ConjureParser.parse(file))
+                .sourceFile(file)
+                .build();
+    }
+
     private static final class RecursiveParser {
         private final Map<String, ConjureSourceFile> cache;
         private final Set<String> currentDepthFirstPath;
