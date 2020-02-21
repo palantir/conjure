@@ -16,8 +16,8 @@
 
 package com.palantir.conjure.defs;
 
+import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureParser;
-import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.NormalizeDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
@@ -34,7 +34,8 @@ public final class Conjure {
      * Deserializes {@link ConjureDefinition} from their YAML representations in the given files.
      */
     public static ConjureDefinition parse(Collection<File> files) {
-        List<ConjureSourceFile> sourceFiles = files.stream().map(ConjureParser::parse).collect(Collectors.toList());
+        List<AnnotatedConjureSourceFile> sourceFiles =
+                files.stream().map(ConjureParser::parseAnnotated).collect(Collectors.toList());
         ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles);
         return NormalizeDefinition.normalize(ir);
     }
