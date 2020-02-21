@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Errors encountered when parsing or validating conjure definition files
+    will now tell you which file the error was found in.
+  links:
+  - https://github.com/palantir/conjure/pull/537
