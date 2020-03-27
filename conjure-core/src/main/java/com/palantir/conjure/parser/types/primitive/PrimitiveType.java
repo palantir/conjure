@@ -33,6 +33,7 @@ public enum PrimitiveType implements LocalReferenceType {
     STRING(TypeName.of("string")),
     INTEGER(TypeName.of("integer")),
     DOUBLE(TypeName.of("double")),
+    BINARY(TypeName.of("binary")),
     BOOLEAN(TypeName.of("boolean")),
     SAFELONG(TypeName.of("safelong")),
     RID(TypeName.of("rid")),

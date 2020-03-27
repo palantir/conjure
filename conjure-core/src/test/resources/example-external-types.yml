@@ -8,6 +8,9 @@ types:
       base-type: string
       external:
         java: com.palantir.example.ExternalIntegerImport
+    ExampleBinaryImport:
+      base-type: binary
+      external: com.palantir.example.ExampleBinaryImport
 
   # Required otherwise imports are ignored by the compiler
   definitions:

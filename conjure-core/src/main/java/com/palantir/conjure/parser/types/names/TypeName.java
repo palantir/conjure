@@ -22,6 +22,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
+import com.palantir.conjure.spec.PrimitiveType;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.immutables.value.Value;
 
@@ -34,9 +36,9 @@ import org.immutables.value.Value;
 public abstract class TypeName {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
-    static final ImmutableSet<String> PRIMITIVE_TYPES =
-            ImmutableSet.of(
-                    "any", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
+    private static final ImmutableSet<String> PRIMITIVE_TYPES = Arrays.stream(PrimitiveType.Value.values())
+            .map(value -> value.name().toLowerCase())
+            .collect(ImmutableSet.toImmutableSet());
 
     @JsonValue
     public abstract String name();
