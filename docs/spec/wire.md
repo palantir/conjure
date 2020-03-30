@@ -173,7 +173,6 @@ _Note, this is more restrictive than the User-Agent definition in [RFC 7231](htt
 #### 2.4.4. Attribution Header
 Where possible, requests must include a `X-Conjure-Attribution` header whose value must be processable by the server to uniquely identify the functional entity making the request. The mechanism for issuing, verifying and associating Attribution identifiers to functional entities is not part of this specification, but it is typically expected for Attribution identifiers to be email addresses of teams or UUIDs mapping to those email addresses.
 
-
 #### 2.4.5. Header Authorization
 For endpoints with `auth` of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
 
