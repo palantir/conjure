@@ -170,13 +170,17 @@ Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/5
 
 _Note, this is more restrictive than the User-Agent definition in [RFC 7231](https://tools.ietf.org/html/rfc7231#section-5.5.3). Requests from some browsers may not comply with these requirements as it is impossible to override browser User-Agent headers._
 
-#### 2.4.4. Header Authorization
+#### 2.4.4. Attribution Header
+Where possible, requests must include a `X-Conjure-Attribution` header whose value must be processable by the server to uniquely identify the functional entity making the request. The mechanism for issuing, verifying and associating Attribution identifiers to functional entities is not part of this specification, but it is typically expected for Attribution identifiers to be email addresses of teams or UUIDs mapping to those email addresses.
+
+
+#### 2.4.5. Header Authorization
 For endpoints with `auth` of type `header`, clients must send a header with name `Authorization` and case-sensitive value `Bearer {{string}}` where `{{string}}` is a user-provided string.
 
-#### 2.4.5. Cookie Authorization
+#### 2.4.6. Cookie Authorization
 For endpoints with `auth` of type `cookie`, clients must send a cookie header with value `{{cookieName}}={{value}}`, where `{{cookieName}}` comes from the IR and `{{value}}` is a user-provided value.
 
-#### 2.4.6. Additional headers
+#### 2.4.7. Additional headers
 Clients may inject additional headers (e.g. for Zipkin tracing, or `Fetch-User-Agent`), as long as these do not clash with any headers already specified in the endpoint definition.
 
 
