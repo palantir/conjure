@@ -161,11 +161,6 @@ jobs:
       - checkout
       - run: /liche -d . -r . -v
 
-  circle-all:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
-    resource_class: small
-    steps:
-      - run: {command: echo "All required jobs finished successfully"}
 
 workflows:
   version: 2
@@ -192,11 +187,6 @@ workflows:
           requires: [ compile ]
           filters: { branches: { ignore: develop } }
 
-      # Catch-all for all required checks
-      - circle-all:
-          requires: [ unit-test, unit-test-11, check, trial-publish ]
-          filters: { tags: { only: /.*/ } }
-
       - publish:
-          requires: [ circle-all ]
+          requires: [ unit-test, unit-test-11, check, trial-publish ]
           filters: { tags: { only: /.*/ }, branches: { only: develop } }
