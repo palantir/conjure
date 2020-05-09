@@ -12,10 +12,10 @@ info.picocli:picocli = 4.2.0
 javax.ws.rs:javax.ws.rs-api = 2.0.1
 junit:junit = 4.13
 org.apache.commons:commons-lang3 = 3.9
-org.assertj:* = 3.16.0
+org.assertj:* = 3.16.1
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.2
-org.immutables:value = 2.8.7
+org.immutables:value = 2.8.8
 org.mockito:mockito-core = 3.3.3
 org.slf4j:* = 1.7.30
 
