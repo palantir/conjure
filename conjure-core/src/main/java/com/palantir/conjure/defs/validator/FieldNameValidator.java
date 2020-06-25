@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public final class FieldNameValidator {
 
-    private static final Logger log = LoggerFactory.getLogger(FieldName.class);
+    private static final Logger log = LoggerFactory.getLogger(FieldNameValidator.class);
 
     private FieldNameValidator() {}
 

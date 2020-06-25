@@ -36,14 +36,14 @@ import picocli.CommandLine;
         name = "conjure",
         description = "CLI to generate Conjure IR from Conjure YML definitions.",
         mixinStandardHelpOptions = true,
-        subcommands = { ConjureCli.CompileCommand.class })
+        subcommands = ConjureCli.CompileCommand.class)
 public final class ConjureCli implements Runnable {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
 
     public static void main(String[] args) {
-        CommandLine.run(new ConjureCli(), args);
+        new CommandLine(new ConjureCli()).execute(args);
     }
 
     @Override
@@ -113,7 +113,8 @@ public final class ConjureCli implements Runnable {
 
     static Map<String, Object> parseExtensions(String extensions) {
         try {
-            return OBJECT_MAPPER.readValue(extensions, new TypeReference<Map<String, Object>>() {});
+            return OBJECT_MAPPER.readValue(extensions, new TypeReference<Map<String, Object>>() {
+            });
         } catch (IOException e) {
             throw new SafeIllegalArgumentException("Failed to parse extensions", e);
         }
