@@ -1,4 +1,4 @@
-rootProject.name = 'conjure'
+rootProject.name = 'conjure-root'
 
 include 'conjure'
 include 'conjure-api'
