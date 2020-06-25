@@ -57,7 +57,10 @@ public final class ConjureCliTest {
                 .outputIrFile(outputFile)
                 .putExtensions("foo", "bar")
                 .build();
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args).asCommandLineList().get(1).getCommand();
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args)
+                .asCommandLineList()
+                .get(1)
+                .getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
     }
 
@@ -68,14 +71,18 @@ public final class ConjureCliTest {
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
                 .build();
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
+                .parseArgs(args)
+                .asCommandLineList()
+                .get(1)
+                .getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
     }
 
     @Test
     public void throwsWhenOutputIsDirectory() {
         String[] args = {"compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()};
-        assertThatThrownBy(() -> CommandLine.run(new ConjureCli(), args))
+        assertThatThrownBy(() -> new CommandLine(new ConjureCli()).execute(args))
                 .isInstanceOf(CommandLine.ExecutionException.class)
                 .hasMessageContaining("Output IR file should not be a directory");
     }
@@ -106,7 +113,10 @@ public final class ConjureCliTest {
     @Test
     public void throwsWhenInvalidExtensions() {
         String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), "--extensions", "foo"};
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args)
+                .asCommandLineList()
+                .get(1)
+                .getCommand();
         assertThatThrownBy(cmd::getConfiguration)
                 .isInstanceOf(SafeIllegalArgumentException.class)
                 .hasMessage("Failed to parse extensions");

@@ -16,7 +16,7 @@
 
 package com.palantir.conjure.defs;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
