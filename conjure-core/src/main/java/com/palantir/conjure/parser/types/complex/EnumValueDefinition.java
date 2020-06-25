@@ -52,9 +52,7 @@ public interface EnumValueDefinition {
                 return builder().value(candidate).build();
             }
 
-            return ImmutableEnumValueDefinition.fromJson(
-                    parser.readValueAs(ImmutableEnumValueDefinition.Json.class));
+            return ImmutableEnumValueDefinition.fromJson(parser.readValueAs(ImmutableEnumValueDefinition.Json.class));
         }
     }
-
 }

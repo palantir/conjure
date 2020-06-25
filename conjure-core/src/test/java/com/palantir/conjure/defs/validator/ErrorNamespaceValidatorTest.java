@@ -32,19 +32,13 @@ public final class ErrorNamespaceValidatorTest {
 
     @Test
     public void testInvalidErrorNamespaces() {
-        for (String invalid : new String[] {
-                "conjure",
-                "palantirFoo",
-                "palantir-foo",
-                "PALANTIR-FOO",
-                "palantir_foo",
-                "PALANTIR_FOO"
-        }) {
+        for (String invalid :
+                new String[] {"conjure", "palantirFoo", "palantir-foo", "PALANTIR-FOO", "palantir_foo", "PALANTIR_FOO"
+                }) {
             assertThatThrownBy(() -> ErrorNamespaceValidator.validate(ErrorNamespace.of(invalid)))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Namespace for errors must match pattern")
                     .hasMessageContaining(invalid);
         }
     }
-
 }

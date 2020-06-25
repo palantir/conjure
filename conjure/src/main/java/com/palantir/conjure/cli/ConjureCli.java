@@ -51,25 +51,23 @@ public final class ConjureCli implements Runnable {
         CommandLine.usage(this, System.out);
     }
 
-    @CommandLine.Command(name = "compile",
+    @CommandLine.Command(
+            name = "compile",
             description = "Generate Conjure IR from Conjure YML definitions.",
             mixinStandardHelpOptions = true,
             usageHelpWidth = 120)
     public static final class CompileCommand implements Runnable {
-        @CommandLine.Parameters(paramLabel = "<input>",
+        @CommandLine.Parameters(
+                paramLabel = "<input>",
                 description = "Path to the input conjure YML definition file, or directory containing multiple such "
                         + "files.",
                 index = "0")
         private String input;
 
-        @CommandLine.Parameters(paramLabel = "<output>",
-                description = "Path to the output IR file.",
-                index = "1")
+        @CommandLine.Parameters(paramLabel = "<output>", description = "Path to the output IR file.", index = "1")
         private String output;
 
-        @CommandLine.Option(
-                names = "--extensions",
-                description = "")
+        @CommandLine.Option(names = "--extensions", description = "")
         @Nullable
         private String extensions;
 
@@ -113,8 +111,7 @@ public final class ConjureCli implements Runnable {
 
     static Map<String, Object> parseExtensions(String extensions) {
         try {
-            return OBJECT_MAPPER.readValue(extensions, new TypeReference<Map<String, Object>>() {
-            });
+            return OBJECT_MAPPER.readValue(extensions, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
             throw new SafeIllegalArgumentException("Failed to parse extensions", e);
         }

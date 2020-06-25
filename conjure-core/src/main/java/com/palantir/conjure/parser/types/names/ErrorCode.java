@@ -37,8 +37,8 @@ import org.immutables.value.Value.Auxiliary;
 @ConjureImmutablesStyle
 public abstract class ErrorCode {
 
-    private static final Set<String> VALID_ERROR_CODE_NAMES =
-            Arrays.stream(com.palantir.conjure.spec.ErrorCode.Value.values())
+    private static final Set<String> VALID_ERROR_CODE_NAMES = Arrays.stream(
+                    com.palantir.conjure.spec.ErrorCode.Value.values())
             .map(Enum::name)
             .filter(code -> !code.equals("UNKNOWN"))
             .collect(Collectors.toSet());
@@ -53,8 +53,11 @@ public abstract class ErrorCode {
 
     @Value.Check
     protected final void check() {
-        Preconditions.checkArgument(VALID_ERROR_CODE_NAMES.contains(name()),
-                "Invalid error code %s. Must be one of: %s", name(), VALID_ERROR_CODE_NAMES);
+        Preconditions.checkArgument(
+                VALID_ERROR_CODE_NAMES.contains(name()),
+                "Invalid error code %s. Must be one of: %s",
+                name(),
+                VALID_ERROR_CODE_NAMES);
     }
 
     @JsonCreator

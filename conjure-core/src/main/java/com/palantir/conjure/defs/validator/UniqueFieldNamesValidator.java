@@ -27,7 +27,6 @@ import java.util.Set;
  * Verifies that field names are unique modulo normalization to
  * {@link CaseConverter.Case#LOWER_CAMEL_CASE lower camel case}.
  */
-
 @com.google.errorprone.annotations.Immutable
 public final class UniqueFieldNamesValidator implements ConjureValidator<Set<FieldName>> {
 
@@ -43,11 +42,13 @@ public final class UniqueFieldNamesValidator implements ConjureValidator<Set<Fie
         for (FieldName argName : args) {
             FieldName normalizedName = FieldNameValidator.toCase(argName, CaseConverter.Case.LOWER_CAMEL_CASE);
             FieldName seenName = seenNormalizedToOriginal.get(normalizedName);
-            Preconditions.checkArgument(seenName == null,
+            Preconditions.checkArgument(
+                    seenName == null,
                     "%s must not contain duplicate field names (modulo case normalization): %s vs %s",
-                    classSimpleName, argName.get(), seenName == null ? "" : seenName.get());
+                    classSimpleName,
+                    argName.get(),
+                    seenName == null ? "" : seenName.get());
             seenNormalizedToOriginal.put(normalizedName, argName);
         }
     }
-
 }

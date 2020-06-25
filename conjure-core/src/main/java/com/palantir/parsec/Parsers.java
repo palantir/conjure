@@ -182,5 +182,4 @@ public final class Parsers {
     public static boolean nullOrEmpty(String string) {
         return string == null || string.isEmpty();
     }
-
 }

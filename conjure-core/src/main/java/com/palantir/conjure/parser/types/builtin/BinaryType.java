@@ -35,5 +35,4 @@ public interface BinaryType extends ConjureType {
     static BinaryType of() {
         return ImmutableBinaryType.builder().build();
     }
-
 }

@@ -54,7 +54,8 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         public void validate(ServiceDefinition definition) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
             definition.getEndpoints().forEach(entry -> {
-                String methodPath = entry.getHttpMethod().get() + " " + entry.getHttpPath().get();
+                String methodPath =
+                        entry.getHttpMethod().get() + " " + entry.getHttpPath().get();
                 // normalize all path parameter variables and regular expressions because all path args are treated
                 // as identical for comparisons (paths cannot differ only in the name/regular expression of a path
                 // variable)
@@ -64,9 +65,11 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
 
             pathToEndpoints.keySet().stream().sorted().forEachOrdered(key -> {
                 Collection<String> endpoints = pathToEndpoints.get(key);
-                Preconditions.checkState(endpoints.size() <= 1,
+                Preconditions.checkState(
+                        endpoints.size() <= 1,
                         "Endpoint \"%s\" is defined by multiple endpoints: %s",
-                        key, endpoints.toString());
+                        key,
+                        endpoints.toString());
             });
         }
     }
@@ -82,7 +85,8 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         public void validate(ServiceDefinition definition) {
             Preconditions.checkState(
                     !definition.getServiceName().getName().endsWith(RETROFIT_SUFFIX),
-                    "Service name must not end in %s: %s", RETROFIT_SUFFIX,
+                    "Service name must not end in %s: %s",
+                    RETROFIT_SUFFIX,
                     definition.getServiceName().getName());
         }
     }

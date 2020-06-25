@@ -39,28 +39,23 @@ public final class HttpPathValidator {
     private static final Pattern SEGMENT_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9._-]*$");
     private static final Pattern PARAM_SEGMENT_PATTERN = Pattern.compile("^\\{" + PATTERN + "}$");
     private static final Pattern PARAM_REGEX_SEGMENT_PATTERN =
-            Pattern.compile(
-                    "^\\{" + PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
-                            + "}$");
+            Pattern.compile("^\\{" + PATTERN + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")" + "}$");
 
     /**
      * returns path arguments of the http path.
      */
     public static Set<ArgumentName> pathArgs(String httpPath) {
         UriTemplate uriTemplate = new UriTemplate(httpPath);
-        return uriTemplate.getTemplateVariables()
-                .stream()
-                .map(ArgumentName::of)
-                .collect(Collectors.toSet());
+        return uriTemplate.getTemplateVariables().stream().map(ArgumentName::of).collect(Collectors.toSet());
     }
 
     /** validates if a new instance has the correct syntax. */
     public static void validate(HttpPath httpPath) {
         Path path = Paths.get(httpPath.get());
-        Preconditions.checkArgument(path.isAbsolute(),
-                "Conjure paths must be absolute, i.e., start with '/': %s", path);
-        Preconditions.checkArgument(path.getSegments().isEmpty() || !path.isFolder(),
-                "Conjure paths must not end with a '/': %s", path);
+        Preconditions.checkArgument(
+                path.isAbsolute(), "Conjure paths must be absolute, i.e., start with '/': %s", path);
+        Preconditions.checkArgument(
+                path.getSegments().isEmpty() || !path.isFolder(), "Conjure paths must not end with a '/': %s", path);
 
         for (String segment : path.getSegments()) {
             Preconditions.checkArgument(
@@ -69,7 +64,11 @@ public final class HttpPathValidator {
                             || PARAM_REGEX_SEGMENT_PATTERN.matcher(segment).matches(),
                     "Segment %s of path %s did not match required segment patterns %s or parameter name "
                             + "patterns %s or %s",
-                    segment, path, SEGMENT_PATTERN, PARAM_SEGMENT_PATTERN, PARAM_REGEX_SEGMENT_PATTERN);
+                    segment,
+                    path,
+                    SEGMENT_PATTERN,
+                    PARAM_SEGMENT_PATTERN,
+                    PARAM_REGEX_SEGMENT_PATTERN);
         }
 
         // verify that path template variables are unique
@@ -98,10 +97,13 @@ public final class HttpPathValidator {
             }
 
             // if regular expression was specified, it must be ".+" or ".*" based on invariant previously enforced
-            Preconditions.checkState(i == segments.size() - 1 || !varPattern.pattern().equals(".*"),
+            Preconditions.checkState(
+                    i == segments.size() - 1 || !varPattern.pattern().equals(".*"),
                     "Path parameter %s in path %s specifies regular expression %s, but this regular "
-                            + "expression is only permitted if the path parameter is the last segment", segment,
-                    path, varPattern);
+                            + "expression is only permitted if the path parameter is the last segment",
+                    segment,
+                    path,
+                    varPattern);
         }
     }
 

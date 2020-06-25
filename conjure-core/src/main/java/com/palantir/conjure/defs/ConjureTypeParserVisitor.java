@@ -42,6 +42,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
     public interface ReferenceTypeResolver {
         Type resolve(LocalReferenceType reference);
+
         Type resolve(ForeignReferenceType reference);
     }
 
@@ -63,14 +64,16 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
         public Type resolve(ForeignReferenceType reference) {
             ConjureImports conjureImports = types.conjureImports().get(reference.namespace());
             Preconditions.checkNotNull(conjureImports, "Import not found for namespace: %s", reference.namespace());
-            return resolveFromTypeName(reference.type(), conjureImports.conjure().types());
+            return resolveFromTypeName(
+                    reference.type(), conjureImports.conjure().types());
         }
 
         private static Type resolveFromTypeName(
                 com.palantir.conjure.parser.types.names.TypeName name, TypesDefinition types) {
             Optional<String> defaultPackage =
                     types.definitions().defaultConjurePackage().map(ConjureParserUtils::parseConjurePackage);
-            BaseObjectTypeDefinition maybeDirectDef = types.definitions().objects().get(name);
+            BaseObjectTypeDefinition maybeDirectDef =
+                    types.definitions().objects().get(name);
             String conjurePackage;
             String typeName;
             if (maybeDirectDef == null) {
@@ -78,7 +81,6 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                 if (maybeExternalDef == null) {
                     throw new IllegalStateException("Unknown LocalReferenceType: " + name);
                 }
-
 
                 String externalPath = maybeExternalDef.external().java();
                 int lastIndex = externalPath.lastIndexOf(".");
@@ -91,8 +93,8 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                         .build());
             } else {
                 // Conjure-defined object
-                conjurePackage = ConjureParserUtils.parsePackageOrElseThrow(
-                        maybeDirectDef.conjurePackage(), defaultPackage);
+                conjurePackage =
+                        ConjureParserUtils.parsePackageOrElseThrow(maybeDirectDef.conjurePackage(), defaultPackage);
                 return Type.reference(TypeName.of(name.name(), conjurePackage));
             }
         }
@@ -122,7 +124,8 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
     @Override
     public Type visitOptional(OptionalType type) {
-        return Type.optional(com.palantir.conjure.spec.OptionalType.of(type.itemType().visit(this)));
+        return Type.optional(
+                com.palantir.conjure.spec.OptionalType.of(type.itemType().visit(this)));
     }
 
     @Override

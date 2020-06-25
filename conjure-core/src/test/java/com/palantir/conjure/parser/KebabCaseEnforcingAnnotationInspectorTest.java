@@ -40,8 +40,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
 
     @Test
     public void testValidDefinitionsCarryJsonPropertyAnnotationsOnSetters() throws Exception {
-        assertThat(
-                mapper.readValue("{\"foo-bar\": \"baz\"}", ValidTarget.class))
+        assertThat(mapper.readValue("{\"foo-bar\": \"baz\"}", ValidTarget.class))
                 .isEqualToComparingFieldByField(new ValidTarget().setFooBar("baz"));
     }
 

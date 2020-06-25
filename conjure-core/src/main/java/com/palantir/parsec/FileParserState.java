@@ -72,5 +72,4 @@ public final class FileParserState implements ParserState {
     public int getCharPosition() {
         return delegate.getLine();
     }
-
 }

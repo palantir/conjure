@@ -36,7 +36,6 @@ public final class KebabCaseEnforcingAnnotationInspector extends AnnotationIntro
 
     private static final Pattern KEBAB_CASE_PATTERN = Pattern.compile("[a-z]+(-[a-z]+)*");
 
-
     @Override
     public Version version() {
         return VersionUtil.parseVersion("0.0.1", "foo", "bar");
@@ -51,20 +50,23 @@ public final class KebabCaseEnforcingAnnotationInspector extends AnnotationIntro
         JsonProperty propertyAnnotation = _findAnnotation(annotatedEntity, JsonProperty.class);
         if (propertyAnnotation != null) {
             String jsonFieldName = propertyAnnotation.value();
-            Preconditions.checkArgument(KEBAB_CASE_PATTERN.matcher(jsonFieldName).matches(),
-                    "Conjure grammar requires kebab-case field names: %s", jsonFieldName);
+            Preconditions.checkArgument(
+                    KEBAB_CASE_PATTERN.matcher(jsonFieldName).matches(),
+                    "Conjure grammar requires kebab-case field names: %s",
+                    jsonFieldName);
         }
 
         if (annotatedEntity instanceof AnnotatedMethod) {
             AnnotatedMethod maybeSetter = (AnnotatedMethod) annotatedEntity;
             if (maybeSetter.getName().startsWith("set")) {
                 // As a pre-caution, require that all setters have a JsonProperty annotation.
-                Preconditions.checkArgument(_findAnnotation(annotatedEntity, JsonProperty.class) != null,
+                Preconditions.checkArgument(
+                        _findAnnotation(annotatedEntity, JsonProperty.class) != null,
                         "All setter ({@code set*}) deserialization targets require @JsonProperty annotations: %s",
                         maybeSetter.getName());
             }
         }
 
-        return null;  // delegate to the next introspector in an AnnotationIntrospectorPair.
+        return null; // delegate to the next introspector in an AnnotationIntrospectorPair.
     }
 }

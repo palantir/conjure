@@ -35,5 +35,4 @@ public interface DateTimeType extends ConjureType {
     static DateTimeType of() {
         return ImmutableDateTimeType.builder().build();
     }
-
 }

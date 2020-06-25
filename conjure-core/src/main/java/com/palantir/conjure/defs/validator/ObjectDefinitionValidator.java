@@ -28,8 +28,8 @@ public final class ObjectDefinitionValidator {
             new UniqueFieldNamesValidator(ObjectDefinition.class);
 
     public static void validate(ObjectDefinition definition) {
-        UNIQUE_FIELD_NAMES_VALIDATOR.validate(
-                definition.getFields().stream()
-                        .map(FieldDefinition::getFieldName).collect(Collectors.toSet()));
+        UNIQUE_FIELD_NAMES_VALIDATOR.validate(definition.getFields().stream()
+                .map(FieldDefinition::getFieldName)
+                .collect(Collectors.toSet()));
     }
 }

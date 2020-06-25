@@ -32,15 +32,17 @@ public interface RequestLineDefinition {
     PathString path();
 
     static RequestLineDefinition of(String method, PathString path) {
-        return ImmutableRequestLineDefinition.builder().method(method).path(path).build();
+        return ImmutableRequestLineDefinition.builder()
+                .method(method)
+                .path(path)
+                .build();
     }
 
     @JsonCreator
     static RequestLineDefinition valueOf(String oneline) {
         String[] parts = oneline.split(" ", 2);
-        checkArgument(parts.length == 2,
-                "Request line must be of the form: [METHOD] [PATH], instead was '%s'",
-                oneline);
+        checkArgument(
+                parts.length == 2, "Request line must be of the form: [METHOD] [PATH], instead was '%s'", oneline);
         return of(parts[0], PathString.of(parts[1]));
     }
 

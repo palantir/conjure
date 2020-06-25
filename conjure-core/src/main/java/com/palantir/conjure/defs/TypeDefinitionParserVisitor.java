@@ -48,8 +48,7 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
 
     @Override
     public TypeDefinition visit(EnumTypeDefinition def) {
-        return ConjureParserUtils.parseEnumType(
-                ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
+        return ConjureParserUtils.parseEnumType(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
     }
 
     @Override

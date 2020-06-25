@@ -59,5 +59,4 @@ public interface ErrorTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     class Builder extends ImmutableErrorTypeDefinition.Builder {}
-
 }

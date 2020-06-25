@@ -54,5 +54,4 @@ public interface TypesDefinition {
     }
 
     class Builder extends ImmutableTypesDefinition.Builder {}
-
 }

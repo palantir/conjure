@@ -34,8 +34,7 @@ public abstract class PathString {
      * Returns this path "concatenated" with the given other path. For example, {@code "/abc".resolve("/def")} is the
      * path {@code /abc/def}.
      */
-    public PathString resolve(
-            PathString other) {
+    public PathString resolve(PathString other) {
         final Path newPath;
         if (other.path().equals(Path.ROOT_PATH)) {
             // special-case since Path#relativize() only works on proper prefixes

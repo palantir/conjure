@@ -39,8 +39,11 @@ public final class PackageValidator {
     public static void validate(String name) {
         // TODO(rfink): NPE when the pattern is static !?!?
 
-        Preconditions.checkArgument(VALID_PACKAGE.matcher(name).matches(),
-                "Conjure package names must match pattern %s: %s", VALID_PACKAGE.pattern(), name);
+        Preconditions.checkArgument(
+                VALID_PACKAGE.matcher(name).matches(),
+                "Conjure package names must match pattern %s: %s",
+                VALID_PACKAGE.pattern(),
+                name);
     }
 
     public static String conjurePackage(Iterable<String> components) {

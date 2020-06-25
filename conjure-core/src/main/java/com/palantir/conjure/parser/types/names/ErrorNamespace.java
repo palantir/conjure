@@ -40,13 +40,15 @@ public abstract class ErrorNamespace {
 
     @Value.Check
     protected final void check() {
-        Preconditions.checkArgument(UPPER_CAMEL_CASE.matcher(name()).matches(),
-                "Namespace for errors must match pattern %s: %s", UPPER_CAMEL_CASE, name());
+        Preconditions.checkArgument(
+                UPPER_CAMEL_CASE.matcher(name()).matches(),
+                "Namespace for errors must match pattern %s: %s",
+                UPPER_CAMEL_CASE,
+                name());
     }
 
     @JsonCreator
     public static ErrorNamespace of(String name) {
         return ImmutableErrorNamespace.builder().name(name).build();
     }
-
 }

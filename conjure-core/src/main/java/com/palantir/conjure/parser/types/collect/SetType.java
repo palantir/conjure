@@ -37,5 +37,4 @@ public interface SetType extends ConjureType {
     static SetType of(ConjureType itemType) {
         return ImmutableSetType.builder().itemType(itemType).build();
     }
-
 }

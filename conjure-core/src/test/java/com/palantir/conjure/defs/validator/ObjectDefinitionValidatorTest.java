@@ -52,7 +52,9 @@ public final class ObjectDefinitionValidatorTest {
 
         assertThatThrownBy(() -> ObjectDefinitionValidator.validate(definition))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(String.format("ObjectDefinition must not contain duplicate field names "
-                        + "(modulo case normalization): %s vs %s", fieldName2, fieldName1));
+                .hasMessage(String.format(
+                        "ObjectDefinition must not contain duplicate field names "
+                                + "(modulo case normalization): %s vs %s",
+                        fieldName2, fieldName1));
     }
 }

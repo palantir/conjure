@@ -49,5 +49,4 @@ public final class ParseException extends Exception {
     public ParserState getState() {
         return state;
     }
-
 }

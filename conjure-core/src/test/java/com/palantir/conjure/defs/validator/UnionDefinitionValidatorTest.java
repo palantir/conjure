@@ -36,8 +36,7 @@ public final class UnionDefinitionValidatorTest {
                 .type(Type.primitive(PrimitiveType.STRING))
                 .build();
 
-        assertThatThrownBy(() ->
-                UnionDefinitionValidator.validateAll(UnionDefinition.builder()
+        assertThatThrownBy(() -> UnionDefinitionValidator.validateAll(UnionDefinition.builder()
                         .union(fieldDefinition)
                         .typeName(TypeName.of("string", ""))
                         .build()))
@@ -53,14 +52,12 @@ public final class UnionDefinitionValidatorTest {
                     .type(Type.primitive(PrimitiveType.STRING))
                     .build();
 
-            assertThatThrownBy(() ->
-                    UnionDefinitionValidator.validateAll(UnionDefinition.builder()
+            assertThatThrownBy(() -> UnionDefinitionValidator.validateAll(UnionDefinition.builder()
                             .union(fieldDefinition)
                             .typeName(TypeName.of("string", ""))
                             .build()))
                     .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageStartingWith(
-                                String.format("Union member key must be a valid Java identifier: %s", key));
+                    .hasMessageStartingWith(String.format("Union member key must be a valid Java identifier: %s", key));
         });
     }
 
@@ -70,12 +67,11 @@ public final class UnionDefinitionValidatorTest {
                 .fieldName(FieldName.of("foo_"))
                 .type(Type.primitive(PrimitiveType.STRING))
                 .build();
-        assertThatThrownBy(() ->
-                UnionDefinitionValidator.validateAll(UnionDefinition.builder()
+        assertThatThrownBy(() -> UnionDefinitionValidator.validateAll(UnionDefinition.builder()
                         .union(fieldDefinition)
                         .typeName(TypeName.of("string", ""))
                         .build()))
-            .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("Union member key must not end with an underscore: foo_");
     }
 }

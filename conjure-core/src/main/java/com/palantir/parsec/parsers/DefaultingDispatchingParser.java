@@ -33,8 +33,8 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
         this(parsers, new RawStringParser(), whitespaceParser);
     }
 
-    public DefaultingDispatchingParser(Map<String, Parser<T>> parsers, Parser<String> directiveParser,
-            Parser<?> whitespaceParser) {
+    public DefaultingDispatchingParser(
+            Map<String, Parser<T>> parsers, Parser<String> directiveParser, Parser<?> whitespaceParser) {
 
         this.map = new HashMap<String, Parser<T>>(parsers);
         if (whitespaceParser == null) {
@@ -103,8 +103,8 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
 
                 } else {
                     input.release();
-                    throw new ParseException("Unknown directive '" + directive + "' and no default parser specified.",
-                            input);
+                    throw new ParseException(
+                            "Unknown directive '" + directive + "' and no default parser specified.", input);
                 }
             }
         }
@@ -113,5 +113,4 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
         // not our problem.
         return lastResult;
     }
-
 }

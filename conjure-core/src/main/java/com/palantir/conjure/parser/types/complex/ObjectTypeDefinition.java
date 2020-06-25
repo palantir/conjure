@@ -51,5 +51,4 @@ public interface ObjectTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     class Builder extends ImmutableObjectTypeDefinition.Builder {}
-
 }

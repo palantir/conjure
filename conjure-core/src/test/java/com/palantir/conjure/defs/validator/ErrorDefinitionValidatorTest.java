@@ -74,5 +74,4 @@ public class ErrorDefinitionValidatorTest {
                 .hasMessage("ErrorDefinition must not contain duplicate field names (modulo case normalization): "
                         + "foo-bar vs foo_bar");
     }
-
 }

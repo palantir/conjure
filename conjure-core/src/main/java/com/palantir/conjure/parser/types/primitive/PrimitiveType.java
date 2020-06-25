@@ -41,13 +41,10 @@ public enum PrimitiveType implements LocalReferenceType {
     ANY(TypeName.of("any"));
 
     private static final Map<TypeName, PrimitiveType> types =
-            EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(
-                    PrimitiveType::type, t -> t));
+            EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(PrimitiveType::type, t -> t));
 
-    private static final Set<TypeName> reservedTypes =
-            ImmutableSortedSet.copyOf(
-                    Comparator.comparing(TypeName::name, String.CASE_INSENSITIVE_ORDER),
-                    types.keySet());
+    private static final Set<TypeName> reservedTypes = ImmutableSortedSet.copyOf(
+            Comparator.comparing(TypeName::name, String.CASE_INSENSITIVE_ORDER), types.keySet());
 
     private final TypeName type;
 
@@ -73,8 +70,10 @@ public enum PrimitiveType implements LocalReferenceType {
 
     public static Optional<PrimitiveType> fromTypeName(TypeName type) {
         PrimitiveType candidate = types.get(type);
-        Preconditions.checkArgument(candidate != null || !reservedTypes.contains(type),
-                "Invalid use of a built-in identifier (please check case): %s", type);
+        Preconditions.checkArgument(
+                candidate != null || !reservedTypes.contains(type),
+                "Invalid use of a built-in identifier (please check case): %s",
+                type);
         return Optional.ofNullable(candidate);
     }
 }

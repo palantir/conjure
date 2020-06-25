@@ -17,5 +17,6 @@
 package com.palantir.parsec.parsers;
 
 public enum ExpectationResult {
-    CORRECT, INCORRECT;
+    CORRECT,
+    INCORRECT;
 }

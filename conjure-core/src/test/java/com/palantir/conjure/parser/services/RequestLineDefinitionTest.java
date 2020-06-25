@@ -29,7 +29,6 @@ public class RequestLineDefinitionTest {
         RequestLineDefinition original = RequestLineDefinition.of("GET", PathString.of("/path"));
         String string = mapper.writeValueAsString(original);
 
-        assertThat(mapper.readValue(string, RequestLineDefinition.class))
-                .isEqualTo(original);
+        assertThat(mapper.readValue(string, RequestLineDefinition.class)).isEqualTo(original);
     }
 }

@@ -41,7 +41,8 @@ public final class TestUnitParsers {
 
     @Test
     public void testQuotedStringParser() throws ParseException {
-        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test 123\""))).isEqualTo("Test 123");
+        assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test 123\"")))
+                .isEqualTo("Test 123");
         assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \\\"123\"")))
                 .isEqualTo("Test \"123");
         assertThat(new QuotedStringParser(false).parse(new StringParserState("\"Test \n\n123\"")))
@@ -53,9 +54,11 @@ public final class TestUnitParsers {
     @Test
     public void testRawStringParser() {
         assertThat(new RawStringParser().parse(new StringParserState("a:b123"))).isEqualTo("a:b123");
-        assertThat(new RawStringParser().parse(new StringParserState(" a:b123"))).isNull();
+        assertThat(new RawStringParser().parse(new StringParserState(" a:b123")))
+                .isNull();
         assertThat(new RawStringParser().parse(new StringParserState("ab123 "))).isEqualTo("ab123");
-        assertThat(new RawStringParser().parse(new StringParserState("ab123\n"))).isEqualTo("ab123");
+        assertThat(new RawStringParser().parse(new StringParserState("ab123\n")))
+                .isEqualTo("ab123");
     }
 
     @Test
@@ -66,9 +69,11 @@ public final class TestUnitParsers {
         map.put("dir2", new QuotedStringParser());
 
         assertThat(new DispatchingParser<String>(map, Parsers.whitespace())
-                .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n"))).isEqualTo("def");
+                        .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n")))
+                .isEqualTo("def");
         assertThat(new DispatchingParser<String>(map, Parsers.whitespace())
-                .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n"))).isEqualTo("def");
+                        .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n")))
+                .isEqualTo("def");
     }
 
     @Test
@@ -83,10 +88,12 @@ public final class TestUnitParsers {
 
     @Test
     public void testBetweenParser() throws ParseException {
-        assertThat(new BetweenParser<String>(new ExpectantParser("{"),
-                        Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
-                        Parsers.prefix(Parsers.whitespace(), new ExpectantParser("}")))
-                        .parse(new StringParserState("{ abcdef }"))).isEqualTo("abcdef");
+        assertThat(new BetweenParser<String>(
+                                new ExpectantParser("{"),
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.prefix(Parsers.whitespace(), new ExpectantParser("}")))
+                        .parse(new StringParserState("{ abcdef }")))
+                .isEqualTo("abcdef");
     }
 
     @Test
@@ -95,23 +102,33 @@ public final class TestUnitParsers {
         list.add("abc");
         list.add("def");
         assertThat(new ListParser<>(new QuotedStringParser(), Parsers.whitespace())
-                .parse(new StringParserState("\"abc\" \"def\""))).isEqualTo(list);
+                        .parse(new StringParserState("\"abc\" \"def\"")))
+                .isEqualTo(list);
     }
 
     @Test
     public void testMapParser() throws ParseException {
         Map<String, String> map = new HashMap<String, String>();
         map.put("abc", "def");
-        assertThat(new MapParser<String, String>(new RawStringParser(),
-                Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                new StringParserState("abc def"))).isEqualTo(map);
-        assertThat(new MapParser<String, String>(Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
-                Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                new StringParserState(" abc def"))).isEqualTo(map);
+        assertThat(new MapParser<String, String>(
+                                new RawStringParser(),
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.whitespace())
+                        .parse(new StringParserState("abc def")))
+                .isEqualTo(map);
+        assertThat(new MapParser<String, String>(
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.whitespace())
+                        .parse(new StringParserState(" abc def")))
+                .isEqualTo(map);
         map.put("ghi", "jkl");
-        assertThat(new MapParser<String, String>(Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
-                Parsers.prefix(Parsers.whitespace(), new RawStringParser()), Parsers.whitespace()).parse(
-                new StringParserState("abc def  ghi jkl"))).isEqualTo(map);
+        assertThat(new MapParser<String, String>(
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
+                                Parsers.whitespace())
+                        .parse(new StringParserState("abc def  ghi jkl")))
+                .isEqualTo(map);
     }
 
     @Test
@@ -177,14 +194,13 @@ public final class TestUnitParsers {
 
     @Test
     public void testEofParser() throws ParseException {
-        assertThat(Parsers.eof(new ExpectantParser("abc"))
-                .parse(new StringParserState("abc"))).isEqualTo(ExpectationResult.CORRECT);
+        assertThat(Parsers.eof(new ExpectantParser("abc")).parse(new StringParserState("abc")))
+                .isEqualTo(ExpectationResult.CORRECT);
     }
 
     @Test
     public void testEofParserFails() throws ParseException {
-        assertThat(Parsers.eof(new ExpectantParser("abc"))
-                .parse(new StringParserState("abcdef"))).isNull();
+        assertThat(Parsers.eof(new ExpectantParser("abc")).parse(new StringParserState("abcdef")))
+                .isNull();
     }
-
 }

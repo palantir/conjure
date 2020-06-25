@@ -46,5 +46,4 @@ public final class ListParser<T> implements Parser<List<T>> {
         } while (Parsers.gingerly(separator).parse(input) != null);
         return results;
     }
-
 }

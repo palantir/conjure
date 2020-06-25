@@ -37,5 +37,4 @@ public interface ListType extends ConjureType {
     static ListType of(ConjureType itemType) {
         return ImmutableListType.builder().itemType(itemType).build();
     }
-
 }

@@ -54,16 +54,18 @@ public abstract class CliConfiguration {
             throw new RuntimeException("Output IR file should not be a directory: " + outputFile);
         }
 
-        return new Builder().inputFiles(inputFiles).outputIrFile(outputFile).extensions(extensions).build();
+        return new Builder()
+                .inputFiles(inputFiles)
+                .outputIrFile(outputFile)
+                .extensions(extensions)
+                .build();
     }
 
     private static Collection<File> resolveInputFiles(File input) throws IOException {
         final Collection<File> inputFiles;
         if (input.isDirectory()) {
             try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {
-                inputFiles = fileStream
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
+                inputFiles = fileStream.map(Path::toFile).collect(Collectors.toList());
             }
         } else if (input.isFile()) {
             inputFiles = ImmutableList.of(input);

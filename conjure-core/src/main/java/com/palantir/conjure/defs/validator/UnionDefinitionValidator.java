@@ -55,7 +55,6 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
                         fieldDef.getFieldName().get());
             });
         }
-
     }
 
     @com.google.errorprone.annotations.Immutable

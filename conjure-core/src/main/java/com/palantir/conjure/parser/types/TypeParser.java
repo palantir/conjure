@@ -70,18 +70,17 @@ public enum TypeParser implements Parser<ConjureType> {
     private enum TypeReferenceParser implements Parser<LocalReferenceType> {
         INSTANCE;
 
-        public static final Parser<String> REF_PARSER = new RawStringParser(
-                new RawStringParser.AllowableCharacters() {
-                    @Override
-                    public boolean isAllowed(char character) {
-                        return Character.isJavaIdentifierPart(character);
-                    }
+        public static final Parser<String> REF_PARSER = new RawStringParser(new RawStringParser.AllowableCharacters() {
+            @Override
+            public boolean isAllowed(char character) {
+                return Character.isJavaIdentifierPart(character);
+            }
 
-                    @Override
-                    public String getDescription() {
-                        return "Character is an allowable Java identifier character";
-                    }
-                });
+            @Override
+            public String getDescription() {
+                return "Character is an allowable Java identifier character";
+            }
+        });
 
         @Override
         public LocalReferenceType parse(ParserState input) throws ParseException {
@@ -100,12 +99,11 @@ public enum TypeParser implements Parser<ConjureType> {
     private enum ForeignReferenceTypeParser implements Parser<ForeignReferenceType> {
         INSTANCE;
 
-        public static final Parser<String> NAMESPACE_PARSER = new RawStringParser(
-                new RawStringParser.AllowableCharacters() {
+        public static final Parser<String> NAMESPACE_PARSER =
+                new RawStringParser(new RawStringParser.AllowableCharacters() {
                     @Override
                     public boolean isAllowed(char character) {
-                        return ('a' <= character && character <= 'z')
-                                || ('A' <= character && character <= 'Z');
+                        return ('a' <= character && character <= 'z') || ('A' <= character && character <= 'Z');
                     }
 
                     @Override
@@ -135,7 +133,8 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType =
+                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
             return ListType.of(itemType);
         }
     }
@@ -150,7 +149,8 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType =
+                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
             return SetType.of(itemType);
         }
     }
@@ -165,7 +165,8 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType =
+                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
             return OptionalType.of(itemType);
         }
     }

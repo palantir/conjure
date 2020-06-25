@@ -29,5 +29,4 @@ public final class BooleanParser implements Parser<Boolean> {
         return !Parsers.nullOrEmpty(val)
                 && (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("1"));
     }
-
 }

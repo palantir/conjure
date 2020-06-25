@@ -47,5 +47,4 @@ public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     class Builder extends ImmutableAliasTypeDefinition.Builder {}
-
 }

@@ -63,5 +63,4 @@ public interface ServiceDefinition {
     }
 
     class Builder extends ImmutableServiceDefinition.Builder {}
-
 }

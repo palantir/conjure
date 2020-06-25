@@ -34,10 +34,11 @@ public class FieldDefinitionValidatorTest {
     public void testNoComplexKeysInMaps() {
         String illegalFieldName = "asdf";
         Type complexKeyType = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
-        FieldDefinition fieldDefinition = FieldDefinition.builder().fieldName(
-                FieldName.of(illegalFieldName))
+        FieldDefinition fieldDefinition = FieldDefinition.builder()
+                .fieldName(FieldName.of(illegalFieldName))
                 .type(Type.map(MapType.of(complexKeyType, Type.primitive(PrimitiveType.STRING))))
-                .docs(Documentation.of("docs")).build();
+                .docs(Documentation.of("docs"))
+                .build();
         assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(illegalFieldName)

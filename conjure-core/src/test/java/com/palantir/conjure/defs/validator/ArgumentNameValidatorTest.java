@@ -54,7 +54,8 @@ public final class ArgumentNameValidatorTest {
             EndpointDefinition.Builder endpoint = createEndpoint(paramName);
             assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build(), dealiasingVisitor))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Parameter names in endpoint paths and service definitions "
+                    .hasMessage(
+                            "Parameter names in endpoint paths and service definitions "
                                     + "must match pattern %s: %s on endpoint test{http: POST /a/path}",
                             CaseConverter.CAMEL_CASE_PATTERN, paramName);
         }

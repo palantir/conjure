@@ -47,14 +47,22 @@ public final class FieldNameValidator {
     public static void validate(FieldName fieldName) {
         Preconditions.checkArgument(
                 CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()
-                        || CaseConverter.KEBAB_CASE_PATTERN.matcher(fieldName.get()).matches()
-                        || CaseConverter.SNAKE_CASE_PATTERN.matcher(fieldName.get()).matches(),
+                        || CaseConverter.KEBAB_CASE_PATTERN
+                                .matcher(fieldName.get())
+                                .matches()
+                        || CaseConverter.SNAKE_CASE_PATTERN
+                                .matcher(fieldName.get())
+                                .matches(),
                 "FieldName \"%s\" must follow one of the following patterns: %s",
-                fieldName, Arrays.toString(CaseConverter.Case.values()));
+                fieldName,
+                Arrays.toString(CaseConverter.Case.values()));
 
         if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()) {
-            log.warn("{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
-                    + "legacy endpoints only: {}", FieldName.class, fieldName.get());
+            log.warn(
+                    "{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
+                            + "legacy endpoints only: {}",
+                    FieldName.class,
+                    fieldName.get());
         }
     }
 
