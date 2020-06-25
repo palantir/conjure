@@ -56,8 +56,7 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
     public Either<TypeDefinition, Type> visitReference(TypeName value) {
         TypeDefinition typeDefinition = objects.get(value);
         Preconditions.checkState(
-                typeDefinition != null,
-                "Referenced TypeDefinition not found in map of types for TypeName: %s", value);
+                typeDefinition != null, "Referenced TypeDefinition not found in map of types for TypeName: %s", value);
         return typeDefinition.accept(new TypeDefinition.Visitor<Either<TypeDefinition, Type>>() {
             @Override
             public Either<TypeDefinition, Type> visitAlias(AliasDefinition value) {

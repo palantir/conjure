@@ -51,5 +51,4 @@ public interface UnionTypeDefinition extends BaseObjectTypeDefinition {
     }
 
     class Builder extends ImmutableUnionTypeDefinition.Builder {}
-
 }

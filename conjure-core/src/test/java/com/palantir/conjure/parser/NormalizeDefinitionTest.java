@@ -35,9 +35,7 @@ public class NormalizeDefinitionTest {
     public void sort_types_services_and_errors() throws IOException {
         ConjureDefinition normalized = Conjure.parse(ImmutableSet.of(new File("src/test/resources/normalize-me.yml")));
 
-        String actual = objectMapper
-                .writerWithDefaultPrettyPrinter()
-                .writeValueAsString(normalized);
+        String actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(normalized);
 
         File file = new File("src/test/resources/normalized.conjure.json");
 

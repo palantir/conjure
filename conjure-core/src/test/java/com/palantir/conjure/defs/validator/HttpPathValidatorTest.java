@@ -44,19 +44,21 @@ public final class HttpPathValidatorTest {
     @Test
     public void testPathSegmentsMustObeySyntax() {
         for (PathSegmentTestCase currCase : new PathSegmentTestCase[] {
-                new PathSegmentTestCase("/123", "123"),
-                new PathSegmentTestCase("/abc/$%^", "$%^"),
-                new PathSegmentTestCase("/abc/{123}", "{123}"),
-                }) {
+            new PathSegmentTestCase("/123", "123"),
+            new PathSegmentTestCase("/abc/$%^", "$%^"),
+            new PathSegmentTestCase("/abc/{123}", "{123}"),
+        }) {
             assertThatThrownBy(() -> validate(currCase.path))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage(String.format("Segment %s of path %s did not match required segment patterns "
+                    .hasMessage(String.format(
+                            "Segment %s of path %s did not match required segment patterns "
                                     + "^[a-zA-Z][a-zA-Z0-9._-]*$ or parameter name patterns "
                                     + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*}$ or "
                                     + "^\\{[a-z][a-z0-9]*([A-Z0-9][a-z0-9]+)*"
                                     + "(" + Pattern.quote(":.+") + "|" + Pattern.quote(":.*") + ")"
                                     + "}$",
-                            currCase.invalidSegment, currCase.path));
+                            currCase.invalidSegment,
+                            currCase.path));
         }
     }
 

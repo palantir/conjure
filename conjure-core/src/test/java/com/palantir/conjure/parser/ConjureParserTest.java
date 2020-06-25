@@ -16,7 +16,6 @@
 
 package com.palantir.conjure.parser;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -66,7 +65,10 @@ public class ConjureParserTest {
     @Test
     public void testConjureExternalImports() {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
-        assertThat(conjure.types().imports().get(TypeName.of("ExampleAnyImport")).baseType())
+        assertThat(conjure.types()
+                        .imports()
+                        .get(TypeName.of("ExampleAnyImport"))
+                        .baseType())
                 .isEqualTo(PrimitiveType.fromString("any"));
     }
 
@@ -173,8 +175,17 @@ public class ConjureParserTest {
     public void testConjureRevisitedImports() throws IOException {
         // create a hierarchy of dependencies such that a significant amount of files is visited repeatedly
         // each file depends on all files from the previous level
-        List<String> inners = ImmutableList.of("innerOne", "innerTwo", "innerThree", "innerFour", "innerFive",
-                "innerSix", "innerSeven", "innerEight", "innerNine", "innerTen");
+        List<String> inners = ImmutableList.of(
+                "innerOne",
+                "innerTwo",
+                "innerThree",
+                "innerFour",
+                "innerFive",
+                "innerSix",
+                "innerSeven",
+                "innerEight",
+                "innerNine",
+                "innerTen");
         List<String> mid = ImmutableList.of("midOne", "midTwo", "midThree", "midFour", "midFive");
         List<String> top = ImmutableList.of("topOne", "topTwo", "topThree", "topFour", "topFive", "topSix");
 

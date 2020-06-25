@@ -52,11 +52,17 @@ public abstract class FieldName {
                         || kebabCase.getPattern().matcher(name()).matches()
                         || snakeCase.getPattern().matcher(name()).matches(),
                 "FieldName \"%s\" must follow one of the following patterns: %s %s %s",
-                name(), lowerCamelCase, kebabCase, snakeCase);
+                name(),
+                lowerCamelCase,
+                kebabCase,
+                snakeCase);
 
         if (!lowerCamelCase.getPattern().matcher(name()).matches()) {
-            log.warn("{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
-                    + "legacy endpoints only: {}", FieldName.class, name());
+            log.warn(
+                    "{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
+                            + "legacy endpoints only: {}",
+                    FieldName.class,
+                    name());
         }
     }
 

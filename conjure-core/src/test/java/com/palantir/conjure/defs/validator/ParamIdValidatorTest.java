@@ -55,10 +55,7 @@ public final class ParamIdValidatorTest {
     @SuppressWarnings("CheckReturnValue")
     public void testValidHeader() {
         List<String> paramIds = ImmutableList.of(
-                HttpHeaders.AUTHORIZATION,
-                HttpHeaders.X_XSS_PROTECTION,
-                HttpHeaders.P3P,
-                HttpHeaders.SET_COOKIE2);
+                HttpHeaders.AUTHORIZATION, HttpHeaders.X_XSS_PROTECTION, HttpHeaders.P3P, HttpHeaders.SET_COOKIE2);
         for (String paramId : paramIds) {
             // Passes validation
             createEndpoint(ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId))));
@@ -71,8 +68,9 @@ public final class ParamIdValidatorTest {
             ParameterType parameterType = ParameterType.query(QueryParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Query param id %s on endpoint test{http: POST /a/path} must match one of the "
-                            + "following patterns: [LOWER_CAMEL_CASE[%s], KEBAB_CASE[%s], SNAKE_CASE[%s]]",
+                    .hasMessage(
+                            "Query param id %s on endpoint test{http: POST /a/path} must match one of the "
+                                    + "following patterns: [LOWER_CAMEL_CASE[%s], KEBAB_CASE[%s], SNAKE_CASE[%s]]",
                             paramId,
                             CaseConverter.CAMEL_CASE_PATTERN,
                             CaseConverter.KEBAB_CASE_PATTERN,
@@ -86,9 +84,9 @@ public final class ParamIdValidatorTest {
             ParameterType parameterType = ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId)));
             assertThatThrownBy(() -> createEndpoint(parameterType))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("Header parameter id %s on endpoint test{http: POST /a/path} must match pattern %s",
-                            paramId,
-                            EndpointDefinitionValidator.HEADER_PATTERN);
+                    .hasMessage(
+                            "Header parameter id %s on endpoint test{http: POST /a/path} must match pattern %s",
+                            paramId, EndpointDefinitionValidator.HEADER_PATTERN);
         }
     }
 

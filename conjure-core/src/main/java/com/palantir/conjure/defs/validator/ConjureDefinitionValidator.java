@@ -79,8 +79,10 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             Set<String> seenNames = new HashSet<>();
             definition.getServices().forEach(service -> {
                 boolean isNewName = seenNames.add(service.getServiceName().getName());
-                Preconditions.checkState(isNewName,
-                        "Service names must be unique: %s", service.getServiceName().getName());
+                Preconditions.checkState(
+                        isNewName,
+                        "Service names must be unique: %s",
+                        service.getServiceName().getName());
             });
         }
     }
@@ -89,9 +91,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     private static final class IllegalVersionValidator implements ConjureValidator<ConjureDefinition> {
         @Override
         public void validate(ConjureDefinition definition) {
-            Preconditions.checkState(definition.getVersion() == Conjure.SUPPORTED_IR_VERSION,
+            Preconditions.checkState(
+                    definition.getVersion() == Conjure.SUPPORTED_IR_VERSION,
                     "Definition version must be %s, but version %s is provided instead.",
-                    Conjure.SUPPORTED_IR_VERSION, definition.getVersion());
+                    Conjure.SUPPORTED_IR_VERSION,
+                    definition.getVersion());
         }
     }
 
@@ -100,20 +104,21 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             Set<TypeName> seenNames = new HashSet<>();
-            definition.getTypes().forEach(typeDef ->
-                    verifyNameIsUnique(seenNames, typeDef.accept(TypeDefinitionVisitor.TYPE_NAME)));
-            definition.getErrors().forEach(errorDef ->
-                    verifyNameIsUnique(seenNames, errorDef.getErrorName()));
-            definition.getServices().forEach(serviceDef ->
-                    verifyNameIsUnique(seenNames, serviceDef.getServiceName()));
+            definition
+                    .getTypes()
+                    .forEach(typeDef -> verifyNameIsUnique(seenNames, typeDef.accept(TypeDefinitionVisitor.TYPE_NAME)));
+            definition.getErrors().forEach(errorDef -> verifyNameIsUnique(seenNames, errorDef.getErrorName()));
+            definition.getServices().forEach(serviceDef -> verifyNameIsUnique(seenNames, serviceDef.getServiceName()));
         }
 
         private static void verifyNameIsUnique(Set<TypeName> seenNames, TypeName name) {
             boolean isNewName = seenNames.add(name);
-            Verify.verify(isNewName,
+            Verify.verify(
+                    isNewName,
                     "Type, error, and service names must be unique across locally defined and imported "
                             + "types/errors: %s\n%s",
-                    seenNames, name);
+                    seenNames,
+                    name);
         }
     }
 
@@ -124,8 +129,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
-            definition.getTypes().forEach(type -> getReferenceType(type).ifPresent(entry ->
-                    typeToRefFields.put(type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
+            definition.getTypes().forEach(type -> getReferenceType(type)
+                    .ifPresent(entry -> typeToRefFields.put(type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -179,15 +184,15 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             // create mapping for resolving reference types during validation
-            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
-                    Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
+            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream()
+                    .collect(Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
             definition.getTypes().forEach(def -> validateTypeDefinition(def, definitionMap));
             definition.getErrors().forEach(def -> validateErrorDefinition(def, definitionMap));
             definition.getServices().forEach(def -> validateServiceDefinition(def, definitionMap));
         }
 
-        private static void validateServiceDefinition(ServiceDefinition serviceDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateServiceDefinition(
+                ServiceDefinition serviceDef, Map<TypeName, TypeDefinition> definitionMap) {
             serviceDef.getEndpoints().forEach(endpoint -> {
                 endpoint.getArgs().stream()
                         .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
@@ -206,28 +211,27 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             });
         }
 
-        private static void validateErrorDefinition(ErrorDefinition errorDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateErrorDefinition(
+                ErrorDefinition errorDef, Map<TypeName, TypeDefinition> definitionMap) {
             Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
                     .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                     .findAny()
                     .ifPresent(_arg -> {
-                        throw new IllegalStateException(
-                                "Illegal nested optionals found in one of arguments of error "
-                                        + errorDef.getErrorName().getName());
+                        throw new IllegalStateException("Illegal nested optionals found in one of arguments of error "
+                                + errorDef.getErrorName().getName());
                     });
         }
 
-        private static void validateTypeDefinition(TypeDefinition typeDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateTypeDefinition(
+                TypeDefinition typeDef, Map<TypeName, TypeDefinition> definitionMap) {
 
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
                 public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, false)) {
-                        throw new IllegalStateException(
-                                "Illegal nested optionals found in alias " + aliasDef.getTypeName().getName());
+                        throw new IllegalStateException("Illegal nested optionals found in alias "
+                                + aliasDef.getTypeName().getName());
                     }
                     return null;
                 }
@@ -285,8 +289,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 if (isOptionalSeen) {
                     return true;
                 }
-                return recursivelyFindNestedOptionals(type.accept(TypeVisitor.OPTIONAL).getItemType(), definitionMap,
-                        true);
+                return recursivelyFindNestedOptionals(
+                        type.accept(TypeVisitor.OPTIONAL).getItemType(), definitionMap, true);
             }
             return false;
         }
@@ -298,56 +302,53 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             // create mapping for resolving reference types during validation
-            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream().collect(
-                    Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
+            Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream()
+                    .collect(Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
             definition.getTypes().forEach(def -> validateTypeDefinition(def, definitionMap));
             definition.getErrors().forEach(def -> validateErrorDefinition(def, definitionMap));
             definition.getServices().forEach(def -> validateServiceDefinition(def, definitionMap));
         }
 
-        private static void validateServiceDefinition(ServiceDefinition serviceDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateServiceDefinition(
+                ServiceDefinition serviceDef, Map<TypeName, TypeDefinition> definitionMap) {
             serviceDef.getEndpoints().forEach(endpoint -> {
                 endpoint.getArgs().stream()
                         .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                         .findAny()
                         .ifPresent(_arg -> {
-                            throw new IllegalStateException(
-                                    "Illegal map key found in one of the arguments of endpoint "
-                                            + endpoint.getEndpointName().get());
+                            throw new IllegalStateException("Illegal map key found in one of the arguments of endpoint "
+                                    + endpoint.getEndpointName().get());
                         });
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindIllegalKeys(returnType, definitionMap, false)) {
-                        throw new IllegalStateException(
-                                "Illegal map key found in return type of endpoint "
-                                        + endpoint.getEndpointName().get());
+                        throw new IllegalStateException("Illegal map key found in return type of endpoint "
+                                + endpoint.getEndpointName().get());
                     }
                 });
             });
         }
 
-        private static void validateErrorDefinition(ErrorDefinition errorDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateErrorDefinition(
+                ErrorDefinition errorDef, Map<TypeName, TypeDefinition> definitionMap) {
             Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
                     .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                     .findAny()
                     .ifPresent(_arg -> {
-                        throw new IllegalStateException(
-                                "Illegal map key found in one of arguments of error "
-                                        + errorDef.getErrorName().getName());
+                        throw new IllegalStateException("Illegal map key found in one of arguments of error "
+                                + errorDef.getErrorName().getName());
                     });
         }
 
-        private static void validateTypeDefinition(TypeDefinition typeDef,
-                Map<TypeName, TypeDefinition> definitionMap) {
+        private static void validateTypeDefinition(
+                TypeDefinition typeDef, Map<TypeName, TypeDefinition> definitionMap) {
 
             typeDef.accept(new TypeDefinition.Visitor<Void>() {
                 @Override
                 public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindIllegalKeys(aliasDef.getAlias(), definitionMap, false)) {
-                        throw new IllegalStateException(
-                                "Illegal map key found in alias " + aliasDef.getTypeName().getName());
+                        throw new IllegalStateException("Illegal map key found in alias "
+                                + aliasDef.getTypeName().getName());
                     }
                     return null;
                 }
@@ -356,13 +357,12 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 public Void visitObject(ObjectDefinition _value) {
                     ObjectDefinition objectDefinition = typeDef.accept(TypeDefinitionVisitor.OBJECT);
                     objectDefinition.getFields().stream()
-                            .filter(fieldDefinition -> recursivelyFindIllegalKeys(
-                                    fieldDefinition.getType(), definitionMap, false))
+                            .filter(fieldDefinition ->
+                                    recursivelyFindIllegalKeys(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(_found -> {
-                                throw new IllegalStateException(
-                                        "Illegal map key found in object "
-                                                + objectDefinition.getTypeName().getName());
+                                throw new IllegalStateException("Illegal map key found in object "
+                                        + objectDefinition.getTypeName().getName());
                             });
                     return null;
                 }
@@ -371,13 +371,12 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 public Void visitUnion(UnionDefinition _value) {
                     UnionDefinition unionDefinition = typeDef.accept(TypeDefinitionVisitor.UNION);
                     unionDefinition.getUnion().stream()
-                            .filter(fieldDefinition -> recursivelyFindIllegalKeys(
-                                    fieldDefinition.getType(), definitionMap, false))
+                            .filter(fieldDefinition ->
+                                    recursivelyFindIllegalKeys(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(_found -> {
-                                throw new IllegalStateException(
-                                        "Illegal map key found in union "
-                                                + unionDefinition.getTypeName().getName());
+                                throw new IllegalStateException("Illegal map key found in union "
+                                        + unionDefinition.getTypeName().getName());
                             });
                     return null;
                 }
@@ -395,21 +394,23 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
 
         private static boolean recursivelyFindIllegalKeys(
-                Type type,
-                Map<TypeName, TypeDefinition> definitionMap,
-                boolean isMapKey) {
+                Type type, Map<TypeName, TypeDefinition> definitionMap, boolean isMapKey) {
             if (type.accept(TypeVisitor.IS_MAP)) {
                 if (isMapKey) {
                     return true;
                 }
                 return recursivelyFindIllegalKeys(type.accept(TypeVisitor.MAP).getKeyType(), definitionMap, true)
-                        || recursivelyFindIllegalKeys(type.accept(TypeVisitor.MAP).getKeyType(), definitionMap, false);
+                        || recursivelyFindIllegalKeys(
+                                type.accept(TypeVisitor.MAP).getKeyType(), definitionMap, false);
             }
 
             if (isMapKey) {
-                return new DealiasingTypeVisitor(definitionMap).dealias(type).fold(
-                        typeDefinition -> !typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
-                        subType -> !subType.accept(TypeVisitor.IS_PRIMITIVE) || subType.accept(TypeVisitor.IS_ANY));
+                return new DealiasingTypeVisitor(definitionMap)
+                        .dealias(type)
+                        .fold(
+                                typeDefinition -> !typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
+                                subType -> !subType.accept(TypeVisitor.IS_PRIMITIVE)
+                                        || subType.accept(TypeVisitor.IS_ANY));
             }
             return false;
         }

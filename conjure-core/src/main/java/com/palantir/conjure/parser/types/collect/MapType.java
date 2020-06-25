@@ -40,5 +40,4 @@ public interface MapType extends ConjureType {
     static MapType of(ConjureType keyType, ConjureType valueType) {
         return ImmutableMapType.builder().keyType(keyType).valueType(valueType).build();
     }
-
 }

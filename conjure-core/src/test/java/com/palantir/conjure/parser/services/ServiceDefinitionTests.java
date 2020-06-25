@@ -50,8 +50,7 @@ import org.junit.Test;
 
 public final class ServiceDefinitionTests {
 
-    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory())
-            .registerModule(new Jdk8Module());
+    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).registerModule(new Jdk8Module());
 
     @Test
     public void testArgumentDefinition_fromString() throws IOException {
@@ -61,9 +60,7 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testArgumentDefinition_withDocs() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "type: string",
-                "docs: docs"), ArgumentDefinition.class))
+        assertThat(mapper.readValue(multiLineString("type: string", "docs: docs"), ArgumentDefinition.class))
                 .isEqualTo(ArgumentDefinition.of(PrimitiveType.STRING, "docs"));
     }
 
@@ -77,23 +74,26 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testEndpointDefinition_fullySpecified() throws IOException, ParseException {
-        assertThat(mapper.readValue(multiLineString(
-                "http: GET /{foo}/v1.2/path",
-                "auth: header",
-                "args:",
-                "  arg:",
-                "    type: string",
-                "    docs: foo-docs",
-                "    param-id: foo",
-                "    param-type: path",
-                "returns: string",
-                "docs: |",
-                "  docs"), EndpointDefinition.class))
+        assertThat(mapper.readValue(
+                        multiLineString(
+                                "http: GET /{foo}/v1.2/path",
+                                "auth: header",
+                                "args:",
+                                "  arg:",
+                                "    type: string",
+                                "    docs: foo-docs",
+                                "    param-id: foo",
+                                "    param-type: path",
+                                "returns: string",
+                                "docs: |",
+                                "  docs"),
+                        EndpointDefinition.class))
                 .isEqualTo(EndpointDefinition.builder()
                         .http(RequestLineDefinition.of("GET", PathString.of("/{foo}/v1.2/path")))
                         .auth(AuthDefinition.header())
                         .args(ImmutableMap.of(
-                                ParameterName.of("arg"), ArgumentDefinition.builder()
+                                ParameterName.of("arg"),
+                                ArgumentDefinition.builder()
                                         .type(PrimitiveType.STRING)
                                         .docs("foo-docs")
                                         .paramId(ParameterName.of("foo"))
@@ -106,10 +106,7 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testParseEnum_baseCase() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "values:",
-                " - A",
-                " - B"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(multiLineString("values:", " - A", " - B"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder()
                         .addValues(EnumValueDefinition.builder().value("A").build())
                         .addValues(EnumValueDefinition.builder().value("B").build())
@@ -118,33 +115,26 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testParseEnum_blank() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "values:"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("values:"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"values\"");
-
     }
 
     @Test
     public void testParseEnum_empty() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "values: []"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(multiLineString("values: []"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder().build());
     }
 
     @Test
     public void testParseEnum_null() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "values: null"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("values: null"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"values\"");
     }
 
     @Test
     public void testParseEnum_withObjectDocs() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "docs: Test",
-                "values:",
-                " - A",
-                " - B"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(
+                        multiLineString("docs: Test", "values:", " - A", " - B"), BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder()
                         .addValues(EnumValueDefinition.builder().value("A").build())
                         .addValues(EnumValueDefinition.builder().value("B").build())
@@ -154,14 +144,14 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testParseEnum_withValueDocs() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "docs: Test",
-                "values:",
-                " - value: A",
-                "   docs: A docs",
-                " - B"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(
+                        multiLineString("docs: Test", "values:", " - value: A", "   docs: A docs", " - B"),
+                        BaseObjectTypeDefinition.class))
                 .isEqualTo(EnumTypeDefinition.builder()
-                        .addValues(EnumValueDefinition.builder().value("A").docs("A docs").build())
+                        .addValues(EnumValueDefinition.builder()
+                                .value("A")
+                                .docs("A docs")
+                                .build())
                         .addValues(EnumValueDefinition.builder().value("B").build())
                         .docs("Test")
                         .build());
@@ -169,32 +159,27 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testParseUnion_blank() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "union:"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("union:"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"union\"");
     }
 
     @Test
     public void testParseUnion_empty() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "union: {}"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(multiLineString("union: {}"), BaseObjectTypeDefinition.class))
                 .isEqualTo(UnionTypeDefinition.builder().build());
     }
 
     @Test
     public void testParseUnion_null() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "union: null"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("union: null"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"union\"");
     }
 
     @Test
     public void testParseUnion_withObjectDocs() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "docs: Test",
-                "union:",
-                "  stringId: string",
-                "  numberId: integer"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(
+                        multiLineString("docs: Test", "union:", "  stringId: string", "  numberId: integer"),
+                        BaseObjectTypeDefinition.class))
                 .isEqualTo(UnionTypeDefinition.builder()
                         .putUnion(FieldName.of("stringId"), FieldDefinition.of(PrimitiveType.STRING))
                         .putUnion(FieldName.of("numberId"), FieldDefinition.of(PrimitiveType.INTEGER))
@@ -204,32 +189,27 @@ public final class ServiceDefinitionTests {
 
     @Test
     public void testParseType_blank() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "fields:"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("fields:"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"fields\"");
     }
 
     @Test
     public void testParseType_empty() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "fields: {}"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(multiLineString("fields: {}"), BaseObjectTypeDefinition.class))
                 .isEqualTo(ObjectTypeDefinition.builder().build());
     }
 
     @Test
     public void testParseType_null() {
-        assertThatThrownBy(() -> mapper.readValue(multiLineString(
-                "fields:"), BaseObjectTypeDefinition.class))
+        assertThatThrownBy(() -> mapper.readValue(multiLineString("fields:"), BaseObjectTypeDefinition.class))
                 .hasMessageContaining("Invalid `null` value encountered for property \"fields\"");
     }
 
     @Test
     public void testParseType_withObjectDocs() throws IOException {
-        assertThat(mapper.readValue(multiLineString(
-                "docs: Test",
-                "fields:",
-                "  name: string",
-                "  age: integer"), BaseObjectTypeDefinition.class))
+        assertThat(mapper.readValue(
+                        multiLineString("docs: Test", "fields:", "  name: string", "  age: integer"),
+                        BaseObjectTypeDefinition.class))
                 .isEqualTo(ObjectTypeDefinition.builder()
                         .putFields(FieldName.of("name"), FieldDefinition.of(PrimitiveType.STRING))
                         .putFields(FieldName.of("age"), FieldDefinition.of(PrimitiveType.INTEGER))
@@ -240,61 +220,81 @@ public final class ServiceDefinitionTests {
     @Test
     public void testParseAlias_validPrimitiveType() throws IOException {
         assertThat(mapper.readValue("alias: string", BaseObjectTypeDefinition.class))
-                .isEqualTo(AliasTypeDefinition.builder().alias(PrimitiveType.STRING).build());
+                .isEqualTo(AliasTypeDefinition.builder()
+                        .alias(PrimitiveType.STRING)
+                        .build());
     }
 
     @Test
     public void testParseAlias_validMapType() throws IOException {
         assertThat(mapper.readValue("alias: map<string, any>", BaseObjectTypeDefinition.class))
-                .isEqualTo(AliasTypeDefinition.builder().alias(MapType.of(PrimitiveType.STRING, AnyType.of())).build());
+                .isEqualTo(AliasTypeDefinition.builder()
+                        .alias(MapType.of(PrimitiveType.STRING, AnyType.of()))
+                        .build());
     }
 
     @Test
     public void testParseAlias_validReference() throws IOException {
         assertThat(mapper.readValue("alias: Foo", BaseObjectTypeDefinition.class))
-                .isEqualTo(AliasTypeDefinition.builder().alias(LocalReferenceType.of(TypeName.of("Foo"))).build());
+                .isEqualTo(AliasTypeDefinition.builder()
+                        .alias(LocalReferenceType.of(TypeName.of("Foo")))
+                        .build());
     }
 
     @Test
     @SuppressWarnings("deprecation")
     public void testParseConjureFile() throws IOException {
         ConjureSourceFile def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
-        assertThat(def).isEqualTo(
-                ConjureSourceFile.builder()
+        assertThat(def)
+                .isEqualTo(ConjureSourceFile.builder()
                         .types(TypesDefinition.builder()
-                                .putImports(TypeName.of("ResourceIdentifier"),
+                                .putImports(
+                                        TypeName.of("ResourceIdentifier"),
                                         ExternalTypeDefinition.javaType(
                                                 "com.palantir.ri.ResourceIdentifier", PrimitiveType.STRING))
                                 .definitions(NamedTypesDefinition.builder()
                                         .defaultConjurePackage(ConjurePackage.of("test.api"))
-                                        .putObjects(TypeName.of("SimpleObject"), ObjectTypeDefinition.builder()
-                                                .putFields(FieldName.of("stringField"),
-                                                        FieldDefinition.of(PrimitiveType.STRING))
-                                                .build())
-                                        .putObjects(TypeName.of("StringAlias"), AliasTypeDefinition.builder()
-                                                .alias(PrimitiveType.STRING)
-                                                .build())
+                                        .putObjects(
+                                                TypeName.of("SimpleObject"),
+                                                ObjectTypeDefinition.builder()
+                                                        .putFields(
+                                                                FieldName.of("stringField"),
+                                                                FieldDefinition.of(PrimitiveType.STRING))
+                                                        .build())
+                                        .putObjects(
+                                                TypeName.of("StringAlias"),
+                                                AliasTypeDefinition.builder()
+                                                        .alias(PrimitiveType.STRING)
+                                                        .build())
                                         .build())
                                 .build())
-                        .putServices(TypeName.of("TestService"), ServiceDefinition.builder()
-                                .doNotUseName("Test Service")
-                                .conjurePackage(ConjurePackage.of("test.api"))
-                                .putEndpoints("get", EndpointDefinition.builder()
-                                        .http(RequestLineDefinition.of("GET", PathString.of("/get")))
+                        .putServices(
+                                TypeName.of("TestService"),
+                                ServiceDefinition.builder()
+                                        .doNotUseName("Test Service")
+                                        .conjurePackage(ConjurePackage.of("test.api"))
+                                        .putEndpoints(
+                                                "get",
+                                                EndpointDefinition.builder()
+                                                        .http(RequestLineDefinition.of("GET", PathString.of("/get")))
+                                                        .build())
+                                        .putEndpoints(
+                                                "post",
+                                                EndpointDefinition.builder()
+                                                        .http(RequestLineDefinition.of("POST", PathString.of("/post")))
+                                                        .args(ImmutableMap.of(
+                                                                ParameterName.of("foo"),
+                                                                ArgumentDefinition.builder()
+                                                                        .paramType(ArgumentDefinition.ParamType.HEADER)
+                                                                        .type(LocalReferenceType.of(
+                                                                                TypeName.of("StringAlias")))
+                                                                        .build()))
+                                                        .build())
                                         .build())
-                                .putEndpoints("post", EndpointDefinition.builder()
-                                        .http(RequestLineDefinition.of("POST", PathString.of("/post")))
-                                        .args(ImmutableMap.of(ParameterName.of("foo"), ArgumentDefinition.builder()
-                                                .paramType(ArgumentDefinition.ParamType.HEADER)
-                                                .type(LocalReferenceType.of(TypeName.of("StringAlias")))
-                                                .build()))
-                                        .build())
-                                .build())
                         .build());
     }
 
     private static String multiLineString(String... lines) {
         return Joiner.on('\n').join(lines);
     }
-
 }

@@ -35,8 +35,7 @@ public abstract class TypeName {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
     static final ImmutableSet<String> PRIMITIVE_TYPES =
-            ImmutableSet.of(
-                    "any", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
+            ImmutableSet.of("any", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
 
     @JsonValue
     public abstract String name();
@@ -46,7 +45,9 @@ public abstract class TypeName {
         Preconditions.checkArgument(
                 CUSTOM_TYPE_PATTERN.matcher(name()).matches() || PRIMITIVE_TYPES.contains(name()),
                 "TypeNames must be a primitive type %s or match pattern %s: %s",
-                PRIMITIVE_TYPES, CUSTOM_TYPE_PATTERN, name());
+                PRIMITIVE_TYPES,
+                CUSTOM_TYPE_PATTERN,
+                name());
     }
 
     @JsonCreator

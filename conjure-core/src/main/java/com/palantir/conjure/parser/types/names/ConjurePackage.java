@@ -49,8 +49,11 @@ public abstract class ConjurePackage {
     protected final void check() {
         // TODO(rfink): NPE when the pattern is static !?!?
         Pattern validPackage = Pattern.compile("^([a-z][a-z0-9]+(\\.[a-z][a-z0-9]*)*)?$");
-        Preconditions.checkArgument(validPackage.matcher(name()).matches(),
-                "Conjure package names must match pattern %s: %s", validPackage.pattern(), name());
+        Preconditions.checkArgument(
+                validPackage.matcher(name()).matches(),
+                "Conjure package names must match pattern %s: %s",
+                validPackage.pattern(),
+                name());
     }
 
     @JsonCreator

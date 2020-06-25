@@ -34,6 +34,9 @@ public interface ForeignReferenceType extends ReferenceType {
     }
 
     static ForeignReferenceType of(Namespace namespace, TypeName type) {
-        return ImmutableForeignReferenceType.builder().namespace(namespace).type(type).build();
+        return ImmutableForeignReferenceType.builder()
+                .namespace(namespace)
+                .type(type)
+                .build();
     }
 }

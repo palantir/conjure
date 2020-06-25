@@ -74,5 +74,4 @@ public final class RawStringParser implements Parser<String> {
             return "NO_WHITESPACE";
         }
     };
-
 }

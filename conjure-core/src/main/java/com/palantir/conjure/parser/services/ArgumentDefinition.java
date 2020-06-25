@@ -111,9 +111,7 @@ public interface ArgumentDefinition {
                 }
             }
 
-            return ImmutableArgumentDefinition.fromJson(
-                    parser.readValueAs(ImmutableArgumentDefinition.Json.class));
+            return ImmutableArgumentDefinition.fromJson(parser.readValueAs(ImmutableArgumentDefinition.Json.class));
         }
     }
-
 }

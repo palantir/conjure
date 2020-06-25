@@ -31,6 +31,7 @@ public final class ErrorDefinitionValidator {
     public static void validate(ErrorDefinition definition) {
         UNIQUE_FIELD_NAMES_VALIDATOR.validate(
                 Stream.concat(definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
-                        .map(FieldDefinition::getFieldName).collect(Collectors.toSet()));
+                        .map(FieldDefinition::getFieldName)
+                        .collect(Collectors.toSet()));
     }
 }

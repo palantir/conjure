@@ -40,7 +40,9 @@ public abstract class Namespace {
     protected final void check() {
         Preconditions.checkArgument(
                 NAMESPACE_PATTERN.matcher(name()).matches(),
-                "Namespaces must match pattern %s: %s", NAMESPACE_PATTERN, name());
+                "Namespaces must match pattern %s: %s",
+                NAMESPACE_PATTERN,
+                name());
     }
 
     @JsonCreator

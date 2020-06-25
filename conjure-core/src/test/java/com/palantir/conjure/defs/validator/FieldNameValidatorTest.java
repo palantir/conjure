@@ -42,22 +42,21 @@ public final class FieldNameValidatorTest {
     @Test
     public void testInvalidNames() throws Exception {
         for (String invalid : new String[] {
-                "UpperCamelCase",
-                "Upper-Kebab-Case",
-                "Upper_Snake_Case",
-                "ABC",
-                "$special",
-                "special%",
-                "snake_123_case",
-                "kebab-123-case",
-                "mixed-kebab_snake-case",
-                "defaultDNSName"
-                }) {
+            "UpperCamelCase",
+            "Upper-Kebab-Case",
+            "Upper_Snake_Case",
+            "ABC",
+            "$special",
+            "special%",
+            "snake_123_case",
+            "kebab-123-case",
+            "mixed-kebab_snake-case",
+            "defaultDNSName"
+        }) {
             assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of(invalid)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining(String.format(
-                            "FieldName \"%s\" must follow one of the following patterns",
-                            invalid));
+                    .hasMessageContaining(
+                            String.format("FieldName \"%s\" must follow one of the following patterns", invalid));
         }
     }
 

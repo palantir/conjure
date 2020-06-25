@@ -35,5 +35,4 @@ public interface AnyType extends ConjureType {
     static AnyType of() {
         return ImmutableAnyType.builder().build();
     }
-
 }

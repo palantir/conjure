@@ -58,9 +58,7 @@ public interface FieldDefinition {
                 }
             }
 
-            return ImmutableFieldDefinition.fromJson(
-                    parser.readValueAs(ImmutableFieldDefinition.Json.class));
+            return ImmutableFieldDefinition.fromJson(parser.readValueAs(ImmutableFieldDefinition.Json.class));
         }
     }
-
 }

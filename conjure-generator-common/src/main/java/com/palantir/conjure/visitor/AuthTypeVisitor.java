@@ -22,7 +22,7 @@ import com.palantir.conjure.spec.HeaderAuthType;
 
 public final class AuthTypeVisitor {
 
-    private AuthTypeVisitor(){}
+    private AuthTypeVisitor() {}
 
     public static final IsHeaderAuthTypeVisitor IS_HEADER = new IsHeaderAuthTypeVisitor();
     public static final IsCookieAuthTypeVisitor IS_COOKIE = new IsCookieAuthTypeVisitor();

@@ -29,14 +29,16 @@ public final class TypeNameValidator {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
 
-    static final List<String> PRIMITIVE_TYPES = Lists.transform(
-            java.util.Arrays.asList(PrimitiveType.Value.values()), PrimitiveType.Value::name);
+    static final List<String> PRIMITIVE_TYPES =
+            Lists.transform(java.util.Arrays.asList(PrimitiveType.Value.values()), PrimitiveType.Value::name);
 
     public static void validate(TypeName typeName) {
         Preconditions.checkArgument(
                 CUSTOM_TYPE_PATTERN.matcher(typeName.getName()).matches()
                         || PRIMITIVE_TYPES.contains(typeName.getName()),
                 "TypeNames must be a primitive type %s or match pattern %s: %s",
-                PRIMITIVE_TYPES, CUSTOM_TYPE_PATTERN, typeName.getName());
+                PRIMITIVE_TYPES,
+                CUSTOM_TYPE_PATTERN,
+                typeName.getName());
     }
 }

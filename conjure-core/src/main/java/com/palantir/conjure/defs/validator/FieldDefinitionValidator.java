@@ -33,8 +33,7 @@ public final class FieldDefinitionValidator {
             MapType mapType = typeDef.getType().accept(TypeVisitor.MAP);
             if (!mapType.getKeyType().accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)) {
                 throw new IllegalStateException(
-                        String.format("Complex type '%s' not allowed in map key: %s.",
-                                mapType.getKeyType(), typeDef));
+                        String.format("Complex type '%s' not allowed in map key: %s.", mapType.getKeyType(), typeDef));
             }
         }
     }

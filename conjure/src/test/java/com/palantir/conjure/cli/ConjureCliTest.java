@@ -49,16 +49,15 @@ public final class ConjureCliTest {
     @Test
     public void correctlyParseArguments() {
         String[] args = {
-                "compile",
-                inputFile.getAbsolutePath(),
-                outputFile.getAbsolutePath(),
-                "--extensions", "{\"foo\": \"bar\"}"};
+            "compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), "--extensions", "{\"foo\": \"bar\"}"
+        };
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
                 .putExtensions("foo", "bar")
                 .build();
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args)
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
+                .parseArgs(args)
                 .asCommandLineList()
                 .get(1)
                 .getCommand();
@@ -82,13 +81,16 @@ public final class ConjureCliTest {
 
     @Test
     public void throwsWhenOutputIsDirectory() {
-        String[] args = {"compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()};
+        String[] args = {
+            "compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()
+        };
         AtomicReference<Exception> executionException = new AtomicReference<>();
         new CommandLine(new ConjureCli())
                 .setExecutionExceptionHandler((ex, _commandLine, _parseResult) -> {
                     executionException.set(ex);
                     throw ex;
-                }).execute(args);
+                })
+                .execute(args);
         assertThat(executionException.get())
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Output IR file should not be a directory");
@@ -97,9 +99,7 @@ public final class ConjureCliTest {
     @Test
     public void throwsWhenSubCommandIsNotCompile() {
         String[] args = {
-                "compiles",
-                folder.getRoot().getAbsolutePath(),
-                folder.getRoot().getAbsolutePath(),
+            "compiles", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath(),
         };
         assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
                 .isInstanceOf(PicocliException.class)
@@ -109,10 +109,7 @@ public final class ConjureCliTest {
     @Test
     public void doesNotThrowWhenUnexpectedFeature() {
         String[] args = {
-                "compile",
-                inputFile.getAbsolutePath(),
-                folder.getRoot().getAbsolutePath(),
-                "--foo"
+            "compile", inputFile.getAbsolutePath(), folder.getRoot().getAbsolutePath(), "--foo"
         };
         CommandLine.populateCommand(new ConjureCli(), args);
     }
@@ -120,7 +117,8 @@ public final class ConjureCliTest {
     @Test
     public void throwsWhenInvalidExtensions() {
         String[] args = {"compile", inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), "--extensions", "foo"};
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args)
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
+                .parseArgs(args)
                 .asCommandLineList()
                 .get(1)
                 .getCommand();

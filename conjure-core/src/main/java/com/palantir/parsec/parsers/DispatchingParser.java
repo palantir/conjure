@@ -36,8 +36,8 @@ public final class DispatchingParser<T> implements Parser<T> {
         this(parsers, new RawStringParser(), whitespaceParser);
     }
 
-    public DispatchingParser(Map<String, Parser<T>> parsers, Parser<String> directiveParser,
-            Parser<?> whitespaceParser) {
+    public DispatchingParser(
+            Map<String, Parser<T>> parsers, Parser<String> directiveParser, Parser<?> whitespaceParser) {
         parserLookup = new HashMap<String, Parser<T>>();
         if (whitespaceParser == null) {
             inputStringParser = directiveParser;
@@ -65,5 +65,4 @@ public final class DispatchingParser<T> implements Parser<T> {
         }
         return lastResult;
     }
-
 }

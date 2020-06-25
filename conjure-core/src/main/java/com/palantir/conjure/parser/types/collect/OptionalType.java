@@ -37,5 +37,4 @@ public interface OptionalType extends ConjureType {
     static OptionalType of(ConjureType itemType) {
         return ImmutableOptionalType.builder().itemType(itemType).build();
     }
-
 }

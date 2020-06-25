@@ -196,12 +196,7 @@
             <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
-        <module name="Indentation"> <!-- Java Style Guide: Block indentation: +4 spaces -->
-            <property name="arrayInitIndent" value="8"/>
-            <property name="lineWrappingIndentation" value="8"/>
-        </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
-        <module name="LeftCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
         <module name="MemberName"> <!-- Java Style Guide: Non-constant field names -->
             <property name="format" value="^[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Member name ''{0}'' must match pattern ''{1}''."/>
@@ -242,7 +237,6 @@
             <message key="name.invalidPattern" value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="ParameterAssignment"/> <!-- Java Coding Guidelines: Final variables and parameters -->
-        <module name="ParenPad"/> <!-- Java Style Guide: Horizontal whitespace -->
         <module name="RedundantImport"/> <!-- Java Style Guide: No unused imports -->
         <module name="RedundantModifier"/> <!-- Java Coding Guidelines: Avoid redundant modifiers -->
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Use appropriate assertion methods -->

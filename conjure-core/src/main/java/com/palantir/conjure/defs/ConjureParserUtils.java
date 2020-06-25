@@ -97,8 +97,9 @@ public final class ConjureParserUtils {
     public static String parsePackageOrElseThrow(
             Optional<com.palantir.conjure.parser.types.names.ConjurePackage> conjurePackage,
             Optional<String> defaultPackage) {
-        String packageName = conjurePackage.map(ConjurePackage::name).orElseGet(() ->
-                defaultPackage.orElseThrow(() -> new SafeIllegalArgumentException(
+        String packageName = conjurePackage
+                .map(ConjurePackage::name)
+                .orElseGet(() -> defaultPackage.orElseThrow(() -> new SafeIllegalArgumentException(
                         // TODO(rfink): Better errors: Can we provide context on where exactly no package was provided?
                         "Must provide default conjure package or "
                                 + "explicit conjure package for every object and service")));
@@ -124,12 +125,13 @@ public final class ConjureParserUtils {
     }
 
     public static TypeDefinition parseEnumType(
-            TypeName name,
-            com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
+            TypeName name, com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
 
         EnumDefinition enumType = EnumDefinition.builder()
                 .typeName(name)
-                .values(def.values().stream().map(ConjureParserUtils::parseEnumValue).collect(Collectors.toList()))
+                .values(def.values().stream()
+                        .map(ConjureParserUtils::parseEnumValue)
+                        .collect(Collectors.toList()))
                 .docs(def.docs().map(Documentation::of))
                 .build();
 
@@ -176,8 +178,7 @@ public final class ConjureParserUtils {
                 .build());
     }
 
-    public static Type parsePrimitiveType(
-            com.palantir.conjure.parser.types.primitive.PrimitiveType primitiveType) {
+    public static Type parsePrimitiveType(com.palantir.conjure.parser.types.primitive.PrimitiveType primitiveType) {
         return Type.primitive(PrimitiveType.valueOf(primitiveType.name()));
     }
 
@@ -204,7 +205,8 @@ public final class ConjureParserUtils {
 
                 // Resolve objects first, so we can use them in service validations
                 Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
-                Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(parsed.types().conjureImports());
+                Map<TypeName, TypeDefinition> importedObjects =
+                        parseImportObjects(parsed.types().conjureImports());
                 Map<TypeName, TypeDefinition> allObjects = new HashMap<>();
                 allObjects.putAll(objects);
                 allObjects.putAll(importedObjects);
@@ -212,12 +214,11 @@ public final class ConjureParserUtils {
                 DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
 
                 parsed.services().forEach((serviceName, service) -> {
-                    servicesBuilder.add(
-                            parseService(
-                                    service,
-                                    TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                                    typeResolver,
-                                    dealiasingVisitor));
+                    servicesBuilder.add(parseService(
+                            service,
+                            TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
+                            typeResolver,
+                            dealiasingVisitor));
                 });
 
                 typesBuilder.addAll(objects.values());
@@ -261,8 +262,8 @@ public final class ConjureParserUtils {
             ReferenceTypeResolver typeResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
         List<EndpointDefinition> endpoints = new ArrayList<>();
-        parsed.endpoints().forEach((name, def) -> endpoints.add(
-                ConjureParserUtils.parseEndpoint(
+        parsed.endpoints()
+                .forEach((name, def) -> endpoints.add(ConjureParserUtils.parseEndpoint(
                         name,
                         def,
                         parsed.basePath(),
@@ -288,21 +289,23 @@ public final class ConjureParserUtils {
         // no need to use validator here since TypeDefinitionParserVisitor calls each TypeDefinition parser that
         // validates its type.
         return parsed.definitions().objects().entrySet().stream()
-                        .map(entry -> entry.getValue().visit(
-                                new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
-                        .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
+                .map(entry -> entry.getValue()
+                        .visit(new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
+                .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
     }
 
     static List<ErrorDefinition> parseErrors(
-            NamedTypesDefinition defs,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            NamedTypesDefinition defs, ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage = defs.defaultConjurePackage().map(ConjurePackage::name);
         ImmutableList.Builder<ErrorDefinition> errorsBuidler = ImmutableList.builder();
-        errorsBuidler.addAll(defs.errors().entrySet().stream().map(entry -> {
-            TypeName typeName = TypeName.of(
-                    entry.getKey().name(), parsePackageOrElseThrow(entry.getValue().conjurePackage(), defaultPackage));
-            return parseErrorType(typeName, entry.getValue(), typeResolver);
-        }).collect(Collectors.toList()));
+        errorsBuidler.addAll(defs.errors().entrySet().stream()
+                .map(entry -> {
+                    TypeName typeName = TypeName.of(
+                            entry.getKey().name(),
+                            parsePackageOrElseThrow(entry.getValue().conjurePackage(), defaultPackage));
+                    return parseErrorType(typeName, entry.getValue(), typeResolver);
+                })
+                .collect(Collectors.toList()));
         return errorsBuidler.build();
     }
 
@@ -319,19 +322,23 @@ public final class ConjureParserUtils {
     }
 
     static List<FieldDefinition> parseField(
-            Map<com.palantir.conjure.parser.types.names.FieldName,
-                    com.palantir.conjure.parser.types.complex.FieldDefinition> def,
+            Map<
+                            com.palantir.conjure.parser.types.names.FieldName,
+                            com.palantir.conjure.parser.types.complex.FieldDefinition>
+                    def,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
-        return def.entrySet().stream().map(entry -> {
-            FieldDefinition fieldDefinition = FieldDefinition.builder()
-                    .fieldName(parseFieldName(entry.getKey()))
-                    .type(entry.getValue().type().visit(new ConjureTypeParserVisitor(typeResolver)))
-                    .docs(entry.getValue().docs().map(Documentation::of))
-                    .deprecated(entry.getValue().deprecated().map(Documentation::of))
-                    .build();
-            FieldDefinitionValidator.validate(fieldDefinition);
-            return fieldDefinition;
-        }).collect(Collectors.toList());
+        return def.entrySet().stream()
+                .map(entry -> {
+                    FieldDefinition fieldDefinition = FieldDefinition.builder()
+                            .fieldName(parseFieldName(entry.getKey()))
+                            .type(entry.getValue().type().visit(new ConjureTypeParserVisitor(typeResolver)))
+                            .docs(entry.getValue().docs().map(Documentation::of))
+                            .deprecated(entry.getValue().deprecated().map(Documentation::of))
+                            .build();
+                    FieldDefinitionValidator.validate(fieldDefinition);
+                    return fieldDefinition;
+                })
+                .collect(Collectors.toList());
     }
 
     private static FieldName parseFieldName(com.palantir.conjure.parser.types.names.FieldName parserFieldName) {
@@ -367,8 +374,7 @@ public final class ConjureParserUtils {
     }
 
     private static HttpPath parseHttpPath(
-            com.palantir.conjure.parser.services.EndpointDefinition def,
-            PathString basePath) {
+            com.palantir.conjure.parser.services.EndpointDefinition def, PathString basePath) {
         HttpPath httpPath = HttpPath.of(basePath.resolve(def.http().path()).toString());
         HttpPathValidator.validate(httpPath);
         return httpPath;
@@ -394,8 +400,10 @@ public final class ConjureParserUtils {
             HttpPath httpPath,
             ReferenceTypeResolver typeResolver) {
         ImmutableList.Builder<ArgumentDefinition> resultBuilder = ImmutableList.builder();
-        for (Map.Entry<com.palantir.conjure.parser.services.ParameterName,
-                com.palantir.conjure.parser.services.ArgumentDefinition> entry : args.entrySet()) {
+        for (Map.Entry<
+                        com.palantir.conjure.parser.services.ParameterName,
+                        com.palantir.conjure.parser.services.ArgumentDefinition>
+                entry : args.entrySet()) {
             com.palantir.conjure.parser.services.ArgumentDefinition original = entry.getValue();
             ArgumentName argName = ArgumentName.of(entry.getKey().name());
             ParameterType paramType = parseParameterType(original, argName, httpPath);
@@ -427,14 +435,16 @@ public final class ConjureParserUtils {
                     return ParameterType.body(BodyParameterType.of());
                 }
             case HEADER:
-                String headerParamId = argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
+                String headerParamId =
+                        argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.header(HeaderParameterType.of(ParameterId.of(headerParamId)));
             case PATH:
                 return ParameterType.path(PathParameterType.of());
             case BODY:
                 return ParameterType.body(BodyParameterType.of());
             case QUERY:
-                String queryParamId = argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
+                String queryParamId =
+                        argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.query(QueryParameterType.of(ParameterId.of(queryParamId)));
             default:
                 throw new IllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());

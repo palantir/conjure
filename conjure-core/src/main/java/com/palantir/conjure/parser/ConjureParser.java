@@ -108,8 +108,8 @@ public final class ConjureParser {
 
             try {
                 ConjureSourceFile definition = MAPPER.readValue(file, ConjureSourceFile.class);
-                Map<Namespace, ConjureImports> imports =
-                        parseImports(definition.types().conjureImports(), file.toPath().getParent());
+                Map<Namespace, ConjureImports> imports = parseImports(
+                        definition.types().conjureImports(), file.toPath().getParent());
                 return ConjureSourceFile.builder()
                         .from(definition)
                         .types(TypesDefinition.builder()
@@ -130,21 +130,20 @@ public final class ConjureParser {
                 Map<Namespace, ConjureImports> declaredImports, Path baseDir) {
             return declaredImports.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 String importedFile = entry.getValue().file();
-                ConjureSourceFile importedConjure = parse(baseDir.resolve(importedFile).toFile());
+                ConjureSourceFile importedConjure =
+                        parse(baseDir.resolve(importedFile).toFile());
                 return ConjureImports.withResolvedImports(importedFile, importedConjure);
             }));
         }
-
     }
 
     @VisibleForTesting
     static ObjectMapper createConjureParserObjectMapper() {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory())
                 .registerModule(new Jdk8Module())
-                .setAnnotationIntrospector(
-                        AnnotationIntrospector.pair(
-                                new KebabCaseEnforcingAnnotationInspector(), // needs to come first.
-                                new JacksonAnnotationIntrospector()));
+                .setAnnotationIntrospector(AnnotationIntrospector.pair(
+                        new KebabCaseEnforcingAnnotationInspector(), // needs to come first.
+                        new JacksonAnnotationIntrospector()));
         mapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
         return mapper;
     }

@@ -23,7 +23,10 @@ import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
 
 public interface TypeDefinitionVisitor<T> {
     T visit(AliasTypeDefinition def);
+
     T visit(EnumTypeDefinition def);
+
     T visit(ObjectTypeDefinition def);
+
     T visit(UnionTypeDefinition def);
 }

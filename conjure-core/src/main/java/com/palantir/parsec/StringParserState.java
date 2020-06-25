@@ -66,5 +66,4 @@ public final class StringParserState implements ParserState {
     public int getCharPosition() {
         return current;
     }
-
 }

@@ -21,9 +21,5 @@ import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
 @JsonDeserialize
-@Value.Style(
-        jdkOnly = true,
-        overshadowImplementation = true,
-        visibility = ImplementationVisibility.PACKAGE
-)
+@Value.Style(jdkOnly = true, overshadowImplementation = true, visibility = ImplementationVisibility.PACKAGE)
 public @interface ConjureImmutablesStyle {}

@@ -53,8 +53,11 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
             Set<String> enumValues = new HashSet<>();
             for (EnumValueDefinition valueDef : definition.getValues()) {
                 boolean unseen = enumValues.add(valueDef.getValue());
-                Preconditions.checkArgument(unseen, "Cannot declare a %s with duplicate enum values: %s",
-                        EnumTypeDefinition.class.getSimpleName(), valueDef.getValue());
+                Preconditions.checkArgument(
+                        unseen,
+                        "Cannot declare a %s with duplicate enum values: %s",
+                        EnumTypeDefinition.class.getSimpleName(),
+                        valueDef.getValue());
             }
         }
     }
@@ -67,5 +70,4 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
             definition.getValues().forEach(EnumValueDefinitionValidator::validateAll);
         }
     }
-
 }

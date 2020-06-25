@@ -38,9 +38,10 @@ public final class TypeNameValidatorTest {
         for (String invalid : new String[] {"a", "IFoo", "ABC", "$Special", "snake_case", "kebab-case", "Camel1B"}) {
             assertThatThrownBy(() -> TypeNameValidator.validate(TypeName.of(invalid, PACKAGE)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("TypeNames must be a primitive type"
-                            + " [STRING, DATETIME, INTEGER, DOUBLE, SAFELONG, BINARY, ANY, BOOLEAN, UUID, RID,"
-                            + " BEARERTOKEN, UNKNOWN] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s",
+                    .hasMessage(
+                            "TypeNames must be a primitive type"
+                                    + " [STRING, DATETIME, INTEGER, DOUBLE, SAFELONG, BINARY, ANY, BOOLEAN, UUID, RID,"
+                                    + " BEARERTOKEN, UNKNOWN] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s",
                             invalid);
         }
     }

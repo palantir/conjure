@@ -16,7 +16,6 @@
 
 package com.palantir.conjure.parser.services;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -48,10 +47,7 @@ public interface AuthDefinition {
     }
 
     static AuthDefinition none() {
-        return ImmutableAuthDefinition.builder()
-                .type(AuthType.NONE)
-                .id("NONE")
-                .build();
+        return ImmutableAuthDefinition.builder().type(AuthType.NONE).id("NONE").build();
     }
 
     static AuthDefinition header() {
@@ -62,10 +58,7 @@ public interface AuthDefinition {
     }
 
     static AuthDefinition cookie(String id) {
-        return ImmutableAuthDefinition.builder()
-                .type(AuthType.COOKIE)
-                .id(id)
-                .build();
+        return ImmutableAuthDefinition.builder().type(AuthType.COOKIE).id(id).build();
     }
 
     @JsonCreator

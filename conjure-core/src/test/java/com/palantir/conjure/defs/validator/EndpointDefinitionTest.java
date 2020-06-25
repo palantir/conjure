@@ -136,8 +136,11 @@ public final class EndpointDefinitionTest {
                 .build();
 
         DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
-                typeName, TypeDefinition.alias(AliasDefinition.of(typeName,
-                        Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))), Documentation.of("")))));
+                typeName,
+                TypeDefinition.alias(AliasDefinition.of(
+                        typeName,
+                        Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))),
+                        Documentation.of("")))));
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)
@@ -292,7 +295,9 @@ public final class EndpointDefinitionTest {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("someName"))
-                        .type(Type.list(ListType.builder().itemType(Type.primitive(PrimitiveType.STRING)).build()))
+                        .type(Type.list(ListType.builder()
+                                .itemType(Type.primitive(PrimitiveType.STRING))
+                                .build()))
                         .paramType(ParameterType.header(HeaderParameterType.of(ParameterId.of("someId"))))
                         .build())
                 .endpointName(ENDPOINT_NAME)
@@ -319,8 +324,8 @@ public final class EndpointDefinitionTest {
                 .httpPath(HttpPath.of("/a/path"));
 
         DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
-                typeName, TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))
-        ));
+                typeName,
+                TypeDefinition.object(ObjectDefinition.of(typeName, ImmutableList.of(), Documentation.of("")))));
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)

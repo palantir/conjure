@@ -50,5 +50,4 @@ public interface ParserState {
     int getLine();
 
     int getCharPosition();
-
 }

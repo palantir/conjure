@@ -47,7 +47,8 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
         @Override
         public void validate(EnumValueDefinition definition) {
-            Preconditions.checkArgument(!definition.getValue().equalsIgnoreCase("UNKNOWN"),
+            Preconditions.checkArgument(
+                    !definition.getValue().equalsIgnoreCase("UNKNOWN"),
                     "UNKNOWN is a reserved enumeration value and cannot be used in an %s",
                     EnumValueDefinition.class.getSimpleName());
         }
@@ -59,8 +60,11 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
         @Override
         public void validate(EnumValueDefinition definition) {
-            Preconditions.checkArgument(REQUIRED_FORMAT.matcher(definition.getValue()).matches(),
-                    "Enumeration values must match format %s: %s", REQUIRED_FORMAT, definition.getValue());
+            Preconditions.checkArgument(
+                    REQUIRED_FORMAT.matcher(definition.getValue()).matches(),
+                    "Enumeration values must match format %s: %s",
+                    REQUIRED_FORMAT,
+                    definition.getValue());
         }
     }
 }
