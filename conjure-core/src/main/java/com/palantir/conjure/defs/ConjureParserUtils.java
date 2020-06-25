@@ -97,7 +97,7 @@ public final class ConjureParserUtils {
     public static String parsePackageOrElseThrow(
             Optional<com.palantir.conjure.parser.types.names.ConjurePackage> conjurePackage,
             Optional<String> defaultPackage) {
-        String packageName = conjurePackage.map(p -> p.name()).orElseGet(() ->
+        String packageName = conjurePackage.map(ConjurePackage::name).orElseGet(() ->
                 defaultPackage.orElseThrow(() -> new SafeIllegalArgumentException(
                         // TODO(rfink): Better errors: Can we provide context on where exactly no package was provided?
                         "Must provide default conjure package or "
@@ -296,7 +296,7 @@ public final class ConjureParserUtils {
     static List<ErrorDefinition> parseErrors(
             NamedTypesDefinition defs,
             ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
-        Optional<String> defaultPackage = defs.defaultConjurePackage().map(p -> p.name());
+        Optional<String> defaultPackage = defs.defaultConjurePackage().map(ConjurePackage::name);
         ImmutableList.Builder<ErrorDefinition> errorsBuidler = ImmutableList.builder();
         errorsBuidler.addAll(defs.errors().entrySet().stream().map(entry -> {
             TypeName typeName = TypeName.of(
@@ -427,14 +427,14 @@ public final class ConjureParserUtils {
                     return ParameterType.body(BodyParameterType.of());
                 }
             case HEADER:
-                String headerParamId = argumentDef.paramId().map(id -> id.name()).orElseGet(() -> argName.get());
+                String headerParamId = argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.header(HeaderParameterType.of(ParameterId.of(headerParamId)));
             case PATH:
                 return ParameterType.path(PathParameterType.of());
             case BODY:
                 return ParameterType.body(BodyParameterType.of());
             case QUERY:
-                String queryParamId = argumentDef.paramId().map(id -> id.name()).orElseGet(() -> argName.get());
+                String queryParamId = argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.query(QueryParameterType.of(ParameterId.of(queryParamId)));
             default:
                 throw new IllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());

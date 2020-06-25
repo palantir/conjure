@@ -81,7 +81,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
      * Simplified constructor for validators that don't need to look at the context.
      */
     EndpointDefinitionValidator(ConjureValidator<EndpointDefinition> validator) {
-        this.validator = (definition, dealiasingTypeVisitor) -> validator.validate(definition);
+        this.validator = (definition, _dealiasingTypeVisitor) -> validator.validate(definition);
     }
 
     EndpointDefinitionValidator(ConjureContextualValidator<EndpointDefinition> validator) {
@@ -110,7 +110,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
         private static boolean validateType(Type input, DealiasingTypeVisitor dealiasingTypeVisitor) {
             Optional<Type> dealiased = dealiasingTypeVisitor.dealias(input)
-                    .fold(typeDefinition -> Optional.empty(), Optional::of);
+                    .fold(_typeDefinition -> Optional.empty(), Optional::of);
             // typeDef isn't binary
             if (!dealiased.isPresent()) {
                 return true;
@@ -175,8 +175,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .forEach(entry -> {
                         boolean isOptionalBinary = dealiasingTypeVisitor.dealias(entry.getType())
                                 .fold(
-                                        typeDef -> false, // typeDef cannot resolve to optional<binary>
-                                        type -> isOptionalBinary(type));
+                                        _typeDef -> false, // typeDef cannot resolve to optional<binary>
+                                        NoOptionalBinaryBodyParamValidator::isOptionalBinary);
                         Preconditions.checkState(
                                 !isOptionalBinary,
                                 "Endpoint BODY argument must not be optional<binary> or alias thereof: %s",
@@ -356,7 +356,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
         private static boolean validateType(Type input, DealiasingTypeVisitor dealiasingTypeVisitor) {
             Optional<Type> dealiased = dealiasingTypeVisitor.dealias(input)
-                    .fold(typeDefinition -> Optional.empty(), Optional::of);
+                    .fold(_typeDefinition -> Optional.empty(), Optional::of);
             // typeDef isn't bearertoken
             if (!dealiased.isPresent()) {
                 return true;

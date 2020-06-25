@@ -56,7 +56,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator());
 
     public static void validateAll(ConjureDefinition definition) {
-        for (ConjureValidator validator : values()) {
+        for (ConjureValidator<ConjureDefinition> validator : values()) {
             validator.validate(definition);
         }
     }
@@ -192,7 +192,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 endpoint.getArgs().stream()
                         .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                         .findAny()
-                        .ifPresent(arg -> {
+                        .ifPresent(_arg -> {
                             throw new IllegalStateException(
                                     "Illegal nested optionals found in one of the arguments of endpoint "
                                             + endpoint.getEndpointName().get());
@@ -211,7 +211,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
                     .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                     .findAny()
-                    .ifPresent(arg -> {
+                    .ifPresent(_arg -> {
                         throw new IllegalStateException(
                                 "Illegal nested optionals found in one of arguments of error "
                                         + errorDef.getErrorName().getName());
@@ -239,7 +239,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition ->
                                     recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(found -> {
+                            .ifPresent(_found -> {
                                 throw new IllegalStateException("Illegal nested optionals found in object "
                                         + objectDefinition.getTypeName().getName());
                             });
@@ -253,7 +253,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition ->
                                     recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(found -> {
+                            .ifPresent(_found -> {
                                 throw new IllegalStateException("Illegal nested optionals found in union "
                                         + unionDefinition.getTypeName().getName());
                             });
@@ -311,7 +311,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 endpoint.getArgs().stream()
                         .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                         .findAny()
-                        .ifPresent(arg -> {
+                        .ifPresent(_arg -> {
                             throw new IllegalStateException(
                                     "Illegal map key found in one of the arguments of endpoint "
                                             + endpoint.getEndpointName().get());
@@ -331,7 +331,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             Stream.concat(errorDef.getSafeArgs().stream(), errorDef.getUnsafeArgs().stream())
                     .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                     .findAny()
-                    .ifPresent(arg -> {
+                    .ifPresent(_arg -> {
                         throw new IllegalStateException(
                                 "Illegal map key found in one of arguments of error "
                                         + errorDef.getErrorName().getName());
@@ -359,7 +359,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition -> recursivelyFindIllegalKeys(
                                     fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(found -> {
+                            .ifPresent(_found -> {
                                 throw new IllegalStateException(
                                         "Illegal map key found in object "
                                                 + objectDefinition.getTypeName().getName());
@@ -374,7 +374,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition -> recursivelyFindIllegalKeys(
                                     fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(found -> {
+                            .ifPresent(_found -> {
                                 throw new IllegalStateException(
                                         "Illegal map key found in union "
                                                 + unionDefinition.getTypeName().getName());

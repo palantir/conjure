@@ -18,8 +18,8 @@ package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.NavigableMap;
 import java.util.Optional;
-import java.util.SortedMap;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = ImmutableTestCaseDefinition.class)
@@ -30,8 +30,8 @@ public interface TestCaseDefinition {
     String testCaseName();
 
     @JsonProperty("negative")
-    Optional<SortedMap<String, NegativeCaseDefinition>> negative();
+    Optional<NavigableMap<String, NegativeCaseDefinition>> negative();
 
     @JsonProperty("positive")
-    Optional<SortedMap<String, PositiveCaseDefinition>> positive();
+    Optional<NavigableMap<String, PositiveCaseDefinition>> positive();
 }

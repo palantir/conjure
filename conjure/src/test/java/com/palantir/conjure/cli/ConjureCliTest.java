@@ -57,7 +57,7 @@ public final class ConjureCliTest {
                 .outputIrFile(outputFile)
                 .putExtensions("foo", "bar")
                 .build();
-        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parse(args).get(1).getCommand();
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli()).parseArgs(args).asCommandLineList().get(1).getCommand();
         assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
     }
 
@@ -86,7 +86,7 @@ public final class ConjureCliTest {
                 "compiles",
                 folder.getRoot().getAbsolutePath(),
                 folder.getRoot().getAbsolutePath(),
-                };
+        };
         assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
                 .isInstanceOf(PicocliException.class)
                 .hasMessageContaining("Unmatched arguments");

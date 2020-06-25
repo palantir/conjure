@@ -22,7 +22,6 @@ import com.palantir.parsec.ParserState;
 import com.palantir.parsec.Parsers;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public final class DispatchingParser<T> implements Parser<T> {
 
@@ -45,7 +44,7 @@ public final class DispatchingParser<T> implements Parser<T> {
             parserLookup.putAll(parsers);
         } else {
             inputStringParser = Parsers.prefix(whitespaceParser, directiveParser);
-            for (Entry<String, Parser<T>> entry : parsers.entrySet()) {
+            for (Map.Entry<String, Parser<T>> entry : parsers.entrySet()) {
                 parserLookup.put(entry.getKey(), Parsers.prefix(whitespaceParser, entry.getValue()));
             }
         }
