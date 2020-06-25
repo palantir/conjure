@@ -26,10 +26,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 import org.junit.Test;
-import picocli.CommandLine.PicocliException;
+import org.junit.rules.TemporaryFolder;
 import picocli.CommandLine;
+import picocli.CommandLine.PicocliException;
 
 public final class ConjureCliTest {
 
