@@ -76,6 +76,6 @@ public final class UnionDefinitionValidatorTest {
                         .typeName(TypeName.of("string", ""))
                         .build()))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("Union member key must not end with an underscore: foo_");
+                .hasMessageStartingWith("Union member key must not end with an underscore: foo_");
     }
 }

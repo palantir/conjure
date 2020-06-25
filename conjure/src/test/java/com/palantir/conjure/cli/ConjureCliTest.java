@@ -23,12 +23,13 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import picocli.CommandLine;
+import org.junit.Test;
 import picocli.CommandLine.PicocliException;
+import picocli.CommandLine;
 
 public final class ConjureCliTest {
 
@@ -82,8 +83,14 @@ public final class ConjureCliTest {
     @Test
     public void throwsWhenOutputIsDirectory() {
         String[] args = {"compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()};
-        assertThatThrownBy(() -> new CommandLine(new ConjureCli()).execute(args))
-                .isInstanceOf(CommandLine.ExecutionException.class)
+        AtomicReference<Exception> executionException = new AtomicReference<>();
+        new CommandLine(new ConjureCli())
+                .setExecutionExceptionHandler((ex, _commandLine, _parseResult) -> {
+                    executionException.set(ex);
+                    throw ex;
+                }).execute(args);
+        assertThat(executionException.get())
+                .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Output IR file should not be a directory");
     }
 
