@@ -41,10 +41,10 @@ org.yaml:snakeyaml:1.26 (1 constraints: 7117f927)
 
 [Test dependencies]
 junit:junit:4.13 (1 constraints: dc040031)
-net.bytebuddy:byte-buddy:1.10.10 (1 constraints: 6d0ba0e9)
-net.bytebuddy:byte-buddy-agent:1.10.10 (1 constraints: 6d0ba0e9)
+net.bytebuddy:byte-buddy:1.10.13 (1 constraints: 700ba3e9)
+net.bytebuddy:byte-buddy-agent:1.10.13 (1 constraints: 700ba3e9)
 org.assertj:assertj-core:3.16.1 (1 constraints: 3d05483b)
 org.hamcrest:hamcrest:2.2 (1 constraints: 720b95d5)
 org.hamcrest:hamcrest-core:2.2 (2 constraints: 730adbbf)
-org.mockito:mockito-core:3.4.0 (1 constraints: 09050636)
+org.mockito:mockito-core:3.4.2 (1 constraints: 0b050836)
 org.objenesis:objenesis:2.6 (1 constraints: b40a14bd)
