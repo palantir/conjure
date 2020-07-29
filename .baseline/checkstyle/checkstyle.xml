@@ -361,6 +361,7 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="\/\/TODO|\/\/ TODO(?!\([^()\s]+\): )"/>
             <property name="message" value="TODO format: // TODO(#issue): explanation"/>
+            <property name="ignoreCase" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
