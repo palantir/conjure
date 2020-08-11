@@ -30,8 +30,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,8 +63,18 @@ public final class ConjureParser {
     }
 
     public static AnnotatedConjureSourceFile parseAnnotated(File file) {
+        RecursiveParser parser = new RecursiveParser();
+        return parseAnnotated(parser, file);
+    }
+
+    public static List<AnnotatedConjureSourceFile> parseAnnotated(Collection<File> files) {
+        RecursiveParser parser = new RecursiveParser();
+        return files.stream().map(file -> parseAnnotated(parser, file)).collect(Collectors.toList());
+    }
+
+    private static AnnotatedConjureSourceFile parseAnnotated(RecursiveParser parser, File file) {
         return AnnotatedConjureSourceFile.builder()
-                .conjureSourceFile(ConjureParser.parse(file))
+                .conjureSourceFile(parser.parse(file))
                 .sourceFile(file)
                 .build();
     }
