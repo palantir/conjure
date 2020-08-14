@@ -1,5 +1,5 @@
 type: improvement
 improvement:
   description: Each conjure file will only be parsed once
-  urls:
-    - https://github.com/palantir/conjure/pull/667
+  links:
+  - https://github.com/palantir/conjure/pull/667
