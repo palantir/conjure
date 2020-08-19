@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: correctly set exit code on failure.
+  links:
+  - https://github.com/palantir/conjure/pull/675
