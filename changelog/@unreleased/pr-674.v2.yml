@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Reverts change to add parsing caching for conjure files, which broke
+    conjure IR outputting.
+  links:
+  - https://github.com/palantir/conjure/pull/674
