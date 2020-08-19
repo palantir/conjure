@@ -43,7 +43,7 @@ public final class ConjureCli implements Runnable {
             .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
 
     public static void main(String[] args) {
-        new CommandLine(new ConjureCli()).execute(args);
+        System.exit(new CommandLine(new ConjureCli()).execute(args));
     }
 
     @Override
