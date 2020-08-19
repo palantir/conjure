@@ -23,6 +23,7 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Conjure {
     public static final Integer SUPPORTED_IR_VERSION = 1;
@@ -33,7 +34,8 @@ public final class Conjure {
      * Deserializes {@link ConjureDefinition} from their YAML representations in the given files.
      */
     public static ConjureDefinition parse(Collection<File> files) {
-        List<AnnotatedConjureSourceFile> sourceFiles = ConjureParser.parseAnnotated(files);
+        List<AnnotatedConjureSourceFile> sourceFiles =
+                files.stream().map(ConjureParser::parseAnnotated).collect(Collectors.toList());
         ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles);
         return NormalizeDefinition.normalize(ir);
     }
