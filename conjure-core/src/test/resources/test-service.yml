@@ -25,6 +25,7 @@ services:
         http: GET /get
 
       post:
+        tags: ['test-tag']
         http: POST /post
         args:
           foo:

@@ -96,7 +96,8 @@
       "returns" : null,
       "docs" : null,
       "deprecated" : null,
-      "markers" : [ ]
+      "markers" : [ ],
+      "tags" : [ ]
     } ],
     "docs" : null
   }, {
@@ -113,7 +114,8 @@
       "returns" : null,
       "docs" : null,
       "deprecated" : null,
-      "markers" : [ ]
+      "markers" : [ ],
+      "tags" : [ ]
     } ],
     "docs" : null
   } ],
