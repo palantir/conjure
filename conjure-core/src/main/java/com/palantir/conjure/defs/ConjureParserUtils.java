@@ -363,6 +363,7 @@ public final class ConjureParserUtils {
                 .httpPath(httpPath)
                 .auth(def.auth().map(ConjureParserUtils::parseAuthType).orElse(defaultAuth))
                 .args(parseArgs(def.args(), httpPath, typeResolver))
+                .tags(def.tags())
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .docs(def.docs().map(Documentation::of))

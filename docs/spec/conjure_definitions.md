@@ -348,6 +348,7 @@ returns | [ConjureType][] | The name of the return type of the endpoint. The val
 args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+tags | Set[`string`] | Set of tags that serves as additional metadata for the endpoint.
 
 
 ## ArgumentDefinition
