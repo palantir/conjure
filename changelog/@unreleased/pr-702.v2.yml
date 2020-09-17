@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Add `tags` field to `EndpointDefinition` in the IR
+  links:
+  - https://github.com/palantir/conjure/pull/702
