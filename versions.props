@@ -1,8 +1,7 @@
-com.fasterxml.jackson.*:jackson-* = 2.11.3
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.4.0
 com.google.guava:guava = 29.0-jre
-com.palantir.conjure.java:* = 5.29.1
+com.palantir.conjure.java:* = 5.29.2
 com.palantir.conjure.typescript:* = 4.2.1
 com.palantir.conjure:* = 4.12.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
@@ -22,3 +21,8 @@ org.slf4j:* = 1.7.30
 # conflict resolution
 javax.annotation:javax.annotation-api = 1.3.2
 com.palantir.safe-logging:* = 1.13.1
+
+# dependency-upgrader:OFF
+# Avoid forcing consumers to upgrade jackson
+com.fasterxml.jackson.*:jackson-* = 2.11.1
+# dependency-upgrader:ON
