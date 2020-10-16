@@ -111,21 +111,25 @@ types:
           typeName: TypeName
           alias: Type
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       EnumDefinition:
         fields:
           typeName: TypeName
           values: list<EnumValueDefinition>
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       ObjectDefinition:
         fields:
           typeName: TypeName
           fields: list<FieldDefinition>
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       UnionDefinition:
         fields:
           typeName: TypeName
           union: list<FieldDefinition>
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       EnumValueDefinition:
         fields:
           value: string
@@ -147,6 +151,7 @@ types:
           serviceName: TypeName
           endpoints: list<EndpointDefinition>
           docs: optional<Documentation>
+          deprecated: optional<Documentation>
       EndpointDefinition:
         fields:
           endpointName: EndpointName
