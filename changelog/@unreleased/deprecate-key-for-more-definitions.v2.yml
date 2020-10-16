@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: More definitions take deprecated key
+  urls:
+    - https://github.com/palantir/conjure/pull/726
