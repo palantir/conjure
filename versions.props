@@ -1,6 +1,6 @@
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.4.0
-com.google.guava:guava = 29.0-jre
+com.google.guava:guava = 30.0-jre
 com.palantir.conjure.java:* = 5.29.4
 com.palantir.conjure.typescript:* = 4.3.0
 com.palantir.conjure:* = 4.13.0
@@ -15,7 +15,7 @@ org.assertj:* = 3.17.2
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.2
 org.immutables:value = 2.8.8
-org.mockito:mockito-core = 3.5.13
+org.mockito:mockito-core = 3.5.15
 org.slf4j:* = 1.7.30
 
 # conflict resolution
