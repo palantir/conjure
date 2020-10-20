@@ -53,7 +53,8 @@
         "docs" : null,
         "deprecated" : null
       } ],
-      "docs" : null
+      "docs" : null,
+      "deprecated" : null
     }
   }, {
     "type" : "alias",
@@ -66,7 +67,8 @@
         "type" : "primitive",
         "primitive" : "STRING"
       },
-      "docs" : null
+      "docs" : null,
+      "deprecated" : null
     }
   }, {
     "type" : "alias",
@@ -79,7 +81,8 @@
         "type" : "primitive",
         "primitive" : "STRING"
       },
-      "docs" : null
+      "docs" : null,
+      "deprecated" : null
     }
   } ],
   "services" : [ {
@@ -98,7 +101,8 @@
       "deprecated" : null,
       "markers" : [ ]
     } ],
-    "docs" : null
+    "docs" : null,
+    "deprecated" : null
   }, {
     "serviceName" : {
       "name" : "TestService2",
@@ -115,7 +119,8 @@
       "deprecated" : null,
       "markers" : [ ]
     } ],
-    "docs" : null
+    "docs" : null,
+    "deprecated" : null
   } ],
   "extensions" : { }
 }
