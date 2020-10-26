@@ -53,6 +53,8 @@ public interface ArgumentDefinition {
 
     Set<ConjureType> markers();
 
+    Set<String> tags();
+
     enum ParamType {
         /**
          * Choose PathParam when this argument appears in the http line, treat as body otherwise.

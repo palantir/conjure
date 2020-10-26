@@ -31,3 +31,4 @@ services:
           foo:
             type: StringAlias
             param-type: header
+            tags: ['safe']

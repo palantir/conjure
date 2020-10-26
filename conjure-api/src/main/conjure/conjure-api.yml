@@ -186,6 +186,7 @@ types:
           paramType: ParameterType
           docs: optional<Documentation>
           markers: list<Type>
+          tags: list<string>
       ArgumentName:
         alias: string
         docs: >

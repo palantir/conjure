@@ -289,6 +289,7 @@ public final class ServiceDefinitionTests {
                                                                         .paramType(ArgumentDefinition.ParamType.HEADER)
                                                                         .type(LocalReferenceType.of(
                                                                                 TypeName.of("StringAlias")))
+                                                                        .addTags("safe")
                                                                         .build()))
                                                         .build())
                                         .build())

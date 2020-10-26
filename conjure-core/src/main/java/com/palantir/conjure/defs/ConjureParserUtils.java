@@ -413,7 +413,8 @@ public final class ConjureParserUtils {
                     .type(original.type().visit(new ConjureTypeParserVisitor(typeResolver)))
                     .paramType(paramType)
                     .docs(original.docs().map(Documentation::of))
-                    .markers(parseMarkers(original.markers(), typeResolver));
+                    .markers(parseMarkers(original.markers(), typeResolver))
+                    .tags(original.tags());
             resultBuilder.add(builder.build());
         }
         return resultBuilder.build();
