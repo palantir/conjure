@@ -72,6 +72,7 @@ import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
+import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -363,7 +364,9 @@ public final class ConjureParserUtils {
                 .httpPath(httpPath)
                 .auth(def.auth().map(ConjureParserUtils::parseAuthType).orElse(defaultAuth))
                 .args(parseArgs(def.args(), httpPath, typeResolver))
-                .tags(def.tags())
+                .tags(def.tags().stream()
+                        .peek(tag -> Preconditions.checkArgument(!tag.isEmpty(), "tag must not be empty"))
+                        .collect(Collectors.toSet()))
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .docs(def.docs().map(Documentation::of))
@@ -414,7 +417,9 @@ public final class ConjureParserUtils {
                     .paramType(paramType)
                     .docs(original.docs().map(Documentation::of))
                     .markers(parseMarkers(original.markers(), typeResolver))
-                    .tags(original.tags());
+                    .tags(original.tags().stream()
+                            .peek(tag -> Preconditions.checkArgument(!tag.isEmpty(), "tag must not be empty"))
+                            .collect(Collectors.toSet()));
             resultBuilder.add(builder.build());
         }
         return resultBuilder.build();
