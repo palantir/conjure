@@ -90,13 +90,12 @@ public final class ConjureParserUtils {
 
     private ConjureParserUtils() {}
 
-    public static String parseConjurePackage(com.palantir.conjure.parser.types.names.ConjurePackage parsed) {
+    public static String parseConjurePackage(ConjurePackage parsed) {
         return parsed.name();
     }
 
     public static String parsePackageOrElseThrow(
-            Optional<com.palantir.conjure.parser.types.names.ConjurePackage> conjurePackage,
-            Optional<String> defaultPackage) {
+            Optional<ConjurePackage> conjurePackage, Optional<String> defaultPackage) {
         String packageName = conjurePackage
                 .map(ConjurePackage::name)
                 .orElseGet(() -> defaultPackage.orElseThrow(() -> new SafeIllegalArgumentException(
@@ -400,10 +399,8 @@ public final class ConjureParserUtils {
             HttpPath httpPath,
             ReferenceTypeResolver typeResolver) {
         ImmutableList.Builder<ArgumentDefinition> resultBuilder = ImmutableList.builder();
-        for (Map.Entry<
-                        com.palantir.conjure.parser.services.ParameterName,
-                        com.palantir.conjure.parser.services.ArgumentDefinition>
-                entry : args.entrySet()) {
+        for (Map.Entry<ParameterName, com.palantir.conjure.parser.services.ArgumentDefinition> entry :
+                args.entrySet()) {
             com.palantir.conjure.parser.services.ArgumentDefinition original = entry.getValue();
             ArgumentName argName = ArgumentName.of(entry.getKey().name());
             ParameterType paramType = parseParameterType(original, argName, httpPath);
