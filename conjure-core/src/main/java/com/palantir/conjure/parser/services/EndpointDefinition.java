@@ -35,6 +35,8 @@ public interface EndpointDefinition {
 
     Map<ParameterName, ArgumentDefinition> args();
 
+    Set<String> tags();
+
     Set<ConjureType> markers();
 
     Optional<ConjureType> returns();

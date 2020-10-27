@@ -158,6 +158,7 @@ types:
           docs: optional<Documentation>
           deprecated: optional<Documentation>
           markers: list<Type>
+          tags: set<string>
       EndpointName:
         alias: string
         docs: Should be in lowerCamelCase.
@@ -185,6 +186,7 @@ types:
           paramType: ParameterType
           docs: optional<Documentation>
           markers: list<Type>
+          tags: list<string>
       ArgumentName:
         alias: string
         docs: >

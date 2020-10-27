@@ -348,6 +348,7 @@ returns | [ConjureType][] | The name of the return type of the endpoint. The val
 args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+tags | Set[`string`] | Set of tags that serves as additional metadata for the endpoint.
 
 
 ## ArgumentDefinition
@@ -360,7 +361,8 @@ type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. Th
 If the param-type is `path` then the de-aliased type MUST be an enum or a primitive (except `binary`, and `bearertoken`).
 If the param-type is `query` then the de-aliased type MUST be an enum or a primitive (except `binary` and `bearertoken`), or a container (list, set, optional) of one of these.
 If the param-type is `header` then the de-aliased type MUST be an enum or a primitive (except binary), or an optional of one of these.
-markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
+markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Prefer to use tags instead of markers.
+tags | Set[`string`] | Set of tags that serves as additional metadata for the argument.
 param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
 

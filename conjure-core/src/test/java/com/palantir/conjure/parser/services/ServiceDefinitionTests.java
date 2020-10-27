@@ -282,12 +282,14 @@ public final class ServiceDefinitionTests {
                                                 "post",
                                                 EndpointDefinition.builder()
                                                         .http(RequestLineDefinition.of("POST", PathString.of("/post")))
+                                                        .addTags("test-tag")
                                                         .args(ImmutableMap.of(
                                                                 ParameterName.of("foo"),
                                                                 ArgumentDefinition.builder()
                                                                         .paramType(ArgumentDefinition.ParamType.HEADER)
                                                                         .type(LocalReferenceType.of(
                                                                                 TypeName.of("StringAlias")))
+                                                                        .addTags("safe")
                                                                         .build()))
                                                         .build())
                                         .build())
