@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: tags are consistently sets
+  links:
+  - https://github.com/palantir/conjure/pull/736
