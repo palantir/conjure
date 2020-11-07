@@ -342,7 +342,7 @@ An object representing an endpoint. An endpoint describes a method, arguments an
 
 Field | Type | Description
 ---|:---:|---
-http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
+http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, HEAD, OPTIONS, PATCH, DELETE, POST, or PUT, and `<path>` is a [PathString][].
 auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [ServiceDefinition][].
 returns | [ConjureType][] | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
 args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
@@ -357,7 +357,7 @@ An object representing an argument to an endpoint.
 
 Field | Type | Description
 ---|:---:|---
-type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type. 
+type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type.
 If the param-type is `path` then the de-aliased type MUST be an enum or a primitive (except `binary`, and `bearertoken`).
 If the param-type is `query` then the de-aliased type MUST be an enum or a primitive (except `binary` and `bearertoken`), or a container (list, set, optional) of one of these.
 If the param-type is `header` then the de-aliased type MUST be an enum or a primitive (except binary), or an optional of one of these.

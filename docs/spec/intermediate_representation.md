@@ -348,7 +348,7 @@ The "services" section is a list of service definitions. Each service definition
 describing the package and name of the service. It must also have an "endpoints" key, which is a list of endpoint
 definitions. Each endpoint definition must have the following keys:
 - "endpointName": a string name for the endpoint
-- "httpMethod": one of the strings "GET", "POST", "PUT", or "DELETE"
+- "httpMethod": one of the strings "GET", "HEAD", "OPTIONS", "PATCH", "DELETE", "POST", or "PUT"
 - "httpPath": a string describing the http path for the endpoint
 
 Each endpoint definition may have the following keys:
