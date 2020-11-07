@@ -165,6 +165,9 @@ types:
       HttpMethod:
         values:
           - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
           - POST
           - PUT
           - DELETE
