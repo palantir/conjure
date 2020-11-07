@@ -78,7 +78,7 @@ client:
 * binary uploads and responses, binary fields and path params
 * auth types (header, none, cookie)
 * headers
-* http methods (GET, PUT, POST, DELETE)
+* http methods (GET, HEAD, OPTIONS, PATCH, DELETE, POST, PUT)
 * path and query parameters
 * coercing from absent fields / null fields
 * invalid JSON

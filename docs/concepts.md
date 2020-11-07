@@ -4,7 +4,7 @@ _Conjure offers the following abstractions to use when defining your APIs. To se
 
 
 ### HTTP endpoints
-- `GET`, `PUT`, `POST`, `DELETE` - [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
+- `GET`, `HEAD`, `OPTIONS`, `PATCH`, `DELETE`, `POST`, `PUT` - [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
 - _Query parameters_ - e.g. `https://example.com/api/something?foo=bar&baz=2`
 - _Path parameters_ - Parsed sections of URLs e.g. `https://example.com/repo/{owner}/{repo}/pulls/{id}`
 - _Headers_ - A non-case sensitive string name associated with a Conjure value (see [docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)).
