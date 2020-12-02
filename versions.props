@@ -1,8 +1,8 @@
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.4.0
 com.google.guava:guava = 30.0-jre
-com.palantir.conjure.java:* = 5.38.3
-com.palantir.conjure.typescript:* = 4.5.0
+com.palantir.conjure.java:* = 5.39.0
+com.palantir.conjure.typescript:* = 4.6.0
 com.palantir.conjure:* = 4.14.1
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
 com.palantir.tokens:* = 3.6.2
