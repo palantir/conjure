@@ -86,8 +86,8 @@ public final class TypeParserTests {
         assertThat(TypeParser.INSTANCE.parse("bar.Foo"))
                 .isEqualTo(ForeignReferenceType.of(Namespace.of("bar"), TypeName.of("Foo")));
 
-        assertThat(TypeParser.INSTANCE.parse("bar1.Foo"))
-                .isEqualTo(ForeignReferenceType.of(Namespace.of("bar1"), TypeName.of("Foo")));
+        assertThat(TypeParser.INSTANCE.parse("bar_1.Foo"))
+                .isEqualTo(ForeignReferenceType.of(Namespace.of("bar_1"), TypeName.of("Foo")));
     }
 
     @Test
