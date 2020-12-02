@@ -44,8 +44,15 @@ public final class RawStringParser implements Parser<String> {
     public String parse(ParserState input) {
         StringBuilder sb = new StringBuilder();
         int curr = input.curr();
+        boolean firstChar = true;
         // not at end of the file and character is explicitly allowed
         while (curr != -1 && condition.isAllowed((char) curr)) {
+            if (firstChar) {
+                if (condition.notAllowedToStartWith((char) curr)) {
+                    return null;
+                }
+                firstChar = false;
+            }
             sb.append((char) curr);
             curr = input.next();
         }
@@ -58,7 +65,12 @@ public final class RawStringParser implements Parser<String> {
     }
 
     public interface AllowableCharacters {
+
         boolean isAllowed(char character);
+
+        default boolean notAllowedToStartWith(char _character) {
+            return false;
+        }
 
         String getDescription();
     }

@@ -103,12 +103,19 @@ public enum TypeParser implements Parser<ConjureType> {
                 new RawStringParser(new RawStringParser.AllowableCharacters() {
                     @Override
                     public boolean isAllowed(char character) {
-                        return ('a' <= character && character <= 'z') || ('A' <= character && character <= 'Z');
+                        return ('a' <= character && character <= 'z')
+                                || ('A' <= character && character <= 'Z')
+                                || ('0' <= character && character <= '9');
+                    }
+
+                    @Override
+                    public boolean notAllowedToStartWith(char character) {
+                        return ('0' <= character && character <= '9');
                     }
 
                     @Override
                     public String getDescription() {
-                        return "Character is one of [a-zA-Z]";
+                        return "Matches ^[a-zA-Z][a-zA-Z0-9]$";
                     }
                 });
 
