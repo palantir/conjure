@@ -34,6 +34,7 @@ org.glassfish.hk2.external:aopalliance-repackaged:2.5.0-b32 (2 constraints: 0519
 org.glassfish.hk2.external:javax.inject:2.5.0-b32 (2 constraints: 451f3a01)
 org.glassfish.jersey.bundles.repackaged:jersey-guava:2.25.1 (1 constraints: 251120d4)
 org.glassfish.jersey.core:jersey-common:2.25.1 (1 constraints: 3c05433b)
+org.graalvm.sdk:graal-sdk:20.3.0 (1 constraints: 3705363b)
 org.immutables:value:2.8.8 (1 constraints: 14051536)
 org.javassist:javassist:3.20.0-GA (1 constraints: 4f0d1a40)
 org.slf4j:slf4j-api:1.7.30 (3 constraints: 451d0579)
