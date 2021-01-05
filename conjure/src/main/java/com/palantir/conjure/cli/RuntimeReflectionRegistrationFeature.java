@@ -16,7 +16,11 @@
 package com.palantir.conjure.cli;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -25,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.graalvm.nativeimage.Platform;
@@ -39,13 +44,13 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
     @Override
     public void beforeAnalysis(BeforeAnalysisAccess access) {
         // Common standard library classes
-        registerClassForReflection(String.class);
-        registerClassForReflection(HashSet.class);
-        registerClassForReflection(HashMap.class);
-        registerClassForReflection(LinkedHashMap.class);
-        registerClassForReflection(ArrayList.class);
-        registerClassForReflection(LinkedList.class);
-        registerClassForReflection(ConcurrentHashMap.class);
+        maybeRegisterClassForReflection(String.class);
+        maybeRegisterClassForReflection(HashSet.class);
+        maybeRegisterClassForReflection(HashMap.class);
+        maybeRegisterClassForReflection(LinkedHashMap.class);
+        maybeRegisterClassForReflection(ArrayList.class);
+        maybeRegisterClassForReflection(LinkedList.class);
+        maybeRegisterClassForReflection(ConcurrentHashMap.class);
         for (Path jarPath : access.getApplicationClassPath()) {
             String jarFileName = jarPath.getFileName().toString();
             if (!jarFileName.endsWith(".jar")) {
@@ -70,7 +75,7 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
                             && !name.startsWith("jakarta")) {
                         String className = name.replace("/", ".").substring(0, name.length() - 6);
                         try {
-                            registerClassForReflection(access.findClassByName(className));
+                            maybeRegisterClassForReflection(access.findClassByName(className));
                         } catch (Throwable t) {
                             t.printStackTrace();
                         }
@@ -82,14 +87,11 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
         }
     }
 
-    private static void registerClassForReflection(Class<?> clazz) {
+    private static void maybeRegisterClassForReflection(Class<?> clazz) {
         if (clazz != null) {
             try {
-                if (!isAnyElementGraalAnnotated(clazz)) {
-                    RuntimeReflection.register(clazz);
-                    RuntimeReflection.register(clazz.getDeclaredMethods());
-                    RuntimeReflection.register(clazz.getDeclaredConstructors());
-                    RuntimeReflection.register(clazz.getDeclaredFields());
+                if (!isAnyElementGraalAnnotated(clazz) && isAnyElementRuntimeAnnotated(clazz)) {
+                    registerClassForReflection(clazz);
                 }
             } catch (NoClassDefFoundError e) {
                 System.err.printf("NoClassDefFoundError: %s While inspecting %s\n", e.getMessage(), clazz.getName());
@@ -100,27 +102,61 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
         }
     }
 
-    private static boolean isAnyElementGraalAnnotated(Class<?> clazz) {
+    private static void registerClassForReflection(Class<?> clazz) {
         try {
-            return isGraalAnnotated(clazz)
-                    || isAnyGraalAnnotated(clazz.getDeclaredMethods())
-                    || isAnyGraalAnnotated(clazz.getDeclaredConstructors())
-                    || isAnyGraalAnnotated(clazz.getDeclaredFields());
+            Method[] declaredMethods = clazz.getDeclaredMethods();
+            Constructor<?>[] declaredConstructors = clazz.getDeclaredConstructors();
+            Field[] declaredFields = clazz.getDeclaredFields();
+            Class<?>[] declaredClasses = clazz.getDeclaredClasses();
+            RuntimeReflection.register(clazz);
+            RuntimeReflection.register(declaredMethods);
+            RuntimeReflection.register(declaredConstructors);
+            RuntimeReflection.register(declaredFields);
+            for (Class<?> declaredClass : declaredClasses) {
+                registerClassForReflection(declaredClass);
+            }
+        } catch (NoClassDefFoundError e) {
+            System.err.printf("NoClassDefFoundError: %s While registering %s\n", e.getMessage(), clazz.getName());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            // ignored
+        }
+    }
+
+    private static boolean isAnyElementGraalAnnotated(Class<?> clazz) {
+        return isAnyElementAnnotated(clazz, Platforms.class::isInstance);
+    }
+
+    private static boolean isAnyElementRuntimeAnnotated(Class<?> clazz) {
+        return isAnyElementAnnotated(clazz, _any -> true);
+    }
+
+    private static boolean isAnyElementAnnotated(Class<?> clazz, Predicate<Annotation> filter) {
+        try {
+            return isAnnotated(clazz, filter)
+                    || isAnyAnnotated(clazz.getDeclaredMethods(), filter)
+                    || isAnyAnnotated(clazz.getDeclaredConstructors(), filter)
+                    || isAnyAnnotated(clazz.getDeclaredFields(), filter);
         } catch (Throwable t) {
             return false;
         }
     }
 
-    private static boolean isAnyGraalAnnotated(AnnotatedElement[] elements) {
+    private static boolean isAnyAnnotated(AnnotatedElement[] elements, Predicate<Annotation> filter) {
         for (AnnotatedElement element : elements) {
-            if (isGraalAnnotated(element)) {
+            if (isAnnotated(element, filter)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static boolean isGraalAnnotated(AnnotatedElement element) {
-        return element.isAnnotationPresent(Platforms.class);
+    private static boolean isAnnotated(AnnotatedElement element, Predicate<Annotation> filter) {
+        for (Annotation annotation : element.getAnnotations()) {
+            if (filter.test(annotation)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
