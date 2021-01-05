@@ -42,8 +42,6 @@ graal {
     javaVersion '11'
     outputName 'conjure'
     graalVersion '20.3.0'
-    // resourceconfig.json which includes all resources to match hotspot.
-    option ('-H:ResourceConfigurationFiles=' + file('resourceconfig.json').absolutePath)
     // Fail if a native image cannot be created. Otherwise a fallback image which relies
     // on a hotspot jdk is required.
     option '--no-fallback'
