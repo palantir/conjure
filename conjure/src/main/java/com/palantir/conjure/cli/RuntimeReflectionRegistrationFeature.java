@@ -27,11 +27,16 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.graalvm.nativeimage.Platform;
 import org.graalvm.nativeimage.Platforms;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -44,13 +49,20 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
     @Override
     public void beforeAnalysis(BeforeAnalysisAccess access) {
         // Common standard library classes
-        maybeRegisterClassForReflection(String.class);
-        maybeRegisterClassForReflection(HashSet.class);
-        maybeRegisterClassForReflection(HashMap.class);
-        maybeRegisterClassForReflection(LinkedHashMap.class);
-        maybeRegisterClassForReflection(ArrayList.class);
-        maybeRegisterClassForReflection(LinkedList.class);
-        maybeRegisterClassForReflection(ConcurrentHashMap.class);
+        registerClassForReflection(String.class);
+        registerClassForReflection(HashSet.class);
+        registerClassForReflection(LinkedHashSet.class);
+        registerClassForReflection(HashMap.class);
+        registerClassForReflection(LinkedHashMap.class);
+        registerClassForReflection(ArrayList.class);
+        registerClassForReflection(LinkedList.class);
+        registerClassForReflection(ConcurrentHashMap.class);
+        try {
+            registerClassForReflection(com.fasterxml.jackson.databind.ext.Java7Handlers.class);
+            registerClassForReflection(com.fasterxml.jackson.databind.ext.Java7HandlersImpl.class);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         for (Path jarPath : access.getApplicationClassPath()) {
             String jarFileName = jarPath.getFileName().toString();
             if (!jarFileName.endsWith(".jar")) {
@@ -128,7 +140,7 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
     }
 
     private static boolean isAnyElementRuntimeAnnotated(Class<?> clazz) {
-        return isAnyElementAnnotated(clazz, _any -> true);
+        return isAnyElementAnnotated(clazz, RuntimeAnnotationFilter.INSTANCE);
     }
 
     private static boolean isAnyElementAnnotated(Class<?> clazz, Predicate<Annotation> filter) {
@@ -158,5 +170,28 @@ final class RuntimeReflectionRegistrationFeature implements Feature {
             }
         }
         return false;
+    }
+
+    private enum RuntimeAnnotationFilter implements Predicate<Annotation> {
+        INSTANCE;
+
+        @Override
+        public boolean test(Annotation annotation) {
+            // javax nullness. Are these used for validation at runtime?
+            if (annotation instanceof Nullable
+                    || annotation instanceof ParametersAreNonnullByDefault
+                    || annotation instanceof Nonnull
+                    || annotation instanceof CheckReturnValue) {
+                // Deprecation annotations are common and provide little signal.
+                return false;
+            }
+            String name = annotation.annotationType().getName();
+            // Errorprone annotations are used at compile time, not runtime
+            return !name.startsWith("com.google.")
+                    && !name.startsWith("org.checkerframework")
+                    // Deprecated, Documented, Target, Retention, FunctionalInterface,
+                    // SafeVarargs, Inherited, Repeatable
+                    && !name.startsWith("java.lang.");
+        }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.parser.types;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.palantir.parsec.ParseException;
 
 /**
@@ -25,6 +26,7 @@ public interface ConjureType {
 
     <T> T visit(ConjureTypeVisitor<T> visitor);
 
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     static ConjureType fromString(String value) throws ParseException {
         return TypeParser.INSTANCE.parse(value);
     }
