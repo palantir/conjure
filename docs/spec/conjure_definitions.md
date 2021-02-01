@@ -79,7 +79,7 @@ types:
     default-package: com.palantir.product
     objects:
       SomeRequest:
-        id: common.ProductId
+        alias: common.ProductId
 ```
 
 ## ExternalTypeDefinition
