@@ -42,7 +42,7 @@ org.slf4j:slf4j-simple:1.7.30 (1 constraints: 3d05453b)
 org.yaml:snakeyaml:1.27 (1 constraints: 7217fa27)
 
 [Test dependencies]
-junit:junit:4.13.1 (2 constraints: f313c282)
+junit:junit:4.13.2 (2 constraints: f413ee82)
 net.bytebuddy:byte-buddy:1.10.19 (1 constraints: 760ba9e9)
 net.bytebuddy:byte-buddy-agent:1.10.19 (1 constraints: 760ba9e9)
 org.assertj:assertj-core:3.19.0 (1 constraints: 3f05503b)
