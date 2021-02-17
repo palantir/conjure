@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: ForeignRefType namespace parsing now adheres to specs, accepting numbers and underscores
+  links:
+    - https://github.com/palantir/conjure/pull/767

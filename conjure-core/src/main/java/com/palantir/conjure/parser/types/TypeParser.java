@@ -90,8 +90,15 @@ public enum TypeParser implements Parser<ConjureType> {
                 input.rewind();
                 return null;
             }
+            TypeName typeName;
+            try {
+                typeName = TypeName.of(typeReference);
+            } catch (IllegalArgumentException _e) {
+                input.rewind();
+                return null;
+            }
             input.release();
-            return LocalReferenceType.of(TypeName.of(typeReference));
+            return LocalReferenceType.of(typeName);
         }
     }
 
@@ -103,12 +110,20 @@ public enum TypeParser implements Parser<ConjureType> {
                 new RawStringParser(new RawStringParser.AllowableCharacters() {
                     @Override
                     public boolean isAllowed(char character) {
-                        return ('a' <= character && character <= 'z') || ('A' <= character && character <= 'Z');
+                        return '_' == character
+                                || ('a' <= character && character <= 'z')
+                                || ('A' <= character && character <= 'Z')
+                                || ('0' <= character && character <= '9');
+                    }
+
+                    @Override
+                    public boolean notAllowedToStartWith(char character) {
+                        return ('0' <= character && character <= '9');
                     }
 
                     @Override
                     public String getDescription() {
-                        return "Character is one of [a-zA-Z]";
+                        return "Matches ^[_a-zA-Z][_a-zA-Z0-9]*$";
                     }
                 });
 

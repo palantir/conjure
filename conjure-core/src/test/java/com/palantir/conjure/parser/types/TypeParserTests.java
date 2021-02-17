@@ -17,6 +17,7 @@
 package com.palantir.conjure.parser.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.conjure.parser.types.builtin.AnyType;
@@ -85,6 +86,11 @@ public final class TypeParserTests {
     public void testParser_foreignRefType() throws ParseException {
         assertThat(TypeParser.INSTANCE.parse("bar.Foo"))
                 .isEqualTo(ForeignReferenceType.of(Namespace.of("bar"), TypeName.of("Foo")));
+
+        assertThat(TypeParser.INSTANCE.parse("bar_1.Foo"))
+                .isEqualTo(ForeignReferenceType.of(Namespace.of("bar_1"), TypeName.of("Foo")));
+
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo")).isInstanceOf(ParseException.class);
     }
 
     @Test
