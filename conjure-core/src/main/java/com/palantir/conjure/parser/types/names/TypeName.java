@@ -22,7 +22,6 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.spec.PrimitiveType;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,9 +36,8 @@ import org.immutables.value.Value;
 public abstract class TypeName {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
-    static final Set<String> PRIMITIVE_TYPES = Arrays.stream(PrimitiveType.Value.values())
-            .filter(type -> type != PrimitiveType.Value.UNKNOWN)
-            .map(PrimitiveType.Value::name)
+    static final Set<String> PRIMITIVE_TYPES = PrimitiveType.values().stream()
+            .map(PrimitiveType::toString)
             .map(String::toLowerCase)
             .collect(Collectors.toSet());
 
