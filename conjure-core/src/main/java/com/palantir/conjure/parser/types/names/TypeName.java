@@ -19,10 +19,12 @@ package com.palantir.conjure.parser.types.names;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
+import com.palantir.conjure.spec.PrimitiveType;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 /**
@@ -34,8 +36,10 @@ import org.immutables.value.Value;
 public abstract class TypeName {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
-    static final ImmutableSet<String> PRIMITIVE_TYPES =
-            ImmutableSet.of("any", "string", "integer", "double", "boolean", "safelong", "rid", "bearertoken", "uuid");
+    static final Set<String> PRIMITIVE_TYPES = PrimitiveType.values().stream()
+            .map(PrimitiveType::toString)
+            .map(String::toLowerCase)
+            .collect(Collectors.toSet());
 
     @JsonValue
     public abstract String name();

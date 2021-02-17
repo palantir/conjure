@@ -170,4 +170,16 @@ public final class TypeParserTests {
         assertThat(new ObjectMapper().readValue("\"list<string>\"", ConjureType.class))
                 .isEqualTo(ListType.of(PrimitiveType.STRING));
     }
+
+    @Test
+    public void testInvalidNames() {
+        String invalid = "bytes";
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse(invalid))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
+                            + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                            + " %s",
+                        invalid);
+    }
 }
