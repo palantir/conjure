@@ -67,7 +67,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 TypeReferenceParser.INSTANCE);
     }
 
-    private enum TypeReferenceParser implements Parser<LocalReferenceType> {
+    enum TypeReferenceParser implements Parser<LocalReferenceType> {
         INSTANCE;
 
         public static final Parser<String> REF_PARSER = new RawStringParser(new RawStringParser.AllowableCharacters() {
