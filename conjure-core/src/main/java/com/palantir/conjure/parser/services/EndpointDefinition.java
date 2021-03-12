@@ -19,7 +19,6 @@ package com.palantir.conjure.parser.services;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.ConjureType;
-import com.palantir.conjure.spec.ErrorDefinition;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -46,7 +45,7 @@ public interface EndpointDefinition {
 
     Optional<String> deprecated();
 
-    Set<ErrorDefinition> errors();
+    Set<ConjureType> errors();
 
     static Builder builder() {
         return new Builder();
