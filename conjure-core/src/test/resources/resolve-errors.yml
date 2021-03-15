@@ -1,0 +1,17 @@
+types:
+  definitions:
+    default-package: com.palantir.a
+    errors:
+      SomeError:
+        namespace: Test
+        code: INVALID_ARGUMENT
+
+services:
+  SomeService:
+    name: Some Service
+    package: com.palantir.foo
+    endpoints:
+      get:
+        http: GET /get
+        errors:
+          - SomeError

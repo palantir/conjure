@@ -90,7 +90,7 @@ public final class TypeParserTests {
         assertThat(TypeParser.INSTANCE.parse("bar_1.Foo"))
                 .isEqualTo(ForeignReferenceType.of(Namespace.of("bar_1"), TypeName.of("Foo")));
 
-        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo")).isInstanceOf(ParseException.class);
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo")).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -178,8 +178,8 @@ public final class TypeParserTests {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                            + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                            + " %s",
+                                + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                                + " %s",
                         invalid);
     }
 }

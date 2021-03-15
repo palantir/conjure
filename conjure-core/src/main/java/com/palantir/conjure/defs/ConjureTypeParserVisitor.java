@@ -27,6 +27,7 @@ import com.palantir.conjure.parser.types.collect.ListType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.collect.OptionalType;
 import com.palantir.conjure.parser.types.collect.SetType;
+import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.ConjureImports;
 import com.palantir.conjure.parser.types.reference.ExternalTypeDefinition;
@@ -74,9 +75,10 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                     types.definitions().defaultConjurePackage().map(ConjureParserUtils::parseConjurePackage);
             BaseObjectTypeDefinition maybeDirectDef =
                     types.definitions().objects().get(name);
+            ErrorTypeDefinition maybeErrorRef = types.definitions().errors().get(name);
             String conjurePackage;
             String typeName;
-            if (maybeDirectDef == null) {
+            if (maybeDirectDef == null && maybeErrorRef == null) {
                 ExternalTypeDefinition maybeExternalDef = types.imports().get(name);
                 if (maybeExternalDef == null) {
                     throw new IllegalStateException("Unknown LocalReferenceType: " + name);
@@ -91,6 +93,11 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                         .externalReference(TypeName.of(typeName, conjurePackage))
                         .fallback(ConjureParserUtils.parsePrimitiveType(maybeExternalDef.baseType()))
                         .build());
+            } else if (maybeErrorRef != null) {
+                // Conjure-defined error
+                conjurePackage =
+                        ConjureParserUtils.parsePackageOrElseThrow(maybeErrorRef.conjurePackage(), defaultPackage);
+                return Type.reference(TypeName.of(name.name(), conjurePackage));
             } else {
                 // Conjure-defined object
                 conjurePackage =
