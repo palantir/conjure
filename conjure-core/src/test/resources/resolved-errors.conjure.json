@@ -1,0 +1,46 @@
+{
+  "version" : 1,
+  "errors" : [ {
+    "errorName" : {
+      "name" : "SomeError",
+      "package" : "com.palantir.a"
+    },
+    "docs" : null,
+    "namespace" : "Test",
+    "code" : "INVALID_ARGUMENT",
+    "safeArgs" : [ ],
+    "unsafeArgs" : [ ]
+  } ],
+  "types" : [ ],
+  "services" : [ {
+    "serviceName" : {
+      "name" : "SomeService",
+      "package" : "com.palantir.foo"
+    },
+    "endpoints" : [ {
+      "endpointName" : "get",
+      "httpMethod" : "GET",
+      "httpPath" : "/get",
+      "auth" : null,
+      "args" : [ ],
+      "returns" : null,
+      "docs" : null,
+      "deprecated" : null,
+      "markers" : [ ],
+      "tags" : [ ],
+      "errors" : [ {
+        "errorName" : {
+          "name" : "SomeError",
+          "package" : "com.palantir.a"
+        },
+        "docs" : null,
+        "namespace" : "Test",
+        "code" : "INVALID_ARGUMENT",
+        "safeArgs" : [ ],
+        "unsafeArgs" : [ ]
+      } ]
+    } ],
+    "docs" : null
+  } ],
+  "extensions" : { }
+}
