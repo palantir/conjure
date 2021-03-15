@@ -23,9 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.conjure.parser.services.ArgumentDefinition.ParamType;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.parser.types.TypesDefinition;
@@ -33,10 +35,13 @@ import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
+import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.complex.FieldDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
+import com.palantir.conjure.parser.types.names.ErrorCode;
+import com.palantir.conjure.parser.types.names.ErrorNamespace;
 import com.palantir.conjure.parser.types.names.FieldName;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
@@ -85,6 +90,7 @@ public final class ServiceDefinitionTests {
                                 "    param-id: foo",
                                 "    param-type: path",
                                 "returns: string",
+                                "errors: [SomeError]",
                                 "docs: |",
                                 "  docs"),
                         EndpointDefinition.class))
@@ -101,6 +107,7 @@ public final class ServiceDefinitionTests {
                                         .build()))
                         .returns(PrimitiveType.STRING)
                         .docs("docs")
+                        .errors(ImmutableList.of(LocalReferenceType.of(TypeName.of("SomeError"))))
                         .build());
     }
 
@@ -266,6 +273,12 @@ public final class ServiceDefinitionTests {
                                                 AliasTypeDefinition.builder()
                                                         .alias(PrimitiveType.STRING)
                                                         .build())
+                                        .putErrors(
+                                                TypeName.of("SomeError"),
+                                                ErrorTypeDefinition.builder()
+                                                        .namespace(ErrorNamespace.of("SimpleObject"))
+                                                        .code(ErrorCode.of("INVALID_ARGUMENT"))
+                                                        .build())
                                         .build())
                                 .build())
                         .putServices(
@@ -286,11 +299,13 @@ public final class ServiceDefinitionTests {
                                                         .args(ImmutableMap.of(
                                                                 ParameterName.of("foo"),
                                                                 ArgumentDefinition.builder()
-                                                                        .paramType(ArgumentDefinition.ParamType.HEADER)
+                                                                        .paramType(ParamType.HEADER)
                                                                         .type(LocalReferenceType.of(
                                                                                 TypeName.of("StringAlias")))
                                                                         .addTags("safe")
                                                                         .build()))
+                                                        .errors(ImmutableList.of(
+                                                                LocalReferenceType.of(TypeName.of("SomeError"))))
                                                         .build())
                                         .build())
                         .build());

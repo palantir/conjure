@@ -14,6 +14,11 @@ types:
 
       StringAlias:
         alias: string
+    errors:
+      SomeError:
+        namespace: SimpleObject
+        code: INVALID_ARGUMENT
+
 
 services:
   TestService:
@@ -32,3 +37,5 @@ services:
             type: StringAlias
             param-type: header
             tags: ['safe']
+        errors:
+          - SomeError
