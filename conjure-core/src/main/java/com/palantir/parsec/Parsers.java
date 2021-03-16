@@ -136,7 +136,11 @@ public final class Parsers {
                 try {
                     result = gingerly(nextOption).parse(input);
                 } catch (RuntimeException e) {
-                    exception = e;
+                    if (exception == null) {
+                        exception = e;
+                    } else {
+                        exception.addSuppressed(e);
+                    }
                 }
 
                 if (result != null) {
