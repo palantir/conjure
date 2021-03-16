@@ -27,6 +27,12 @@ public final class ParseException extends Exception {
         this.state = state;
     }
 
+    public ParseException(String message, ParserState state, Exception cause) {
+        super(cause);
+        this.message = message;
+        this.state = state;
+    }
+
     @Override
     public String getMessage() {
 

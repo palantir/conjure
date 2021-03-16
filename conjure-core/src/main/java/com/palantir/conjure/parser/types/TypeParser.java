@@ -90,13 +90,7 @@ public enum TypeParser implements Parser<ConjureType> {
                 input.rewind();
                 return null;
             }
-            TypeName typeName;
-            try {
-                typeName = TypeName.of(typeReference);
-            } catch (IllegalArgumentException _e) {
-                input.rewind();
-                return null;
-            }
+            TypeName typeName = TypeName.of(typeReference);
             input.release();
             return LocalReferenceType.of(typeName);
         }

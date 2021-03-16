@@ -175,11 +175,14 @@ public final class TypeParserTests {
     public void testInvalidNames() {
         String invalid = "bytes";
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse(invalid))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ParseException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
                             + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                            + " %s",
+                            + " %s\n"
+                            + "at or before character 5\n"
+                            + "on or before line 0\n"
+                            + "bytes",
                         invalid);
     }
 }
