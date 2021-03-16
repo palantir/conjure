@@ -153,11 +153,7 @@ public final class Parsers {
             }
 
             if (exception != null) {
-                ParseException toThrow = new ParseException(exception.getMessage(), input);
-                for (Throwable suppressed : exception.getSuppressed()) {
-                    toThrow.addSuppressed(suppressed);
-                }
-                throw toThrow;
+                throw new ParseException(exception.getMessage(), input, exception);
             }
 
             return null;
