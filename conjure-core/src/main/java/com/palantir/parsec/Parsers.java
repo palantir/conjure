@@ -120,12 +120,14 @@ public final class Parsers {
     public static <T> Parser<T> or(final Parser<? extends T> firstOption, final Parser<? extends T>... otherOptions) {
         return input -> {
             T result;
-            RuntimeException exception = null;
+            Exception exception = null;
 
+            input.mark();
             try {
                 result = gingerly(firstOption).parse(input);
             } catch (RuntimeException e) {
                 exception = e;
+                input.rewind();
                 result = null;
             }
 
@@ -133,6 +135,7 @@ public final class Parsers {
                 return result;
             }
             for (Parser<? extends T> nextOption : otherOptions) {
+                input.mark();
                 try {
                     result = gingerly(nextOption).parse(input);
                 } catch (RuntimeException e) {
@@ -141,6 +144,7 @@ public final class Parsers {
                     } else {
                         exception.addSuppressed(e);
                     }
+                    input.rewind();
                 }
 
                 if (result != null) {
@@ -149,7 +153,11 @@ public final class Parsers {
             }
 
             if (exception != null) {
-                throw new ParseException(exception.getMessage(), input);
+                ParseException toThrow = new ParseException(exception.getMessage(), input);
+                for (Throwable suppressed : exception.getSuppressed()) {
+                    toThrow.addSuppressed(suppressed);
+                }
+                throw toThrow;
             }
 
             return null;

@@ -179,7 +179,7 @@ public final class TypeParserTests {
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
                                 + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                                + " %s\nat or before character 5\non or before line 0\n",
+                                + " %s\nat or before character 5\non or before line 0\nbytes",
                         invalid);
     }
 }

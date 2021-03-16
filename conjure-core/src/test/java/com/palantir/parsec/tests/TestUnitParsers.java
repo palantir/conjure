@@ -17,6 +17,7 @@
 package com.palantir.parsec.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
@@ -171,6 +172,22 @@ public final class TestUnitParsers {
                 .isEqualTo("abcdef");
         assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("\"abcdef\"")))
                 .isEqualTo("abcdef");
+    }
+
+    @Test
+    public void testOrParserErrorPassthrough() throws ParseException {
+        Parser<String> alwaysThrows = input -> {
+            input.next();
+            throw new IllegalStateException("bad thing");
+        };
+
+        assertThat(Parsers.or(alwaysThrows, alwaysThrows, new QuotedStringParser())
+                        .parse(new StringParserState("\"abcdef\"")))
+                .isEqualTo("abcdef");
+        assertThatThrownBy(() -> Parsers.or(alwaysThrows, alwaysThrows).parse(new StringParserState("\"abcdef\"")))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("bad thing\nat or before character 8\non or before line 0\n\"abcdef\"")
+                .hasSuppressedException(new IllegalStateException("bad thing"));
     }
 
     private static final Parser<String> rsp = Parsers.prefix(Parsers.whitespace(), new RawStringParser());
