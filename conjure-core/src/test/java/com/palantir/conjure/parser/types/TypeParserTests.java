@@ -178,8 +178,8 @@ public final class TypeParserTests {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                                + " %s",
+                                + " safelong, integer, rid, any, uuid] or match pattern"
+                                + " ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s",
                         invalid);
     }
 }
