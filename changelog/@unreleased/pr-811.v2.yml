@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: >
+    An incorrect Type parsing now throws IllegalArgumentException with an informative error message rather than simply
+    ParseException.
+  link: https://github.com/palantir/conjure/issues/812
