@@ -178,8 +178,11 @@ public final class TypeParserTests {
                 .isInstanceOf(ParseException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                                + " %s\nat or before character 5\non or before line 0\nbytes",
+                            + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                            + " %s\n"
+                            + "at or before character 5\n"
+                            + "on or before line 0\n"
+                            + "bytes",
                         invalid);
     }
 }
