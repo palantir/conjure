@@ -108,6 +108,9 @@ public final class Parsers {
     /**
      * Parse either firstOption or iterate through otherOptions and return result.
      *
+     * Exceptions are caught while trying options - if no options succeed, then the last exception thrown is re-thrown
+     * as a {@code ParseError}.
+     *
      * @param <T> the type the parsers return
      * @param firstOption the first parser to try
      * @param otherOptions additional parsers to try
@@ -115,21 +118,37 @@ public final class Parsers {
      */
     @SafeVarargs
     public static <T> Parser<T> or(final Parser<? extends T> firstOption, final Parser<? extends T>... otherOptions) {
-        return new Parser<T>() {
-            @Override
-            public T parse(ParserState input) throws ParseException {
-                T result = gingerly(firstOption).parse(input);
+        return input -> {
+            T result;
+            RuntimeException exception = null;
+
+            try {
+                result = gingerly(firstOption).parse(input);
+            } catch (RuntimeException e) {
+                exception = e;
+                result = null;
+            }
+
+            if (result != null) {
+                return result;
+            }
+            for (Parser<? extends T> nextOption : otherOptions) {
+                try {
+                    result = gingerly(nextOption).parse(input);
+                } catch (RuntimeException e) {
+                    exception = e;
+                }
+
                 if (result != null) {
                     return result;
                 }
-                for (Parser<? extends T> nextOption : otherOptions) {
-                    result = gingerly(nextOption).parse(input);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-                return result;
             }
+
+            if (exception != null) {
+                throw new ParseException(exception.getMessage(), input);
+            }
+
+            return null;
         };
     }
 
