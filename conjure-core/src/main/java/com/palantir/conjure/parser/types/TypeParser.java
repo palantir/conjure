@@ -84,16 +84,13 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public LocalReferenceType parse(ParserState input) throws ParseException {
-            System.out.println("Parsing for type ref");
             input.mark();
             String typeReference = REF_PARSER.parse(input);
-            System.out.println(typeReference);
             if (typeReference == null) {
                 input.rewind();
                 return null;
             }
             TypeName typeName = TypeName.of(typeReference);
-            System.out.println("Parsed type name " + typeName);
             input.release();
             return LocalReferenceType.of(typeName);
         }
