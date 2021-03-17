@@ -29,15 +29,8 @@
       "markers" : [ ],
       "tags" : [ ],
       "errors" : [ {
-        "errorName" : {
-          "name" : "SomeError",
-          "package" : "com.palantir.a"
-        },
-        "docs" : null,
-        "namespace" : "Test",
-        "code" : "INVALID_ARGUMENT",
-        "safeArgs" : [ ],
-        "unsafeArgs" : [ ]
+        "name" : "SomeError",
+        "package" : "com.palantir.a"
       } ]
     } ],
     "docs" : null

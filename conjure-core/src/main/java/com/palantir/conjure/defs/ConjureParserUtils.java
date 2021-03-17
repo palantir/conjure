@@ -17,7 +17,6 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
@@ -214,19 +213,15 @@ public final class ConjureParserUtils {
                 allObjects.putAll(importedObjects);
 
                 DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(allObjects);
-                List<ErrorDefinition> errors = parseErrors(parsed.types().definitions(), typeResolver);
-                Map<TypeName, ErrorDefinition> errorsByName = Maps.uniqueIndex(errors, ErrorDefinition::getErrorName);
 
-                parsed.services().forEach((serviceName, service) -> {
-                    servicesBuilder.add(parseService(
-                            service,
-                            TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
-                            typeResolver,
-                            dealiasingVisitor,
-                            errorsByName));
-                });
+                parsed.services()
+                        .forEach((serviceName, service) -> servicesBuilder.add(parseService(
+                                service,
+                                TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
+                                typeResolver,
+                                dealiasingVisitor)));
 
-                errorsBuilder.addAll(errors);
+                errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
                 typesBuilder.addAll(objects.values());
             } catch (RuntimeException e) {
                 throw new RuntimeException(
@@ -265,8 +260,7 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.ServiceDefinition parsed,
             TypeName serviceName,
             ReferenceTypeResolver typeResolver,
-            DealiasingTypeVisitor dealiasingVisitor,
-            Map<TypeName, ErrorDefinition> errorsByName) {
+            DealiasingTypeVisitor dealiasingVisitor) {
         List<EndpointDefinition> endpoints = new ArrayList<>();
         parsed.endpoints()
                 .forEach((name, def) -> endpoints.add(ConjureParserUtils.parseEndpoint(
@@ -275,8 +269,7 @@ public final class ConjureParserUtils {
                         parsed.basePath(),
                         parseAuthType(parsed.defaultAuth()),
                         typeResolver,
-                        dealiasingVisitor,
-                        errorsByName)));
+                        dealiasingVisitor)));
         ServiceDefinition service = ServiceDefinition.builder()
                 .serviceName(serviceName)
                 .docs(parsed.docs().map(Documentation::of))
@@ -361,8 +354,7 @@ public final class ConjureParserUtils {
             PathString basePath,
             Optional<AuthType> defaultAuth,
             ReferenceTypeResolver typeResolver,
-            DealiasingTypeVisitor dealiasingVisitor,
-            Map<TypeName, ErrorDefinition> errorsByName) {
+            DealiasingTypeVisitor dealiasingVisitor) {
 
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
@@ -375,7 +367,7 @@ public final class ConjureParserUtils {
                         .peek(tag -> Preconditions.checkArgument(!tag.isEmpty(), "tag must not be empty"))
                         .collect(Collectors.toSet()))
                 .markers(parseMarkers(def.markers(), typeResolver))
-                .errors(parseEndpointErrors(def.errors(), typeResolver, errorsByName))
+                .errors(parseEndpointErrors(def.errors(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .docs(def.docs().map(Documentation::of))
                 .deprecated(def.deprecated().map(Documentation::of))
@@ -431,14 +423,11 @@ public final class ConjureParserUtils {
         return resultBuilder.build();
     }
 
-    private static List<ErrorDefinition> parseEndpointErrors(
-            Set<ConjureType> errorTypes,
-            ReferenceTypeResolver typeResolver,
-            Map<TypeName, ErrorDefinition> errorsByName) {
+    private static List<TypeName> parseEndpointErrors(Set<ConjureType> errorTypes, ReferenceTypeResolver typeResolver) {
         return errorTypes.stream()
                 .map(e -> e.visit(new ConjureTypeParserVisitor(typeResolver)))
-                .map(t -> t.accept(new TypeToErrorVisitor(errorsByName)))
-                .collect(Collectors.toList());
+                .map(t -> t.accept(new TypeToReferenceVisitor()))
+                .collect(ImmutableList.toImmutableList());
     }
 
     private static ParameterType parseParameterType(
