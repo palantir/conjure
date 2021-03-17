@@ -159,7 +159,7 @@ types:
           deprecated: optional<Documentation>
           markers: list<Type>
           tags: set<string>
-          errors: list<ErrorDefinition>
+          errors: list<TypeName>
       EndpointName:
         alias: string
         docs: Should be in lowerCamelCase.
