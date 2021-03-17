@@ -1,5 +1,0 @@
-type: new-feature
-new-feature:
-  description: >
-    Add the ability to attach errors to endpoint definitions. In Java-land, these could be realised as checked
-    exceptions on the endpoint, thus mandating that they be handled by consumers.
