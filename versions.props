@@ -5,17 +5,17 @@ com.palantir.conjure.java:* = 5.48.0
 com.palantir.conjure.typescript:* = 4.6.0
 com.palantir.conjure:* = 4.14.2
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
-com.palantir.tokens:* = 3.6.2
+com.palantir.tokens:* = 3.8.0
 commons-io:commons-io = 2.8.0
 info.picocli:picocli = 4.6.1
 javax.ws.rs:javax.ws.rs-api = 2.0.1
 junit:junit = 4.13.2
-org.apache.commons:commons-lang3 = 3.11
+org.apache.commons:commons-lang3 = 3.12.0
 org.assertj:* = 3.19.0
 org.glassfish.jersey.core:jersey-common = 2.25.1
 org.hamcrest:hamcrest-core = 2.2
 org.immutables:value = 2.8.8
-org.mockito:mockito-core = 3.7.7
+org.mockito:mockito-core = 3.8.0
 org.slf4j:* = 1.7.30
 
 # conflict resolution
