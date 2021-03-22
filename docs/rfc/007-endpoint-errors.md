@@ -3,7 +3,7 @@
 **Date:** 2020/03/19
 
 **Stakeholders:**
-* *Anyone that produces or consumes conjure-generated code via Dialogue or Undertow.*
+* *Anyone that produces or consumes conjure-generated code.*
 
 * * *
 
