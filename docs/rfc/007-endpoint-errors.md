@@ -29,7 +29,7 @@ and should be handled by consumers.
 * Conjure Java API Changes: https://github.com/palantir/conjure-java-runtime-api/pull/634
 * Conjure Java & Dialogue implementation: https://github.com/palantir/conjure-java/pull/1275
 
-## Example Conjure and Java implementation
+## Example Conjure and Java implementations
 
 **Conjure API**
 
@@ -84,8 +84,10 @@ public final class MyConjureResource implements MyConjureService {
    }
 ```
 
+### Example CLient Implementation via Exceptions
 
-**Dialogue Client**
+
+**Dialogue Client (Exceptions)**
 
 ```
 MyConjureServiceBlocking myConjureService = 
@@ -97,6 +99,35 @@ try {
 } catch (BlueMoonRemoteException e) { // <- checked exception so has to be caught!
     handleBlueMoonEvent();
 }
+```
+
+### Example Client Implementation via Union Types
+
+
+**Dialogue Client ()**
+
+```
+MyConjureServiceBlocking myConjureService = 
+    witchcraft.conjureClients()
+        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
+
+List<ResourceIdentifier> myUnsafeResult = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
+// v- is this null in the failure case?
+List<ResourceIdentifier> mySafeResult1 = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
+    .blueMoon(e -> handleBlueMoonEvent())
+    .build());
+    
+// v- could wrap the response into { ok: boolean, result: List<ResourceIdentifier> }, which throws a runtime exception
+//    if you try to access `result` but `ok == false`.
+SomeResultResponse mySafeResult2 = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
+    .blueMoon(e -> handleBlueMoonEvent())
+    .build());
+    
+// v- alternative implementation where you force logic splitting
+myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
+    .blueMoon(e -> handleBlueMoonEvent())
+    .ok(mySafeResult3 -> handleOk(mySafeResult3))
+    .build());
 ```
 
 ## Proposal
