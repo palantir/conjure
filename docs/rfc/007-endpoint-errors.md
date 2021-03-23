@@ -84,10 +84,8 @@ public final class MyConjureResource implements MyConjureService {
    }
 ```
 
-### Example CLient Implementation via Exceptions
+### Example Dialogue Client Implementation via Exceptions
 
-
-**Dialogue Client (Exceptions)**
 
 ```
 MyConjureServiceBlocking myConjureService = 
@@ -101,10 +99,7 @@ try {
 }
 ```
 
-### Example Client Implementation via Union Types
-
-
-**Dialogue Client ()**
+### Example Dialogue Client Implementation via Union Types
 
 ```
 MyConjureServiceBlocking myConjureService = 
