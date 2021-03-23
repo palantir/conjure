@@ -107,6 +107,7 @@ MyConjureServiceBlocking myConjureService =
         .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
 
 List<ResourceIdentifier> myUnsafeResult = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
+
 // v- is this null in the failure case?
 List<ResourceIdentifier> mySafeResult1 = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
     .blueMoon(e -> handleBlueMoonEvent())
@@ -120,6 +121,12 @@ SomeResultResponse mySafeResult2 = myConjureService.getSomeResult(AuthHeader.val
     
 // v- alternative implementation where you force logic splitting
 myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
+    .blueMoon(e -> handleBlueMoonEvent())
+    .ok(mySafeResult3 -> handleOk(mySafeResult3))
+    .build());
+    
+// v- or via `Visitor<T>` and return `T` in all branches
+SomeOtherResult otherResult = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
     .blueMoon(e -> handleBlueMoonEvent())
     .ok(mySafeResult3 -> handleOk(mySafeResult3))
     .build());
