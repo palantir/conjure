@@ -99,8 +99,6 @@ try {
 }
 ```
 
-
-
 ## Proposal
 
 This proposal should be viewed in two distinct parts - declared (and handled) exceptions on Conjure endpoints, and the 
@@ -135,12 +133,33 @@ an authorized service).
   time dealing with these without upgrading.
 * Producers might be incentivized to cram *all* the possible outcomes of their endpoint as errors (see the 
   `UserNotAuthorized` example above), and as such unduly burden consumers of their endpoint with things that should 
-  probably just be `RuntimeException`s.
+  probably just be `RuntimeException`s. This in turn might have knock-on effects in the codebase depending on the exact
+  implementation used.
 * Introducing further types (whether as checked exceptions or otherwise) that determine control flow may result in them 
   spreading throughout a code base and result in further coupling to the RPC layer. As an example, using checked exceptions
   could encourage the consumer to throw the exception upwards rather than dealing with it at the callsite.
+  
+### Mandatory vs. Optional
 
-### Implementation
+As discussed above, declared errors can be either made to be optional, or mandatory. Both versions come with their own
+pros and cons, and picking one side or the other inevitably involves making sacrifices.
+
+**The case for mandatory handling**
+
+_Forcing_ consumers to handle your exceptional cases is beneficial to the _producer_. You can have confidence that
+consumers will be encouraged to handle the exceptional cases, even if they are not reading your documentation. Acknowledging
+the presence of exceptional cases will be required at the minimum.
+
+There are benefits as a consumer as well - additional errors, behaviors, or edge cases will be exposed to you on upgrading
+your client, and you should (in theory) never miss out on a new case (assuming you keep your client relatively up to date).
+
+**The case for optional handling**
+
+Optional handling favors the _consumer_ - existing code and behaviors will not have to change at the outset, and they
+can opt into improved error handling as necessary. The obvious downside is that producers could publish new errors until
+the cows come home, but lazy consumers may never actually handle these edge cases.
+
+## Implementation (Java)
 
 Declaring errors on endpoints not only allows producers to enforce that each error case is going to be handled by a 
 consumer, but it also allows us to provide the tools to make that ergonomic for consumers. Exactly how those ergonomics 
@@ -150,16 +169,14 @@ will be provided depend on the language. There were two main approaches that wer
 
 With an expressive type system, it is possible to express the different possible outcomes as an enriched version of the 
 normal return type. This could be done, for example, by using union types, which already exist in the Conjure universe. 
-Some languages are more amiable to union types than others - even now Java doesn’t really provide the necessary tools 
-to do this in a succinct way (ie. sealed classes with switch’ing over instances such 
-as [Sealed classes | Kotlin](https://kotlinlang.org/docs/sealed-classes.html#sealed-classes-and-when-expression)).
+Some languages are more amiable to union types than others. 
 
 **Checked Exceptions**
 
 Java provides checked exceptions as a method of enforcing that exceptional states are handled, and declared errors on 
 endpoints fit nicely into that.
 
-**Why We Chose Checked Exceptions**
+**Why The Demo Uses Checked Exceptions**
 
 As of now, `SerializableError` does not lend itself to complex data types as complex error objects are flattened into a 
 `Map<String, String>`, which makes parsing it out very difficult. Checked exceptions preserve the existing status-quo 
@@ -168,10 +185,12 @@ actually handled.
 
 ## Open Questions ##
 
-1) Should declared errors on endpoints be mandatory? While it seems like a good idea in principle, could it cause 'bad'
+1) Should handling errors on endpoints be mandatory? While it seems like a good idea in principle, could it cause 'bad'
    behavior in client or server code?
 2) In the Java implementation, are checked exceptions the way to go? There are several other possible implementations
-   and ideas that may be more in-line with other languages, such as:
-   1) Using union type via a visitor pattern (which can be made much less verbose via a 'Visitor Builder')
-   2) Making it non-mandatory via a second client function `callFoo(auth, visitor)`
-   3) Making it non-mandatory via a `RemoteException` wrapper, which can then be consumed as a visitor pattern
+   and ideas that may be more in-line with other languages, such as using a union type via a visitor pattern (which 
+   can be made much less verbose via a 'Visitor Builder').
+3) How important is implementation consistency across languages? Would it be acceptable to have union types in TS, but
+   exceptions in Java, for instance?
+4) How will the implementation function in a world where `SerializableError` kinda sucks still? What is the intermediary
+   case, and what is the 'ideal' case?
