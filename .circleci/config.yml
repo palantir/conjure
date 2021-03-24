@@ -173,4 +173,4 @@ workflows:
 
       - publish:
           requires: [ unit-test, check, trial-publish ]
-          filters: { tags: { only: /.*/ }, branches: { only: develop } }
+          filters: { tags: { only: /.*/ }, branches: { only: /.*/ } }
