@@ -29,7 +29,7 @@ and should be handled by consumers.
 * Conjure Java API Changes: https://github.com/palantir/conjure-java-runtime-api/pull/634
 * Conjure Java & Dialogue implementation: https://github.com/palantir/conjure-java/pull/1275
 
-## Example Conjure and Java implementations
+## Example Conjure implementations
 
 **Conjure API**
 
@@ -55,83 +55,6 @@ services:
           - BlueMoon
         docs: Returns some result, but once in a blue moon throws an error
 ```
-
-
-**Undertow Service**
-
-```
-@Generated("com.palantir.conjure.java.services.UndertowServiceInterfaceGenerator")
-public interface MyConjureService {
-    /**
-     * Returns some result, but once in a blue moon throws an error
-     * @apiNote {@code GET /}
-     */
-    List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
-            throws MyConjureServiceErrors.BlueMoonServiceException;
-```
-
-**Undertow Resource**
-
-```
-public final class MyConjureResource implements MyConjureService {
-
-   ...
-
-   @Override
-   public List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
-          throws BlueMoonServiceException {
-      throw MyConjureServiceErrors.throwIfBlueMoon(isBlueMoon);
-   }
-```
-
-### Example Dialogue Client Implementation via Exceptions
-
-
-```
-MyConjureServiceBlocking myConjureService = 
-    witchcraft.conjureClients()
-        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
-
-try {
-    myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
-} catch (BlueMoonRemoteException e) { // <- checked exception so has to be caught!
-    handleBlueMoonEvent();
-}
-```
-
-### Example Dialogue Client Implementation via Union Types
-
-```
-MyConjureServiceBlocking myConjureService = 
-    witchcraft.conjureClients()
-        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
-
-List<ResourceIdentifier> myUnsafeResult = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
-
-// v- is this null in the failure case?
-List<ResourceIdentifier> mySafeResult1 = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
-    .blueMoon(e -> handleBlueMoonEvent())
-    .build());
-    
-// v- could wrap the response into { ok: boolean, result: List<ResourceIdentifier> }, which throws a runtime exception
-//    if you try to access `result` but `ok == false`.
-SomeResultResponse mySafeResult2 = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
-    .blueMoon(e -> handleBlueMoonEvent())
-    .build());
-    
-// v- alternative implementation where you force logic splitting
-myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
-    .blueMoon(e -> handleBlueMoonEvent())
-    .ok(mySafeResult3 -> handleOk(mySafeResult3))
-    .build());
-    
-// v- or via `Visitor<T>` and return `T` in all branches
-SomeOtherResult otherResult = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), MyConjureServiceErrors.getSomeResultBuilder()
-    .blueMoon(e -> handleBlueMoonEvent())
-    .ok(mySafeResult3 -> handleOk(mySafeResult3))
-    .build());
-```
-
 ## Proposal
 
 This proposal should be viewed in two distinct parts - declared (and handled) exceptions on Conjure endpoints, and the 
@@ -192,22 +115,29 @@ Optional handling favors the _consumer_ - existing code and behaviors will not h
 can opt into improved error handling as necessary. The obvious downside is that producers could publish new errors until
 the cows come home, but lazy consumers may never actually handle these edge cases.
 
-## Implementation (Java)
+## Implementation
+
+Generally, the client-side implementation should be done using whatever language features are best supported by the language
+itself. In Java, we have decided that that is checked exceptions - but in a language such as TypeScript that might be
+something akin to union types.
+
+### Java Implementation
 
 Declaring errors on endpoints not only allows producers to enforce that each error case is going to be handled by a 
-consumer, but it also allows us to provide the tools to make that ergonomic for consumers. Exactly how those ergonomics 
-will be provided depend on the language. There were two main approaches that were considered:
-
-**Enriched Types**
-
-With an expressive type system, it is possible to express the different possible outcomes as an enriched version of the 
-normal return type. This could be done, for example, by using union types, which already exist in the Conjure universe. 
-Some languages are more amiable to union types than others. 
+consumer, but it also allows us to provide the tools to make that ergonomic for consumers. There were two main approaches 
+that were considered:
 
 **Checked Exceptions**
 
 Java provides checked exceptions as a method of enforcing that exceptional states are handled, and declared errors on 
-endpoints fit nicely into that.
+endpoints fit nicely into that. Further, it is a well known language feature that requires no external libraries and 
+clearly shows the lineage of errors that are thrown.
+
+**Enriched Types**
+
+With an expressive type system, it is possible to express the different possible outcomes as an enriched version of the
+normal return type. This could be done, for example, by using union types, which already exist in the Conjure universe.
+Some languages are more amiable to union types than others.
 
 **Why The Demo Uses Checked Exceptions**
 
@@ -215,6 +145,59 @@ As of now, `SerializableError` does not lend itself to complex data types as com
 `Map<String, String>`, which makes parsing it out very difficult. Checked exceptions preserve the existing status-quo 
 (that is, not messing with the reality of  `SerializableError`), but still improve expressivity and enforce errors being 
 actually handled. 
+
+Further to this, leveraging checked exceptions provides a few other benefits - it is an existing language feature that
+is well-supported by all IDEs, and it makes it simpler to find exactly where a particular error case is coming from (by
+following the exception declarations).
+
+Conversely, a `Result` type (or similar) would involve constructing our own library (or importing an external one), is 
+not currently ergonomically supported by the Java language (until we get something resembling `switch` statements for 
+sealed classes), and would require error-prone rules to enforce that error cases are actually thrown (rather than just
+ignored in the error case).
+
+### Example Server Implementations
+
+**Undertow Service**
+
+```
+@Generated("com.palantir.conjure.java.services.UndertowServiceInterfaceGenerator")
+public interface MyConjureService {
+    /**
+     * Returns some result, but once in a blue moon throws an error
+     * @apiNote {@code GET /}
+     */
+    List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
+            throws MyConjureServiceErrors.BlueMoonServiceException;
+```
+
+**Undertow Resource**
+
+```
+public final class MyConjureResource implements MyConjureService {
+
+   ...
+
+   @Override
+   public List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
+          throws BlueMoonServiceException {
+      throw MyConjureServiceErrors.throwIfBlueMoon(isBlueMoon);
+   }
+```
+
+### Example Dialogue Client Implementation via Exceptions
+
+
+```
+MyConjureServiceBlocking myConjureService = 
+    witchcraft.conjureClients()
+        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
+
+try {
+    myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
+} catch (BlueMoonRemoteException e) { // <- checked exception so has to be caught!
+    handleBlueMoonEvent();
+}
+```
 
 ## Open Questions ##
 
