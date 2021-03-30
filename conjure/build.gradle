@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+plugins {
+    id 'com.palantir.graal' version '0.7.2'
+}
+
 apply from: "$rootDir/gradle/publish-dist.gradle"
 
 mainClassName = 'com.palantir.conjure.cli.ConjureCli'
@@ -29,4 +33,29 @@ dependencies {
 
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
+    compileOnly 'org.graalvm.sdk:graal-sdk'
+}
+
+
+graal {
+    mainClass mainClassName
+    javaVersion '11'
+    outputName 'conjure'
+    graalVersion '20.3.0'
+    // Fail if a native image cannot be created. Otherwise a fallback image which relies
+    // on a hotspot jdk is required.
+    option '--no-fallback'
+    option '--static'
+    // Missing classes result in runtime failures rather than compile time. Many libraries
+    // have optional dependencies that may be excluded. Take the log4j-core disruptor
+    // dependency for example.
+    option '--allow-incomplete-classpath'
+    // Allows optional dependencies to fail at runtime, not build time. This feature is
+    // equivalent to 'allow-incomplete-classpath' for unsupported java features,
+    // methodHandles for example.
+    option '--report-unsupported-elements-at-runtime'
+    // Easier debugging on failure
+    option '-H:+ReportExceptionStackTraces'
+    // Discover reflection info at build time
+    option '--features=com.palantir.conjure.cli.RuntimeReflectionRegistrationFeature'
 }
