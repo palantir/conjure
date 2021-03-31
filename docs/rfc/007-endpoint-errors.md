@@ -58,7 +58,7 @@ services:
 ## Proposal
 
 This proposal should be viewed in two distinct parts - declared (and handled) exceptions on Conjure endpoints, and the 
-language implementations of such a feature.
+possible language implementations of such a feature.
 
 ### Intent
 
@@ -121,17 +121,20 @@ Generally, the client-side implementation should be done using whatever language
 itself. In Java, we have decided that that is checked exceptions - but in a language such as TypeScript that might be
 something akin to union types.
 
+### Compatibility
+
+It is worth noting that the changes suggested in this RFC do not entail a wire-format change, and as such should not
+affect backwards (or forwards) compatibility. Old servers that throw exceptions will continue to use `SerializableError`,
+and clients that do not upgrade can continue to catch `SerializableError`s as they did before.
+
+The intention instead is to better leverage Conjure types to provide better tooling for categorising errors into their
+types when they are received, and to improve documentation around what errors can be thrown by an endpoint.
+
 ### Java Implementation
 
 Declaring errors on endpoints not only allows producers to enforce that each error case is going to be handled by a 
 consumer, but it also allows us to provide the tools to make that ergonomic for consumers. There were two main approaches 
 that were considered:
-
-**Checked Exceptions**
-
-Java provides checked exceptions as a method of enforcing that exceptional states are handled, and declared errors on 
-endpoints fit nicely into that. Further, it is a well known language feature that requires no external libraries and 
-clearly shows the lineage of errors that are thrown.
 
 **Enriched Types**
 
@@ -139,53 +142,42 @@ With an expressive type system, it is possible to express the different possible
 normal return type. This could be done, for example, by using union types, which already exist in the Conjure universe.
 Some languages are more amiable to union types than others.
 
-**Why The Demo Uses Checked Exceptions**
+**Exception Handlers**
 
-As of now, `SerializableError` does not lend itself to complex data types as complex error objects are flattened into a 
-`Map<String, String>`, which makes parsing it out very difficult. Checked exceptions preserve the existing status-quo 
-(that is, not messing with the reality of  `SerializableError`), but still improve expressivity and enforce errors being 
-actually handled. 
+Using staged builders, it is possible to provide ergonomic handlers for different error outcomes. This could be passed
+to an alternative version of a method, or simply wrap a `RemoteException`.
 
-Further to this, leveraging checked exceptions provides a few other benefits - it is an existing language feature that
-is well-supported by all IDEs, and it makes it simpler to find exactly where a particular error case is coming from (by
-following the exception declarations).
+**Checked Exceptions**
 
-Conversely, a `Result` type (or similar) would involve constructing our own library (or importing an external one), is 
-not currently ergonomically supported by the Java language (until we get something resembling `switch` statements for 
-sealed classes), and would require error-prone rules to enforce that error cases are actually thrown (rather than just
-ignored in the error case).
+Java provides checked exceptions as a method of enforcing that exceptional states are handled, and declared errors on
+endpoints fit nicely into that. Further, it is a well known language feature that requires no external libraries and
+clearly shows the lineage of errors that are thrown. However, it is not commonly used in the Foundry codebase and would
+could be burdensome when the thrown errors are deep in a call stack.
 
-### Example Server Implementations
+### Example Dialogue Client Implementation via Exception Handlers
 
-**Undertow Service**
 
 ```
-@Generated("com.palantir.conjure.java.services.UndertowServiceInterfaceGenerator")
-public interface MyConjureService {
-    /**
-     * Returns some result, but once in a blue moon throws an error
-     * @apiNote {@code GET /}
-     */
-    List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
-            throws MyConjureServiceErrors.BlueMoonServiceException;
-```
+MyConjureServiceBlocking myConjureService = 
+    witchcraft.conjureClients()
+        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
 
-**Undertow Resource**
+try {
+    SomeResult result = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
+} catch (RemoteException e) { 
+    SomeResultException.Visitor.builder()
+        .blueMoon(err -> { ... })
+        .build();
+}
 
-```
-public final class MyConjureResource implements MyConjureService {
-
-   ...
-
-   @Override
-   public List<ResourceIdentifier> getSomeResult(AuthHeader authHeader)
-          throws BlueMoonServiceException {
-      throw MyConjureServiceErrors.throwIfBlueMoon(isBlueMoon);
-   }
+// alternatively, we could even provide an extra version of the `getSomeResult` method:
+    SomeResult result = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), 
+               SomeResultException.Visitor.builder()
+                    .blueMoon(err -> { ... return otherResult; })
+                    .build());
 ```
 
 ### Example Dialogue Client Implementation via Exceptions
-
 
 ```
 MyConjureServiceBlocking myConjureService = 
@@ -198,15 +190,3 @@ try {
     handleBlueMoonEvent();
 }
 ```
-
-## Open Questions ##
-
-1) Should handling errors on endpoints be mandatory? While it seems like a good idea in principle, could it cause 'bad'
-   behavior in client or server code?
-2) In the Java implementation, are checked exceptions the way to go? There are several other possible implementations
-   and ideas that may be more in-line with other languages, such as using a union type via a visitor pattern (which 
-   can be made much less verbose via a 'Visitor Builder').
-3) How important is implementation consistency across languages? Would it be acceptable to have union types in TS, but
-   exceptions in Java, for instance?
-4) How will the implementation function in a world where `SerializableError` kinda sucks still? What is the intermediary
-   case, and what is the 'ideal' case?
