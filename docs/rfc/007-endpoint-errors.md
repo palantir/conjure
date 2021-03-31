@@ -1,6 +1,6 @@
 # [RFC] Conjure Endpoint Errors
 
-**Date:** 2020/03/19
+**Date:** 2021/03/19
 
 **Stakeholders:**
 * *Anyone that produces or consumes conjure-generated code.*
