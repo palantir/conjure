@@ -23,11 +23,10 @@ and should be handled by consumers.
 
 ## Existing Documentation
 
-### PRs for example implementation (in Java, using checked exceptions)
+### PRs 
 
 * Root PR (Conjure API changes): https://github.com/palantir/conjure/pull/816
-* Conjure Java API Changes: https://github.com/palantir/conjure-java-runtime-api/pull/634
-* Conjure Java & Dialogue implementation: https://github.com/palantir/conjure-java/pull/1275
+* Other implementation PRs to follow.
 
 ## Example Conjure implementations
 
