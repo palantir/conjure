@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: "$rootDir/gradle/publish-dist.gradle"
+apply plugin: 'com.palantir.external-publish-application-dist'
 
 mainClassName = 'com.palantir.conjure.cli.ConjureCli'
 
