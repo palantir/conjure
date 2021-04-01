@@ -129,6 +129,15 @@ and clients that do not upgrade can continue to catch `SerializableError`s as th
 The intention instead is to better leverage Conjure types to provide better tooling for categorising errors into their
 types when they are received, and to improve documentation around what errors can be thrown by an endpoint.
 
+#### Backwards Compatibility of Error Fields
+
+As part of upgrading errors to a first-class part of the API, we should additionally treat errors in a first-class way
+when it comes to backwards compatibility. As the new suggested tooling will make errors more usable, accessing fields
+will also be more important, and (just as with regular fields) removing them will become more problematic.
+
+As such, we suggest that fields in errors should now be tracked for backwards compatibility. Adding new fields or 
+declaring new errors should still be fine, however.
+
 ### Java Implementation
 
 Declaring errors on endpoints not only allows producers to enforce that each error case is going to be handled by a 
