@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.palantir.extrenal-publish-conjure'
+apply plugin: 'com.palantir.external-publish-conjure'
 
 project (':conjure-api:conjure-api-objects') {
     apply plugin: 'com.palantir.external-publish-jar'
