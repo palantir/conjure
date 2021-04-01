@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-apply from: "$rootDir/gradle/publish-jar.gradle"
+apply plugin: 'com.palantir.external-publish-jar'
 
 dependencies {
     compile project(':conjure-generator-common')
