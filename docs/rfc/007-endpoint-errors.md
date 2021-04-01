@@ -170,7 +170,8 @@ try {
 }
 
 // alternatively, we could even provide an extra version of the `getSomeResult` method:
-    SomeResult result = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"), 
+    SomeResult result = myConjureService.getSomeResult(
+    		AuthHeader.valueOf("authHeader"),
                SomeResultException.Visitor.builder()
                     .blueMoon(err -> { ... return otherResult; })
                     .build());
