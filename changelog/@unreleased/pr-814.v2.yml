@@ -4,4 +4,5 @@ fix:
     When an exception is hit while performing Parser.or, the exception is immediately thrown. Additionally, this
     current behaviour is causing tests to fail on master. Instead, store and re-throw any exceptions if no other
     parsers match.
-  link: https://github.com/palantir/conjure/issues/812
+  links:
+  - https://github.com/palantir/conjure/issues/812
