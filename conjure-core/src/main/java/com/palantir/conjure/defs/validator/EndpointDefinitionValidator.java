@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.either.Either;
@@ -74,6 +75,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     public static final Pattern HEADER_PATTERN = Pattern.compile("^[A-Z][a-zA-Z0-9]*(-[A-Z][a-zA-Z0-9]*)*$");
+    public static final ImmutableSet<String> PROTOCOL_HEADERS = ImmutableSet.of("Host", "Accept", "Content-Type");
 
     private final ConjureContextualValidator<EndpointDefinition> validator;
 
@@ -417,6 +419,13 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                             paramId.get(),
                             describe(definition),
                             HEADER_PATTERN);
+
+                    Preconditions.checkState(
+                            !PROTOCOL_HEADERS.contains(paramId.get()),
+                            "Header parameter id %s on endpoint %s should not be one of the protocol headers %s",
+                            paramId.get(),
+                            describe(definition),
+                            PROTOCOL_HEADERS);
 
                 } else if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
                     ParameterId paramId =

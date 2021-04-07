@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Users can no longer set protocol headers (Host, Accept, Content-Type).
+  links:
+  - https://github.com/palantir/conjure/pull/835
