@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Remove docs link to https://www.getpostman.com/ so builds pass again.
+  links:
+  - https://github.com/palantir/conjure/pull/848
