@@ -18,15 +18,12 @@ There are multiple issues with this. As a consumer, you only know that an endpoi
 documentation or the implementation itself. As a producer, you are limited in the expressivity of what you can say 
 with your exception, as you have no guarantee that a consumer will handle your exception (or even read your documentation).
 
-This RFC introduces *declared errors* on Conjure endpoints. These errors represent real outcomes of a call to an endpoint, 
-and should be handled by consumers.
+This RFC introduces *declared errors* on Conjure endpoints. These errors represent real outcomes of a call to an endpoint,
+and can be leveraged to make tooling to improve handling of errors.
 
-## Existing Documentation
-
-### PRs 
+## PRs 
 
 * Root PR (Conjure API changes): https://github.com/palantir/conjure/pull/816
-* Other implementation PRs to follow.
 
 ## Example Conjure implementations
 
@@ -54,10 +51,14 @@ services:
           - BlueMoon
         docs: Returns some result, but once in a blue moon throws an error
 ```
+
+*** 
+
 ## Proposal
 
-This proposal should be viewed in two distinct parts - declared (and handled) exceptions on Conjure endpoints, and the 
-possible language implementations of such a feature.
+This proposal should be viewed in two distinct parts - declared exceptions on Conjure endpoints and how they can be handled, 
+and the possible language implementations of such a feature. The exact details on language implementation will be left
+to the following PRs on the respective repositories.
 
 ### Intent
 
@@ -76,14 +77,11 @@ an authorized service).
 **Pros:**
 
 * Consumers now know the *expected* outcomes of calling an endpoint in a first-class way and can handle those outcomes accordingly.
-* Producers are able to express the different failure states of their endpoints in greater detail, and have conviction that those failure states are being handled by consumers.
+* Producers are able to express the different failure states of their endpoints in greater detail.
 * Changing the failure states of an endpoint now visibly affects the API definition - changes in behavior are properly captured in code (rather than just documentation).
 
 **Cons:**
 
-* To be effective, these failure cases will need to be ‘forced’ upon consumers via the compiler. This could be as complex 
-  data types (perhaps unions of {success, error1, error2, ...} or via checked exceptions. This would entail some degree 
-  of (justified) work migrating to a with-errors world to wire each failure case into the correct behavior in client code.
 * Given the new flexibility, producers may more eagerly throw errors in their code, and ‘old’ clients will have a hard 
   time dealing with these without upgrading.
 * Producers might be incentivized to cram *all* the possible outcomes of their endpoint as errors (see the 
@@ -92,33 +90,12 @@ an authorized service).
   implementation used.
 * Introducing further types (whether as checked exceptions or otherwise) that determine control flow may result in them 
   spreading throughout a code base and result in further coupling to the RPC layer. As an example, using checked exceptions
-  could encourage the consumer to throw the exception upwards rather than dealing with it at the callsite.
+  could encourage the consumer to throw the exception upwards rather than dealing with it at the call-site.
   
-### Mandatory vs. Optional
-
-As discussed above, declared errors can be either made to be optional, or mandatory. Both versions come with their own
-pros and cons, and picking one side or the other inevitably involves making sacrifices.
-
-**The case for mandatory handling**
-
-_Forcing_ consumers to handle your exceptional cases is beneficial to the _producer_. You can have confidence that
-consumers will be encouraged to handle the exceptional cases, even if they are not reading your documentation. Acknowledging
-the presence of exceptional cases will be required at the minimum.
-
-There are benefits as a consumer as well - additional errors, behaviors, or edge cases will be exposed to you on upgrading
-your client, and you should (in theory) never miss out on a new case (assuming you keep your client relatively up to date).
-
-**The case for optional handling**
-
-Optional handling favors the _consumer_ - existing code and behaviors will not have to change at the outset, and they
-can opt into improved error handling as necessary. The obvious downside is that producers could publish new errors until
-the cows come home, but lazy consumers may never actually handle these edge cases.
-
 ## Implementation
 
 Generally, the client-side implementation should be done using whatever language features are best supported by the language
-itself. In Java, we have decided that that is checked exceptions - but in a language such as TypeScript that might be
-something akin to union types.
+itself. 
 
 ### Compatibility
 
@@ -138,64 +115,10 @@ will also be more important, and (just as with regular fields) removing them wil
 As such, we suggest that fields in errors should now be tracked for backwards compatibility. Adding new fields or 
 declaring new errors should still be fine, however.
 
-### Java Implementation
+## Next Steps
 
-Declaring errors on endpoints not only allows producers to enforce that each error case is going to be handled by a 
-consumer, but it also allows us to provide the tools to make that ergonomic for consumers. There were two main approaches 
-that were considered:
-
-**Enriched Types**
-
-With an expressive type system, it is possible to express the different possible outcomes as an enriched version of the
-normal return type. This could be done, for example, by using union types, which already exist in the Conjure universe.
-Some languages are more amiable to union types than others.
-
-**Exception Handlers**
-
-Using staged builders, it is possible to provide ergonomic handlers for different error outcomes. This could be passed
-to an alternative version of a method, or simply wrap a `RemoteException`.
-
-**Checked Exceptions**
-
-Java provides checked exceptions as a method of enforcing that exceptional states are handled, and declared errors on
-endpoints fit nicely into that. Further, it is a well known language feature that requires no external libraries and
-clearly shows the lineage of errors that are thrown. However, it is not commonly used in the Foundry codebase and would
-could be burdensome when the thrown errors are deep in a call stack.
-
-### Example Dialogue Client Implementation via Exception Handlers
-
-
-```
-MyConjureServiceBlocking myConjureService = 
-    witchcraft.conjureClients()
-        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
-
-try {
-    SomeResult result = myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
-} catch (RemoteException e) { 
-    SomeResultException.Visitor.builder()
-        .blueMoon(err -> { ... })
-        .build();
-}
-
-// alternatively, we could even provide an extra version of the `getSomeResult` method:
-    SomeResult result = myConjureService.getSomeResult(
-    		AuthHeader.valueOf("authHeader"),
-               SomeResultException.Visitor.builder()
-                    .blueMoon(err -> { ... return otherResult; })
-                    .build());
-```
-
-### Example Dialogue Client Implementation via Exceptions
-
-```
-MyConjureServiceBlocking myConjureService = 
-    witchcraft.conjureClients()
-        .client(MyConjureServiceBlocking.class, "my-conjure-service").get();
-
-try {
-    myConjureService.getSomeResult(AuthHeader.valueOf("authHeader"));
-} catch (BlueMoonRemoteException e) { // <- checked exception so has to be caught!
-    handleBlueMoonEvent();
-}
-```
+1) Implement new error declarations into documentation generation.
+2) Start work on language-specific implementations:
+   1) This will be split between server and client-side improvements.
+   2) Server-side will most likely just be better tooling around throwing errors that you have declared.
+   3) Client-side will begin with easy (and not-controversial) wins, such as better optional error handling.
