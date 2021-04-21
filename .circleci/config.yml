@@ -146,7 +146,7 @@ jobs:
     docker: [{ image: 'lycheeverse/lychee:0.6.0' }]
     steps:
       - checkout
-      - run: lychee --exclude-loopback **/*.md
+      - run: lychee --exclude-all-private **/*.md
 
 
 workflows:
