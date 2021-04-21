@@ -48,7 +48,7 @@ The [conjure-verification](https://github.com/palantir/conjure-verification) too
 
 The following tools also operate on IR:
 
-- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman](https://learning.postman.com/) [Collections](https://learning.getpostman.com/docs/postman/collections/intro-to-collections/) for interacting with Conjure defined APIs.
+- [conjure-postman](https://github.com/palantir/conjure-postman) - generates [Postman Collections](https://learning.getpostman.com/docs/postman/collections/intro-to-collections/) for interacting with Conjure defined APIs.
 - conjure-backcompat - an experimental type checker that compares two IR definitions to evaluate whether they are wire format compatible (not yet open-sourced).
 
 
