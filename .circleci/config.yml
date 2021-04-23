@@ -143,10 +143,10 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   markdown:
-    docker: [{ image: 'lycheeverse/lychee:0.6.0' }]
+    docker: [{ image: 'raviqqe/liche:0.1.1' }]
     steps:
       - checkout
-      - run: lychee --exclude-all-private --exclude localhost --no-progress *.md **/*.md
+      - run: /liche -d . -r . -v
 
 
 workflows:
