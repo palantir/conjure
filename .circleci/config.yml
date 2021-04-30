@@ -5,7 +5,7 @@
 version: 2.1
 jobs:
   compile:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -54,7 +54,7 @@ jobs:
           paths: [ project, .gradle/init.gradle ]
 
   check:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
     resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -76,7 +76,7 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   unit-test:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -98,7 +98,7 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   trial-publish:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
     resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -120,7 +120,7 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   publish:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
     resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -143,10 +143,10 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   markdown:
-    docker: [{ image: 'lycheeverse/lychee:0.6.0' }]
+    docker: [{ image: 'raviqqe/liche:0.1.1' }]
     steps:
       - checkout
-      - run: lychee --exclude-all-private --exclude localhost --no-progress *.md **/*.md
+      - run: /liche -d . -r . -v
 
 
 workflows:
