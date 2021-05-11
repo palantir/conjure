@@ -16,7 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -36,6 +36,9 @@ import com.palantir.conjure.spec.QueryParameterType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import java.util.List;
+import javax.annotation.CheckReturnValue;
+import org.assertj.core.api.AbstractThrowableAssert;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public final class ParamIdValidatorTest {
@@ -46,8 +49,8 @@ public final class ParamIdValidatorTest {
     @SuppressWarnings("CheckReturnValue")
     public void testValidNonHeader() {
         for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234", "foo_bar", "foo-bar")) {
-            // Passes validation
-            createEndpoint(ParameterType.query(QueryParameterType.of(ParameterId.of(paramId))));
+            assertThatEndpointValidation(ParameterType.query(QueryParameterType.of(ParameterId.of(paramId))))
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -57,8 +60,8 @@ public final class ParamIdValidatorTest {
         List<String> paramIds = ImmutableList.of(
                 HttpHeaders.AUTHORIZATION, HttpHeaders.X_XSS_PROTECTION, HttpHeaders.P3P, HttpHeaders.SET_COOKIE2);
         for (String paramId : paramIds) {
-            // Passes validation
-            createEndpoint(ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId))));
+            assertThatEndpointValidation(ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId))))
+                    .doesNotThrowAnyException();
         }
     }
 
@@ -66,7 +69,7 @@ public final class ParamIdValidatorTest {
     public void testInvalidNonHeader() {
         for (String paramId : ImmutableList.of("AB", "123", "foo.bar")) {
             ParameterType parameterType = ParameterType.query(QueryParameterType.of(ParameterId.of(paramId)));
-            assertThatThrownBy(() -> createEndpoint(parameterType))
+            assertThatThrownByEndpointValidation(parameterType)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage(
                             "Query param id %s on endpoint test{http: POST /a/path} must match one of the "
@@ -82,7 +85,7 @@ public final class ParamIdValidatorTest {
     public void testInvalidHeader() {
         for (String paramId : ImmutableList.of("authorization", "123", "Foo_Bar", "Foo.Bar")) {
             ParameterType parameterType = ParameterType.header(HeaderParameterType.of(ParameterId.of(paramId)));
-            assertThatThrownBy(() -> createEndpoint(parameterType))
+            assertThatThrownByEndpointValidation(parameterType)
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage(
                             "Header parameter id %s on endpoint test{http: POST /a/path} must match pattern %s",
@@ -90,20 +93,41 @@ public final class ParamIdValidatorTest {
         }
     }
 
-    private EndpointDefinition createEndpoint(ParameterType paramType) {
-        ArgumentDefinition arg = ArgumentDefinition.builder()
-                .argName(PARAMETER_NAME)
-                .paramType(paramType)
-                .type(Type.primitive(PrimitiveType.INTEGER))
-                .build();
-        EndpointDefinition definition = EndpointDefinition.builder()
-                .httpMethod(HttpMethod.POST)
-                .httpPath(HttpPath.of("/a/path"))
-                .args(arg)
-                .endpointName(EndpointName.of("test"))
-                .build();
+    @Test
+    public void testProtocolHeaders() {
+        for (String protocolHeader : EndpointDefinitionValidator.PROTOCOL_HEADERS) {
+            ParameterType parameterType = ParameterType.header(HeaderParameterType.of(ParameterId.of(protocolHeader)));
+            assertThatThrownByEndpointValidation(parameterType)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(
+                            "Header parameter id %s on endpoint test{http: POST /a/path} should not be one of the "
+                                    + "protocol headers %s",
+                            protocolHeader, EndpointDefinitionValidator.PROTOCOL_HEADERS);
+        }
+    }
 
-        EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor);
-        return definition;
+    @CheckReturnValue
+    private AbstractThrowableAssert<?, ? extends Throwable> assertThatThrownByEndpointValidation(
+            ParameterType paramType) {
+        return assertThatEndpointValidation(paramType);
+    }
+
+    @CheckReturnValue
+    private AbstractThrowableAssert<?, ? extends Throwable> assertThatEndpointValidation(ParameterType paramType) {
+        return assertThat(Assertions.catchThrowable(() -> {
+            ArgumentDefinition arg = ArgumentDefinition.builder()
+                    .argName(PARAMETER_NAME)
+                    .paramType(paramType)
+                    .type(Type.primitive(PrimitiveType.INTEGER))
+                    .build();
+            EndpointDefinition definition = EndpointDefinition.builder()
+                    .httpMethod(HttpMethod.POST)
+                    .httpPath(HttpPath.of("/a/path"))
+                    .args(arg)
+                    .endpointName(EndpointName.of("test"))
+                    .build();
+
+            EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor);
+        }));
     }
 }

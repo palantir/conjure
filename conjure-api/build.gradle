@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.palantir.conjure-publish'
-apply from: "$rootDir/gradle/publish-conjure.gradle"
+apply plugin: 'com.palantir.external-publish-conjure'
 
 project (':conjure-api:conjure-api-objects') {
-    apply from: "$rootDir/gradle/publish-jar.gradle"
+    apply plugin: 'com.palantir.external-publish-jar'
 
     dependencies {
         compile 'com.palantir.conjure.java:conjure-lib'

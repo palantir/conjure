@@ -16,17 +16,15 @@
 
 buildscript {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
-        maven { url 'https://dl.bintray.com/palantir/releases/' }
-        maven { url 'https://plugins.gradle.org/m2/' }
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-        classpath 'com.netflix.nebula:gradle-info-plugin:9.3.0'
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:17.3.2'
-        classpath 'com.palantir.baseline:gradle-baseline-java:3.75.0'
-        classpath 'com.palantir.gradle.conjure:gradle-conjure:5.1.1'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.2.1'
+        classpath 'com.palantir.baseline:gradle-baseline-java:3.83.0'
+        classpath 'com.palantir.gradle.conjure:gradle-conjure:5.5.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.28.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.3'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:1.1.0'
@@ -34,6 +32,7 @@ buildscript {
     }
 }
 
+apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.consistent-versions'
@@ -48,7 +47,7 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven { url 'https://dl.bintray.com/palantir/releases/' }
+        jcenter()
     }
 }
 

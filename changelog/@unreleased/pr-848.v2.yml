@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Replace liche with lychee for markdown link checking
+  links:
+  - https://github.com/palantir/conjure/pull/848

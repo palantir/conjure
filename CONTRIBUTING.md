@@ -12,7 +12,6 @@ If your change affects just one language or client, you'll probably just need to
   - [conjure-java](https://github.com/palantir/conjure-java)
   - [conjure-java-runtime](https://github.com/palantir/conjure-java-runtime)
   - [conjure-typescript](https://github.com/palantir/conjure-typescript)
-  - [conjure-typescript-client](https://github.com/palantir/conjure-typescript-client)
   - [conjure-python](https://github.com/palantir/conjure-python)
   - [conjure-python-client](https://github.com/palantir/conjure-python-client)
 
