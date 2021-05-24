@@ -186,6 +186,22 @@ public final class ConjureCliTest {
     }
 
     @Test
+    public void generatesCleanError_invalid_json() {
+        String[] args = {"compile", "src/test/resources/invalid-json.yml", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString())
+                .isEqualTo("Error while parsing src/test/resources/invalid-json.yml:\n"
+                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
+                        + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
+                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n");
+        assertThat(outputFile).doesNotExist();
+    }
+
+    @Test
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
