@@ -30,11 +30,9 @@ import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
@@ -82,20 +80,11 @@ public final class ConjureCli implements Runnable {
                 throw ex;
             }
 
-            // Dedupe exceptions to ensure we don't end up in a cause loop
-            Set<Throwable> seen = new HashSet<>();
             // Unpack errors; we don't care about where in the code the error comes from: the issue is in the supplied
             // conjure code. The stack doesn't help.
-            Throwable curr = ex;
-            while (curr != null) {
-                if (seen.contains(curr)) {
-                    break;
-                }
+            Throwables.getCausalChain(ex)
+                    .forEach(exception -> commandLine.getErr().println(exception.getMessage()));
 
-                seen.add(curr);
-                commandLine.getErr().println(curr.getMessage());
-                curr = curr.getCause();
-            }
             return -1;
         }
     }
