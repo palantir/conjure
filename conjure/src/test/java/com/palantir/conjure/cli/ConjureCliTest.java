@@ -175,8 +175,9 @@ public final class ConjureCliTest {
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
         assertThat(stringWriter.toString())
-                .isEqualTo("Type, error, and service names must be unique across locally defined and imported "
-                        + "types/errors:\nFound duplicate name: test.api.ConflictingName\n"
+                .isEqualTo("Type, error, and service names must be unique across locally defined and "
+                        + "imported types/errors:\n"
+                        + "Found duplicate name: test.api.ConflictingName\n"
                         + "Known names:\n"
                         + " - test.api.UniqueName\n"
                         + " - test.api.UniqueName2\n"
