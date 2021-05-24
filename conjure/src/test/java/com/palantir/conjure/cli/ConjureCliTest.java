@@ -136,7 +136,7 @@ public final class ConjureCliTest {
                 .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
-        assertThat(outputFile.isFile()).isTrue();
+        assertThat(outputFile).exists();
     }
 
     @Test
@@ -150,7 +150,7 @@ public final class ConjureCliTest {
         assertThat(stringWriter.toString())
                 .isEqualTo("Encountered error trying to parse file 'src/test/resources/simple-error.yml'\n"
                         + "Unknown LocalReferenceType: TypeName{name=UnknownType}\n");
-        assertThat(outputFile.isFile()).isFalse();
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
@@ -163,7 +163,7 @@ public final class ConjureCliTest {
         printWriter.flush();
         assertThat(stringWriter.toString().trim())
                 .isEqualTo("Illegal map key found in union SimpleUnion in member optionA");
-        assertThat(outputFile.isFile()).isFalse();
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
@@ -182,7 +182,7 @@ public final class ConjureCliTest {
                         + " - test.api.UniqueName\n"
                         + " - test.api.UniqueName2\n"
                         + " - test.api.ConflictingName\n");
-        assertThat(outputFile.isFile()).isFalse();
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
