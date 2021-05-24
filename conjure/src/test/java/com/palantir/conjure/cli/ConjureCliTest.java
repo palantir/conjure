@@ -167,6 +167,24 @@ public final class ConjureCliTest {
     }
 
     @Test
+    public void generatesCleanError_unique_name() {
+        String[] args = {"compile", "src/test/resources/unique-name-error", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString())
+                .isEqualTo("Type, error, and service names must be unique across locally defined and imported "
+                        + "types/errors:\nFound duplicate name: test.api.ConflictingName\n"
+                        + "Known names:\n"
+                        + " - test.api.UniqueName\n"
+                        + " - test.api.UniqueName2\n"
+                        + " - test.api.ConflictingName\n");
+        assertThat(outputFile.isFile()).isFalse();
+    }
+
+    @Test
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))

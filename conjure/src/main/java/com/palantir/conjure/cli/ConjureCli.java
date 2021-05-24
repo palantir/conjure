@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.google.common.base.VerifyException;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.exceptions.ConjureException;
 import com.palantir.conjure.parser.ConjureParser.CyclicImportException;
@@ -69,8 +68,7 @@ public final class ConjureCli implements Runnable {
             Throwable rootCause = Throwables.getRootCause(ex);
             if (!(rootCause instanceof ConjureException)
                     && !(rootCause instanceof ParseException)
-                    && !(rootCause instanceof CyclicImportException)
-                    && !(rootCause instanceof VerifyException)) {
+                    && !(rootCause instanceof CyclicImportException)) {
                 throw ex;
             }
             if (!(commandLine.getCommand() instanceof ConjureCliCommand)) {
