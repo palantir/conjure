@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ConjureTypeVisitor;
 import com.palantir.conjure.parser.types.TypesDefinition;
@@ -79,7 +80,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
             if (maybeDirectDef == null) {
                 ExternalTypeDefinition maybeExternalDef = types.imports().get(name);
                 if (maybeExternalDef == null) {
-                    throw new IllegalStateException("Unknown LocalReferenceType: " + name);
+                    throw new ConjureIllegalStateException("Unknown LocalReferenceType: " + name);
                 }
 
                 String externalPath = maybeExternalDef.external().java();

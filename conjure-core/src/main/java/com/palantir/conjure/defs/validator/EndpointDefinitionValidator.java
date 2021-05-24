@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.CaseConverter;
 import com.palantir.conjure.either.Either;
+import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -40,7 +41,6 @@ import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.ParameterTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
-import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -329,17 +329,20 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                 // DealiasingTypeVisitor above
                                 @Override
                                 public Boolean visitReference(TypeName _value) {
-                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                    throw new ConjureRuntimeException(
+                                            "Unexpected type when validating query parameters");
                                 }
 
                                 @Override
                                 public Boolean visitExternal(ExternalReference _value) {
-                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                    throw new ConjureRuntimeException(
+                                            "Unexpected type when validating query parameters");
                                 }
 
                                 @Override
                                 public Boolean visitUnknown(String _unknownType) {
-                                    throw new SafeRuntimeException("Unexpected type when validating query parameters");
+                                    throw new ConjureRuntimeException(
+                                            "Unexpected type when validating query parameters");
                                 }
                             }));
         }

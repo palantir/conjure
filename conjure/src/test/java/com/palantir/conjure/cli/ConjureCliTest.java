@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
@@ -135,6 +137,33 @@ public final class ConjureCliTest {
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
         assertThat(outputFile.isFile()).isTrue();
+    }
+
+    @Test
+    public void generatesCleanError_unknown() {
+        String[] args = {"compile", "src/test/resources/simple-error.yml", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString())
+                .isEqualTo("Encountered error trying to parse file 'src/test/resources/simple-error.yml'\n"
+                        + "Unknown LocalReferenceType: TypeName{name=UnknownType}\n");
+        assertThat(outputFile.isFile()).isFalse();
+    }
+
+    @Test
+    public void generatesCleanError_map() {
+        String[] args = {"compile", "src/test/resources/key-error.yml", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString().trim())
+                .isEqualTo("Illegal map key found in union SimpleUnion in member optionA");
+        assertThat(outputFile.isFile()).isFalse();
     }
 
     @Test

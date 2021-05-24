@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.visitor.TypeVisitor;
@@ -32,7 +33,7 @@ public final class FieldDefinitionValidator {
         if (typeDef.getType().accept(TypeVisitor.IS_MAP)) {
             MapType mapType = typeDef.getType().accept(TypeVisitor.MAP);
             if (!mapType.getKeyType().accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)) {
-                throw new IllegalStateException(
+                throw new ConjureIllegalStateException(
                         String.format("Complex type '%s' not allowed in map key: %s.", mapType.getKeyType(), typeDef));
             }
         }
