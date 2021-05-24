@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Clean up error messages generated from the CLI
+  links:
+  - https://github.com/palantir/conjure/pull/873
