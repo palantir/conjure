@@ -1,0 +1,16 @@
+types:
+  imports:
+    ResourceIdentifier:
+      base-type: string
+      external:
+        java: com.palantir.ri.ResourceIdentifier
+
+  definitions: 
+    default-package: test.api
+    objects:
+      IllegalKey:
+        fields:
+          key: string
+      SimpleUnion:
+        union:
+          optionA: map<IllegalKey, string>

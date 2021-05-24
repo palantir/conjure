@@ -23,6 +23,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
@@ -167,7 +168,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 TypeName typeName, Multimap<TypeName, TypeName> typeMap, List<TypeName> path) {
             if (path.contains(typeName)) {
                 path.add(typeName);
-                throw new IllegalStateException("Illegal recursive data type: "
+                throw new ConjureIllegalStateException("Illegal recursive data type: "
                         + Joiner.on(" -> ").join(Lists.transform(path, TypeName::getName)));
             }
 
@@ -198,14 +199,15 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                         .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                         .findAny()
                         .ifPresent(_arg -> {
-                            throw new IllegalStateException(
+                            throw new ConjureIllegalStateException(
                                     "Illegal nested optionals found in one of the arguments of endpoint "
                                             + endpoint.getEndpointName().get());
                         });
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindNestedOptionals(returnType, definitionMap, false)) {
-                        throw new IllegalStateException("Illegal nested optionals found in return type of endpoint "
-                                + endpoint.getEndpointName().get());
+                        throw new ConjureIllegalStateException(
+                                "Illegal nested optionals found in return type of endpoint "
+                                        + endpoint.getEndpointName().get());
                     }
                 });
             });
@@ -217,8 +219,9 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                     .filter(arg -> recursivelyFindNestedOptionals(arg.getType(), definitionMap, false))
                     .findAny()
                     .ifPresent(_arg -> {
-                        throw new IllegalStateException("Illegal nested optionals found in one of arguments of error "
-                                + errorDef.getErrorName().getName());
+                        throw new ConjureIllegalStateException(
+                                "Illegal nested optionals found in one of arguments of error "
+                                        + errorDef.getErrorName().getName());
                     });
         }
 
@@ -230,7 +233,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindNestedOptionals(aliasDef.getAlias(), definitionMap, false)) {
-                        throw new IllegalStateException("Illegal nested optionals found in alias "
+                        throw new ConjureIllegalStateException("Illegal nested optionals found in alias "
                                 + aliasDef.getTypeName().getName());
                     }
                     return null;
@@ -244,7 +247,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                     recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(_found -> {
-                                throw new IllegalStateException("Illegal nested optionals found in object "
+                                throw new ConjureIllegalStateException("Illegal nested optionals found in object "
                                         + objectDefinition.getTypeName().getName());
                             });
                     return null;
@@ -258,7 +261,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                     recursivelyFindNestedOptionals(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
                             .ifPresent(_found -> {
-                                throw new IllegalStateException("Illegal nested optionals found in union "
+                                throw new ConjureIllegalStateException("Illegal nested optionals found in union "
                                         + unionDefinition.getTypeName().getName());
                             });
                     return null;
@@ -316,12 +319,13 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                         .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                         .findAny()
                         .ifPresent(_arg -> {
-                            throw new IllegalStateException("Illegal map key found in one of the arguments of endpoint "
-                                    + endpoint.getEndpointName().get());
+                            throw new ConjureIllegalStateException(
+                                    "Illegal map key found in one of the arguments of endpoint "
+                                            + endpoint.getEndpointName().get());
                         });
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindIllegalKeys(returnType, definitionMap, false)) {
-                        throw new IllegalStateException("Illegal map key found in return type of endpoint "
+                        throw new ConjureIllegalStateException("Illegal map key found in return type of endpoint "
                                 + endpoint.getEndpointName().get());
                     }
                 });
@@ -334,7 +338,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                     .filter(arg -> recursivelyFindIllegalKeys(arg.getType(), definitionMap, false))
                     .findAny()
                     .ifPresent(_arg -> {
-                        throw new IllegalStateException("Illegal map key found in one of arguments of error "
+                        throw new ConjureIllegalStateException("Illegal map key found in one of arguments of error "
                                 + errorDef.getErrorName().getName());
                     });
         }
@@ -347,7 +351,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 public Void visitAlias(AliasDefinition _value) {
                     AliasDefinition aliasDef = typeDef.accept(TypeDefinitionVisitor.ALIAS);
                     if (recursivelyFindIllegalKeys(aliasDef.getAlias(), definitionMap, false)) {
-                        throw new IllegalStateException("Illegal map key found in alias "
+                        throw new ConjureIllegalStateException("Illegal map key found in alias "
                                 + aliasDef.getTypeName().getName());
                     }
                     return null;
@@ -360,9 +364,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition ->
                                     recursivelyFindIllegalKeys(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(_found -> {
-                                throw new IllegalStateException("Illegal map key found in object "
-                                        + objectDefinition.getTypeName().getName());
+                            .ifPresent(found -> {
+                                throw new ConjureIllegalStateException(String.format(
+                                        "Illegal map key found in object %s in field %s",
+                                        objectDefinition.getTypeName().getName(),
+                                        found.getFieldName().get()));
                             });
                     return null;
                 }
@@ -374,9 +380,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .filter(fieldDefinition ->
                                     recursivelyFindIllegalKeys(fieldDefinition.getType(), definitionMap, false))
                             .findAny()
-                            .ifPresent(_found -> {
-                                throw new IllegalStateException("Illegal map key found in union "
-                                        + unionDefinition.getTypeName().getName());
+                            .ifPresent(found -> {
+                                throw new ConjureIllegalStateException(String.format(
+                                        "Illegal map key found in union %s in member %s",
+                                        unionDefinition.getTypeName().getName(),
+                                        found.getFieldName().get()));
                             });
                     return null;
                 }

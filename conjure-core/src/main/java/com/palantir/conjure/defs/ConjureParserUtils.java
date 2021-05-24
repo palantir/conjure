@@ -31,6 +31,8 @@ import com.palantir.conjure.defs.validator.PackageValidator;
 import com.palantir.conjure.defs.validator.ServiceDefinitionValidator;
 import com.palantir.conjure.defs.validator.TypeNameValidator;
 import com.palantir.conjure.defs.validator.UnionDefinitionValidator;
+import com.palantir.conjure.exceptions.ConjureIllegalArgumentException;
+import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
 import com.palantir.conjure.parser.services.ParameterName;
@@ -224,7 +226,7 @@ public final class ConjureParserUtils {
                 typesBuilder.addAll(objects.values());
                 errorsBuilder.addAll(parseErrors(parsed.types().definitions(), typeResolver));
             } catch (RuntimeException e) {
-                throw new RuntimeException(
+                throw new ConjureRuntimeException(
                         String.format("Encountered error trying to parse file '%s'", annotatedParsed.sourceFile()), e);
             }
         });
@@ -394,7 +396,7 @@ public final class ConjureParserUtils {
             case NONE:
                 return Optional.empty();
             default:
-                throw new SafeIllegalArgumentException("Unrecognized auth type.");
+                throw new ConjureIllegalArgumentException("Unrecognized auth type.");
         }
     }
 
@@ -451,7 +453,7 @@ public final class ConjureParserUtils {
                         argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.query(QueryParameterType.of(ParameterId.of(queryParamId)));
             default:
-                throw new IllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());
+                throw new ConjureIllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());
         }
     }
 
