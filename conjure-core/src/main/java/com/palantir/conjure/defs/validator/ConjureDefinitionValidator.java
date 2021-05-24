@@ -18,7 +18,6 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -113,13 +112,19 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
 
         private static void verifyNameIsUnique(Set<TypeName> seenNames, TypeName name) {
-            boolean isNewName = seenNames.add(name);
-            Verify.verify(
-                    isNewName,
-                    "Type, error, and service names must be unique across locally defined and imported "
-                            + "types/errors: %s\n%s",
-                    seenNames,
-                    name);
+            if (!seenNames.add(name)) {
+                throw new ConjureIllegalStateException(String.format(
+                        "Type, error, and service names must be unique across locally defined and imported "
+                                + "types/errors:\nFound duplicate name: %s\nKnown names:\n - %s",
+                        typeNameToString(name),
+                        seenNames.stream()
+                                .map(UniqueNamesValidator::typeNameToString)
+                                .collect(Collectors.joining("\n - "))));
+            }
+        }
+
+        private static String typeNameToString(TypeName typeName) {
+            return String.format("%s.%s", typeName.getPackage(), typeName.getName());
         }
     }
 

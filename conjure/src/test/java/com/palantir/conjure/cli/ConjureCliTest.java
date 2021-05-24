@@ -136,7 +136,7 @@ public final class ConjureCliTest {
                 .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
-        assertThat(outputFile.isFile()).isTrue();
+        assertThat(outputFile).exists();
     }
 
     @Test
@@ -150,7 +150,7 @@ public final class ConjureCliTest {
         assertThat(stringWriter.toString())
                 .isEqualTo("Encountered error trying to parse file 'src/test/resources/simple-error.yml'\n"
                         + "Unknown LocalReferenceType: TypeName{name=UnknownType}\n");
-        assertThat(outputFile.isFile()).isFalse();
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
@@ -163,7 +163,26 @@ public final class ConjureCliTest {
         printWriter.flush();
         assertThat(stringWriter.toString().trim())
                 .isEqualTo("Illegal map key found in union SimpleUnion in member optionA");
-        assertThat(outputFile.isFile()).isFalse();
+        assertThat(outputFile).doesNotExist();
+    }
+
+    @Test
+    public void generatesCleanError_unique_name() {
+        String[] args = {"compile", "src/test/resources/unique-name-error", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString())
+                .isEqualTo("Type, error, and service names must be unique across locally defined and "
+                        + "imported types/errors:\n"
+                        + "Found duplicate name: test.api.ConflictingName\n"
+                        + "Known names:\n"
+                        + " - test.api.UniqueName\n"
+                        + " - test.api.UniqueName2\n"
+                        + " - test.api.ConflictingName\n");
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
