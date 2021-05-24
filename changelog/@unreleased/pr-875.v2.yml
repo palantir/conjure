@@ -1,5 +1,5 @@
-type: improvement
-improvement:
+type: fix
+fix:
   description: Improve readability of JSON mapping errors.
   links:
   - https://github.com/palantir/conjure/pull/875
