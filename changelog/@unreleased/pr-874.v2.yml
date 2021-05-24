@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Clean up duplicate name error message in CLI.
+  links:
+  - https://github.com/palantir/conjure/pull/874
