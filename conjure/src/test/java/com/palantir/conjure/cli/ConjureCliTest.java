@@ -19,6 +19,7 @@ package com.palantir.conjure.cli;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
@@ -208,7 +209,7 @@ public final class ConjureCliTest {
                 .outputIrFile(folder.newFolder())
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("MismatchedInputException");
+                .getRootCause()
+                .isInstanceOf(MismatchedInputException.class);
     }
 }
