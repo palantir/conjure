@@ -19,6 +19,7 @@ package com.palantir.conjure.cli;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
@@ -186,13 +187,29 @@ public final class ConjureCliTest {
     }
 
     @Test
+    public void generatesCleanError_invalid_json() {
+        String[] args = {"compile", "src/test/resources/invalid-json.yml", outputFile.getAbsolutePath()};
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        ConjureCli.prepareCommand().setErr(printWriter).execute(args);
+        printWriter.flush();
+        assertThat(stringWriter.toString())
+                .isEqualTo("Error while parsing src/test/resources/invalid-json.yml:\n"
+                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
+                        + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
+                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n");
+        assertThat(outputFile).doesNotExist();
+    }
+
+    @Test
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(folder.newFolder())
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("MismatchedInputException");
+                .getRootCause()
+                .isInstanceOf(MismatchedInputException.class);
     }
 }

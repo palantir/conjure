@@ -18,6 +18,8 @@ package com.palantir.conjure.cli;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,10 +31,12 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
@@ -64,13 +68,6 @@ public final class ConjureCli implements Runnable {
             if (ex == null) {
                 return 0;
             }
-            // For known internal errors, continue, as they're signaling errors on the input, not in the code
-            Throwable rootCause = Throwables.getRootCause(ex);
-            if (!(rootCause instanceof ConjureException)
-                    && !(rootCause instanceof ParseException)
-                    && !(rootCause instanceof CyclicImportException)) {
-                throw ex;
-            }
             if (!(commandLine.getCommand() instanceof ConjureCliCommand)) {
                 throw ex;
             }
@@ -79,13 +76,40 @@ public final class ConjureCli implements Runnable {
                 // If the command is verbose, print the full stack trace
                 throw ex;
             }
+            List<Throwable> chain = Throwables.getCausalChain(ex);
+
+            // For known internal errors, change logging, as they're signaling errors on the input, not in the code
+            if (chain.stream().noneMatch(ExceptionHandler::isConjureThrowable)) {
+                throw ex;
+            }
 
             // Unpack errors; we don't care about where in the code the error comes from: the issue is in the supplied
             // conjure code. The stack doesn't help.
-            Throwables.getCausalChain(ex)
-                    .forEach(exception -> commandLine.getErr().println(exception.getMessage()));
+            chain.forEach(exception -> {
+                if (exception instanceof JsonMappingException) {
+                    handleJsonMappingException(commandLine.getErr(), (JsonMappingException) exception);
+                } else {
+                    commandLine.getErr().println(exception.getMessage());
+                }
+            });
 
             return -1;
+        }
+
+        private void handleJsonMappingException(PrintWriter err, JsonMappingException jsonException) {
+            String message = jsonException.getOriginalMessage();
+
+            String path = jsonException.getPath().stream()
+                    .map(Reference::getFieldName)
+                    .collect(Collectors.joining(" -> "));
+
+            err.println(String.format("%s\n  @ %s", message, path));
+        }
+
+        private static boolean isConjureThrowable(Throwable rootCause) {
+            return (rootCause instanceof ConjureException)
+                    || (rootCause instanceof ParseException)
+                    || (rootCause instanceof CyclicImportException);
         }
     }
 

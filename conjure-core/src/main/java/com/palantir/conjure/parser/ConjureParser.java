@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
+import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.reference.ConjureImports;
@@ -130,7 +131,7 @@ public final class ConjureParser {
                                 .build())
                         .build();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ConjureRuntimeException(String.format("Error while parsing %s:", file), e);
             }
         }
 
