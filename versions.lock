@@ -37,8 +37,8 @@ org.glassfish.jersey.bundles.repackaged:jersey-guava:2.25.1 (1 constraints: 2511
 org.glassfish.jersey.core:jersey-common:2.25.1 (1 constraints: 3c05433b)
 org.immutables:value:2.8.8 (1 constraints: 14051536)
 org.javassist:javassist:3.20.0-GA (1 constraints: 4f0d1a40)
-org.slf4j:slf4j-api:1.7.30 (3 constraints: 451d0579)
-org.slf4j:slf4j-simple:1.7.30 (1 constraints: 3d05453b)
+org.slf4j:slf4j-api:1.7.31 (3 constraints: 471d5079)
+org.slf4j:slf4j-simple:1.7.31 (1 constraints: 3e05463b)
 org.yaml:snakeyaml:1.27 (1 constraints: 7217fa27)
 
 [Test dependencies]
