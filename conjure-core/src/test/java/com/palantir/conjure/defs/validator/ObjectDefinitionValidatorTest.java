@@ -24,7 +24,7 @@ import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class ObjectDefinitionValidatorTest {
 

@@ -26,7 +26,7 @@ import com.palantir.conjure.spec.FieldName;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ErrorDefinitionValidatorTest {
 

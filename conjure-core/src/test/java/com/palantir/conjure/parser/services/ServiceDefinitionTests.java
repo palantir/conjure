@@ -46,7 +46,7 @@ import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class ServiceDefinitionTests {
 

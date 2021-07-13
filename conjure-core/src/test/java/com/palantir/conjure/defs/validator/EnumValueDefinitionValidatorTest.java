@@ -19,7 +19,7 @@ package com.palantir.conjure.defs.validator;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.palantir.conjure.spec.EnumValueDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class EnumValueDefinitionValidatorTest {
 

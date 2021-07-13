@@ -27,22 +27,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 import picocli.CommandLine.PicocliException;
 
 public final class ConjureCliTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     private File inputFile;
     private File outputFile;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         File inputs = folder.newFolder("inputs");
         inputFile = File.createTempFile("junit", ".yml", inputs);
