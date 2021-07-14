@@ -40,7 +40,7 @@ import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ConjureSourceFileValidatorTest {
     private static final String PACKAGE = "package";

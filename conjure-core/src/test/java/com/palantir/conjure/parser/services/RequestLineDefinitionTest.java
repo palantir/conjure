@@ -19,7 +19,7 @@ package com.palantir.conjure.parser.services;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RequestLineDefinitionTest {
 

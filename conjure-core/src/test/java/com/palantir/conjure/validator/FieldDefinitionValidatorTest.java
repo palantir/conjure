@@ -26,7 +26,7 @@ import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FieldDefinitionValidatorTest {
 

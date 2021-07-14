@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
 import com.palantir.conjure.spec.TypeName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class EnumDefinitionValidatorTest {
 
