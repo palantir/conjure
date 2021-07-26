@@ -17,9 +17,12 @@
 package com.palantir.conjure.defs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Style.ImplementationVisibility;
 
 @JsonDeserialize
+@Retention(RetentionPolicy.SOURCE)
 @Value.Style(jdkOnly = true, overshadowImplementation = true, visibility = ImplementationVisibility.PACKAGE)
 public @interface ConjureImmutablesStyle {}
