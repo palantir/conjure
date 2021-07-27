@@ -1,14 +1,14 @@
 # How to invoke Conjure CLIs manually
-The recommended way to use Conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, all the Conjure ecosystems CLIs can be invoked manually - there are executables published on [bintray](https://bintray.com/palantir/releases/conjure).
+The recommended way to use Conjure is via a build tool like [gradle-conjure](https://github.com/palantir/gradle-conjure). However, if you don't want to use gradle-conjure, all the Conjure ecosystems CLIs can be invoked manually - there are executables published on [maven central](https://search.maven.org/artifact/com.palantir.conjure/conjure).
 
 ## 1. Install the CLIs
 
-Download the [`conjure`](https://palantir.bintray.com/releases/com/palantir/conjure/conjure/) TGZ and any generators you want to use:
+Download the [`conjure`](https://search.maven.org/artifact/com.palantir.conjure/conjure) TGZ and any generators you want to use:
 
-- [conjure-java](https://palantir.bintray.com/releases/com/palantir/conjure/java/conjure-java/)
-- [conjure-typescript](https://palantir.bintray.com/releases/com/palantir/conjure/typescript/conjure-typescript/)
-- [conjure-python](https://palantir.bintray.com/releases/com/palantir/conjure/python/conjure-python/)
-- [conjure-postman](https://palantir.bintray.com/releases/com/palantir/conjure/postman/conjure-postman/)
+- [conjure-java](https://search.maven.org/artifact/com.palantir.conjure.java/conjure-java)
+- [conjure-typescript](https://search.maven.org/artifact/com.palantir.conjure.typescript/conjure-typescript)
+- [conjure-python](https://search.maven.org/artifact/com.palantir.conjure.python/conjure-python)
+- [conjure-postman](https://search.maven.org/artifact/com.palantir.conjure.postman/conjure-postman)
 
 Each of these TGZs contain an executable located at `<name>-<version>/bin/<name>`:
 
