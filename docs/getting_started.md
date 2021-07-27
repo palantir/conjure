@@ -30,7 +30,6 @@ In your top level `build.gradle` file, add a buildscript dependency on Conjure.
 buildscript {
     repositories {
         mavenCentral()
-        maven { url 'https://dl.bintray.com/palantir/releases/' }
     }
 
     dependencies {
@@ -40,7 +39,7 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url 'https://dl.bintray.com/palantir/releases/' }
+        mavenCentral()
     }
 }
 ```
