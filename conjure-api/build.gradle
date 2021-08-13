@@ -20,8 +20,8 @@ project (':conjure-api:conjure-api-objects') {
     apply plugin: 'com.palantir.external-publish-jar'
 
     dependencies {
-        compile 'com.palantir.conjure.java:conjure-lib'
-        compile 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'com.palantir.conjure.java:conjure-lib'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
     }
 }
 

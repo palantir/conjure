@@ -17,28 +17,28 @@
 apply plugin: 'com.palantir.external-publish-jar'
 
 dependencies {
-    compile project(':conjure-generator-common')
-    compile project(':conjure-api:conjure-api-objects')
+    api project(':conjure-generator-common')
+    api project(':conjure-api:conjure-api-objects')
 
-    compile 'com.fasterxml.jackson.core:jackson-databind'
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
-    compile 'com.google.guava:guava'
-    compile 'com.palantir.syntactic-paths:syntactic-paths'
-    compile 'org.glassfish.jersey.core:jersey-common'
-    compile 'org.slf4j:slf4j-api'
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    api 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    api 'com.google.guava:guava'
+    api 'com.palantir.syntactic-paths:syntactic-paths'
+    api 'org.glassfish.jersey.core:jersey-common'
+    api 'org.slf4j:slf4j-api'
     implementation 'org.apache.commons:commons-lang3'
     implementation 'com.google.errorprone:error_prone_annotations'
 
-    testCompile 'junit:junit'
-    testCompile 'org.assertj:assertj-core'
-    testCompile 'org.mockito:mockito-core'
-    testRuntime 'org.slf4j:slf4j-simple'
+    testImplementation 'junit:junit'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.mockito:mockito-core'
+    testRuntimeOnly 'org.slf4j:slf4j-simple'
 
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
 
     testAnnotationProcessor 'org.immutables:value'
     testCompileOnly 'org.immutables:value::annotations'
-    testCompile 'org.immutables:value'
+    testImplementation 'org.immutables:value'
 }

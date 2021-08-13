@@ -19,13 +19,13 @@ apply plugin: 'com.palantir.external-publish-application-dist'
 mainClassName = 'com.palantir.conjure.cli.ConjureCli'
 
 dependencies {
-    compile project(':conjure-core')
-    compile 'commons-io:commons-io'
-    compile 'info.picocli:picocli'
-    runtime 'org.slf4j:slf4j-simple'
+    api project(':conjure-core')
+    api 'commons-io:commons-io'
+    api 'info.picocli:picocli'
+    runtimeOnly 'org.slf4j:slf4j-simple'
 
-    testCompile 'junit:junit'
-    testCompile 'org.assertj:assertj-core'
+    testImplementation 'junit:junit'
+    testImplementation 'org.assertj:assertj-core'
 
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
