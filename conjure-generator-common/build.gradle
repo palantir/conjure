@@ -17,12 +17,12 @@
 apply plugin: 'com.palantir.external-publish-jar'
 
 dependencies {
-    compile project(':conjure-api:conjure-api-objects')
+    api project(':conjure-api:conjure-api-objects')
 
-    compile 'com.google.guava:guava'
+    api 'com.google.guava:guava'
 
-    testCompile 'junit:junit'
-    testCompile 'org.assertj:assertj-core'
+    testImplementation 'junit:junit'
+    testImplementation 'org.assertj:assertj-core'
 
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
