@@ -98,7 +98,7 @@ public interface ArgumentDefinition {
     class Builder extends ImmutableArgumentDefinition.Builder {}
 
     // solve Jackson sad-times for multiple parser
-    class ArgumentDefinitionDeserializer extends JsonDeserializer<ArgumentDefinition> {
+    final class ArgumentDefinitionDeserializer extends JsonDeserializer<ArgumentDefinition> {
         @SuppressWarnings("deprecation")
         @Override
         public ArgumentDefinition deserialize(JsonParser parser, DeserializationContext _context)

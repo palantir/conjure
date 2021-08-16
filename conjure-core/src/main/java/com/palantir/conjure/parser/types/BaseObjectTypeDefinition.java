@@ -43,7 +43,7 @@ public interface BaseObjectTypeDefinition {
 
     <T> T visit(TypeDefinitionVisitor<T> visitor);
 
-    class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
+    final class BaseObjectTypeDefinitionDeserializer extends JsonDeserializer<BaseObjectTypeDefinition> {
         @Override
         public BaseObjectTypeDefinition deserialize(JsonParser parser, DeserializationContext _ctxt)
                 throws IOException {
