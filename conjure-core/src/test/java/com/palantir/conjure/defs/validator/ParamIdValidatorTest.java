@@ -39,7 +39,7 @@ import java.util.List;
 import javax.annotation.CheckReturnValue;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class ParamIdValidatorTest {
     private static final ArgumentName PARAMETER_NAME = ArgumentName.of("arg");
