@@ -43,7 +43,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class EndpointDefinitionTest {
 

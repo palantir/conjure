@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class KebabCaseEnforcingAnnotationInspectorTest {
 
