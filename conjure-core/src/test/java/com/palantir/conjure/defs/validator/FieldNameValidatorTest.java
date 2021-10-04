@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.palantir.conjure.spec.FieldName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class FieldNameValidatorTest {
 
