@@ -29,9 +29,11 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesImportedAliases() {
-        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(ImmutableList.of(
-                ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml"))));
-        assertThat(conjureDefinition.getTypes()).hasSize(1);
+        ConjureDefinition conjureDefinition =
+                ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(ImmutableList.of(
+                        new File("src/test/resources/example-conjure-imports.yml"),
+                        new File("src/test/resources/test-service.yml"))));
+        assertThat(conjureDefinition.getTypes()).hasSize(3);
     }
 
     // Test currently fails as it attempts to parse a TypeScript package name as a java package

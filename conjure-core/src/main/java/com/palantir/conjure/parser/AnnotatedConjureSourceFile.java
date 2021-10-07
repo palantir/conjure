@@ -17,13 +17,17 @@
 package com.palantir.conjure.parser;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.types.names.Namespace;
 import java.io.File;
+import java.util.Map;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface AnnotatedConjureSourceFile {
     ConjureSourceFile conjureSourceFile();
+
+    Map<Namespace, String> importProviders();
 
     File sourceFile();
 
