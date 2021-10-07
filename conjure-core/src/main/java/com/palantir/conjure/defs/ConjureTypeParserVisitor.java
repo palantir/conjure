@@ -72,11 +72,11 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
         @Override
         public Type resolve(ForeignReferenceType reference) {
-            String namespacePath = importProviders.get(reference.namespace());
-            Preconditions.checkNotNull(namespacePath, "Import not found for namespace: %s", reference.namespace());
-            AnnotatedConjureSourceFile externalFile = externalTypes.get(namespacePath);
+            String namespaceFile = importProviders.get(reference.namespace());
+            Preconditions.checkNotNull(namespaceFile, "Import not found for namespace: %s", reference.namespace());
+            AnnotatedConjureSourceFile externalFile = externalTypes.get(namespaceFile);
             Preconditions.checkNotNull(
-                    externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespacePath);
+                    externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespaceFile);
             return resolveFromTypeName(
                     reference.type(), externalFile.conjureSourceFile().types());
         }

@@ -18,7 +18,6 @@ package com.palantir.conjure.defs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.spec.ConjureDefinition;
 import java.io.File;
@@ -29,10 +28,8 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesImportedAliases() {
-        ConjureDefinition conjureDefinition =
-                ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(ImmutableList.of(
-                        new File("src/test/resources/example-conjure-imports.yml"),
-                        new File("src/test/resources/test-service.yml"))));
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml")));
         assertThat(conjureDefinition.getTypes()).hasSize(3);
     }
 
@@ -40,7 +37,7 @@ public class ConjureDefTest {
     @Test
     @Ignore
     public void handlesNonJavaExternalType() {
-        ConjureParserUtils.parseConjureDef(ImmutableList.of(
-                ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml"))));
+        ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml")));
     }
 }

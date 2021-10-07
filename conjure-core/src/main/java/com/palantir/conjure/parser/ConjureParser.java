@@ -23,17 +23,20 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypesDefinition;
-import com.palantir.conjure.parser.types.reference.ConjureImports;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 public final class ConjureParser {
@@ -56,23 +59,45 @@ public final class ConjureParser {
 
     /** Deserializes a {@link ConjureSourceFile} from its YAML representation in the given file. */
     public static ConjureSourceFile parse(File file) {
-        RecursiveParser parser = new RecursiveParser();
+        CachingParser parser = new CachingParser();
         return parser.parse(file);
     }
 
-    public static AnnotatedConjureSourceFile parseAnnotated(File file) {
-        RecursiveParser parser = new RecursiveParser();
-        return parseAnnotated(parser, file);
+    /**
+     * Parse file & all imports (recursively).
+     */
+    public static Map<String, AnnotatedConjureSourceFile> parseAnnotated(File file) {
+        return parseAnnotated(ImmutableList.of(file));
     }
 
+    /**
+     * Parse file & all imports (recursively).
+     */
     public static Map<String, AnnotatedConjureSourceFile> parseAnnotated(Collection<File> files) {
-        RecursiveParser parser = new RecursiveParser();
-        return files.stream()
-                .map(file -> parseAnnotated(parser, file))
-                .collect(Collectors.toMap(parsed -> parsed.sourceFile().getAbsolutePath(), Function.identity()));
+        CachingParser parser = new CachingParser();
+
+        Map<String, AnnotatedConjureSourceFile> parsed = new HashMap<>();
+        Queue<File> toProcess = new ArrayDeque<>(files);
+
+        while (!toProcess.isEmpty()) {
+            File nextFile = toProcess.poll();
+            String key = nextFile.getAbsolutePath();
+
+            if (!parsed.containsKey(key)) {
+                AnnotatedConjureSourceFile annotatedConjureSourceFile = parseSingleFile(parser, nextFile);
+                parsed.put(key, annotatedConjureSourceFile);
+
+                // Add all imports as files to be parsed
+                annotatedConjureSourceFile.importProviders().values().stream()
+                        .map(File::new)
+                        .forEach(toProcess::add);
+            }
+        }
+
+        return parsed;
     }
 
-    private static AnnotatedConjureSourceFile parseAnnotated(RecursiveParser parser, File file) {
+    private static AnnotatedConjureSourceFile parseSingleFile(CachingParser parser, File file) {
         ConjureSourceFile parsed = parser.parse(file);
 
         return AnnotatedConjureSourceFile.builder()
@@ -80,21 +105,20 @@ public final class ConjureParser {
                 .sourceFile(file)
                 // Hoist imports
                 .importProviders(parsed.types().conjureImports().entrySet().stream()
-                        .collect(Collectors.toMap(Entry::getKey, entry -> file.getParentFile()
-                                .toPath()
-                                .resolve(entry.getValue().file())
-                                .toFile()
+                        .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue()
+                                .absoluteFile()
+                                .orElseThrow(() -> new SafeIllegalStateException(
+                                        "Absolute file MUST be resolved as part of parsing stage"))
                                 .getAbsolutePath())))
                 .build();
     }
 
-    private static final class RecursiveParser {
+    private static final class CachingParser {
+        // From absolute path to the parsed file
         private final Map<String, ConjureSourceFile> cache;
-        // private final Set<String> currentDepthFirstPath;
 
-        private RecursiveParser() {
+        private CachingParser() {
             this.cache = new HashMap<>();
-            // this.currentDepthFirstPath = new LinkedHashSet<>(); // maintain order so we can print the cycle
         }
 
         ConjureSourceFile parse(File file) {
@@ -113,10 +137,6 @@ public final class ConjureParser {
         }
 
         private ConjureSourceFile parseInternal(File file) {
-            // Note(rfink): The mechanism of parsing the ConjureSourceFile and the imports separately isn't pretty,
-            // but it's better than the previous implementation where ConjureImports types were passed around all
-            // over the place. Main obstacle to simpler parsing is that Jackson parsers don't have context, i.e., it's
-            // impossible to know the base-path w.r.t. which the imported file is declared.
             if (!Files.exists(file.toPath())) {
                 throw new ImportNotFoundException(file);
             }
@@ -124,6 +144,8 @@ public final class ConjureParser {
             try {
                 ConjureSourceFile definition = MAPPER.readValue(file, ConjureSourceFile.class);
 
+                // For ease of book-keeping, resolve the import paths here
+                Path baseDir = file.toPath().getParent();
                 return ConjureSourceFile.builder()
                         .from(definition)
                         .types(TypesDefinition.builder()
@@ -131,44 +153,15 @@ public final class ConjureParser {
                                 .conjureImports(definition.types().conjureImports().entrySet().stream()
                                         .collect(Collectors.toMap(
                                                 Entry::getKey,
-                                                // Make path absolute
-                                                conjureImport -> ConjureImports.fromFile(file.toPath()
-                                                        .getParent()
-                                                        .resolve(conjureImport
-                                                                .getValue()
-                                                                .file())
-                                                        .toFile()
-                                                        .getAbsolutePath()))))
+                                                // Resolve absolute path to ensure we don't need to track this anymore
+                                                conjureImport ->
+                                                        conjureImport.getValue().resolve(baseDir))))
                                 .build())
                         .build();
-                // ConjureSourceFile definition = MAPPER.readValue(file, ConjureSourceFile.class);
-                // Map<Namespace, ConjureImports> imports = parseImports(
-                //         definition.types().conjureImports(), file.toPath().getParent());
-                // return ConjureSourceFile.builder()
-                //         .from(definition)
-                //         .types(TypesDefinition.builder()
-                //                 .from(definition.types())
-                //                 .conjureImports(imports)
-                //                 .build())
-                //         .build();
             } catch (IOException e) {
                 throw new ConjureRuntimeException(String.format("Error while parsing %s:", file), e);
             }
         }
-
-        // /**
-        //  * Replaces the (typically empty) ImportedTypes object for each namespace by an object with inlined/populated
-        //  * {@link ConjureImports#conjure()} imported definitions}.
-        //  */
-        // private Map<Namespace, ConjureImports> parseImports(
-        //         Map<Namespace, ConjureImports> declaredImports, Path baseDir) {
-        //     return declaredImports.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-        //         String importedFile = entry.getValue().file();
-        //         ConjureSourceFile importedConjure =
-        //                 parse(baseDir.resolve(importedFile).toFile());
-        //         return ConjureImports.withResolvedImports(importedFile, importedConjure);
-        //     }));
-        // }
     }
 
     @VisibleForTesting

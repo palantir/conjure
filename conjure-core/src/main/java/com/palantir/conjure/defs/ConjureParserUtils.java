@@ -77,6 +77,7 @@ import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.UnsafeArg;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -198,7 +199,7 @@ public final class ConjureParserUtils {
     @Deprecated
     static ConjureDefinition parseConjureDef(Collection<AnnotatedConjureSourceFile> annotatedParsedDefs) {
         return parseConjureDef(annotatedParsedDefs.stream()
-                .collect(Collectors.toMap(parsed -> parsed.sourceFile().getAbsolutePath(), Function.identity())));
+                .collect(Collectors.toMap(source -> source.sourceFile().getAbsolutePath(), Function.identity())));
     }
 
     static ConjureDefinition parseConjureDef(Map<String, AnnotatedConjureSourceFile> annotatedParsedDefs) {
@@ -260,7 +261,11 @@ public final class ConjureParserUtils {
             Map<String, AnnotatedConjureSourceFile> externalTypes) {
         Map<TypeName, TypeDefinition> allDefinitions = new HashMap<>();
         conjureImports.values().forEach(conjureImport -> {
-            AnnotatedConjureSourceFile annotatedConjureSourceFile = externalTypes.get(conjureImport.file());
+            AnnotatedConjureSourceFile annotatedConjureSourceFile = externalTypes.get(conjureImport
+                    .absoluteFile()
+                    .orElseThrow(() ->
+                            new SafeIllegalStateException("Absolute file MUST be resolved as part of parsing stage"))
+                    .getAbsolutePath());
 
             Preconditions.checkNotNull(
                     annotatedConjureSourceFile, "Couldn't find import", UnsafeArg.of("file", conjureImport.file()));
