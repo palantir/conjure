@@ -19,7 +19,6 @@ package com.palantir.conjure.defs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,11 +32,11 @@ import org.junit.jupiter.api.io.TempDir;
 public class ReadmeTest {
 
     @TempDir
-    public File folder;
+    public Path folder;
 
     @Test
     public void prove_readme_example_is_valid_conjure() throws IOException {
-        Path path = folder.getRoot().toPath().resolve("example1.yml");
+        Path path = folder.resolve("example1.yml");
         Files.write(path, extractSnippetFromReadme().getBytes(StandardCharsets.UTF_8));
         Conjure.parse(ImmutableList.of(path.toFile()));
     }
