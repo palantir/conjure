@@ -26,18 +26,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class ReadmeTest {
 
-    @Rule
-    public final TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public Path folder;
 
     @Test
     public void prove_readme_example_is_valid_conjure() throws IOException {
-        Path path = folder.getRoot().toPath().resolve("example1.yml");
+        Path path = folder.resolve("example1.yml");
         Files.write(path, extractSnippetFromReadme().getBytes(StandardCharsets.UTF_8));
         Conjure.parse(ImmutableList.of(path.toFile()));
     }

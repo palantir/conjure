@@ -32,7 +32,7 @@ import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class ArgumentNameValidatorTest {
 

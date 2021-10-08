@@ -34,15 +34,15 @@ import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.StringJoiner;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class ConjureParserTest {
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path temporaryFolder;
 
     @Test
     public void testConjureInlinedImports() throws IOException {
@@ -197,14 +197,14 @@ public class ConjureParserTest {
         generateFiles(top, mid);
         generateFiles(ImmutableList.of(root), top);
 
-        ConjureSourceFile result = ConjureParser.parse(
-                temporaryFolder.getRoot().toPath().resolve(root + ".yml").toFile());
+        ConjureSourceFile result =
+                ConjureParser.parse(temporaryFolder.resolve(root + ".yml").toFile());
         assertThat(result.types().conjureImports()).isNotEmpty();
     }
 
     private void generateFiles(List<String> names, List<String> importedNamespaces) throws IOException {
         for (String name : names) {
-            File file = temporaryFolder.newFile(name + ".yml");
+            Path file = temporaryFolder.resolve(name + ".yml");
             StringJoiner sj = new StringJoiner(System.lineSeparator());
             sj.add("types:");
             if (!importedNamespaces.isEmpty()) {
@@ -219,7 +219,7 @@ public class ConjureParserTest {
             sj.add("    objects:");
             sj.add("      TestObject:");
             sj.add("        alias: string");
-            PrintWriter writer = new PrintWriter(file, "UTF-8");
+            PrintWriter writer = new PrintWriter(file.toFile(), "UTF-8");
             writer.write(sj.toString());
             writer.close();
         }

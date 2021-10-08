@@ -33,7 +33,8 @@ import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public final class TypeParserTests {
 
@@ -149,14 +150,18 @@ public final class TypeParserTests {
                 .isEqualTo(MapType.of(PrimitiveType.STRING, AnyType.of()));
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void testParser_invalidSuffixType() throws ParseException {
-        TypeParser.INSTANCE.parse("string[]");
+        Assertions.assertThrows(ParseException.class, () -> {
+            TypeParser.INSTANCE.parse("string[]");
+        });
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void testParser_invalidType() throws ParseException {
-        TypeParser.INSTANCE.parse("[]");
+        Assertions.assertThrows(ParseException.class, () -> {
+            TypeParser.INSTANCE.parse("[]");
+        });
     }
 
     @Test
