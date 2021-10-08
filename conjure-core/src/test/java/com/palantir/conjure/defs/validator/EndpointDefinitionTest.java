@@ -50,9 +50,12 @@ public final class EndpointDefinitionTest {
     private final DealiasingTypeVisitor emptyDealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
     private static final EndpointName ENDPOINT_NAME = EndpointName.of("test");
-    private static final ArgumentDefinition.Builder BODY_ARG_BUILDER = ArgumentDefinition.builder()
-            .type(Type.primitive(PrimitiveType.ANY))
-            .paramType(ParameterType.body(BodyParameterType.of()));
+
+    private static ArgumentDefinition.Builder bodyArgBuilder() {
+        return ArgumentDefinition.builder()
+                .type(Type.primitive(PrimitiveType.ANY))
+                .paramType(ParameterType.body(BodyParameterType.of()));
+    }
 
     @Test
     public void testArgumentTypeValidator() {
@@ -92,8 +95,8 @@ public final class EndpointDefinitionTest {
     @Test
     public void testSingleBodyParamValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg1")).build())
-                .args(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg2")).build())
+                .args(bodyArgBuilder().argName(ArgumentName.of("bodyArg1")).build())
+                .args(bodyArgBuilder().argName(ArgumentName.of("bodyArg2")).build())
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
@@ -107,7 +110,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testNoOptionalBinaryBodyParamValidator_direct() {
         EndpointDefinition definition = EndpointDefinition.builder()
-                .args(BODY_ARG_BUILDER
+                .args(bodyArgBuilder()
                         .argName(ArgumentName.of("bodyArg1"))
                         .type(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))))
                         .build())
@@ -126,7 +129,7 @@ public final class EndpointDefinitionTest {
     public void testNoOptionalBinaryBodyParamValidator_throughAlias() {
         TypeName typeName = TypeName.of("OptionalBinary", "foo");
         EndpointDefinition definition = EndpointDefinition.builder()
-                .args(BODY_ARG_BUILDER
+                .args(bodyArgBuilder()
                         .argName(ArgumentName.of("someName"))
                         .type(Type.reference(typeName))
                         .build())
@@ -280,7 +283,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testNoGetBodyValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
-                .args(BODY_ARG_BUILDER.argName(ArgumentName.of("bodyArg")).build())
+                .args(bodyArgBuilder().argName(ArgumentName.of("bodyArg")).build())
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/a/path"));
