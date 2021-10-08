@@ -43,9 +43,10 @@ public final class ConjureCliTest {
 
     @BeforeEach
     public void before() throws IOException {
-        File inputs = folder.newFolder("inputs");
+        File inputs = new File(folder, "inputs");
+        assertThat(inputs.mkdir()).isTrue();
         inputFile = File.createTempFile("junit", ".yml", inputs);
-        outputFile = new File(folder.getRoot(), "conjureIr.json");
+        outputFile = new File(folder, "conjureIr.json");
     }
 
     @Test
@@ -68,7 +69,7 @@ public final class ConjureCliTest {
 
     @Test
     public void discoversFilesInDirectory() {
-        String[] args = {"compile", folder.getRoot().getAbsolutePath(), outputFile.getAbsolutePath()};
+        String[] args = {"compile", folder.getAbsolutePath(), outputFile.getAbsolutePath()};
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
@@ -83,9 +84,7 @@ public final class ConjureCliTest {
 
     @Test
     public void throwsWhenOutputIsDirectory() {
-        String[] args = {
-            "compile", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath()
-        };
+        String[] args = {"compile", folder.getAbsolutePath(), folder.getAbsolutePath()};
         AtomicReference<Exception> executionException = new AtomicReference<>();
         new CommandLine(new ConjureCli())
                 .setExecutionExceptionHandler((ex, _commandLine, _parseResult) -> {
@@ -101,7 +100,7 @@ public final class ConjureCliTest {
     @Test
     public void throwsWhenSubCommandIsNotCompile() {
         String[] args = {
-            "compiles", folder.getRoot().getAbsolutePath(), folder.getRoot().getAbsolutePath(),
+            "compiles", folder.getAbsolutePath(), folder.getAbsolutePath(),
         };
         assertThatThrownBy(() -> CommandLine.populateCommand(new ConjureCli(), args))
                 .isInstanceOf(PicocliException.class)
@@ -110,9 +109,7 @@ public final class ConjureCliTest {
 
     @Test
     public void doesNotThrowWhenUnexpectedFeature() {
-        String[] args = {
-            "compile", inputFile.getAbsolutePath(), folder.getRoot().getAbsolutePath(), "--foo"
-        };
+        String[] args = {"compile", inputFile.getAbsolutePath(), folder.getAbsolutePath(), "--foo"};
         CommandLine.populateCommand(new ConjureCli(), args);
     }
 
@@ -205,7 +202,7 @@ public final class ConjureCliTest {
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
-                .outputIrFile(folder.newFolder())
+                .outputIrFile(folder)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .getRootCause()
