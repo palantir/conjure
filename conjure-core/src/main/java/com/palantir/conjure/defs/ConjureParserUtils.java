@@ -81,6 +81,7 @@ import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -217,8 +218,8 @@ public final class ConjureParserUtils {
 
                 // Resolve objects first, so we can use them in service validations
                 Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
-                Map<TypeName, TypeDefinition> importedObjects = parseImportObjects(
-                        parsed.types().conjureImports(), annotatedParsed.importProviders(), annotatedParsedDefs);
+                Map<TypeName, TypeDefinition> importedObjects =
+                        parseImportObjects(parsed.types().conjureImports(), annotatedParsedDefs);
                 Map<TypeName, TypeDefinition> allObjects = new HashMap<>();
                 allObjects.putAll(objects);
                 allObjects.putAll(importedObjects);
@@ -256,27 +257,41 @@ public final class ConjureParserUtils {
      * Recursively resolve all imported types
      */
     private static Map<TypeName, TypeDefinition> parseImportObjects(
+            Map<Namespace, ConjureImports> conjureImports, Map<String, AnnotatedConjureSourceFile> externalTypes) {
+        return innerParseImportObjects(conjureImports, externalTypes, new HashSet<>());
+    }
+
+    private static Map<TypeName, TypeDefinition> innerParseImportObjects(
             Map<Namespace, ConjureImports> conjureImports,
-            Map<Namespace, String> importProviders,
-            Map<String, AnnotatedConjureSourceFile> externalTypes) {
+            Map<String, AnnotatedConjureSourceFile> externalTypes,
+            Set<String> loadedFiles) {
         Map<TypeName, TypeDefinition> allDefinitions = new HashMap<>();
         conjureImports.values().forEach(conjureImport -> {
-            AnnotatedConjureSourceFile annotatedConjureSourceFile = externalTypes.get(conjureImport
+            String pathKey = conjureImport
                     .absoluteFile()
                     .orElseThrow(() ->
                             new SafeIllegalStateException("Absolute file MUST be resolved as part of parsing stage"))
-                    .getAbsolutePath());
+                    .getAbsolutePath();
+
+            // These structures are potentially recursive; load in any given conjure file once
+            if (loadedFiles.contains(pathKey)) {
+                return;
+            }
+            loadedFiles.add(pathKey);
+
+            AnnotatedConjureSourceFile annotatedConjureSourceFile = externalTypes.get(pathKey);
 
             Preconditions.checkNotNull(
                     annotatedConjureSourceFile, "Couldn't find import", UnsafeArg.of("file", conjureImport.file()));
 
             ConjureSourceFile conjureDef = annotatedConjureSourceFile.conjureSourceFile();
+            Map<Namespace, String> importProviders = annotatedConjureSourceFile.importProviders();
             ReferenceTypeResolver importTypeResolver =
                     new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(
                             conjureDef.types(), importProviders, externalTypes);
-            allDefinitions.putAll(parseImportObjects(
-                    conjureDef.types().conjureImports(), annotatedConjureSourceFile.importProviders(), externalTypes));
             allDefinitions.putAll(parseObjects(conjureDef.types(), importTypeResolver));
+            allDefinitions.putAll(
+                    innerParseImportObjects(conjureDef.types().conjureImports(), externalTypes, loadedFiles));
         });
 
         return allDefinitions;
