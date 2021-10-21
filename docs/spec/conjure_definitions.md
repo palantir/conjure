@@ -350,6 +350,17 @@ docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http:
 deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 tags | Set[`string`] | Set of tags that serves as additional metadata for the endpoint.
 
+**Example:**
+```yaml
+createRecipe:
+  http: POST /recipe/{categoryId}
+  args:
+    categoryId: CategoryId
+    createRecipeRequest:
+      param-type: body
+      type: Recipe
+    returns: RecipeId
+```
 
 ## ArgumentDefinition
 [ArgumentDefinition]: #argumentdefinition
@@ -367,6 +378,33 @@ param&#8209;id | `string` | An identifier to use as a parameter value. If the pa
 param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
 
 Arguments with parameter type `body` MUST NOT be of type `optional<binary>`, or, intuitively, of a type that reduces to `optional<binary>` via unfolding of alias definitions and nested `optional`.
+
+**Examples:**
+
+```yaml
+createRecipeRequest:
+  param-type: body
+  type: Recipe
+```
+
+```yaml
+categoryId:
+  param-type: path
+  type: CategoryId
+```
+
+```yaml
+pageSize:
+  param-type: query
+  type: integer
+```
+
+```yaml
+forwardedFor:
+  param-type: header
+  type: string
+  param-id: X-Forwarded-For
+```
 
 
 ## ArgumentDefinition.ParamType
