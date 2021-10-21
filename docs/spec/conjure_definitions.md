@@ -359,7 +359,7 @@ createRecipe:
     createRecipeRequest:
       param-type: body
       type: Recipe
-    returns: RecipeId
+  returns: RecipeId
 ```
 
 ## ArgumentDefinition
