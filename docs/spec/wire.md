@@ -42,12 +42,20 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [5.6. Deserialization](#56-deserialization)
     + [5.6.1. Coercing JSON `null` / absent to Conjure types](#561-coercing-json-null--absent-to-conjure-types)
     + [5.6.2. No automatic casting](#562-no-automatic-casting)
-- [6. PLAIN format](#6-plain-format)
+- [6. Smile format](#6-smile-format)
+  * [6.1. Built-in types](#61-built-in-types)
+  * [6.2. Container types](#62-container-types)
+  * [6.3. Named types](#63-named-types)
+  * [6.4. Union JSON format](#64-union-json-format)
+  * [6.5. Conjure Errors](#65-conjure-errors)
+  * [6.6. Deserialization](#66-deserialization)
+- [7. PLAIN format](#7-plain-format)
 <!-- /TOC -->
 
 <!-- these are just markdown link definitions, they do not get rendered -->
 [JSON format]: #5-json-format
-[PLAIN format]: #6-plain-format
+[Smile format]: #6-smile-format
+[PLAIN format]: #7-plain-format
 [URL encoded]: https://tools.ietf.org/html/rfc3986#section-2.1
 [Path parameters]: ./conjure_definitions.md#path-templating
 
@@ -141,7 +149,19 @@ A `Content-Type` header must be added if the endpoint defines a `body` argument.
 _Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt)._
 
 #### 2.4.2. Accept header
-Clients must send an `Accept: application/json` header for all requests unless the endpoint returns binary, in which case the client must send `Accept: application/octet-stream`.
+Clients must send an `Accept` header for all requests. For requests the endpoints returning binary, it must declare that the `application/octet-stream` MIME type is acceptable. For all other requests, it must declare that the `application/json` MIME type is acceptable. Clients may also optionally declare that the `application/x-jackson-smile` MIME type is acceptable to request the server use Smile instead of JSON.
+
+For example, the following are valid `Accept` headers:
+```
+For an endpoint returning binary:
+Accept: application/octet-stream
+Accept: */*
+
+For an endpoint not returning binary:
+Accept: application/json
+Accept: */*
+Accept: application/x-jackson-smile, application/json;q=0.8
+```
 
 #### 2.4.3. User-agent
 Where possible, requests must include a `User-Agent` header defined below using [ABNF notation](https://tools.ietf.org/html/rfc5234#appendix-B.1) and regexes:
@@ -198,16 +218,18 @@ Conjure servers must serialize return values using the [JSON format][] defined b
   - the de-aliased return type is `optional<T>` and the value is not present: servers must return an empty HTTP body
   - the de-aliased return type is `optional<binary>` and the value is present: servers must write the raw bytes as an octet-stream
   - the de-aliased return type is `binary`: servers must write the raw bytes as an octet-stream
+  - the client has indicated that the `application/x-jackson-smile` MIME type is acceptable and a non-binary value is present: servers may serialize return values using the [Smile format][] defined below
 
 ### 3.3. Content-Type header
 Conjure servers must send a `Content-Type` header according to the endpoint's return value:
 
   - if the endpoint returns [`204 No Content`](https://tools.ietf.org/html/rfc2616#section-10.2.5), servers must send no `Content-Type` header.
   - if the de-aliased return type is `binary`, servers must send `Content-Type: application/octet-stream`,
-  - otherwise, servers must send `Content-Type: application/json`.
+  - otherwise, servers must send `Content-Type: application/json` if encoding the response as JSON,
+  - or `Content-Type: application/x-jackson-smile` if encoding the response as Smile.
 
 ### 3.4. Conjure errors
-In order to send a Conjure error, servers must serialize the error using the [JSON format][]. In addition, servers must send a http status code corresponding to the error's code.
+In order to send a Conjure error, servers must serialize the error using the [JSON format][] or [Smile format]][]. In addition, servers must send a http status code corresponding to the error's code.
 
 Conjure Error code         | HTTP Status code |
 -------------------------- | ---------------- |
@@ -353,9 +375,53 @@ _Note: this rule means that the Conjure type `optional<optional<T>>` would be am
 #### 5.6.2. No automatic casting
 Unexpected JSON types should not be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
 
+## 6. Smile format
+This format describes how all Conjure types are serialized into and deserialized from [Smile](https://github.com/FasterXML/smile-format-specification). Smile is designed to be a binary equivalent of JSON, so much of the encoding behavior specified for JSON carries over directly to Smile. Any differences are noted in the comments sections below.
 
-## 6. PLAIN format
-The PLAIN format describes an unquoted [JSON](https://tools.ietf.org/html/rfc7159) representation of a _subset_ of de-aliased conjure types.
+Serializers may use optional Smile features: raw binary encoding, string deduplication, and property deduplication. The encoded data must include the standard Smile header, and may include the Smile end of stream token.
+
+### 6.1. Built-in types
+Conjure&nbsp;Type | Smile Type | Comments |
+----------------- | ---------- | ---------|
+`bearertoken`     | String     |
+`binary`          | Binary     | Smile natively supports binary data, so no Base64 encoding is necessary.
+`boolean`         | Boolean    |
+`datetime`        | String     |
+`double`          | Double     | Non-finite values are not handled specially.
+`integer`         | Integer    |
+`rid`             | String     |
+`safelong`        | Long       |
+`string`          | String     |
+`uuid`            | Binary     | UUIDs are encoded as 16 big-endian bytes.
+`any`             | N/A        |
+
+### 6.2. Container types
+Conjure&nbsp;Type | Smile Type                   | Comments |
+----------------- | ---------------------------- | ---------|
+`optional<T>`     | `Smile(T)`&nbsp;or&nbsp;Null |
+`list<T>`         | Array                        |
+`set<T>`          | Array                        |
+`map<K, V>`       | Object                       |
+
+### 6.3. Named types
+Conjure&nbsp;Type | Smile Type | Comments |
+----------------- | ---------- | ---------|
+_Object_          | Object     |
+_Enum_            | String     |
+_Union_           | Object     |
+_Alias_(x)        | `Smile(x)` |
+
+### 6.4. Union Smile format
+Conjure Union types are serialized as Smile objects with the same structure as the JSON format.
+
+### 6.5. Conjure Error
+Conjure Errors are serialized as Smile objects with the same structure as the JSON format.
+
+### 6.6. Deserialization
+The deserialization rules for JSON apply to Smile.
+
+## 7. PLAIN format
+The PLAIN format describes an unquoted string representation of a _subset_ of de-aliased conjure types.
 The types listed below have a PLAIN format representation, while those omitted do not.
 
 Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
