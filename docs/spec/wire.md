@@ -47,8 +47,7 @@ Generated using https://github.com/jonschlinkert/markdown-toc:
   * [6.2. Container types](#62-container-types)
   * [6.3. Named types](#63-named-types)
   * [6.4. Union JSON format](#64-union-json-format)
-  * [6.5. Conjure Errors](#65-conjure-errors)
-  * [6.6. Deserialization](#66-deserialization)
+  * [6.5. Deserialization](#66-deserialization)
 - [7. PLAIN format](#7-plain-format)
 <!-- /TOC -->
 
@@ -229,7 +228,7 @@ Conjure servers must send a `Content-Type` header according to the endpoint's re
   - or `Content-Type: application/x-jackson-smile` if encoding the response as Smile.
 
 ### 3.4. Conjure errors
-In order to send a Conjure error, servers must serialize the error using the [JSON format][] or [Smile format]][]. In addition, servers must send a http status code corresponding to the error's code.
+In order to send a Conjure error, servers must serialize the error using the [JSON format][] (even if the client has indicated that a Smile response is also acceptable). In addition, servers must send a http status code corresponding to the error's code.
 
 Conjure Error code         | HTTP Status code |
 -------------------------- | ---------------- |
@@ -414,10 +413,7 @@ _Alias_(x)        | `Smile(x)` |
 ### 6.4. Union Smile format
 Conjure Union types are serialized as Smile objects with the same structure as the JSON format.
 
-### 6.5. Conjure Error
-Conjure Errors are serialized as Smile objects with the same structure as the JSON format.
-
-### 6.6. Deserialization
+### 6.5. Deserialization
 The deserialization rules for JSON apply to Smile.
 
 ## 7. PLAIN format
