@@ -4,5 +4,6 @@ types:
   definitions:
     default-package: test.api.with.imports
     objects:
-      SimpleObject:
-        alias: string
+      RecursiveObject:
+        fields:
+          foo: optional<imports.RecursiveObject>

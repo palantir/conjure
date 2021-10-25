@@ -29,16 +29,39 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesImportedAliases() {
-        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(ImmutableList.of(
-                ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml"))));
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml")));
+        assertThat(conjureDefinition.getTypes()).hasSize(3);
+    }
+
+    @Test
+    public void resolvesRecursiveImportType() {
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-recursive-imports.yml")));
         assertThat(conjureDefinition.getTypes()).hasSize(1);
+    }
+
+    @Test
+    public void resolvesCircularType_singleFile() {
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-circular.yml")));
+        assertThat(conjureDefinition.getTypes()).hasSize(2);
+    }
+
+    @Test
+    public void resolvesCircularType_multiFile() {
+        ConjureDefinition conjureDefinition =
+                ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(ImmutableList.of(
+                        new File("src/test/resources/example-multi-file-circular-import-a.yml"),
+                        new File("src/test/resources/example-multi-file-circular-import-b.yml"))));
+        assertThat(conjureDefinition.getTypes()).hasSize(2);
     }
 
     // Test currently fails as it attempts to parse a TypeScript package name as a java package
     @Test
     @Ignore
     public void handlesNonJavaExternalType() {
-        ConjureParserUtils.parseConjureDef(ImmutableList.of(
-                ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml"))));
+        ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml")));
     }
 }
