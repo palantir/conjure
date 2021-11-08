@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: 'fix #974: The Conjure parser supports a `--strict` flag to fail on
+    non-camel-case fields'
+  links:
+  - https://github.com/palantir/conjure/pull/975
