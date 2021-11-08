@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.palantir.conjure.CaseConverter;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.spec.ArgumentDefinition;
@@ -68,9 +69,10 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
     private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
-    public static void validateAll(EndpointDefinition definition, DealiasingTypeVisitor dealiasingVisitor) {
+    public static void validateAll(
+            EndpointDefinition definition, DealiasingTypeVisitor dealiasingVisitor, ConjureOptions options) {
         for (EndpointDefinitionValidator validator : values()) {
-            validator.validate(definition, dealiasingVisitor);
+            validator.validate(definition, dealiasingVisitor, options);
         }
     }
 
@@ -83,7 +85,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
      * Simplified constructor for validators that don't need to look at the context.
      */
     EndpointDefinitionValidator(ConjureValidator<EndpointDefinition> validator) {
-        this.validator = (definition, _dealiasingTypeVisitor) -> validator.validate(definition);
+        this.validator = (definition, _dealiasingTypeVisitor, options) -> validator.validate(definition, options);
     }
 
     EndpointDefinitionValidator(ConjureContextualValidator<EndpointDefinition> validator) {
@@ -91,14 +93,16 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     }
 
     @Override
-    public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
-        validator.validate(definition, dealiasingTypeVisitor);
+    public void validate(
+            EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions options) {
+        validator.validate(definition, dealiasingTypeVisitor, options);
     }
 
     @com.google.errorprone.annotations.Immutable
     private static final class NonBodyArgumentTypeValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(arg -> !arg.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .forEach(arg -> Preconditions.checkArgument(
@@ -133,7 +137,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class SingleBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, ConjureOptions _options) {
             List<ArgumentDefinition> bodyParams = definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .collect(Collectors.toList());
@@ -149,7 +153,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class NoGetBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, ConjureOptions _options) {
             HttpMethod method = definition.getHttpMethod();
             if (method.equals(HttpMethod.GET)) {
                 boolean hasBody = definition.getArgs().stream()
@@ -165,7 +169,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     private static final class NoOptionalBinaryBodyParamValidator
             implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_BODY))
                     .forEach(entry -> {
@@ -191,7 +196,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, ConjureOptions _options) {
             String description = describe(definition);
             Set<ArgumentName> pathParamIds = new HashSet<>();
             definition.getArgs().stream()
@@ -228,7 +233,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexPathParamValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH))
                     .forEach(entry -> {
@@ -250,7 +256,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     private static final class NoComplexHeaderParamValidator implements ConjureContextualValidator<EndpointDefinition> {
 
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_HEADER))
                     .forEach(headerArgDefinition -> {
@@ -281,7 +288,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexQueryParamValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(argDefinition -> {
@@ -352,7 +360,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     private static final class NoBearerTokenPathOrQueryParams
             implements ConjureContextualValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor) {
+        public void validate(
+                EndpointDefinition definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions _options) {
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_PATH)
                             || entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
@@ -389,7 +398,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class ParameterNameValidator implements ConjureValidator<EndpointDefinition> {
         @Override
-        public void validate(EndpointDefinition definition) {
+        public void validate(EndpointDefinition definition, ConjureOptions _options) {
             definition.getArgs().forEach(arg -> {
                 Matcher matcher = CaseConverter.CAMEL_CASE_PATTERN.matcher(
                         arg.getArgName().get());
@@ -407,8 +416,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     @com.google.errorprone.annotations.Immutable
     private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
         @Override
-        @SuppressWarnings("Slf4jLogsafeArgs")
-        public void validate(EndpointDefinition definition) {
+        @SuppressWarnings({"Slf4jLogsafeArgs", "Slf4jConstantLogMessage"})
+        public void validate(EndpointDefinition definition, ConjureOptions options) {
             definition.getArgs().forEach(arg -> {
                 ParameterType paramType = arg.getParamType();
                 if (paramType.accept(ParameterTypeVisitor.IS_BODY) || paramType.accept(ParameterTypeVisitor.IS_PATH)) {
@@ -449,11 +458,16 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                             Arrays.toString(CaseConverter.Case.values()));
 
                     if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(paramId.get()).matches()) {
-                        log.warn(
+                        String message = String.format(
                                 "Query param ids should be camelCase. kebab-case and snake_case are supported for "
-                                        + "legacy endpoints only: {} on endpoint {}",
-                                paramId.get(),
-                                describe(definition));
+                                        + "legacy endpoints only: %s on endpoint %s",
+                                paramId.get(), describe(definition));
+
+                        if (options.strict()) {
+                            throw new IllegalStateException(message);
+                        } else {
+                            log.warn(message);
+                        }
                     }
                 } else {
                     throw new IllegalStateException("Validation for paramType does not exist: " + arg.getParamType());

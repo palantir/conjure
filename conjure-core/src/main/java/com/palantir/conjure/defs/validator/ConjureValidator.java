@@ -16,11 +16,13 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.palantir.conjure.defs.ConjureOptions;
+
 @com.google.errorprone.annotations.Immutable
 public interface ConjureValidator<T> {
     /**
      * Validates that the provided definition is valid according to Conjure rules. Throws an exception if the
      * provided definition is invalid.
      */
-    void validate(T definition);
+    void validate(T definition, ConjureOptions options);
 }

@@ -35,11 +35,17 @@ public abstract class CliConfiguration {
 
     abstract Map<String, Object> extensions();
 
+    @SuppressWarnings("checkstyle:DesignForExtension")
+    @Value.Default
+    public boolean strict() {
+        return false;
+    }
+
     static Builder builder() {
         return new Builder();
     }
 
-    static CliConfiguration create(String input, String outputIrFile, Map<String, Object> extensions) {
+    static CliConfiguration create(String input, String outputIrFile, Map<String, Object> extensions, boolean strict) {
         File inputFile = new File(input);
 
         Collection<File> inputFiles;
@@ -58,6 +64,7 @@ public abstract class CliConfiguration {
                 .inputFiles(inputFiles)
                 .outputIrFile(outputFile)
                 .extensions(extensions)
+                .strict(strict)
                 .build();
     }
 

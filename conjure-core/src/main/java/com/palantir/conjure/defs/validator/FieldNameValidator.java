@@ -43,8 +43,13 @@ public final class FieldNameValidator {
         return FieldName.of(nameCase(fieldName).convertTo(fieldName.get(), targetCase));
     }
 
-    @SuppressWarnings("Slf4jLogsafeArgs")
+    @Deprecated
     public static void validate(FieldName fieldName) {
+        validate(fieldName, false);
+    }
+
+    @SuppressWarnings({"Slf4jLogsafeArgs", "Slf4jConstantLogMessage"})
+    public static void validate(FieldName fieldName, boolean strict) {
         Preconditions.checkArgument(
                 CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()
                         || CaseConverter.KEBAB_CASE_PATTERN
@@ -58,11 +63,15 @@ public final class FieldNameValidator {
                 Arrays.toString(CaseConverter.Case.values()));
 
         if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()) {
-            log.warn(
-                    "{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
-                            + "legacy endpoints only: {}",
-                    FieldName.class,
-                    fieldName.get());
+            String message = String.format(
+                    "%s should be specified in lowerCamelCase. kebab-case and snake_case are "
+                            + "supported for legacy endpoints only: %s",
+                    FieldName.class, fieldName.get());
+            if (strict) {
+                throw new IllegalArgumentException(message);
+            } else {
+                log.warn(message);
+            }
         }
     }
 

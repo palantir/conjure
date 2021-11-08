@@ -18,6 +18,7 @@ package com.palantir.conjure.defs.validator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.ErrorCode;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.ErrorNamespace;
@@ -29,6 +30,9 @@ import com.palantir.conjure.spec.TypeName;
 import org.junit.jupiter.api.Test;
 
 public class ErrorDefinitionValidatorTest {
+
+    private static final ConjureOptions OPTIONS =
+            ConjureOptions.builder().strict(false).build();
 
     @Test
     public void testUniqueArgNamesValidator() {
@@ -48,7 +52,7 @@ public class ErrorDefinitionValidatorTest {
                 .unsafeArgs(unsafeArg1)
                 .build();
 
-        assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition1))
+        assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition1, OPTIONS))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("ErrorDefinition must not contain duplicate field names (modulo case normalization): "
                         + "foo-bar vs fooBar");
@@ -69,7 +73,7 @@ public class ErrorDefinitionValidatorTest {
                 .unsafeArgs(unsafeArg2)
                 .build();
 
-        assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition2))
+        assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition2, OPTIONS))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("ErrorDefinition must not contain duplicate field names (modulo case normalization): "
                         + "foo-bar vs foo_bar");

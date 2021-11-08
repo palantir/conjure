@@ -30,14 +30,17 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
     private final String name;
     private final Optional<String> defaultPackage;
     private final ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver;
+    private final ConjureOptions options;
 
     public TypeDefinitionParserVisitor(
             String typeName,
             Optional<String> defaultPackage,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver,
+            ConjureOptions options) {
         this.name = typeName;
         this.defaultPackage = defaultPackage;
         this.typeResolver = typeResolver;
+        this.options = options;
     }
 
     @Override
@@ -48,18 +51,19 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
 
     @Override
     public TypeDefinition visit(EnumTypeDefinition def) {
-        return ConjureParserUtils.parseEnumType(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
+        return ConjureParserUtils.parseEnumType(
+                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, options);
     }
 
     @Override
     public TypeDefinition visit(ObjectTypeDefinition def) {
         return ConjureParserUtils.parseObjectType(
-                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver);
+                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver, options);
     }
 
     @Override
     public TypeDefinition visit(UnionTypeDefinition def) {
         return ConjureParserUtils.parseUnionType(
-                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver);
+                ConjureParserUtils.createTypeName(name, def, defaultPackage), def, typeResolver, options);
     }
 }

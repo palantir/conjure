@@ -26,17 +26,36 @@ public final class FieldNameValidatorTest {
 
     @Test
     public void testValidNames() {
-        FieldNameValidator.validate(FieldName.of("camel"));
-        FieldNameValidator.validate(FieldName.of("camelCase"));
-        FieldNameValidator.validate(FieldName.of("camelCase1"));
-        FieldNameValidator.validate(FieldName.of("camel1Case2"));
-        FieldNameValidator.validate(FieldName.of("kebab-case"));
-        FieldNameValidator.validate(FieldName.of("kebab1-case123"));
-        FieldNameValidator.validate(FieldName.of("snake_case"));
-        FieldNameValidator.validate(FieldName.of("snake1_case123"));
-        FieldNameValidator.validate(FieldName.of("xCoordinate"));
-        FieldNameValidator.validate(FieldName.of("defaultXPosition"));
-        FieldNameValidator.validate(FieldName.of("defaultX"));
+        FieldNameValidator.validate(FieldName.of("camel"), false);
+        FieldNameValidator.validate(FieldName.of("camelCase"), false);
+        FieldNameValidator.validate(FieldName.of("camelCase1"), false);
+        FieldNameValidator.validate(FieldName.of("camel1Case2"), false);
+        FieldNameValidator.validate(FieldName.of("kebab-case"), false);
+        FieldNameValidator.validate(FieldName.of("kebab1-case123"), false);
+        FieldNameValidator.validate(FieldName.of("snake_case"), false);
+        FieldNameValidator.validate(FieldName.of("snake1_case123"), false);
+        FieldNameValidator.validate(FieldName.of("xCoordinate"), false);
+        FieldNameValidator.validate(FieldName.of("defaultXPosition"), false);
+        FieldNameValidator.validate(FieldName.of("defaultX"), false);
+    }
+
+    @Test
+    public void testValidNames_strict() {
+        FieldNameValidator.validate(FieldName.of("camel"), true);
+        FieldNameValidator.validate(FieldName.of("camelCase"), true);
+        FieldNameValidator.validate(FieldName.of("camelCase1"), true);
+        FieldNameValidator.validate(FieldName.of("camel1Case2"), true);
+        assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of("kebab-case"), true))
+                .hasMessageContaining("lowerCamelCase");
+        assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of("kebab1-case123"), true))
+                .hasMessageContaining("lowerCamelCase");
+        assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of("snake_case"), true))
+                .hasMessageContaining("lowerCamelCase");
+        assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of("snake1_case123"), true))
+                .hasMessageContaining("lowerCamelCase");
+        FieldNameValidator.validate(FieldName.of("xCoordinate"), true);
+        FieldNameValidator.validate(FieldName.of("defaultXPosition"), true);
+        FieldNameValidator.validate(FieldName.of("defaultX"), true);
     }
 
     @Test

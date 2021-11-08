@@ -18,6 +18,7 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.UnionDefinition;
 
 @com.google.errorprone.annotations.Immutable
@@ -26,9 +27,9 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
     NO_TRAILING_UNDERSCORE(new NoTrailingUnderscoreValidator()),
     NO_CLOBBER_TYPE(new NoClobberTypeValidator());
 
-    public static void validateAll(UnionDefinition definition) {
+    public static void validateAll(UnionDefinition definition, ConjureOptions options) {
         for (UnionDefinitionValidator validator : values()) {
-            validator.validate(definition);
+            validator.validate(definition, options);
         }
     }
 
@@ -39,15 +40,15 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
     }
 
     @Override
-    public void validate(UnionDefinition definition) {
-        validator.validate(definition);
+    public void validate(UnionDefinition definition, ConjureOptions options) {
+        validator.validate(definition, options);
     }
 
     @com.google.errorprone.annotations.Immutable
     private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionDefinition> {
 
         @Override
-        public void validate(UnionDefinition definition) {
+        public void validate(UnionDefinition definition, ConjureOptions _options) {
             definition.getUnion().forEach(fieldDef -> {
                 Preconditions.checkArgument(
                         !fieldDef.getFieldName().get().endsWith("_"),
@@ -73,7 +74,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
         }
 
         @Override
-        public void validate(UnionDefinition definition) {
+        public void validate(UnionDefinition definition, ConjureOptions _options) {
             definition.getUnion().forEach(fieldDef -> {
                 com.palantir.logsafe.Preconditions.checkArgument(
                         !Strings.isNullOrEmpty(fieldDef.getFieldName().get()), "Union member key must not be empty");
@@ -89,7 +90,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
     private static final class NoClobberTypeValidator implements ConjureValidator<UnionDefinition> {
 
         @Override
-        public void validate(UnionDefinition definition) {
+        public void validate(UnionDefinition definition, ConjureOptions _options) {
             definition.getUnion().forEach(fieldDef -> {
                 com.palantir.logsafe.Preconditions.checkArgument(
                         !fieldDef.getFieldName().get().equals("type"), "Union member key must not be 'type'");

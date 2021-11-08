@@ -18,6 +18,7 @@ package com.palantir.conjure.defs.validator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
 import com.palantir.conjure.spec.TypeName;
@@ -32,7 +33,9 @@ public final class EnumDefinitionValidatorTest {
                 .values(EnumValueDefinition.builder().value("FOO").build())
                 .values(EnumValueDefinition.builder().value("FOO").build());
 
-        assertThatThrownBy(() -> EnumDefinitionValidator.validateAll(definition.build()))
+        assertThatThrownBy(() -> EnumDefinitionValidator.validateAll(
+                        definition.build(),
+                        ConjureOptions.builder().strict(false).build()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Cannot declare a EnumTypeDefinition with duplicate enum values: FOO");
     }

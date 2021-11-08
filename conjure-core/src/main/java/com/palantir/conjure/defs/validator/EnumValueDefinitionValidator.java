@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.EnumValueDefinition;
 import java.util.regex.Pattern;
 
@@ -25,9 +26,9 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
     UnknownValueNotUsed(new UnknownValueNotUsedValidator()),
     Format(new FormatValidator());
 
-    public static void validateAll(EnumValueDefinition definition) {
+    public static void validateAll(EnumValueDefinition definition, ConjureOptions options) {
         for (ConjureValidator<EnumValueDefinition> validator : values()) {
-            validator.validate(definition);
+            validator.validate(definition, options);
         }
     }
 
@@ -38,15 +39,15 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
     }
 
     @Override
-    public void validate(EnumValueDefinition definition) {
-        validator.validate(definition);
+    public void validate(EnumValueDefinition definition, ConjureOptions options) {
+        validator.validate(definition, options);
     }
 
     @com.google.errorprone.annotations.Immutable
     private static final class UnknownValueNotUsedValidator implements ConjureValidator<EnumValueDefinition> {
 
         @Override
-        public void validate(EnumValueDefinition definition) {
+        public void validate(EnumValueDefinition definition, ConjureOptions _options) {
             Preconditions.checkArgument(
                     !definition.getValue().equalsIgnoreCase("UNKNOWN"),
                     "UNKNOWN is a reserved enumeration value and cannot be used in an %s",
@@ -59,7 +60,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
         private static final Pattern REQUIRED_FORMAT = Pattern.compile("[A-Z][A-Z0-9]*(_[A-Z0-9]+)*");
 
         @Override
-        public void validate(EnumValueDefinition definition) {
+        public void validate(EnumValueDefinition definition, ConjureOptions _options) {
             Preconditions.checkArgument(
                     REQUIRED_FORMAT.matcher(definition.getValue()).matches(),
                     "Enumeration values must match format %s: %s",

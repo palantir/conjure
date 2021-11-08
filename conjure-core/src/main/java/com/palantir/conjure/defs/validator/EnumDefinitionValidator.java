@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
@@ -28,9 +29,9 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
     UniqueEnumValues(new UniqueEnumValuesValidator()),
     ValuesValidator(new ValuesValidator());
 
-    public static void validateAll(EnumDefinition definition) {
+    public static void validateAll(EnumDefinition definition, ConjureOptions options) {
         for (EnumDefinitionValidator validator : values()) {
-            validator.validate(definition);
+            validator.validate(definition, options);
         }
     }
 
@@ -41,15 +42,15 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
     }
 
     @Override
-    public void validate(EnumDefinition definition) {
-        validator.validate(definition);
+    public void validate(EnumDefinition definition, ConjureOptions options) {
+        validator.validate(definition, options);
     }
 
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueEnumValuesValidator implements ConjureValidator<EnumDefinition> {
 
         @Override
-        public void validate(EnumDefinition definition) {
+        public void validate(EnumDefinition definition, ConjureOptions _options) {
             Set<String> enumValues = new HashSet<>();
             for (EnumValueDefinition valueDef : definition.getValues()) {
                 boolean unseen = enumValues.add(valueDef.getValue());
@@ -66,8 +67,8 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
     private static final class ValuesValidator implements ConjureValidator<EnumDefinition> {
 
         @Override
-        public void validate(EnumDefinition definition) {
-            definition.getValues().forEach(EnumValueDefinitionValidator::validateAll);
+        public void validate(EnumDefinition definition, ConjureOptions options) {
+            definition.getValues().forEach(def -> EnumValueDefinitionValidator.validateAll(def, options));
         }
     }
 }

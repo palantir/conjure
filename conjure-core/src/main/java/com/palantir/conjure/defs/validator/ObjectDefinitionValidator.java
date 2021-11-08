@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.ObjectDefinition;
 import java.util.stream.Collectors;
@@ -27,9 +28,15 @@ public final class ObjectDefinitionValidator {
     private static final UniqueFieldNamesValidator UNIQUE_FIELD_NAMES_VALIDATOR =
             new UniqueFieldNamesValidator(ObjectDefinition.class);
 
-    public static void validate(ObjectDefinition definition) {
-        UNIQUE_FIELD_NAMES_VALIDATOR.validate(definition.getFields().stream()
-                .map(FieldDefinition::getFieldName)
-                .collect(Collectors.toSet()));
+    public static void validate(ObjectDefinition definition, ConjureOptions options) {
+        UNIQUE_FIELD_NAMES_VALIDATOR.validate(
+                definition.getFields().stream()
+                        .map(FieldDefinition::getFieldName)
+                        .collect(Collectors.toSet()),
+                options);
+
+        definition
+                .getFields()
+                .forEach(fieldName -> FieldNameValidator.validate(fieldName.getFieldName(), options.strict()));
     }
 }

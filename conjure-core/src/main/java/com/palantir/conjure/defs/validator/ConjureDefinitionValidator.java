@@ -22,6 +22,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
@@ -55,9 +56,9 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     NO_NESTED_OPTIONAL(new NoNestedOptionalValidator()),
     ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator());
 
-    public static void validateAll(ConjureDefinition definition) {
+    public static void validateAll(ConjureDefinition definition, ConjureOptions options) {
         for (ConjureValidator<ConjureDefinition> validator : values()) {
-            validator.validate(definition);
+            validator.validate(definition, options);
         }
     }
 
@@ -68,14 +69,14 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     }
 
     @Override
-    public void validate(ConjureDefinition definition) {
-        validator.validate(definition);
+    public void validate(ConjureDefinition definition, ConjureOptions options) {
+        validator.validate(definition, options);
     }
 
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueServiceNamesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             Set<String> seenNames = new HashSet<>();
             definition.getServices().forEach(service -> {
                 boolean isNewName = seenNames.add(service.getServiceName().getName());
@@ -90,7 +91,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     @com.google.errorprone.annotations.Immutable
     private static final class IllegalVersionValidator implements ConjureValidator<ConjureDefinition> {
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             Preconditions.checkState(
                     definition.getVersion() == Conjure.SUPPORTED_IR_VERSION,
                     "Definition version must be %s, but version %s is provided instead.",
@@ -102,7 +103,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueNamesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             Set<TypeName> seenNames = new HashSet<>();
             definition
                     .getTypes()
@@ -131,7 +132,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     @com.google.errorprone.annotations.Immutable
     private static final class NoRecursiveTypesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
@@ -188,7 +189,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     @com.google.errorprone.annotations.Immutable
     public static final class NoNestedOptionalValidator implements ConjureValidator<ConjureDefinition> {
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             // create mapping for resolving reference types during validation
             Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream()
                     .collect(Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));
@@ -308,7 +309,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     private static final class IllegalMapKeyValidator implements ConjureValidator<ConjureDefinition> {
 
         @Override
-        public void validate(ConjureDefinition definition) {
+        public void validate(ConjureDefinition definition, ConjureOptions _options) {
             // create mapping for resolving reference types during validation
             Map<TypeName, TypeDefinition> definitionMap = definition.getTypes().stream()
                     .collect(Collectors.toMap(entry -> entry.accept(TypeDefinitionVisitor.TYPE_NAME), entry -> entry));

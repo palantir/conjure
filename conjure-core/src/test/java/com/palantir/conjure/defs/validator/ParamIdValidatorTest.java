@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HttpHeaders;
 import com.palantir.conjure.CaseConverter;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -42,6 +43,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public final class ParamIdValidatorTest {
+    private static final ConjureOptions OPTIONS =
+            ConjureOptions.builder().strict(false).build();
     private static final ArgumentName PARAMETER_NAME = ArgumentName.of("arg");
     private final DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
@@ -127,7 +130,7 @@ public final class ParamIdValidatorTest {
                     .endpointName(EndpointName.of("test"))
                     .build();
 
-            EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor);
+            EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor, OPTIONS);
         }));
     }
 }

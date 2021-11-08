@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.CaseConverter;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
@@ -37,6 +38,8 @@ import org.junit.jupiter.api.Test;
 public final class ArgumentNameValidatorTest {
 
     private final DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
+    private static final ConjureOptions OPTIONS =
+            ConjureOptions.builder().strict(false).build();
 
     @Test
     @SuppressWarnings("CheckReturnValue")
@@ -52,7 +55,8 @@ public final class ArgumentNameValidatorTest {
     public void testInvalid() {
         for (String paramName : ImmutableList.of("AB", "123", "foo_bar", "foo-bar", "foo.bar")) {
             EndpointDefinition.Builder endpoint = createEndpoint(paramName);
-            assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(endpoint.build(), dealiasingVisitor))
+            assertThatThrownBy(
+                            () -> EndpointDefinitionValidator.validateAll(endpoint.build(), dealiasingVisitor, OPTIONS))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage(
                             "Parameter names in endpoint paths and service definitions "

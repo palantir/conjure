@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
 import java.util.stream.Collectors;
@@ -28,10 +29,11 @@ public final class ErrorDefinitionValidator {
     private static final UniqueFieldNamesValidator UNIQUE_FIELD_NAMES_VALIDATOR =
             new UniqueFieldNamesValidator(ErrorDefinition.class);
 
-    public static void validate(ErrorDefinition definition) {
+    public static void validate(ErrorDefinition definition, ConjureOptions options) {
         UNIQUE_FIELD_NAMES_VALIDATOR.validate(
                 Stream.concat(definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
                         .map(FieldDefinition::getFieldName)
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                options);
     }
 }

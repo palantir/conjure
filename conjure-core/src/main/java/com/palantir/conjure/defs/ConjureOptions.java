@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.palantir.conjure.defs.validator;
+package com.palantir.conjure.defs;
 
-import com.palantir.conjure.defs.ConjureOptions;
-import com.palantir.conjure.visitor.DealiasingTypeVisitor;
+import org.immutables.value.Value;
 
-@com.google.errorprone.annotations.Immutable
-public interface ConjureContextualValidator<T> {
-    /**
-     * Validates that the provided definition is valid according to Conjure rules. Throws an exception if the
-     * provided definition is invalid.
-     */
-    void validate(T definition, DealiasingTypeVisitor dealiasingTypeVisitor, ConjureOptions options);
+@ConjureImmutablesStyle
+@Value.Immutable
+public interface ConjureOptions {
+
+    boolean strict();
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder extends ImmutableConjureOptions.Builder {}
 }

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.Documentation;
@@ -47,6 +48,8 @@ public class ConjureSourceFileValidatorTest {
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);
     private static final Documentation DOCS = Documentation.of("docs");
+    private static final ConjureOptions OPTIONS =
+            ConjureOptions.builder().strict(false).build();
 
     @Test
     public void testNoSelfRecursiveType() {
@@ -62,7 +65,7 @@ public class ConjureSourceFileValidatorTest {
                         .build())))
                 .build();
 
-        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Illegal recursive data type: Foo -> Foo");
     }
@@ -99,7 +102,7 @@ public class ConjureSourceFileValidatorTest {
                 .types(ImmutableList.of(objectDefinition))
                 .build();
 
-        ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef);
+        ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef, OPTIONS);
     }
 
     @Test
@@ -117,7 +120,7 @@ public class ConjureSourceFileValidatorTest {
                                 .build())))
                 .build();
 
-        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.NO_RECURSIVE_TYPES.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal recursive data type: ");
     }
@@ -139,7 +142,7 @@ public class ConjureSourceFileValidatorTest {
                         .build())
                 .build();
 
-        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in return type of endpoint badEndpoint");
     }
@@ -159,7 +162,7 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in object Foo");
     }
@@ -183,7 +186,7 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in object Foo");
     }
@@ -206,7 +209,7 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatCode(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+        assertThatCode(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef, OPTIONS))
                 .describedAs("External imports may be used as map keys provided the fallback type is valid")
                 .doesNotThrowAnyException();
     }
@@ -229,7 +232,7 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef, OPTIONS))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in object Foo");
     }

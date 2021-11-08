@@ -33,8 +33,16 @@ public final class Conjure {
      * Deserializes {@link ConjureDefinition} from their YAML representations in the given files.
      */
     public static ConjureDefinition parse(Collection<File> files) {
+        return parse(files, ConjureOptions.builder().strict(false).build());
+    }
+
+    /**
+     * Deserializes {@link ConjureDefinition} from their YAML representations in the given files, using the provided
+     * {@link ConjureOptions}.
+     */
+    public static ConjureDefinition parse(Collection<File> files, ConjureOptions options) {
         Map<String, AnnotatedConjureSourceFile> sourceFiles = ConjureParser.parseAnnotated(files);
-        ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles);
+        ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles, options);
         return NormalizeDefinition.normalize(ir);
     }
 }

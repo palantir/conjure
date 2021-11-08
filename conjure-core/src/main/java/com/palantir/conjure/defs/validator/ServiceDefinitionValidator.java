@@ -19,6 +19,7 @@ package com.palantir.conjure.defs.validator;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.palantir.conjure.defs.ConjureOptions;
 import com.palantir.conjure.spec.ServiceDefinition;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -30,9 +31,9 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
 
     private final ConjureValidator<ServiceDefinition> validator;
 
-    public static void validateAll(ServiceDefinition definition) {
+    public static void validateAll(ServiceDefinition definition, ConjureOptions options) {
         for (ServiceDefinitionValidator validator : ServiceDefinitionValidator.values()) {
-            validator.validate(definition);
+            validator.validate(definition, options);
         }
     }
 
@@ -41,8 +42,8 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     }
 
     @Override
-    public void validate(ServiceDefinition definition) {
-        validator.validate(definition);
+    public void validate(ServiceDefinition definition, ConjureOptions options) {
+        validator.validate(definition, options);
     }
 
     // The ? is for reluctant matching, i.e. matching as few characters as possible.
@@ -51,7 +52,7 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     @com.google.errorprone.annotations.Immutable
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
         @Override
-        public void validate(ServiceDefinition definition) {
+        public void validate(ServiceDefinition definition, ConjureOptions _options) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
             definition.getEndpoints().forEach(entry -> {
                 String methodPath =
@@ -82,7 +83,7 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
         private static final String RETROFIT_SUFFIX = "Retrofit";
 
         @Override
-        public void validate(ServiceDefinition definition) {
+        public void validate(ServiceDefinition definition, ConjureOptions _options) {
             Preconditions.checkState(
                     !definition.getServiceName().getName().endsWith(RETROFIT_SUFFIX),
                     "Service name must not end in %s: %s",

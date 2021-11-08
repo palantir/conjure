@@ -141,6 +141,12 @@ public final class ConjureCli implements Runnable {
         @CommandLine.Option(names = "--verbose", description = "")
         private boolean verbose;
 
+        @CommandLine.Option(
+                names = "--strict",
+                description = "Strict mode fails validation rather than logging warnings "
+                        + "when non-camel-case field names and query parameters are used")
+        private boolean strict;
+
         @CommandLine.Option(names = "--extensions", description = "")
         @Nullable
         private String extensions;
@@ -179,7 +185,8 @@ public final class ConjureCli implements Runnable {
                     output,
                     Optional.ofNullable(extensions)
                             .map(ConjureCli::parseExtensions)
-                            .orElseGet(Collections::emptyMap));
+                            .orElseGet(Collections::emptyMap),
+                    strict);
         }
 
         @Override
