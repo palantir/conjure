@@ -37,6 +37,7 @@ apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.consistent-versions'
+apply plugin: 'com.palantir.baseline-java-versions'
 
 version gitVersion()
 
@@ -55,7 +56,6 @@ configure(subprojects - project(':conjure-api')) {
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
 
-    sourceCompatibility = 1.8
 
     tasks.withType(JavaCompile) {
         options.compilerArgs += ['-Werror']
@@ -72,4 +72,8 @@ configure(subprojects - project(':conjure-api')) {
     tasks.withType(Test) {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
     }
+}
+
+javaVersions {
+    libraryTarget = 11
 }
