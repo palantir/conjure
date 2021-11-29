@@ -39,4 +39,9 @@ public final class IntegerParser implements Parser<Integer> {
         String str = RAW_INT_PARSER.parse(input);
         return str != null ? Integer.valueOf(str) : null;
     }
+
+    @Override
+    public String description() {
+        return "integer";
+    }
 }

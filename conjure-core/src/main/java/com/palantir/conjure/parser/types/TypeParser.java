@@ -44,9 +44,9 @@ public enum TypeParser implements Parser<ConjureType> {
         ParserState inputParserState = new StringParserState(input);
         ConjureType resultType = Parsers.eof(typeParser()).parse(inputParserState);
         if (resultType == null) {
-            throw new ParseException(input, inputParserState);
+            throw new ParseException("Couldn't fully parse input", inputParserState);
         }
-        return parse(new StringParserState(input));
+        return resultType;
     }
 
     @Override
@@ -54,8 +54,14 @@ public enum TypeParser implements Parser<ConjureType> {
         return typeParser().parse(input);
     }
 
+    @Override
+    public String description() {
+        return "conjure type";
+    }
+
     private Parser<ConjureType> typeParser() {
         return Parsers.or(
+                "conjure type",
                 MapTypeParser.INSTANCE,
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
@@ -94,6 +100,11 @@ public enum TypeParser implements Parser<ConjureType> {
             input.release();
             return LocalReferenceType.of(typeName);
         }
+
+        @Override
+        public String description() {
+            return "type reference";
+        }
     }
 
     // TODO(qchen): Change to ExternalType?
@@ -130,6 +141,11 @@ public enum TypeParser implements Parser<ConjureType> {
             String ref = TypeReferenceParser.REF_PARSER.parse(input);
             return ForeignReferenceType.of(Namespace.of(namespace), TypeName.of(ref));
         }
+
+        @Override
+        public String description() {
+            return "foreign type";
+        }
     }
 
     private enum ListTypeParser implements Parser<ListType> {
@@ -142,9 +158,14 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType =
-                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">", description())
+                    .parse(input);
             return ListType.of(itemType);
+        }
+
+        @Override
+        public String description() {
+            return "list";
         }
     }
 
@@ -158,9 +179,14 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType =
-                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">", description())
+                    .parse(input);
             return SetType.of(itemType);
+        }
+
+        @Override
+        public String description() {
+            return "set";
         }
     }
 
@@ -174,9 +200,14 @@ public enum TypeParser implements Parser<ConjureType> {
                 return null;
             }
 
-            ConjureType itemType =
-                    Parsers.liberalBetween("<", TypeParser.INSTANCE, ">").parse(input);
+            ConjureType itemType = Parsers.liberalBetween("<", TypeParser.INSTANCE, ">", description())
+                    .parse(input);
             return OptionalType.of(itemType);
+        }
+
+        @Override
+        public String description() {
+            return "list";
         }
     }
 
@@ -196,10 +227,16 @@ public enum TypeParser implements Parser<ConjureType> {
                             Parsers.whitespace(TypeParser.INSTANCE),
                             Parsers.whitespace(Parsers.expect(",")),
                             Parsers.whitespace(TypeParser.INSTANCE)),
-                    ">");
+                    ">",
+                    description());
 
             KeyValue<ConjureType, ConjureType> types = kv.parse(input);
             return MapType.of(types.getKey(), types.getValue());
+        }
+
+        @Override
+        public String description() {
+            return "map";
         }
     }
 
@@ -220,6 +257,11 @@ public enum TypeParser implements Parser<ConjureType> {
             }
 
             return instance;
+        }
+
+        @Override
+        public String description() {
+            return type;
         }
 
         public static <T> TypeFromString<T> of(String type, T instance, Class<T> _metric) {

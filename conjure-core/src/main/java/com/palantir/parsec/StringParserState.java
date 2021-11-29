@@ -18,8 +18,12 @@ package com.palantir.parsec;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class StringParserState implements ParserState {
+    private static final int SNIPPET_WIDTH = 60;
+    private static final int SNIPPET_HEIGHT = 5;
 
     private final CharSequence seq;
     private final Deque<Integer> marks = new ArrayDeque<>();
@@ -65,5 +69,33 @@ public final class StringParserState implements ParserState {
     @Override
     public int getCharPosition() {
         return current;
+    }
+
+    @Override
+    public String fetchSnippetForException() {
+        int colStart = Math.max(0, getCharPosition() - SNIPPET_WIDTH / 2);
+        int colEnd = colStart + SNIPPET_WIDTH;
+
+        String[] lines = seq.toString().split("\n", -1);
+
+        int rowStart = Math.max(0, getLine() - SNIPPET_HEIGHT / 2);
+        int rowEnd = Math.min(lines.length, rowStart + SNIPPET_HEIGHT);
+
+        String prefix = colStart > 0 ? "... " : "";
+
+        String indicatorLineSuffix = IntStream.range(0, getCharPosition() - colStart + prefix.length())
+                        .mapToObj(_i -> " ")
+                        .collect(Collectors.joining())
+                + "^";
+
+        return IntStream.range(rowStart, rowEnd)
+                .mapToObj(rowNumber -> {
+                    String line = lines[rowNumber];
+                    String suffix = (colEnd < line.length() ? " ..." : "")
+                            + (rowNumber == getLine() ? "\n" + indicatorLineSuffix : "");
+                    String segment = line.substring(Math.min(colStart, line.length()), Math.min(colEnd, line.length()));
+                    return prefix + segment + suffix;
+                })
+                .collect(Collectors.joining("\n"));
     }
 }

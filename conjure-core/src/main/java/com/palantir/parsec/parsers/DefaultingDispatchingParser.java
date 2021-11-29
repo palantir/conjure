@@ -25,17 +25,21 @@ import java.util.Map;
 
 public final class DefaultingDispatchingParser<T> implements Parser<T> {
 
+    private final String description;
     private final Map<String, Parser<T>> map;
     private final Parser<String> inputStringParser;
     private Parser<T> defaultParser;
 
-    public DefaultingDispatchingParser(Map<String, Parser<T>> parsers, Parser<?> whitespaceParser) {
-        this(parsers, new RawStringParser(), whitespaceParser);
+    public DefaultingDispatchingParser(String description, Map<String, Parser<T>> parsers, Parser<?> whitespaceParser) {
+        this(description, parsers, new RawStringParser(), whitespaceParser);
     }
 
     public DefaultingDispatchingParser(
-            Map<String, Parser<T>> parsers, Parser<String> directiveParser, Parser<?> whitespaceParser) {
-
+            String description,
+            Map<String, Parser<T>> parsers,
+            Parser<String> directiveParser,
+            Parser<?> whitespaceParser) {
+        this.description = description;
         this.map = new HashMap<String, Parser<T>>(parsers);
         if (whitespaceParser == null) {
             inputStringParser = directiveParser;
@@ -112,5 +116,10 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
         // managed to run. Its result still might have been null, but that's
         // not our problem.
         return lastResult;
+    }
+
+    @Override
+    public String description() {
+        return description;
     }
 }

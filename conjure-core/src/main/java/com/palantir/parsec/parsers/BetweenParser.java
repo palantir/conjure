@@ -26,11 +26,13 @@ public final class BetweenParser<T> implements Parser<T> {
     private final Parser<?> start;
     private final Parser<?> end;
     private final Parser<T> parser;
+    private final String description;
 
-    public BetweenParser(Parser<?> start, Parser<T> parser, Parser<?> end) {
+    public BetweenParser(Parser<?> start, Parser<T> parser, Parser<?> end, String description) {
         this.start = start;
         this.parser = parser;
         this.end = end;
+        this.description = description;
     }
 
     @Override
@@ -38,10 +40,12 @@ public final class BetweenParser<T> implements Parser<T> {
 
         // First, consume the thing you expect to find at the beginning.
         // This is likely to be a string constant like "{".
+        input.mark();
         if (Parsers.nullOrUnexpected(start.parse(input))) {
-            // TODO(melliot): improve this exception
-            throw new ParseException("Expected startToken", input);
+            input.rewind();
+            throw new ParseException("Expected start token " + start.description(), input);
         }
+        input.release();
 
         // Then, consume the thing you expect to find in the middle.
         // This is likely to be done with a more complicated parser
@@ -50,13 +54,20 @@ public final class BetweenParser<T> implements Parser<T> {
 
         // Finally, consume the thing you expect to find at the end.
         // This is likely to be a string constant like "}".
+        input.mark();
         if (Parsers.nullOrUnexpected(end.parse(input))) {
-            // TODO(melliot): improve this exception
-            throw new ParseException("Expected endToken", input);
+            input.rewind();
+            throw new ParseException("Expected end token " + end.description(), input);
         }
+        input.release();
 
         // The thing we care about was in the middle.
         // Parser<?>, and return the T.)
         return item;
+    }
+
+    @Override
+    public String description() {
+        return description;
     }
 }

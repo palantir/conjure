@@ -50,6 +50,11 @@ public final class KeyValueParser<A, B> implements Parser<KeyValue<A, B>> {
         return null;
     }
 
+    @Override
+    public String description() {
+        return keyParser.description() + " " + separator.description() + " " + valueParser.description();
+    }
+
     public static final class KeyValue<A, B> {
         private final A key;
         private final B value;

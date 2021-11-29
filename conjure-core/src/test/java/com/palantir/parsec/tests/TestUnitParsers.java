@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
+import com.palantir.parsec.ParserState;
 import com.palantir.parsec.Parsers;
 import com.palantir.parsec.StringParserState;
 import com.palantir.parsec.parsers.BetweenParser;
@@ -69,10 +70,10 @@ public final class TestUnitParsers {
         map.put("dir1", new RawStringParser());
         map.put("dir2", new QuotedStringParser());
 
-        assertThat(new DispatchingParser<String>(map, Parsers.whitespace())
+        assertThat(new DispatchingParser<String>("dispatch", map, Parsers.whitespace())
                         .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n")))
                 .isEqualTo("def");
-        assertThat(new DispatchingParser<String>(map, Parsers.whitespace())
+        assertThat(new DispatchingParser<String>("dispatch", map, Parsers.whitespace())
                         .parse(new StringParserState("dir1 abc\ndir2 \"def\n\"\n")))
                 .isEqualTo("def");
     }
@@ -92,7 +93,8 @@ public final class TestUnitParsers {
         assertThat(new BetweenParser<String>(
                                 new ExpectantParser("{"),
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
-                                Parsers.prefix(Parsers.whitespace(), new ExpectantParser("}")))
+                                Parsers.prefix(Parsers.whitespace(), new ExpectantParser("}")),
+                                "brackets")
                         .parse(new StringParserState("{ abcdef }")))
                 .isEqualTo("abcdef");
     }
@@ -168,23 +170,33 @@ public final class TestUnitParsers {
             }
         });
 
-        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("abcdef")))
+        assertThat(Parsers.or("or", rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("abcdef")))
                 .isEqualTo("abcdef");
-        assertThat(Parsers.or(rawNoPunctuation, new QuotedStringParser()).parse(new StringParserState("\"abcdef\"")))
+        assertThat(Parsers.or("or", rawNoPunctuation, new QuotedStringParser())
+                        .parse(new StringParserState("\"abcdef" + "\"")))
                 .isEqualTo("abcdef");
     }
 
     @Test
     public void testOrParserErrorPassthrough() throws ParseException {
-        Parser<String> alwaysThrows = input -> {
-            input.next();
-            throw new IllegalStateException("bad thing");
+        Parser<String> alwaysThrows = new Parser<String>() {
+            @Override
+            public String parse(ParserState input) throws ParseException {
+                input.next();
+                throw new IllegalStateException("bad thing");
+            }
+
+            @Override
+            public String description() {
+                return "always throws";
+            }
         };
 
-        assertThat(Parsers.or(alwaysThrows, alwaysThrows, new QuotedStringParser())
+        assertThat(Parsers.or("or", alwaysThrows, alwaysThrows, new QuotedStringParser())
                         .parse(new StringParserState("\"abcdef\"")))
                 .isEqualTo("abcdef");
-        assertThatThrownBy(() -> Parsers.or(alwaysThrows, alwaysThrows).parse(new StringParserState("\"abcdef\"")))
+        assertThatThrownBy(() ->
+                        Parsers.or("or", alwaysThrows, alwaysThrows).parse(new StringParserState("\"abcdef" + "\"")))
                 .isInstanceOf(ParseException.class)
                 .hasMessage("bad thing\nat or before character 8\non or before line 0\n\"abcdef\"")
                 .hasCause(new IllegalStateException("bad thing"))
@@ -219,7 +231,7 @@ public final class TestUnitParsers {
 
     @Test
     public void testEofParserFails() throws ParseException {
-        assertThat(Parsers.eof(new ExpectantParser("abc")).parse(new StringParserState("abcdef")))
+        assertThat(Parsers.eof(new ExpectantParser("abc")).parse(new StringParserState("abcd")))
                 .isNull();
     }
 }

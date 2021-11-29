@@ -60,6 +60,11 @@ public final class RawStringParser implements Parser<String> {
     }
 
     @Override
+    public String description() {
+        return "raw string";
+    }
+
+    @Override
     public String toString() {
         return "RawStringParser(" + condition + ")";
     }
