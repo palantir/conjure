@@ -210,7 +210,8 @@ public final class TypeParserTests {
                 .isInstanceOf(ParseException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                                + " safelong, integer, rid, any, uuid] or match pattern "
+                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
                                 + " %s\n"
                                 + "bytes\n"
                                 + "^",
@@ -224,7 +225,8 @@ public final class TypeParserTests {
                 .isInstanceOf(ParseException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                                + " safelong, integer, rid, any, uuid] or match pattern "
+                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
                                 + " bytes\n"
                                 + "list<bytes>\n"
                                 + "     ^");
