@@ -171,6 +171,19 @@ public final class TypeParserTests {
     }
 
     @Test
+    public void testParser_sensibleErrorForMultiLine() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<\n  map\n    string,\n    integer>\n  >"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Expected start token \"<\" for map\n"
+                        + "list<\n"
+                        + "  map\n"
+                        + "     ^\n"
+                        + "    string,\n"
+                        + "    integer>\n"
+                        + "  >");
+    }
+
+    @Test
     public void testParser_missingSeparator() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<string"))
                 .isInstanceOf(ParseException.class)

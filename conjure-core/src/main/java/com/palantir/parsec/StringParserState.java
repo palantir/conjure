@@ -62,28 +62,40 @@ public final class StringParserState implements ParserState {
     }
 
     @Override
-    public int getLine() {
-        return 0;
-    }
-
-    @Override
     public int getCharPosition() {
         return current;
     }
 
     @Override
     public String fetchSnippetForException() {
-        int colStart = Math.max(0, getCharPosition() - SNIPPET_WIDTH / 2);
-        int colEnd = colStart + SNIPPET_WIDTH;
-
         String[] lines = seq.toString().split("\n", -1);
 
-        int rowStart = Math.max(0, getLine() - SNIPPET_HEIGHT / 2);
+        int currentLine;
+        int lineCharPosition = getCharPosition();
+        for (currentLine = 0; currentLine < lines.length; currentLine++) {
+            if (currentLine > 0) {
+                // Account for the newline
+                lineCharPosition--;
+            }
+
+            if (lineCharPosition > lines[currentLine].length()) {
+                lineCharPosition -= lines[currentLine].length();
+            } else {
+                // We reached the current line
+                break;
+            }
+        }
+        int finalCurrentLine = currentLine;
+
+        int colStart = Math.max(0, lineCharPosition - SNIPPET_WIDTH / 2);
+        int colEnd = colStart + SNIPPET_WIDTH;
+
+        int rowStart = Math.max(0, finalCurrentLine - SNIPPET_HEIGHT / 2);
         int rowEnd = Math.min(lines.length, rowStart + SNIPPET_HEIGHT);
 
         String prefix = colStart > 0 ? "... " : "";
 
-        String indicatorLineSuffix = IntStream.range(0, getCharPosition() - colStart + prefix.length())
+        String indicatorLineSuffix = IntStream.range(0, lineCharPosition - colStart + prefix.length())
                         .mapToObj(_i -> " ")
                         .collect(Collectors.joining())
                 + "^";
@@ -92,7 +104,7 @@ public final class StringParserState implements ParserState {
                 .mapToObj(rowNumber -> {
                     String line = lines[rowNumber];
                     String suffix = (colEnd < line.length() ? " ..." : "")
-                            + (rowNumber == getLine() ? "\n" + indicatorLineSuffix : "");
+                            + (rowNumber == finalCurrentLine ? "\n" + indicatorLineSuffix : "");
                     String segment = line.substring(Math.min(colStart, line.length()), Math.min(colEnd, line.length()));
                     return prefix + segment + suffix;
                 })
