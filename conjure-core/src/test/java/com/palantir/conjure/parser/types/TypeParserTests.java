@@ -172,7 +172,7 @@ public final class TypeParserTests {
 
     @Test
     public void testParser_sensibleErrorForMultiLine() throws ParseException {
-        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<\n  map\n    string,\n    integer>\n  >"))
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<\n  map\n    string,\n    integer>\n  \n>"))
                 .isInstanceOf(ParseException.class)
                 .hasMessage("Expected start token \"<\" for map\n"
                         + "list<\n"
@@ -180,7 +180,7 @@ public final class TypeParserTests {
                         + "     ^\n"
                         + "    string,\n"
                         + "    integer>\n"
-                        + "  >");
+                        + "  "); // Note that the ">" is cut off due to the line limit
     }
 
     @Test
