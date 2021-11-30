@@ -198,7 +198,7 @@ public final class TestUnitParsers {
         assertThatThrownBy(() ->
                         Parsers.or("or", alwaysThrows, alwaysThrows).parse(new StringParserState("\"abcdef" + "\"")))
                 .isInstanceOf(ParseException.class)
-                .hasMessage("bad thing\nat or before character 8\non or before line 0\n\"abcdef\"")
+                .hasMessage("bad thing\n" + "\"abcdef\"\n" + "^")
                 .hasCause(new IllegalStateException("bad thing"))
                 .getCause()
                 .hasSuppressedException(new IllegalStateException("bad thing"));
