@@ -45,6 +45,8 @@ public final class KeyValueParser<A, B> implements Parser<KeyValue<A, B>> {
                 } else {
                     throw new ParseException("Found key '" + key + "' without associated value.", input);
                 }
+            } else {
+                throw new ParseException("Missing separator " + separator.description(), input);
             }
         }
         return null;

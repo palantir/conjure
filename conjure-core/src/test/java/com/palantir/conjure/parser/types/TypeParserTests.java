@@ -167,14 +167,35 @@ public final class TypeParserTests {
     public void testParser_badList() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list string"))
                 .isInstanceOf(ParseException.class)
-                .hasMessage("Expected start token \"<\"\n" + "list string\n" + "    ^");
+                .hasMessage("Expected start token \"<\" for list\n" + "list string\n" + "    ^");
+    }
+
+    @Test
+    public void testParser_missingSeparator() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<string"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing separator \",\"\n" + "map<string\n" + "          ^");
+    }
+
+    @Test
+    public void testParser_emptyList() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Didn't match conjureType inside of list\n" + "list<>\n" + "     ^");
+    }
+
+    @Test
+    public void testParser_emptyMap() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Didn't match conjureType \",\" conjureType inside of map\n" + "map<>\n" + "    ^");
     }
 
     @Test
     public void testParser_missingEnd() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string"))
                 .isInstanceOf(ParseException.class)
-                .hasMessage("Expected end token \">\"\n" + "list<string\n" + "           ^");
+                .hasMessage("Expected end token \">\" for list\n" + "list<string\n" + "           ^");
     }
 
     @Test

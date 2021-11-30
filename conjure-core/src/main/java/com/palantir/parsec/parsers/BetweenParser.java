@@ -43,7 +43,7 @@ public final class BetweenParser<T> implements Parser<T> {
         input.mark();
         if (Parsers.nullOrUnexpected(start.parse(input))) {
             input.rewind();
-            throw new ParseException("Expected start token " + start.description(), input);
+            throw new ParseException("Expected start token " + start.description() + " for " + description, input);
         }
         input.release();
 
@@ -52,12 +52,16 @@ public final class BetweenParser<T> implements Parser<T> {
         // such as DispatchingParser.
         T item = parser.parse(input);
 
+        if (item == null) {
+            throw new ParseException("Didn't match " + parser.description() + " inside of " + description, input);
+        }
+
         // Finally, consume the thing you expect to find at the end.
         // This is likely to be a string constant like "}".
         input.mark();
         if (Parsers.nullOrUnexpected(end.parse(input))) {
             input.rewind();
-            throw new ParseException("Expected end token " + end.description(), input);
+            throw new ParseException("Expected end token " + end.description() + " for " + description, input);
         }
         input.release();
 

@@ -56,12 +56,12 @@ public enum TypeParser implements Parser<ConjureType> {
 
     @Override
     public String description() {
-        return "conjure type";
+        return "conjureType";
     }
 
     private Parser<ConjureType> typeParser() {
         return Parsers.or(
-                "conjure type",
+                "conjureType",
                 MapTypeParser.INSTANCE,
                 ListTypeParser.INSTANCE,
                 SetTypeParser.INSTANCE,
@@ -103,7 +103,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public String description() {
-            return "type reference";
+            return "typeReference";
         }
     }
 
@@ -144,7 +144,7 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public String description() {
-            return "foreign type";
+            return "foreignType";
         }
     }
 
