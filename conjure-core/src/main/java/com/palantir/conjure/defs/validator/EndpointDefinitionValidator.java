@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -391,10 +390,10 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         @Override
         public void validate(EndpointDefinition definition) {
             definition.getArgs().forEach(arg -> {
-                Matcher matcher = CaseConverter.CAMEL_CASE_PATTERN.matcher(
+                boolean matches = CaseConverter.CAMEL_CASE_PATTERN.matches(
                         arg.getArgName().get());
                 Preconditions.checkState(
-                        matcher.matches(),
+                        matches,
                         "Parameter names in endpoint paths and service definitions "
                                 + "must match pattern %s: %s on endpoint %s",
                         CaseConverter.CAMEL_CASE_PATTERN,
@@ -434,21 +433,15 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     ParameterId paramId =
                             paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
                     Preconditions.checkState(
-                            CaseConverter.CAMEL_CASE_PATTERN
-                                            .matcher(paramId.get())
-                                            .matches()
-                                    || CaseConverter.KEBAB_CASE_PATTERN
-                                            .matcher(paramId.get())
-                                            .matches()
-                                    || CaseConverter.SNAKE_CASE_PATTERN
-                                            .matcher(paramId.get())
-                                            .matches(),
+                            CaseConverter.CAMEL_CASE_PATTERN.matches(paramId.get())
+                                    || CaseConverter.KEBAB_CASE_PATTERN.matches(paramId.get())
+                                    || CaseConverter.SNAKE_CASE_PATTERN.matches(paramId.get()),
                             "Query param id %s on endpoint %s must match one of the following patterns: %s",
                             paramId.get(),
                             describe(definition),
                             Arrays.toString(CaseConverter.Case.values()));
 
-                    if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(paramId.get()).matches()) {
+                    if (!CaseConverter.CAMEL_CASE_PATTERN.matches(paramId.get())) {
                         log.warn(
                                 "Query param ids should be camelCase. kebab-case and snake_case are supported for "
                                         + "legacy endpoints only: {} on endpoint {}",

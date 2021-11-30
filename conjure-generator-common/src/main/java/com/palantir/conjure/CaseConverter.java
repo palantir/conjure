@@ -20,14 +20,16 @@ import com.google.common.base.CaseFormat;
 import java.util.regex.Pattern;
 
 public final class CaseConverter {
-    public static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])*[A-Z]?$");
-    public static final Pattern KEBAB_CASE_PATTERN =
-            Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$");
-    public static final Pattern SNAKE_CASE_PATTERN =
-            Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$");
+    public static final CachedPatternMatcher CAMEL_CASE_PATTERN =
+            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]([A-Z]{1," + "2}[a-z0-9]|[a-z0-9])*[A-Z]?$"));
+    public static final CachedPatternMatcher KEBAB_CASE_PATTERN =
+            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$"));
+    public static final CachedPatternMatcher SNAKE_CASE_PATTERN =
+            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$"));
 
     private CaseConverter() {}
 
+    @SuppressWarnings("ImmutableEnumChecker")
     public enum Case {
         LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN) {
             @Override
@@ -72,19 +74,19 @@ public final class CaseConverter {
             }
         };
 
-        private final Pattern pattern;
+        private final CachedPatternMatcher pattern;
 
-        Case(Pattern pattern) {
+        Case(CachedPatternMatcher pattern) {
             this.pattern = pattern;
         }
 
-        public Pattern getPattern() {
+        public CachedPatternMatcher getPattern() {
             return pattern;
         }
 
         @Override
         public String toString() {
-            return name() + "[" + pattern + "]";
+            return name() + "[" + pattern.pattern() + "]";
         }
 
         public abstract String convertTo(String name, Case targetCase);
@@ -96,7 +98,7 @@ public final class CaseConverter {
 
     private static Case nameCase(String name) {
         for (Case nameCase : Case.values()) {
-            if (nameCase.pattern.matcher(name).matches()) {
+            if (nameCase.pattern.matches(name)) {
                 return nameCase;
             }
         }

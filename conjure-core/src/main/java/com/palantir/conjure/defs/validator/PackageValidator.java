@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.CachedPatternMatcher;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,8 @@ public final class PackageValidator {
 
     private PackageValidator() {}
 
-    private static final Pattern VALID_PACKAGE = Pattern.compile("^([a-z][a-z0-9]+(\\.[a-z][a-z0-9]*)*)?$");
+    private static final CachedPatternMatcher VALID_PACKAGE =
+            CachedPatternMatcher.wrap(Pattern.compile("^([a-z][a-z0-9]+(\\" + ".[a-z][a-z0-9]*)*)?$"));
 
     public static List<String> components(String name) {
         return ImmutableList.copyOf(Splitter.on('.').split(name));
@@ -40,7 +42,7 @@ public final class PackageValidator {
         // TODO(rfink): NPE when the pattern is static !?!?
 
         Preconditions.checkArgument(
-                VALID_PACKAGE.matcher(name).matches(),
+                VALID_PACKAGE.matches(name),
                 "Conjure package names must match pattern %s: %s",
                 VALID_PACKAGE.pattern(),
                 name);
