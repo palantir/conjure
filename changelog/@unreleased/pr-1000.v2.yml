@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Revert late-resolve imports to enable circular type references as it
+    can cause the service uniqueness validator to misfire.
+  links:
+  - https://github.com/palantir/conjure/pull/1000
