@@ -51,8 +51,9 @@ public class ConjureParserTest {
     }
 
     @Test
-    public void cyclicImportsAreAllowed() throws IOException {
-        ConjureParser.parse(new File("src/test/resources/example-recursive-imports.yml"));
+    public void cyclicImportsAreNotAllowed() throws IOException {
+        assertThatThrownBy(() -> ConjureParser.parse(new File("src/test/resources/example-recursive-imports.yml")))
+                .isInstanceOf(ConjureParser.CyclicImportException.class);
     }
 
     @Test

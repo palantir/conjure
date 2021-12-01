@@ -269,7 +269,7 @@ public final class ServiceDefinitionTests {
                                         .build())
                                 .build())
                         .putServices(
-                                TypeName.of("MyTestService"),
+                                TypeName.of("TestService"),
                                 ServiceDefinition.builder()
                                         .doNotUseName("Test Service")
                                         .conjurePackage(ConjurePackage.of("test.api"))
@@ -286,7 +286,6 @@ public final class ServiceDefinitionTests {
                                                         .args(ImmutableMap.of(
                                                                 ParameterName.of("foo"),
                                                                 ArgumentDefinition.builder()
-                                                                        .paramId(ParameterName.of("Foo"))
                                                                         .paramType(ArgumentDefinition.ParamType.HEADER)
                                                                         .type(LocalReferenceType.of(
                                                                                 TypeName.of("StringAlias")))
