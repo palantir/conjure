@@ -17,11 +17,8 @@
 package com.palantir.conjure.parser.types.reference;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Optional;
+import com.palantir.conjure.parser.ConjureSourceFile;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -34,22 +31,21 @@ public interface ConjureImports {
      */
     String file();
 
-    /**
-     * The resolved file from which types are to be imported.
-     */
-    Optional<File> absoluteFile();
+    ConjureSourceFile conjure();
 
     @JsonCreator
-    static ConjureImports relativeFile(String file) {
-        return ImmutableConjureImports.builder().file(file).build();
+    static ConjureImports fromFile(String file) {
+        return ImmutableConjureImports.builder()
+                .file(file)
+                // When deserializing this object from user-supplied conjure yaml, we just fill in the file.
+                .conjure(ConjureSourceFile.builder().build())
+                .build();
     }
 
-    @Value.Auxiliary
-    @JsonIgnore
-    default ConjureImports resolve(Path baseDir) {
+    static ConjureImports withResolvedImports(String file, ConjureSourceFile conjureDefinition) {
         return ImmutableConjureImports.builder()
-                .file(file())
-                .absoluteFile(baseDir.resolve(file()).toFile())
+                .file(file)
+                .conjure(conjureDefinition)
                 .build();
     }
 }

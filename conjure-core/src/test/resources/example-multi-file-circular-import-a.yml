@@ -1,9 +1,0 @@
-types:
-  conjure-imports:
-    imported: example-multi-file-circular-import-b.yml
-  definitions:
-    default-package: test.api.circular.one
-    objects:
-      ObjectOne:
-        fields:
-          value: optional<imported.ObjectTwo>
