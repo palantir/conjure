@@ -1,0 +1,10 @@
+types:
+  definitions:
+    default-package: test.api.with.circular
+    objects:
+      ObjectOne:
+        fields:
+          value: optional<ObjectTwo>
+      ObjectTwo:
+        fields:
+          value: optional<ObjectOne>
