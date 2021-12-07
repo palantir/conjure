@@ -33,7 +33,6 @@ import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public final class TypeParserTests {
@@ -152,16 +151,18 @@ public final class TypeParserTests {
 
     @Test
     public void testParser_invalidSuffixType() throws ParseException {
-        Assertions.assertThrows(ParseException.class, () -> {
-            TypeParser.INSTANCE.parse("string[]");
-        });
+        assertThatThrownBy(() -> {
+                    TypeParser.INSTANCE.parse("string[]");
+                })
+                .isInstanceOf(ParseException.class);
     }
 
     @Test
     public void testParser_invalidType() throws ParseException {
-        Assertions.assertThrows(ParseException.class, () -> {
-            TypeParser.INSTANCE.parse("[]");
-        });
+        assertThatThrownBy(() -> {
+                    TypeParser.INSTANCE.parse("[]");
+                })
+                .isInstanceOf(ParseException.class);
     }
 
     @Test
