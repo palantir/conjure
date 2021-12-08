@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalStateException;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,7 +81,12 @@ public final class ConjureParser {
         Queue<File> toProcess = new ArrayDeque<>(files);
 
         while (!toProcess.isEmpty()) {
-            File nextFile = toProcess.poll();
+            File nextFile;
+            try {
+                nextFile = toProcess.poll().getCanonicalFile();
+            } catch (IOException e) {
+                throw new SafeRuntimeException("Couldn't canonicalize file path", e);
+            }
             String key = nextFile.getAbsolutePath();
 
             if (!parsed.containsKey(key)) {

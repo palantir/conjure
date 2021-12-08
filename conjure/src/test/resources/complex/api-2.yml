@@ -1,0 +1,18 @@
+types:
+  conjure-imports:
+    id: ./id.yml
+    objects: ./objects.yml
+
+services:
+  TestService2:
+    name: Test Service 2
+    package: test.api
+
+    endpoints:
+      get:
+        http: GET /get/{simpleId}
+        args:
+          simpleId:
+            type: id.SimpleId
+
+        returns: objects.SimpleObject

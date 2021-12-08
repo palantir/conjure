@@ -129,7 +129,9 @@ public final class ConjureCliTest {
     @Test
     public void generatesCode() {
         CliConfiguration configuration = CliConfiguration.builder()
-                .inputFiles(ImmutableList.of(new File("src/test/resources/test-service.yml")))
+                .inputFiles(ImmutableList.of(
+                        new File("src/test/resources/complex/api.yml"),
+                        new File("src/test/resources/complex/api-2.yml")))
                 .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);

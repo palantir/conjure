@@ -19,7 +19,9 @@ package com.palantir.conjure.parser.types.reference;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import org.immutables.value.Value;
@@ -47,9 +49,13 @@ public interface ConjureImports {
     @Value.Auxiliary
     @JsonIgnore
     default ConjureImports resolve(Path baseDir) {
-        return ImmutableConjureImports.builder()
-                .file(file())
-                .absoluteFile(baseDir.resolve(file()).toFile())
-                .build();
+        try {
+            return ImmutableConjureImports.builder()
+                    .file(file())
+                    .absoluteFile(baseDir.resolve(file()).toFile().getCanonicalFile())
+                    .build();
+        } catch (IOException e) {
+            throw new SafeRuntimeException("Couldn't canonicalize file path", e);
+        }
     }
 }
