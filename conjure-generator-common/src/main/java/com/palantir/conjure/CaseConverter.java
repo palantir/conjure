@@ -25,7 +25,6 @@ public final class CaseConverter {
 
     private CaseConverter() {}
 
-    @SuppressWarnings("ImmutableEnumChecker")
     public enum Case {
         LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN) {
             @Override
