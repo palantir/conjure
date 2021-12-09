@@ -18,6 +18,7 @@ package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
@@ -41,5 +42,20 @@ class KebabCasePatternTest {
                     .isFalse()
                     .isEqualTo(regexPattern.matcher(testCase).matches());
         }
+    }
+
+    @Test
+    public void randomSampleTest() {
+        SimplifiedPattern simplifiedPattern = new KebabCasePattern();
+        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+
+        PatternTestUtil.runRandomTests(
+                10_000,
+                8,
+                ImmutableList.of('a', 'b', 'y', 'z', '-', '-', '0', '9'),
+                ImmutableList.of('A', 'Z', '_'),
+                testCase -> assertThat(simplifiedPattern.matches(testCase))
+                        .as(testCase)
+                        .isEqualTo(regexPattern.matcher(testCase).matches()));
     }
 }
