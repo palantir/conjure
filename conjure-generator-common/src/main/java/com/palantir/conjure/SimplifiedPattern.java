@@ -19,6 +19,8 @@ package com.palantir.conjure;
 /**
  * A simplified/restricted pattern matcher. Goal is to execute faster than general regex at the cost of reduced
  * features.
+ *
+ * JMH benchmarks suggest a ~40x increased throughput using the manual coded versions.
  */
 public interface SimplifiedPattern {
     String pattern();
