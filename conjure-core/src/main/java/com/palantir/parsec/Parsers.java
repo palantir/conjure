@@ -54,8 +54,8 @@ public final class Parsers {
             }
 
             @Override
-            public String toString() {
-                return prefix.toString() + " then " + parser.toString();
+            public String description() {
+                return parser.description();
             }
         };
     }
@@ -102,6 +102,11 @@ public final class Parsers {
                 }
                 return result;
             }
+
+            @Override
+            public String description() {
+                return parser.description();
+            }
         };
     }
 
@@ -117,46 +122,58 @@ public final class Parsers {
      * @return the specified parser
      */
     @SafeVarargs
-    public static <T> Parser<T> or(final Parser<? extends T> firstOption, final Parser<? extends T>... otherOptions) {
-        return input -> {
-            T result;
-            Exception exception = null;
+    public static <T> Parser<T> or(
+            final String description,
+            final Parser<? extends T> firstOption,
+            final Parser<? extends T>... otherOptions) {
+        return new Parser<T>() {
+            @Override
+            public T parse(ParserState input) throws ParseException {
 
-            input.mark();
-            try {
-                result = gingerly(firstOption).parse(input);
-            } catch (RuntimeException e) {
-                exception = e;
-                input.rewind();
-                result = null;
-            }
+                T result;
+                Exception exception = null;
 
-            if (result != null) {
-                return result;
-            }
-            for (Parser<? extends T> nextOption : otherOptions) {
                 input.mark();
                 try {
-                    result = gingerly(nextOption).parse(input);
+                    result = gingerly(firstOption).parse(input);
                 } catch (RuntimeException e) {
-                    if (exception == null) {
-                        exception = e;
-                    } else {
-                        exception.addSuppressed(e);
-                    }
+                    exception = e;
                     input.rewind();
+                    result = null;
                 }
 
                 if (result != null) {
                     return result;
                 }
+                for (Parser<? extends T> nextOption : otherOptions) {
+                    input.mark();
+                    try {
+                        result = gingerly(nextOption).parse(input);
+                    } catch (RuntimeException e) {
+                        if (exception == null) {
+                            exception = e;
+                        } else {
+                            exception.addSuppressed(e);
+                        }
+                        input.rewind();
+                    }
+
+                    if (result != null) {
+                        return result;
+                    }
+                }
+
+                if (exception != null) {
+                    throw new ParseException(exception.getMessage(), input, exception);
+                }
+
+                return null;
             }
 
-            if (exception != null) {
-                throw new ParseException(exception.getMessage(), input, exception);
+            @Override
+            public String description() {
+                return description;
             }
-
-            return null;
         };
     }
 
@@ -164,16 +181,18 @@ public final class Parsers {
         return new ExpectantParser(expectation);
     }
 
-    public static <T> BetweenParser<T> between(ExpectantParser start, Parser<T> parser, ExpectantParser end) {
-        return new BetweenParser<T>(start, parser, end);
+    public static <T> BetweenParser<T> between(
+            ExpectantParser start, Parser<T> parser, ExpectantParser end, String description) {
+        return new BetweenParser<T>(start, parser, end, description);
     }
 
-    public static <T> BetweenParser<T> between(String start, Parser<T> parser, String end) {
-        return new BetweenParser<T>(expect(start), parser, expect(end));
+    public static <T> BetweenParser<T> between(String start, Parser<T> parser, String end, String description) {
+        return new BetweenParser<T>(expect(start), parser, expect(end), description);
     }
 
-    public static <T> BetweenParser<T> liberalBetween(String start, Parser<T> parser, String end) {
-        return new BetweenParser<T>(whitespace(expect(start)), whitespace(parser), whitespace(expect(end)));
+    public static <T> BetweenParser<T> liberalBetween(String start, Parser<T> parser, String end, String description) {
+        return new BetweenParser<T>(
+                whitespace(expect(start)), whitespace(parser), whitespace(expect(end)), description);
     }
 
     public static <T> Parser<T> eof(Parser<T> parser) {
@@ -182,10 +201,15 @@ public final class Parsers {
             public T parse(ParserState input) throws ParseException {
                 T result = parser.parse(input);
 
-                if (input.next() != -1) {
+                if (input.curr() != -1) {
                     return null;
                 }
                 return result;
+            }
+
+            @Override
+            public String description() {
+                return "end-of-file";
             }
         };
     }

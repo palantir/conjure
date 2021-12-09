@@ -47,7 +47,7 @@ public interface ParserState {
      */
     void rewind();
 
-    int getLine();
-
     int getCharPosition();
+
+    String fetchSnippetForException();
 }

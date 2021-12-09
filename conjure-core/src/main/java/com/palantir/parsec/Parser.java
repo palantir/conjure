@@ -19,4 +19,9 @@ package com.palantir.parsec;
 public interface Parser<T> {
 
     T parse(ParserState input) throws ParseException;
+
+    /**
+     * Human-intelligible description of this parser for use in error messages.
+     */
+    String description();
 }

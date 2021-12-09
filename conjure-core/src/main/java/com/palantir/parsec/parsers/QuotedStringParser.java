@@ -63,4 +63,9 @@ public final class QuotedStringParser implements Parser<String> {
         }
         return sb.toString();
     }
+
+    @Override
+    public String description() {
+        return "quoted string";
+    }
 }

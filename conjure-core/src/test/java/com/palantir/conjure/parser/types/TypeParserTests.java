@@ -33,7 +33,6 @@ import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public final class TypeParserTests {
@@ -91,7 +90,14 @@ public final class TypeParserTests {
         assertThat(TypeParser.INSTANCE.parse("bar_1.Foo"))
                 .isEqualTo(ForeignReferenceType.of(Namespace.of("bar_1"), TypeName.of("Foo")));
 
-        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo")).isInstanceOf(ParseException.class);
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage(
+                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary, "
+                                + "safelong, integer, rid, any, uuid] or match pattern "
+                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: 1_bar\n"
+                                + "1_bar.Foo\n"
+                                + "^");
     }
 
     @Test
@@ -152,16 +158,71 @@ public final class TypeParserTests {
 
     @Test
     public void testParser_invalidSuffixType() throws ParseException {
-        Assertions.assertThrows(ParseException.class, () -> {
-            TypeParser.INSTANCE.parse("string[]");
-        });
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("string[]"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Couldn't fully parse input\n" + "string[]\n" + "      ^");
     }
 
     @Test
-    public void testParser_invalidType() throws ParseException {
-        Assertions.assertThrows(ParseException.class, () -> {
-            TypeParser.INSTANCE.parse("[]");
-        });
+    public void testParser_badList() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list string"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Expected start token \"<\" for list\n" + "list string\n" + "    ^");
+    }
+
+    @Test
+    public void testParser_sensibleErrorForMultiLine() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<\n  map\n    string,\n    integer>\n  \n>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Expected start token \"<\" for map\n"
+                        + "list<\n"
+                        + "  map\n"
+                        + "     ^\n"
+                        + "    string,\n"
+                        + "    integer>\n"
+                        + "  "); // Note that the ">" is cut off due to the line limit
+    }
+
+    @Test
+    public void testParser_missingSeparator() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<string"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Missing separator \",\"\n" + "map<string\n" + "          ^");
+    }
+
+    @Test
+    public void testParser_emptyList() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Didn't match conjureType inside of list\n" + "list<>\n" + "     ^");
+    }
+
+    @Test
+    public void testParser_emptyMap() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Didn't match conjureType \",\" conjureType inside of map\n" + "map<>\n" + "    ^");
+    }
+
+    @Test
+    public void testParser_missingEnd() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string"))
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Expected end token \">\" for list\n" + "list<string\n" + "           ^");
+    }
+
+    @Test
+    public void testParser_doubleClosed() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string>>"))
+                .isInstanceOf(ParseException.class)
+                .hasMessageContaining("Couldn't fully parse input\n" + "list<string>>\n" + "            ^");
+    }
+
+    @Test
+    public void testParser_forcesFullConsumption() throws ParseException {
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string>a"))
+                .isInstanceOf(ParseException.class)
+                .hasMessageContaining("Couldn't fully parse input\n" + "list<string>a\n" + "            ^");
     }
 
     @Test
@@ -183,11 +244,25 @@ public final class TypeParserTests {
                 .isInstanceOf(ParseException.class)
                 .hasMessage(
                         "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                            + " safelong, integer, rid, any, uuid] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                            + " %s\n"
-                            + "at or before character 5\n"
-                            + "on or before line 0\n"
-                            + "bytes",
+                                + " safelong, integer, rid, any, uuid] or match pattern "
+                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                                + " %s\n"
+                                + "bytes\n"
+                                + "^",
                         invalid);
+    }
+
+    @Test
+    public void testInvalidNames_list() {
+        String invalid = "list<bytes>";
+        assertThatThrownBy(() -> TypeParser.INSTANCE.parse(invalid))
+                .isInstanceOf(ParseException.class)
+                .hasMessage(
+                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
+                                + " safelong, integer, rid, any, uuid] or match pattern "
+                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                                + " bytes\n"
+                                + "list<bytes>\n"
+                                + "     ^");
     }
 }
