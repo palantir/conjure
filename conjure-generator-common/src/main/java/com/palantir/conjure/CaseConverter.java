@@ -17,15 +17,11 @@
 package com.palantir.conjure;
 
 import com.google.common.base.CaseFormat;
-import java.util.regex.Pattern;
 
 public final class CaseConverter {
-    public static final CachedPatternMatcher CAMEL_CASE_PATTERN =
-            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]([A-Z]{1," + "2}[a-z0-9]|[a-z0-9])*[A-Z]?$"));
-    public static final CachedPatternMatcher KEBAB_CASE_PATTERN =
-            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$"));
-    public static final CachedPatternMatcher SNAKE_CASE_PATTERN =
-            CachedPatternMatcher.wrap(Pattern.compile("^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$"));
+    public static final SimplifiedPattern CAMEL_CASE_PATTERN = new CamelCasePattern();
+    public static final SimplifiedPattern KEBAB_CASE_PATTERN = new KebabCasePattern();
+    public static final SimplifiedPattern SNAKE_CASE_PATTERN = new SnakeCasePattern();
 
     private CaseConverter() {}
 
@@ -74,13 +70,13 @@ public final class CaseConverter {
             }
         };
 
-        private final CachedPatternMatcher pattern;
+        private final SimplifiedPattern pattern;
 
-        Case(CachedPatternMatcher pattern) {
+        Case(SimplifiedPattern pattern) {
             this.pattern = pattern;
         }
 
-        public CachedPatternMatcher getPattern() {
+        public SimplifiedPattern getPattern() {
             return pattern;
         }
 

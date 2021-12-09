@@ -17,9 +17,9 @@
 package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
-import com.palantir.conjure.CachedPatternMatcher;
+import com.palantir.conjure.EnumPattern;
+import com.palantir.conjure.SimplifiedPattern;
 import com.palantir.conjure.spec.EnumValueDefinition;
-import java.util.regex.Pattern;
 
 @com.google.errorprone.annotations.Immutable
 public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDefinition> {
@@ -57,8 +57,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
     @com.google.errorprone.annotations.Immutable
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
-        private static final CachedPatternMatcher REQUIRED_FORMAT =
-                CachedPatternMatcher.wrap(Pattern.compile("[A-Z][A-Z0-9]*" + "(_[A-Z0-9]+)*"));
+        private static final SimplifiedPattern REQUIRED_FORMAT = new EnumPattern();
 
         @Override
         public void validate(EnumValueDefinition definition) {
