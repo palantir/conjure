@@ -16,12 +16,15 @@
 
 package com.palantir.conjure;
 
+import com.google.errorprone.annotations.Immutable;
+
 /**
  * A simplified/restricted pattern matcher. Goal is to execute faster than general regex at the cost of reduced
  * features.
  *
  * JMH benchmarks suggest a ~40x increased throughput using the manual coded versions.
  */
+@Immutable
 public interface SimplifiedPattern {
     String pattern();
 

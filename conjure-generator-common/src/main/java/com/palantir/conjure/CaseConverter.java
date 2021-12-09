@@ -17,7 +17,9 @@
 package com.palantir.conjure;
 
 import com.google.common.base.CaseFormat;
+import com.google.errorprone.annotations.Immutable;
 
+@Immutable
 public final class CaseConverter {
     public static final SimplifiedPattern CAMEL_CASE_PATTERN = new CamelCasePattern();
     public static final SimplifiedPattern KEBAB_CASE_PATTERN = new KebabCasePattern();
