@@ -58,7 +58,7 @@ dependencies {
 subprojects {
     pluginManager.withPlugin 'java', {
         dependencies {
-            compile 'com.palantir.conjure.java:conjure-lib:2.5.0'
+            implementation 'com.palantir.conjure.java:conjure-lib:2.5.0'
         }
     }
 }
@@ -135,8 +135,8 @@ In your main gradle project, you can now depend on the generated Jersey interfac
 // ./your-project/build.gradle
 
 dependencies {
-    compile 'com.palantir.conjure.java.runtime:conjure-java-jersey-server:latest.release'
-    compile project(':your-project-api:your-project-api-jersey')
+    implementation 'com.palantir.conjure.java.runtime:conjure-java-jersey-server:latest.release'
+    implementation project(':your-project-api:your-project-api-jersey')
     ...
 }
 ```
