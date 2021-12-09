@@ -1,0 +1,11 @@
+types:
+  conjure-imports:
+    id: ./id.yml
+
+  definitions:
+    default-package: test.api
+    objects:
+      SimpleObject:
+        fields:
+          id: id.SimpleId
+          stringField: string

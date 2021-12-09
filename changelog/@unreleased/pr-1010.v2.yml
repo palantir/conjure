@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Late-resolve imports to enable circular type references
+  links:
+  - https://github.com/palantir/conjure/pull/1010

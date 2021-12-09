@@ -18,6 +18,7 @@ package com.palantir.conjure.defs;
 
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
+import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ConjureTypeVisitor;
 import com.palantir.conjure.parser.types.TypesDefinition;
@@ -28,14 +29,15 @@ import com.palantir.conjure.parser.types.collect.ListType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.collect.OptionalType;
 import com.palantir.conjure.parser.types.collect.SetType;
+import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
-import com.palantir.conjure.parser.types.reference.ConjureImports;
 import com.palantir.conjure.parser.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
+import java.util.Map;
 import java.util.Optional;
 
 /** The core translator between parsed/raw types and the IR spec representation exposed to compilers. */
@@ -51,9 +53,16 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
     public static final class ByParsedRepresentationTypeNameResolver implements ReferenceTypeResolver {
 
         private final TypesDefinition types;
+        private final Map<Namespace, String> importProviders;
+        private final Map<String, AnnotatedConjureSourceFile> externalTypes;
 
-        public ByParsedRepresentationTypeNameResolver(TypesDefinition types) {
+        public ByParsedRepresentationTypeNameResolver(
+                TypesDefinition types,
+                Map<Namespace, String> importProviders,
+                Map<String, AnnotatedConjureSourceFile> externalTypes) {
             this.types = types;
+            this.importProviders = importProviders;
+            this.externalTypes = externalTypes;
         }
 
         @Override
@@ -63,10 +72,13 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
         @Override
         public Type resolve(ForeignReferenceType reference) {
-            ConjureImports conjureImports = types.conjureImports().get(reference.namespace());
-            Preconditions.checkNotNull(conjureImports, "Import not found for namespace: %s", reference.namespace());
+            String namespaceFile = importProviders.get(reference.namespace());
+            Preconditions.checkNotNull(namespaceFile, "Import not found for namespace: %s", reference.namespace());
+            AnnotatedConjureSourceFile externalFile = externalTypes.get(namespaceFile);
+            Preconditions.checkNotNull(
+                    externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespaceFile);
             return resolveFromTypeName(
-                    reference.type(), conjureImports.conjure().types());
+                    reference.type(), externalFile.conjureSourceFile().types());
         }
 
         private static Type resolveFromTypeName(
