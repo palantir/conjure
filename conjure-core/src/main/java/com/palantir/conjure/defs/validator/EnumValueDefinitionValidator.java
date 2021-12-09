@@ -64,7 +64,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
             Preconditions.checkArgument(
                     REQUIRED_FORMAT.matches(definition.getValue()),
                     "Enumeration values must match format %s: %s",
-                    REQUIRED_FORMAT,
+                    REQUIRED_FORMAT.pattern(),
                     definition.getValue());
         }
     }
