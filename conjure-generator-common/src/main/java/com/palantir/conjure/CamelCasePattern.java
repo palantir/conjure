@@ -40,7 +40,7 @@ public enum CamelCasePattern implements SimplifiedPattern {
         }
 
         char firstChar = value.charAt(0);
-        if (firstChar < 'a' || firstChar > 'z') {
+        if (!CharUtils.isLower(firstChar)) {
             return false;
         }
 
@@ -48,12 +48,12 @@ public enum CamelCasePattern implements SimplifiedPattern {
         for (int i = 1; i < len; i++) {
             char curChar = value.charAt(i);
 
-            boolean isLowerOrNumeric = (curChar >= 'a' && curChar <= 'z') || (curChar >= '0' && curChar <= '9');
+            boolean isLowerOrNumeric = CharUtils.isLower(curChar) || CharUtils.isNumeric(curChar);
 
             if (isLowerOrNumeric) {
                 uppercaseChars = 0;
             } else {
-                if (uppercaseChars >= 2 || curChar < 'A' || curChar > 'Z') {
+                if (uppercaseChars >= 2 || !CharUtils.isUpper(curChar)) {
                     return false;
                 }
                 uppercaseChars++;

@@ -40,7 +40,7 @@ public enum KebabCasePattern implements SimplifiedPattern {
         }
 
         char firstChar = value.charAt(0);
-        if (firstChar < 'a' || firstChar > 'z') {
+        if (!CharUtils.isLower(firstChar)) {
             return false;
         }
 
@@ -54,13 +54,15 @@ public enum KebabCasePattern implements SimplifiedPattern {
                     return false;
                 }
                 curChar = value.charAt(i);
-                if (dashChars >= 2 || curChar < 'a' || curChar > 'z') {
+                if (dashChars >= 2 || !CharUtils.isLower(curChar)) {
                     return false;
                 }
                 dashChars++;
             } else {
                 dashChars = 0;
-                if (!((curChar >= 'a' && curChar <= 'z') || (curChar >= '0' && curChar <= '9'))) {
+
+                boolean isLowerOrNumeric = CharUtils.isLower(curChar) || CharUtils.isNumeric(curChar);
+                if (!isLowerOrNumeric) {
                     return false;
                 }
             }

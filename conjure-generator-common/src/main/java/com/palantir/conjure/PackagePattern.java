@@ -44,7 +44,7 @@ public enum PackagePattern implements SimplifiedPattern {
         }
 
         char firstChar = value.charAt(0);
-        if (firstChar < 'a' || firstChar > 'z') {
+        if (!CharUtils.isLower(firstChar)) {
             return false;
         }
 
@@ -62,11 +62,11 @@ public enum PackagePattern implements SimplifiedPattern {
                 }
                 curChar = value.charAt(i);
 
-                if (curChar < 'a' || curChar > 'z') {
+                if (!CharUtils.isLower(curChar)) {
                     return false;
                 }
             } else {
-                boolean isLowerOrNumeric = (curChar >= 'a' && curChar <= 'z') || (curChar >= '0' && curChar <= '9');
+                boolean isLowerOrNumeric = CharUtils.isLower(curChar) || CharUtils.isNumeric(curChar);
 
                 if (!isLowerOrNumeric) {
                     return false;

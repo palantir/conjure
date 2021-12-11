@@ -40,7 +40,7 @@ public enum EnumPattern implements SimplifiedPattern {
         }
 
         char firstChar = value.charAt(0);
-        if (firstChar < 'A' || firstChar > 'Z') {
+        if (!CharUtils.isUpper(firstChar)) {
             return false;
         }
 
@@ -55,7 +55,7 @@ public enum EnumPattern implements SimplifiedPattern {
                 lastDash = true;
             } else {
                 lastDash = false;
-                boolean isUpperOrNumeric = (curChar >= 'A' && curChar <= 'Z') || (curChar >= '0' && curChar <= '9');
+                boolean isUpperOrNumeric = CharUtils.isUpper(curChar) || CharUtils.isNumeric(curChar);
 
                 if (!isUpperOrNumeric) {
                     return false;
