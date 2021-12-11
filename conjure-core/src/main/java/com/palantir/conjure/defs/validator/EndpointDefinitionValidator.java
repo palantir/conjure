@@ -432,8 +432,10 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                 } else if (paramType.accept(ParameterTypeVisitor.IS_QUERY)) {
                     ParameterId paramId =
                             paramType.accept(ParameterTypeVisitor.QUERY).getParamId();
+                    boolean paramIdIsCamelCase = CaseConverter.CAMEL_CASE_PATTERN.matches(paramId.get());
+
                     Preconditions.checkState(
-                            CaseConverter.CAMEL_CASE_PATTERN.matches(paramId.get())
+                            paramIdIsCamelCase
                                     || CaseConverter.KEBAB_CASE_PATTERN.matches(paramId.get())
                                     || CaseConverter.SNAKE_CASE_PATTERN.matches(paramId.get()),
                             "Query param id %s on endpoint %s must match one of the following patterns: %s",
@@ -441,7 +443,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                             describe(definition),
                             Arrays.toString(CaseConverter.Case.values()));
 
-                    if (!CaseConverter.CAMEL_CASE_PATTERN.matches(paramId.get())) {
+                    if (!paramIdIsCamelCase) {
                         log.warn(
                                 "Query param ids should be camelCase. kebab-case and snake_case are supported for "
                                         + "legacy endpoints only: {} on endpoint {}",

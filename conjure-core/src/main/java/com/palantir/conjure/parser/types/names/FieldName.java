@@ -47,8 +47,10 @@ public abstract class FieldName {
         CaseConverter.Case kebabCase = CaseConverter.Case.KEBAB_CASE;
         CaseConverter.Case snakeCase = CaseConverter.Case.SNAKE_CASE;
 
+        boolean nameIsCamelCase = lowerCamelCase.getPattern().matches(name());
+
         Preconditions.checkArgument(
-                lowerCamelCase.getPattern().matches(name())
+                nameIsCamelCase
                         || kebabCase.getPattern().matches(name())
                         || snakeCase.getPattern().matches(name()),
                 "FieldName \"%s\" must follow one of the following patterns: %s %s %s",
@@ -57,7 +59,7 @@ public abstract class FieldName {
                 kebabCase,
                 snakeCase);
 
-        if (!lowerCamelCase.getPattern().matches(name())) {
+        if (!nameIsCamelCase) {
             log.warn(
                     "{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
                             + "legacy endpoints only: {}",
