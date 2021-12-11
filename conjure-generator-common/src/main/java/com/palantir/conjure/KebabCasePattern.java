@@ -16,6 +16,9 @@
 
 package com.palantir.conjure;
 
+import com.google.errorprone.annotations.Immutable;
+
+@Immutable
 public enum KebabCasePattern implements SimplifiedPattern {
     INSTANCE;
 
