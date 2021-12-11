@@ -18,20 +18,29 @@ package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.regex.Pattern;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.CharRange;
+import net.jqwik.api.constraints.Chars;
+import net.jqwik.api.constraints.StringLength;
 import org.junit.jupiter.api.Test;
 
 class PackagePatternTest {
     private final String[] valid = {
         "", "foo", "af.b.c", "af.b23.f2",
     };
-    private final String[] invalid = {".", "ad..b", "a.b.c", "ad.2.df"};
+    private final String[] invalid = {".", "a", "ad..b", "a.b.c", "ad.2.df"};
+
+    private final SimplifiedPattern simplifiedPattern = new PackagePattern();
+    private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test
     public void validate() {
-        SimplifiedPattern simplifiedPattern = new PackagePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
         for (String testCase : valid) {
             assertThat(simplifiedPattern.matches(testCase))
                     .as(testCase)
@@ -46,18 +55,34 @@ class PackagePatternTest {
         }
     }
 
-    @Test
-    public void randomSampleTest() {
-        SimplifiedPattern simplifiedPattern = new PackagePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = '0', to = '9')
+    @Chars('.')
+    @StringLength(max = 25)
+    @interface ValidPackageChars {}
 
-        PatternTestUtil.runRandomTests(
-                10_000,
-                8,
-                ImmutableList.of('a', 'b', 'y', 'z', '.', '0', '9'),
-                ImmutableList.of('_', '-', 'A'),
-                testCase -> assertThat(simplifiedPattern.matches(testCase))
-                        .as(testCase)
-                        .isEqualTo(regexPattern.matcher(testCase).matches()));
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @Chars({'_', '-', '.'})
+    @StringLength(max = 25)
+    @interface InvalidPackageChars {}
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testValidCharsMatch(@ForAll @ValidPackageChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
+    }
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testInvalidCharsMatch(@ForAll @InvalidPackageChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
     }
 }

@@ -18,18 +18,27 @@ package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.regex.Pattern;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.CharRange;
+import net.jqwik.api.constraints.Chars;
+import net.jqwik.api.constraints.StringLength;
 import org.junit.jupiter.api.Test;
 
 class SnakeCasePatternTest {
     private final String[] valid = {"a_b", "a2_c3", "a_c_d23"};
-    private final String[] invalid = {"", "a_b_cC", "a_2b", "a__b", "a_"};
+    private final String[] invalid = {"", "a_b_cC", "a_2b", "a__b", "a_", "a_c_d_f23"};
+
+    private final SimplifiedPattern simplifiedPattern = new SnakeCasePattern();
+    private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test
     public void validate() {
-        SimplifiedPattern simplifiedPattern = new SnakeCasePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
         for (String testCase : valid) {
             assertThat(simplifiedPattern.matches(testCase))
                     .as(testCase)
@@ -44,18 +53,34 @@ class SnakeCasePatternTest {
         }
     }
 
-    @Test
-    public void randomSampleTest() {
-        SimplifiedPattern simplifiedPattern = new SnakeCasePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = '0', to = '9')
+    @Chars('_')
+    @StringLength(max = 25)
+    @interface ValidSnakeCaseChars {}
 
-        PatternTestUtil.runRandomTests(
-                10_000,
-                8,
-                ImmutableList.of('a', 'b', 'y', 'z', '_', '_', '0', '9'),
-                ImmutableList.of('A', 'Z', '-'),
-                testCase -> assertThat(simplifiedPattern.matches(testCase))
-                        .as(testCase)
-                        .isEqualTo(regexPattern.matcher(testCase).matches()));
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @Chars({'_', '-', '.'})
+    @StringLength(max = 25)
+    @interface InvalidSnakeCaseChars {}
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testValidCharsMatch(@ForAll @ValidSnakeCaseChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
+    }
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testInvalidCharsMatch(@ForAll @InvalidSnakeCaseChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
     }
 }

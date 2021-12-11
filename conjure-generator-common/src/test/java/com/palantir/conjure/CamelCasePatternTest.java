@@ -18,8 +18,16 @@ package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.regex.Pattern;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.CharRange;
+import net.jqwik.api.constraints.Chars;
+import net.jqwik.api.constraints.StringLength;
 import org.junit.jupiter.api.Test;
 
 class CamelCasePatternTest {
@@ -30,10 +38,11 @@ class CamelCasePatternTest {
         "", "aAC", "21B23", "a21BFD23",
     };
 
+    private final SimplifiedPattern simplifiedPattern = new CamelCasePattern();
+    private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+
     @Test
     public void validate() {
-        SimplifiedPattern simplifiedPattern = new CamelCasePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
         for (String testCase : valid) {
             assertThat(simplifiedPattern.matches(testCase))
                     .as(testCase)
@@ -48,18 +57,34 @@ class CamelCasePatternTest {
         }
     }
 
-    @Test
-    public void randomSampleTest() {
-        SimplifiedPattern simplifiedPattern = new CamelCasePattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @StringLength(max = 25)
+    @interface ValidCamelCaseChars {}
 
-        PatternTestUtil.runRandomTests(
-                10_000,
-                8,
-                ImmutableList.of('a', 'b', 'y', 'z', 'A', 'Z', '0', '9'),
-                ImmutableList.of('_', '-'),
-                testCase -> assertThat(simplifiedPattern.matches(testCase))
-                        .as(testCase)
-                        .isEqualTo(regexPattern.matcher(testCase).matches()));
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @Chars({'_', '-', '.'})
+    @StringLength(max = 25)
+    @interface InvalidCamelCaseChars {}
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testValidCharsMatch(@ForAll @ValidCamelCaseChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
+    }
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testInvalidCharsMatch(@ForAll @InvalidCamelCaseChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
     }
 }

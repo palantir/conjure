@@ -18,8 +18,16 @@ package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.regex.Pattern;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.CharRange;
+import net.jqwik.api.constraints.Chars;
+import net.jqwik.api.constraints.StringLength;
 import org.junit.jupiter.api.Test;
 
 class EnumPatternTest {
@@ -28,10 +36,11 @@ class EnumPatternTest {
     };
     private final String[] invalid = {"", "A__A", "23A"};
 
+    private final SimplifiedPattern simplifiedPattern = new EnumPattern();
+    private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+
     @Test
     public void validate() {
-        SimplifiedPattern simplifiedPattern = new EnumPattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
         for (String testCase : valid) {
             assertThat(simplifiedPattern.matches(testCase))
                     .as(testCase)
@@ -46,18 +55,34 @@ class EnumPatternTest {
         }
     }
 
-    @Test
-    public void randomSampleTest() {
-        SimplifiedPattern simplifiedPattern = new EnumPattern();
-        Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @Chars('_')
+    @StringLength(max = 25)
+    @interface ValidEnumChars {}
 
-        PatternTestUtil.runRandomTests(
-                10_000,
-                8,
-                ImmutableList.of('A', 'B', 'C', '_', 'Z', '0', '9'),
-                ImmutableList.of('a', 'z', '-'),
-                testCase -> assertThat(simplifiedPattern.matches(testCase))
-                        .as(testCase)
-                        .isEqualTo(regexPattern.matcher(testCase).matches()));
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    @CharRange(from = 'a', to = 'z')
+    @CharRange(from = 'A', to = 'Z')
+    @CharRange(from = '0', to = '9')
+    @Chars({'_', '-', '.'})
+    @StringLength(max = 25)
+    @interface InvalidEnumChars {}
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testValidCharsMatch(@ForAll @ValidEnumChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
+    }
+
+    @Property(tries = 5000, seed = "8202857274439734019")
+    void testInvalidCharsMatch(@ForAll @InvalidEnumChars String input) {
+        assertThat(simplifiedPattern.matches(input))
+                .as(input)
+                .isEqualTo(regexPattern.matcher(input).matches());
     }
 }

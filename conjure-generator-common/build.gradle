@@ -23,6 +23,7 @@ dependencies {
 
     testImplementation 'junit:junit'
     testImplementation 'org.assertj:assertj-core'
+    testImplementation 'net.jqwik:jqwik'
 
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
@@ -32,3 +33,8 @@ dependencies {
     }
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform {
+        includeEngines 'jqwik', 'junit-jupiter'
+    }
+}

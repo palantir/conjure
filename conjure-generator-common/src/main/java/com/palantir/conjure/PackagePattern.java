@@ -29,8 +29,12 @@ public final class PackagePattern implements SimplifiedPattern {
     @SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:ModifiedControlVariable"})
     public boolean matches(String value) {
         int len = value.length();
+        // Must be either empty, or start with at least two chars
         if (len == 0) {
             return true;
+        }
+        if (len == 1) {
+            return false;
         }
 
         char firstChar = value.charAt(0);

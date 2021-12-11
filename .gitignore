@@ -67,3 +67,6 @@ coverage.xml
 *,cover
 .hypothesis/
 pytest.xml
+
+# JQwik
+.jqwik-database
