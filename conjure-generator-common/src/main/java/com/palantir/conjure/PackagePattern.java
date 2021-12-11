@@ -16,10 +16,13 @@
 
 package com.palantir.conjure;
 
-import com.google.errorprone.annotations.Immutable;
+public enum PackagePattern implements SimplifiedPattern {
+    INSTANCE;
 
-@Immutable
-public final class PackagePattern implements SimplifiedPattern {
+    public static PackagePattern get() {
+        return INSTANCE;
+    }
+
     @Override
     public String pattern() {
         return "^([a-z][a-z0-9]+(\\.[a-z][a-z0-9]*)*)?$";

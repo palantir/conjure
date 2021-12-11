@@ -57,7 +57,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
     @com.google.errorprone.annotations.Immutable
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
-        private static final SimplifiedPattern REQUIRED_FORMAT = new EnumPattern();
+        private static final SimplifiedPattern REQUIRED_FORMAT = EnumPattern.get();
 
         @Override
         public void validate(EnumValueDefinition definition) {

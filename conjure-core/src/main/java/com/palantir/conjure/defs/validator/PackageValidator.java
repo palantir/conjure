@@ -31,7 +31,7 @@ public final class PackageValidator {
 
     private PackageValidator() {}
 
-    private static final SimplifiedPattern VALID_PACKAGE = new PackagePattern();
+    private static final SimplifiedPattern VALID_PACKAGE = PackagePattern.get();
 
     public static List<String> components(String name) {
         return ImmutableList.copyOf(Splitter.on('.').split(name));
