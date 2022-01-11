@@ -18,8 +18,12 @@ package com.palantir.parsec;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class StringParserState implements ParserState {
+    private static final int SNIPPET_WIDTH = 60;
+    private static final int SNIPPET_HEIGHT = 5;
 
     private final CharSequence seq;
     private final Deque<Integer> marks = new ArrayDeque<>();
@@ -58,12 +62,52 @@ public final class StringParserState implements ParserState {
     }
 
     @Override
-    public int getLine() {
-        return 0;
+    public int getCharPosition() {
+        return current;
     }
 
     @Override
-    public int getCharPosition() {
-        return current;
+    public String fetchSnippetForException() {
+        String[] lines = seq.toString().split("\n", -1);
+
+        int currentLine;
+        int lineCharPosition = getCharPosition();
+        for (currentLine = 0; currentLine < lines.length; currentLine++) {
+            if (currentLine > 0) {
+                // Account for the newline
+                lineCharPosition--;
+            }
+
+            if (lineCharPosition > lines[currentLine].length()) {
+                lineCharPosition -= lines[currentLine].length();
+            } else {
+                // We reached the current line
+                break;
+            }
+        }
+        int finalCurrentLine = currentLine;
+
+        int colStart = Math.max(0, lineCharPosition - SNIPPET_WIDTH / 2);
+        int colEnd = colStart + SNIPPET_WIDTH;
+
+        int rowStart = Math.max(0, finalCurrentLine - SNIPPET_HEIGHT / 2);
+        int rowEnd = Math.min(lines.length, rowStart + SNIPPET_HEIGHT);
+
+        String prefix = colStart > 0 ? "... " : "";
+
+        String indicatorLineSuffix = IntStream.range(0, lineCharPosition - colStart + prefix.length())
+                        .mapToObj(_i -> " ")
+                        .collect(Collectors.joining())
+                + "^";
+
+        return IntStream.range(rowStart, rowEnd)
+                .mapToObj(rowNumber -> {
+                    String line = lines[rowNumber];
+                    String suffix = (colEnd < line.length() ? " ..." : "")
+                            + (rowNumber == finalCurrentLine ? "\n" + indicatorLineSuffix : "");
+                    String segment = line.substring(Math.min(colStart, line.length()), Math.min(colEnd, line.length()));
+                    return prefix + segment + suffix;
+                })
+                .collect(Collectors.joining("\n"));
     }
 }

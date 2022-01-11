@@ -16,7 +16,7 @@ types:
         alias: string
 
 services:
-  TestService:
+  MyTestService:
     name: Test Service
     package: test.api
 
@@ -30,5 +30,6 @@ services:
         args:
           foo:
             type: StringAlias
+            param-id: Foo
             param-type: header
             tags: ['safe']

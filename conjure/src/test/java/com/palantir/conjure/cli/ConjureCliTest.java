@@ -129,7 +129,9 @@ public final class ConjureCliTest {
     @Test
     public void generatesCode() {
         CliConfiguration configuration = CliConfiguration.builder()
-                .inputFiles(ImmutableList.of(new File("src/test/resources/test-service.yml")))
+                .inputFiles(ImmutableList.of(
+                        new File("src/test/resources/complex/api.yml"),
+                        new File("src/test/resources/complex/api-2.yml")))
                 .outputIrFile(outputFile)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
@@ -145,8 +147,9 @@ public final class ConjureCliTest {
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
         assertThat(stringWriter.toString())
-                .isEqualTo("Encountered error trying to parse file 'src/test/resources/simple-error.yml'\n"
-                        + "Unknown LocalReferenceType: TypeName{name=UnknownType}\n");
+                .contains("Encountered error trying to parse file")
+                .contains("src/test/resources/simple-error.yml")
+                .contains("Unknown LocalReferenceType: TypeName{name=UnknownType}");
         assertThat(outputFile).doesNotExist();
     }
 
@@ -191,7 +194,8 @@ public final class ConjureCliTest {
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
         assertThat(stringWriter.toString())
-                .isEqualTo("Error while parsing src/test/resources/invalid-json.yml:\n"
+                .startsWith("Error while parsing")
+                .endsWith("src/test/resources/invalid-json.yml:\n"
                         + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
                         + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
                         + "Cannot build FieldDefinition, some of required attributes are not set [type]\n");

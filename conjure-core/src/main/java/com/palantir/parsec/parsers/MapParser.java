@@ -53,4 +53,9 @@ public final class MapParser<A, B> implements Parser<Map<A, B>> {
         } while (Parsers.gingerly(separator).parse(input) != null);
         return results;
     }
+
+    @Override
+    public String description() {
+        return "map";
+    }
 }

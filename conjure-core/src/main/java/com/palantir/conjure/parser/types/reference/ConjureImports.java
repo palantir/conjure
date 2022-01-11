@@ -17,8 +17,13 @@
 package com.palantir.conjure.parser.types.reference;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -31,21 +36,26 @@ public interface ConjureImports {
      */
     String file();
 
-    ConjureSourceFile conjure();
+    /**
+     * The resolved file from which types are to be imported.
+     */
+    Optional<File> absoluteFile();
 
     @JsonCreator
-    static ConjureImports fromFile(String file) {
-        return ImmutableConjureImports.builder()
-                .file(file)
-                // When deserializing this object from user-supplied conjure yaml, we just fill in the file.
-                .conjure(ConjureSourceFile.builder().build())
-                .build();
+    static ConjureImports relativeFile(String file) {
+        return ImmutableConjureImports.builder().file(file).build();
     }
 
-    static ConjureImports withResolvedImports(String file, ConjureSourceFile conjureDefinition) {
-        return ImmutableConjureImports.builder()
-                .file(file)
-                .conjure(conjureDefinition)
-                .build();
+    @Value.Auxiliary
+    @JsonIgnore
+    default ConjureImports resolve(Path baseDir) {
+        try {
+            return ImmutableConjureImports.builder()
+                    .file(file())
+                    .absoluteFile(baseDir.resolve(file()).toFile().getCanonicalFile())
+                    .build();
+        } catch (IOException e) {
+            throw new SafeRuntimeException("Couldn't canonicalize file path", e);
+        }
     }
 }

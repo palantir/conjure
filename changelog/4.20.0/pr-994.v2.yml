@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Fix EOF handling and improve error messages of type parsing
+  links:
+  - https://github.com/palantir/conjure/pull/994

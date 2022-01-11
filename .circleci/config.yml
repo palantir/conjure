@@ -10,7 +10,7 @@ jobs:
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xmx2g' -Dorg.gradle.workers.max=2
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
@@ -40,7 +40,7 @@ jobs:
             echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'compile-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace classes testClasses
+      - run: ./gradlew --parallel --stacktrace classes testClasses -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
           paths: [ ~/.gradle/wrapper ]
@@ -59,13 +59,13 @@ jobs:
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xmx2g' -Dorg.gradle.workers.max=1
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'check-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace --continue check idea -x test
+      - run: ./gradlew --parallel --stacktrace --continue check idea -x test -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'check-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -81,13 +81,13 @@ jobs:
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xmx2g' -Dorg.gradle.workers.max=2
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 test
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 test -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -103,13 +103,13 @@ jobs:
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xmx2g' -Dorg.gradle.workers.max=1
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'trial-publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --stacktrace publishToMavenLocal
+      - run: ./gradlew --stacktrace publishToMavenLocal -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - run:
           command: git status --porcelain
           when: always
@@ -125,14 +125,14 @@ jobs:
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xmx2g' -Dorg.gradle.workers.max=1
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publish
+          command: ./gradlew --parallel --stacktrace --continue publish -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - run:
           command: git status --porcelain
           when: always
@@ -141,12 +141,6 @@ jobs:
           paths: [ ~/.gradle/caches ]
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
-
-  markdown:
-    docker: [{ image: 'raviqqe/liche:0.1.1' }]
-    steps:
-      - checkout
-      - run: /liche -d . -r . -v
 
 
 workflows:
@@ -162,9 +156,6 @@ workflows:
 
       - check:
           requires: [ compile ]
-          filters: { tags: { only: /.*/ } }
-
-      - markdown:
           filters: { tags: { only: /.*/ } }
 
       - trial-publish:

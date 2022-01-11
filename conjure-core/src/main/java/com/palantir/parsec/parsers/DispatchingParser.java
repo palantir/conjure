@@ -25,19 +25,24 @@ import java.util.Map;
 
 public final class DispatchingParser<T> implements Parser<T> {
 
+    private final String description;
     private final Map<String, Parser<T>> parserLookup;
     private final Parser<String> inputStringParser;
 
-    public DispatchingParser(Map<String, Parser<T>> parsers) {
-        this(parsers, null);
+    public DispatchingParser(String description, Map<String, Parser<T>> parsers) {
+        this(description, parsers, null);
     }
 
-    public DispatchingParser(Map<String, Parser<T>> parsers, Parser<?> whitespaceParser) {
-        this(parsers, new RawStringParser(), whitespaceParser);
+    public DispatchingParser(String description, Map<String, Parser<T>> parsers, Parser<?> whitespaceParser) {
+        this(description, parsers, new RawStringParser(), whitespaceParser);
     }
 
     public DispatchingParser(
-            Map<String, Parser<T>> parsers, Parser<String> directiveParser, Parser<?> whitespaceParser) {
+            String description,
+            Map<String, Parser<T>> parsers,
+            Parser<String> directiveParser,
+            Parser<?> whitespaceParser) {
+        this.description = description;
         parserLookup = new HashMap<String, Parser<T>>();
         if (whitespaceParser == null) {
             inputStringParser = directiveParser;
@@ -64,5 +69,10 @@ public final class DispatchingParser<T> implements Parser<T> {
             }
         }
         return lastResult;
+    }
+
+    @Override
+    public String description() {
+        return description;
     }
 }

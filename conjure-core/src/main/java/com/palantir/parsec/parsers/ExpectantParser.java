@@ -42,4 +42,9 @@ public final class ExpectantParser implements Parser<ExpectationResult> {
             return ExpectationResult.INCORRECT;
         }
     }
+
+    @Override
+    public String description() {
+        return "\"" + expectation + "\"";
+    }
 }
