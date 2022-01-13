@@ -28,8 +28,8 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3 (2 constraints: da209b58)
 org.glassfish.hk2.external:jakarta.inject:2.6.1 (2 constraints: e420b559)
 org.glassfish.jersey.core:jersey-common:2.34 (2 constraints: fe143db0)
 org.immutables:value:2.8.8 (2 constraints: 0d1518b9)
-org.slf4j:slf4j-api:1.7.32 (4 constraints: 6e2d5eb4)
-org.slf4j:slf4j-simple:1.7.32 (2 constraints: 63155adb)
+org.slf4j:slf4j-api:1.7.33 (4 constraints: 702dd8b4)
+org.slf4j:slf4j-simple:1.7.33 (2 constraints: 64158adb)
 org.yaml:snakeyaml:1.27 (2 constraints: 35279cd0)
 
 [Test dependencies]
