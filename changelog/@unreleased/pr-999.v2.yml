@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Replace regex validators by a faster equivalent implementation.
+  links:
+  - https://github.com/palantir/conjure/pull/999

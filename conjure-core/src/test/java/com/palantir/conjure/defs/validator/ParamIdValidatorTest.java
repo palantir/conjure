@@ -75,9 +75,9 @@ public final class ParamIdValidatorTest {
                             "Query param id %s on endpoint test{http: POST /a/path} must match one of the "
                                     + "following patterns: [LOWER_CAMEL_CASE[%s], KEBAB_CASE[%s], SNAKE_CASE[%s]]",
                             paramId,
-                            CaseConverter.CAMEL_CASE_PATTERN,
-                            CaseConverter.KEBAB_CASE_PATTERN,
-                            CaseConverter.SNAKE_CASE_PATTERN);
+                            CaseConverter.CAMEL_CASE_PATTERN.pattern(),
+                            CaseConverter.KEBAB_CASE_PATTERN.pattern(),
+                            CaseConverter.SNAKE_CASE_PATTERN.pattern());
         }
     }
 

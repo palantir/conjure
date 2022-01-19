@@ -45,19 +45,17 @@ public final class FieldNameValidator {
 
     @SuppressWarnings("Slf4jLogsafeArgs")
     public static void validate(FieldName fieldName) {
+        boolean matchesCamelCase = CaseConverter.CAMEL_CASE_PATTERN.matches(fieldName.get());
+
         Preconditions.checkArgument(
-                CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()
-                        || CaseConverter.KEBAB_CASE_PATTERN
-                                .matcher(fieldName.get())
-                                .matches()
-                        || CaseConverter.SNAKE_CASE_PATTERN
-                                .matcher(fieldName.get())
-                                .matches(),
+                matchesCamelCase
+                        || CaseConverter.KEBAB_CASE_PATTERN.matches(fieldName.get())
+                        || CaseConverter.SNAKE_CASE_PATTERN.matches(fieldName.get()),
                 "FieldName \"%s\" must follow one of the following patterns: %s",
                 fieldName,
                 Arrays.toString(CaseConverter.Case.values()));
 
-        if (!CaseConverter.CAMEL_CASE_PATTERN.matcher(fieldName.get()).matches()) {
+        if (!matchesCamelCase) {
             log.warn(
                     "{} should be specified in lowerCamelCase. kebab-case and snake_case are supported for "
                             + "legacy endpoints only: {}",
@@ -68,7 +66,7 @@ public final class FieldNameValidator {
 
     private static CaseConverter.Case nameCase(FieldName fieldName) {
         for (CaseConverter.Case nameCase : CaseConverter.Case.values()) {
-            if (nameCase.getPattern().matcher(fieldName.get()).matches()) {
+            if (nameCase.getPattern().matches(fieldName.get())) {
                 return nameCase;
             }
         }
