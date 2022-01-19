@@ -38,7 +38,7 @@ class CamelCasePatternTest {
         "", "aAC", "21B23", "a21BFD23",
     };
 
-    private final SimplifiedPattern simplifiedPattern = CamelCasePattern.get();
+    private final CamelCasePattern simplifiedPattern = CamelCasePattern.INSTANCE;
     private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test

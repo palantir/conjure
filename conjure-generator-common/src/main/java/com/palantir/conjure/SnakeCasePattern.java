@@ -22,10 +22,6 @@ import com.google.errorprone.annotations.Immutable;
 public enum SnakeCasePattern implements SimplifiedPattern {
     INSTANCE;
 
-    public static SnakeCasePattern get() {
-        return INSTANCE;
-    }
-
     @Override
     public String pattern() {
         return "^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$";

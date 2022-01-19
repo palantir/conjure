@@ -22,10 +22,6 @@ import com.google.errorprone.annotations.Immutable;
 public enum CamelCasePattern implements SimplifiedPattern {
     INSTANCE;
 
-    public static CamelCasePattern get() {
-        return INSTANCE;
-    }
-
     @Override
     public String pattern() {
         return "^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])*[A-Z]?$";

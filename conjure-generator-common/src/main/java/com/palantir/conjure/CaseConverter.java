@@ -21,9 +21,9 @@ import com.google.errorprone.annotations.Immutable;
 
 @Immutable
 public final class CaseConverter {
-    public static final SimplifiedPattern CAMEL_CASE_PATTERN = CamelCasePattern.get();
-    public static final SimplifiedPattern KEBAB_CASE_PATTERN = KebabCasePattern.get();
-    public static final SimplifiedPattern SNAKE_CASE_PATTERN = SnakeCasePattern.get();
+    public static final CamelCasePattern CAMEL_CASE_PATTERN = CamelCasePattern.INSTANCE;
+    public static final KebabCasePattern KEBAB_CASE_PATTERN = KebabCasePattern.INSTANCE;
+    public static final SnakeCasePattern SNAKE_CASE_PATTERN = SnakeCasePattern.INSTANCE;
 
     private CaseConverter() {}
 

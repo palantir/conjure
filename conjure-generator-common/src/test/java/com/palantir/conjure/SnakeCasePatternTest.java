@@ -34,7 +34,7 @@ class SnakeCasePatternTest {
     private final String[] valid = {"a_b", "a2_c3", "a_c_d23"};
     private final String[] invalid = {"", "a_b_cC", "a_2b", "a__b", "a_", "a_c_d_f23"};
 
-    private final SimplifiedPattern simplifiedPattern = SnakeCasePattern.get();
+    private final SnakeCasePattern simplifiedPattern = SnakeCasePattern.INSTANCE;
     private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test

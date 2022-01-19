@@ -22,10 +22,6 @@ import com.google.errorprone.annotations.Immutable;
 public enum KebabCasePattern implements SimplifiedPattern {
     INSTANCE;
 
-    public static KebabCasePattern get() {
-        return INSTANCE;
-    }
-
     @Override
     public String pattern() {
         return "^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$";

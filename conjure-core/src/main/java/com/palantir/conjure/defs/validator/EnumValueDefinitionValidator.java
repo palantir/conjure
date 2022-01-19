@@ -18,7 +18,6 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.EnumPattern;
-import com.palantir.conjure.SimplifiedPattern;
 import com.palantir.conjure.spec.EnumValueDefinition;
 
 @com.google.errorprone.annotations.Immutable
@@ -57,7 +56,7 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
 
     @com.google.errorprone.annotations.Immutable
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
-        private static final SimplifiedPattern REQUIRED_FORMAT = EnumPattern.get();
+        private static final EnumPattern REQUIRED_FORMAT = EnumPattern.get();
 
         @Override
         public void validate(EnumValueDefinition definition) {

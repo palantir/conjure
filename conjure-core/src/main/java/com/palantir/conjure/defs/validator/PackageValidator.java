@@ -21,7 +21,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.PackagePattern;
-import com.palantir.conjure.SimplifiedPattern;
 import java.util.List;
 
 public final class PackageValidator {
@@ -31,7 +30,7 @@ public final class PackageValidator {
 
     private PackageValidator() {}
 
-    private static final SimplifiedPattern VALID_PACKAGE = PackagePattern.get();
+    private static final PackagePattern VALID_PACKAGE = PackagePattern.get();
 
     public static List<String> components(String name) {
         return ImmutableList.copyOf(Splitter.on('.').split(name));

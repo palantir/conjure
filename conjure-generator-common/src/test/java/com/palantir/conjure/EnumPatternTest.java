@@ -36,7 +36,7 @@ class EnumPatternTest {
     };
     private final String[] invalid = {"", "A__A", "23A"};
 
-    private final SimplifiedPattern simplifiedPattern = EnumPattern.get();
+    private final EnumPattern simplifiedPattern = EnumPattern.get();
     private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test
