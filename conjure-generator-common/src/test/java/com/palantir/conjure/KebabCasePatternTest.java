@@ -34,7 +34,7 @@ class KebabCasePatternTest {
     private final String[] valid = {"a-b", "a2-c3", "a-c-d23"};
     private final String[] invalid = {"", "a-b-cC", "a-2b", "a--b", "a-"};
 
-    private final SimplifiedPattern simplifiedPattern = KebabCasePattern.INSTANCE;
+    private final KebabCasePattern simplifiedPattern = KebabCasePattern.INSTANCE;
     private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test

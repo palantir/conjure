@@ -36,7 +36,7 @@ class PackagePatternTest {
     };
     private final String[] invalid = {".", "a", "ad..b", "a.b.c", "ad.2.df"};
 
-    private final SimplifiedPattern simplifiedPattern = PackagePattern.get();
+    private final PackagePattern simplifiedPattern = PackagePattern.get();
     private final Pattern regexPattern = Pattern.compile(simplifiedPattern.pattern());
 
     @Test
