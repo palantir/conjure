@@ -106,7 +106,7 @@ public final class TestUnitParsers {
         list.add("def");
         assertThat(new ListParser<>(new QuotedStringParser(), Parsers.whitespace())
                         .parse(new StringParserState("\"abc\" \"def\"")))
-                .isEqualTo(list);
+                .containsExactlyElementsOf(list);
     }
 
     @Test
@@ -118,20 +118,20 @@ public final class TestUnitParsers {
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                                 Parsers.whitespace())
                         .parse(new StringParserState("abc def")))
-                .isEqualTo(map);
+                .containsExactlyInAnyOrderEntriesOf(map);
         assertThat(new MapParser<String, String>(
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                                 Parsers.whitespace())
                         .parse(new StringParserState(" abc def")))
-                .isEqualTo(map);
+                .containsExactlyInAnyOrderEntriesOf(map);
         map.put("ghi", "jkl");
         assertThat(new MapParser<String, String>(
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                                 Parsers.prefix(Parsers.whitespace(), new RawStringParser()),
                                 Parsers.whitespace())
                         .parse(new StringParserState("abc def  ghi jkl")))
-                .isEqualTo(map);
+                .containsExactlyInAnyOrderEntriesOf(map);
     }
 
     @Test
@@ -148,12 +148,12 @@ public final class TestUnitParsers {
         MapParser<String, String> mapParser2 =
                 new MapParser<String, String>(whitespaceStringParser, whitespaceStringParser, Parsers.whitespace());
 
-        assertThat(mapParser1.parse(new StringParserState("abc def"))).isEqualTo(map);
-        assertThat(mapParser2.parse(new StringParserState(" abc def"))).isEqualTo(map);
+        assertThat(mapParser1.parse(new StringParserState("abc def"))).containsExactlyInAnyOrderEntriesOf(map);
+        assertThat(mapParser2.parse(new StringParserState(" abc def"))).containsExactlyInAnyOrderEntriesOf(map);
 
         map.put("ghi", "jkl");
 
-        assertThat(mapParser2.parse(new StringParserState("abc def  ghi jkl"))).isEqualTo(map);
+        assertThat(mapParser2.parse(new StringParserState("abc def  ghi jkl"))).containsExactlyInAnyOrderEntriesOf(map);
     }
 
     @Test
