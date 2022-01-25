@@ -31,8 +31,8 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3 (2 constraints: da209b58)
 org.glassfish.hk2.external:jakarta.inject:2.6.1 (2 constraints: e420b559)
 org.glassfish.jersey.core:jersey-common:2.34 (2 constraints: fe143db0)
 org.immutables:value:2.9.0 (3 constraints: e6226838)
-org.slf4j:slf4j-api:1.7.33 (9 constraints: 3d7d93f2)
-org.slf4j:slf4j-simple:1.7.33 (2 constraints: 64158adb)
+org.slf4j:slf4j-api:1.7.35 (9 constraints: 417d59f5)
+org.slf4j:slf4j-simple:1.7.35 (2 constraints: 6615eadb)
 org.yaml:snakeyaml:1.27 (2 constraints: 35279cd0)
 
 [Test dependencies]
