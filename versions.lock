@@ -47,7 +47,7 @@ org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r (2 constraints: b1299390
 org.glassfish.hk2:osgi-resource-locator:1.0.3 (2 constraints: da209b58)
 org.glassfish.hk2.external:jakarta.inject:2.6.1 (2 constraints: e420b559)
 org.glassfish.jersey.core:jersey-common:2.34 (2 constraints: fe143db0)
-org.immutables:value:2.9.0 (5 constraints: 7c44db10)
+org.immutables:value:2.9.0 (5 constraints: 8344da15)
 org.mockito:mockito-core:4.3.1 (4 constraints: 533419d2)
 org.mockito:mockito-errorprone:4.3.1 (1 constraints: fc1105f9)
 org.objenesis:objenesis:3.2 (3 constraints: 862b94e9)
