@@ -5,7 +5,7 @@ com.palantir.conjure.java:* = 6.30.0
 com.palantir.conjure.typescript:* = 5.3.0
 com.palantir.conjure:* = 4.22.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
-com.palantir.tokens:* = 3.11.0
+com.palantir.tokens:* = 3.12.0
 commons-io:commons-io = 2.11.0
 info.picocli:picocli = 4.6.3
 junit:junit = 4.13.2
@@ -21,7 +21,7 @@ org.mockito:* = 4.3.1
 org.slf4j:* = 1.7.36
 
 # conflict resolution
-com.palantir.safe-logging:* = 1.21.0
+com.palantir.safe-logging:* = 1.22.0
 
 # dependency-upgrader:OFF
 # Avoid forcing consumers to upgrade jackson
