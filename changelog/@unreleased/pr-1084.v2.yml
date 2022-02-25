@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: ImportNotFoundException indicates which file imported the missing file
+    if possible.
+  links:
+  - https://github.com/palantir/conjure/pull/1084
