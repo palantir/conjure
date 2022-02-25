@@ -63,6 +63,32 @@ public class ConjureParserTest {
     }
 
     @Test
+    public void testImportNotFoundException() {
+        File file = new File("src/test/resources/does-not-exist.yml");
+
+        String expectedMessage = "Import not found: " + file.getAbsolutePath();
+
+        assertThatThrownBy(() -> ConjureParser.parse(file))
+                .isInstanceOf(ConjureParser.ImportNotFoundException.class)
+                .hasMessage(expectedMessage);
+    }
+
+    @Test
+    public void testImportNotFoundExceptionWithImportedFrom() {
+        File file = new File("src/test/resources/imports-file-that-does-not-exist.yml");
+        File missingFile = new File("src/test/resources/does-not-exist.yml");
+
+        assertThat(missingFile.exists()).isFalse();
+
+        String expectedMessage = "Import not found: " + missingFile.getAbsolutePath() + " (imported from "
+                + file.getAbsolutePath() + ")";
+
+        assertThatThrownBy(() -> ConjureParser.parseAnnotated(file))
+                .isInstanceOf(ConjureParser.ImportNotFoundException.class)
+                .hasMessage(expectedMessage);
+    }
+
+    @Test
     public void testConjureExternalImports() {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
         assertThat(conjure.types()

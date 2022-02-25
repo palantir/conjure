@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -44,9 +45,20 @@ public final class ConjureParser {
 
     private static final ObjectMapper MAPPER = createConjureParserObjectMapper();
 
+    private static String getErrorMessage(File file, Optional<File> importedFrom) {
+        String message = "Import not found: " + file.getAbsolutePath();
+        return importedFrom
+                .map(importedFromFile -> message + " (imported from " + importedFromFile.getAbsolutePath() + ")")
+                .orElse(message);
+    }
+
     public static class ImportNotFoundException extends RuntimeException {
         public ImportNotFoundException(File file) {
-            super("Import not found: " + file.getAbsolutePath());
+            this(file, Optional.empty());
+        }
+
+        public ImportNotFoundException(File file, Optional<File> importedFrom) {
+            super(getErrorMessage(file, importedFrom));
         }
     }
 
@@ -79,6 +91,7 @@ public final class ConjureParser {
 
         Map<String, AnnotatedConjureSourceFile> parsed = new HashMap<>();
         Queue<File> toProcess = new ArrayDeque<>(files);
+        Map<File, File> importProvenance = new HashMap<>();
 
         while (!toProcess.isEmpty()) {
             File nextFile;
@@ -90,21 +103,26 @@ public final class ConjureParser {
             String key = nextFile.getAbsolutePath();
 
             if (!parsed.containsKey(key)) {
-                AnnotatedConjureSourceFile annotatedConjureSourceFile = parseSingleFile(parser, nextFile);
+                AnnotatedConjureSourceFile annotatedConjureSourceFile =
+                        parseSingleFile(parser, nextFile, Optional.ofNullable(importProvenance.get(nextFile)));
                 parsed.put(key, annotatedConjureSourceFile);
 
                 // Add all imports as files to be parsed
                 annotatedConjureSourceFile.importProviders().values().stream()
                         .map(File::new)
-                        .forEach(toProcess::add);
+                        .forEach(file -> {
+                            toProcess.add(file);
+                            importProvenance.put(file, nextFile);
+                        });
             }
         }
 
         return parsed;
     }
 
-    private static AnnotatedConjureSourceFile parseSingleFile(CachingParser parser, File file) {
-        ConjureSourceFile parsed = parser.parse(file);
+    private static AnnotatedConjureSourceFile parseSingleFile(
+            CachingParser parser, File file, Optional<File> importedFrom) {
+        ConjureSourceFile parsed = parser.parse(file, importedFrom);
 
         return AnnotatedConjureSourceFile.builder()
                 .conjureSourceFile(parsed)
@@ -128,6 +146,10 @@ public final class ConjureParser {
         }
 
         ConjureSourceFile parse(File file) {
+            return parse(file, Optional.empty());
+        }
+
+        ConjureSourceFile parse(File file, Optional<File> importedFrom) {
             // HashMap.computeIfAbsent does not work with recursion; the size of the map gets corrupted,
             // and if the map gets resized during the recursion, some of the new nodes can be put in wrong
             // buckets. Therefore don't use computeIfAbsent in parse/parseInternal
@@ -137,14 +159,14 @@ public final class ConjureParser {
                 return result;
             }
 
-            result = parseInternal(file);
+            result = parseInternal(file, importedFrom);
             cache.put(file.getAbsolutePath(), result);
             return result;
         }
 
-        private ConjureSourceFile parseInternal(File file) {
+        private ConjureSourceFile parseInternal(File file, Optional<File> importedFrom) {
             if (!Files.exists(file.toPath())) {
-                throw new ImportNotFoundException(file);
+                throw new ImportNotFoundException(file, importedFrom);
             }
 
             try {
