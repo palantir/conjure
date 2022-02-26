@@ -84,19 +84,20 @@ public final class ConjureParser {
     }
 
     /**
-     * Parse file & all imports (recursively).
+     * Parse all files & imports (breadth-first).
      */
     public static Map<String, AnnotatedConjureSourceFile> parseAnnotated(Collection<File> files) {
         CachingParser parser = new CachingParser();
 
         Map<String, AnnotatedConjureSourceFile> parsed = new HashMap<>();
-        Queue<File> toProcess = new ArrayDeque<>(files);
-        Map<File, File> importProvenance = new HashMap<>();
+        Queue<FileWithProvenance> toProcess =
+                new ArrayDeque<>(files.stream().map(FileWithProvenance::of).collect(Collectors.toList()));
 
         while (!toProcess.isEmpty()) {
+            FileWithProvenance nextFileWithProvenance = toProcess.poll();
             File nextFile;
             try {
-                nextFile = toProcess.poll().getCanonicalFile();
+                nextFile = nextFileWithProvenance.file().getCanonicalFile();
             } catch (IOException e) {
                 throw new SafeRuntimeException("Couldn't canonicalize file path", e);
             }
@@ -104,16 +105,13 @@ public final class ConjureParser {
 
             if (!parsed.containsKey(key)) {
                 AnnotatedConjureSourceFile annotatedConjureSourceFile =
-                        parseSingleFile(parser, nextFile, Optional.ofNullable(importProvenance.get(nextFile)));
+                        parseSingleFile(parser, nextFile, nextFileWithProvenance.importedFrom());
                 parsed.put(key, annotatedConjureSourceFile);
 
                 // Add all imports as files to be parsed
                 annotatedConjureSourceFile.importProviders().values().stream()
                         .map(File::new)
-                        .forEach(file -> {
-                            toProcess.add(file);
-                            importProvenance.put(file, nextFile);
-                        });
+                        .forEach(file -> toProcess.add(FileWithProvenance.of(file, nextFile)));
             }
         }
 
