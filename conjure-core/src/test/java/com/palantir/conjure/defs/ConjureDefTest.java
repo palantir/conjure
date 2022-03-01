@@ -54,7 +54,7 @@ public class ConjureDefTest {
                 ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(ImmutableList.of(
                         new File("src/test/resources/example-multi-file-circular-import-a.yml"),
                         new File("src/test/resources/example-multi-file-circular-import-b.yml"))));
-        assertThat(conjureDefinition.getTypes()).hasSize(2);
+        assertThat(conjureDefinition.getTypes().size()).isEqualTo(2);
     }
 
     // Test currently fails as it attempts to parse a TypeScript package name as a java package
