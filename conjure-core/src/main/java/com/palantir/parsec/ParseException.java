@@ -23,13 +23,13 @@ public final class ParseException extends Exception {
 
     public ParseException(String message, ParserState state) {
         this.message = message;
-        this.state = state;
+        this.state = state.snapshot();
     }
 
     public ParseException(String message, ParserState state, Exception cause) {
         super(cause);
         this.message = message;
-        this.state = state;
+        this.state = state.snapshot();
     }
 
     @Override
