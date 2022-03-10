@@ -44,7 +44,7 @@ public interface ParserState {
 
     String fetchSnippetForException();
 
-    /** Creates an immutable state snapshot. */
+    /** Creates a new state object identical to this one, which does not follow location mutations to the original. */
     ParserState snapshot();
 
     interface MarkedLocation {
