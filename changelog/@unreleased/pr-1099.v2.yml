@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix references with container prefixes `set`/`list`/`optional`
+  links:
+  - https://github.com/palantir/conjure/pull/1099
