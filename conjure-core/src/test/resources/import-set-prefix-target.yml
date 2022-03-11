@@ -1,0 +1,7 @@
+types:
+  definitions:
+    default-package: com.palantir.a
+    objects:
+      ImportSetPrefixTarget:
+        package: com.palantir.a
+        alias: string

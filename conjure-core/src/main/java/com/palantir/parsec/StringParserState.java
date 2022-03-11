@@ -16,8 +16,6 @@
 
 package com.palantir.parsec;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,7 +24,6 @@ public final class StringParserState implements ParserState {
     private static final int SNIPPET_HEIGHT = 5;
 
     private final CharSequence seq;
-    private final Deque<Integer> marks = new ArrayDeque<>();
     private int current = 0;
 
     public StringParserState(CharSequence str) {
@@ -47,18 +44,9 @@ public final class StringParserState implements ParserState {
     }
 
     @Override
-    public void mark() {
-        marks.push(current);
-    }
-
-    @Override
-    public void rewind() {
-        current = marks.pop();
-    }
-
-    @Override
-    public void release() {
-        marks.pop();
+    public MarkedLocation mark() {
+        int markedPosition = current;
+        return () -> current = markedPosition;
     }
 
     @Override
@@ -109,5 +97,12 @@ public final class StringParserState implements ParserState {
                     return prefix + segment + suffix;
                 })
                 .collect(Collectors.joining("\n"));
+    }
+
+    @Override
+    public ParserState snapshot() {
+        StringParserState snapshot = new StringParserState(seq);
+        snapshot.current = current;
+        return snapshot;
     }
 }

@@ -30,6 +30,7 @@ import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
+import com.palantir.parsec.ParserState.MarkedLocation;
 import com.palantir.parsec.Parsers;
 import com.palantir.parsec.StringParserState;
 import com.palantir.parsec.parsers.ExpectationResult;
@@ -90,14 +91,13 @@ public enum TypeParser implements Parser<ConjureType> {
 
         @Override
         public LocalReferenceType parse(ParserState input) throws ParseException {
-            input.mark();
+            MarkedLocation mark = input.mark();
             String typeReference = REF_PARSER.parse(input);
             if (typeReference == null) {
-                input.rewind();
+                mark.rewind();
                 return null;
             }
             TypeName typeName = TypeName.of(typeReference);
-            input.release();
             return LocalReferenceType.of(typeName);
         }
 

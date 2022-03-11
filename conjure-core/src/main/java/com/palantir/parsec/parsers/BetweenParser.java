@@ -19,6 +19,7 @@ package com.palantir.parsec.parsers;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
+import com.palantir.parsec.ParserState.MarkedLocation;
 import com.palantir.parsec.Parsers;
 
 public final class BetweenParser<T> implements Parser<T> {
@@ -40,12 +41,11 @@ public final class BetweenParser<T> implements Parser<T> {
 
         // First, consume the thing you expect to find at the beginning.
         // This is likely to be a string constant like "{".
-        input.mark();
+        MarkedLocation mark = input.mark();
         if (Parsers.nullOrUnexpected(start.parse(input))) {
-            input.rewind();
+            mark.rewind();
             throw new ParseException("Expected start token " + start.description() + " for " + description, input);
         }
-        input.release();
 
         // Then, consume the thing you expect to find in the middle.
         // This is likely to be done with a more complicated parser
@@ -58,12 +58,11 @@ public final class BetweenParser<T> implements Parser<T> {
 
         // Finally, consume the thing you expect to find at the end.
         // This is likely to be a string constant like "}".
-        input.mark();
+        mark = input.mark();
         if (Parsers.nullOrUnexpected(end.parse(input))) {
-            input.rewind();
+            mark.rewind();
             throw new ParseException("Expected end token " + end.description() + " for " + description, input);
         }
-        input.release();
 
         // The thing we care about was in the middle.
         // Parser<?>, and return the T.)

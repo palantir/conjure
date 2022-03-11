@@ -1,0 +1,16 @@
+types:
+  conjure-imports:
+    settings: import-set-prefix-target.yml
+  definitions:
+    default-package: com.palantir.a
+    objects:
+      ImportSetPrefixObject:
+        package: com.palantir.a
+        fields:
+          first: settings.ImportSetPrefixTarget
+    errors:
+      ImportSetPrefixError:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          first: settings.ImportSetPrefixTarget

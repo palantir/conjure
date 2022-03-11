@@ -19,6 +19,7 @@ package com.palantir.parsec.parsers;
 import com.palantir.parsec.ParseException;
 import com.palantir.parsec.Parser;
 import com.palantir.parsec.ParserState;
+import com.palantir.parsec.ParserState.MarkedLocation;
 import com.palantir.parsec.Parsers;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +68,7 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
         T lastResult = null;
         while (input.curr() != -1) {
 
-            input.mark();
+            MarkedLocation mark = input.mark();
             // Mark is now before directive.
 
             // Gingerly will put its own mark at the exact same location.
@@ -76,14 +77,13 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
             if (Parsers.nullOrEmpty(directive)) {
                 // If we get here, we couldn't parse a directive.
                 // Gingerly rewound to its mark; we should rewind too.
-                input.rewind();
+                mark.rewind();
                 break;
             } else {
                 // If we get here, directive was parsed okay.
 
                 if (map.containsKey(directive)) {
-                    // Gingerly's mark is already released; release ours too.
-                    input.release();
+                    // Gingerly's mark is already released;
                     lastResult = map.get(directive).parse(input);
 
                 } else if (defaultParser != null) {
@@ -91,7 +91,7 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
 
                     // The default parser has to handle the entire line, so
                     // rewind to before the directive.
-                    input.rewind();
+                    mark.rewind();
 
                     // lastResult = Parsers.gingerly(defaultParser).parse(input);
                     lastResult = defaultParser.parse(input);
@@ -106,7 +106,6 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
                     // }
 
                 } else {
-                    input.release();
                     throw new ParseException(
                             "Unknown directive '" + directive + "' and no default parser specified.", input);
                 }

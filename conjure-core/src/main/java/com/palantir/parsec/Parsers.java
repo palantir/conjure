@@ -16,6 +16,7 @@
 
 package com.palantir.parsec;
 
+import com.palantir.parsec.ParserState.MarkedLocation;
 import com.palantir.parsec.parsers.BetweenParser;
 import com.palantir.parsec.parsers.ExpectantParser;
 import com.palantir.parsec.parsers.ExpectationResult;
@@ -92,13 +93,11 @@ public final class Parsers {
         return new Parser<T>() {
             @Override
             public T parse(ParserState input) throws ParseException {
-                input.mark();
+                MarkedLocation mark = input.mark();
                 T result = parser.parse(input);
 
-                if (!nullOrUnexpected(result)) {
-                    input.release();
-                } else {
-                    input.rewind();
+                if (nullOrUnexpected(result)) {
+                    mark.rewind();
                 }
                 return result;
             }
@@ -133,12 +132,12 @@ public final class Parsers {
                 T result;
                 Exception exception = null;
 
-                input.mark();
+                MarkedLocation mark = input.mark();
                 try {
                     result = gingerly(firstOption).parse(input);
-                } catch (RuntimeException e) {
+                } catch (RuntimeException | ParseException e) {
                     exception = e;
-                    input.rewind();
+                    mark.rewind();
                     result = null;
                 }
 
@@ -146,16 +145,16 @@ public final class Parsers {
                     return result;
                 }
                 for (Parser<? extends T> nextOption : otherOptions) {
-                    input.mark();
+                    mark = input.mark();
                     try {
                         result = gingerly(nextOption).parse(input);
-                    } catch (RuntimeException e) {
+                    } catch (RuntimeException | ParseException e) {
                         if (exception == null) {
                             exception = e;
                         } else {
                             exception.addSuppressed(e);
                         }
-                        input.rewind();
+                        mark.rewind();
                     }
 
                     if (result != null) {
@@ -164,6 +163,9 @@ public final class Parsers {
                 }
 
                 if (exception != null) {
+                    if (exception instanceof ParseException) {
+                        throw (ParseException) exception;
+                    }
                     throw new ParseException(exception.getMessage(), input, exception);
                 }
 

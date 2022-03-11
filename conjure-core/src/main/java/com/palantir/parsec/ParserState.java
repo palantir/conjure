@@ -16,6 +16,8 @@
 
 package com.palantir.parsec;
 
+import com.google.errorprone.annotations.CheckReturnValue;
+
 public interface ParserState {
 
     /**
@@ -35,19 +37,20 @@ public interface ParserState {
     /**
      * Mark beginning of an interesting feature (held as a stack).
      */
-    void mark();
-
-    /**
-     * Pop the last mark.
-     */
-    void release();
-
-    /**
-     * Pop the last mark and return to its position.
-     */
-    void rewind();
+    @CheckReturnValue
+    MarkedLocation mark();
 
     int getCharPosition();
 
     String fetchSnippetForException();
+
+    /** Creates a new state object identical to this one, which does not follow location mutations to the original. */
+    ParserState snapshot();
+
+    interface MarkedLocation {
+        /**
+         * return to this marked position.
+         */
+        void rewind();
+    }
 }
