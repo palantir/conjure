@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix validation of deep complex types in map keys
+  links:
+  - https://github.com/palantir/conjure/pull/1136
