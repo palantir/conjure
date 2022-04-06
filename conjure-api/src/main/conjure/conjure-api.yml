@@ -26,6 +26,20 @@ types:
       Documentation:
         alias: string
 
+      LogSafety:
+        docs: >
+          Safety with regards to logging based on [safe-logging](https://github.com/palantir/safe-logging) concepts.
+        values:
+          - value: SAFE
+            docs: Explicitly marks an element as safe.
+          - value: UNSAFE
+            docs: Explicitly marks an element as unsafe, diallowing contents from being logged as `SAFE`.
+          - value: DO_NOT_LOG
+            docs: >
+              Marks elements that must never be logged.
+              For example, credentials, keys, and other secrets cannot be logged because such an action would
+              compromise security.
+
       # errors
       ErrorNamespace:
         alias: string
@@ -111,6 +125,7 @@ types:
           typeName: TypeName
           alias: Type
           docs: optional<Documentation>
+          safety: optional<LogSafety>
       EnumDefinition:
         fields:
           typeName: TypeName
@@ -137,6 +152,7 @@ types:
           type: Type
           docs: optional<Documentation>
           deprecated: optional<Documentation>
+          safety: optional<LogSafety>
       FieldName:
         alias: string
         docs: Should be in lowerCamelCase, but kebab-case and snake_case are also permitted.

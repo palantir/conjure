@@ -140,10 +140,11 @@ public final class EndpointDefinitionTest {
 
         DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
                 typeName,
-                TypeDefinition.alias(AliasDefinition.of(
-                        typeName,
-                        Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))),
-                        Documentation.of("")))));
+                TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(typeName)
+                        .alias(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.BINARY))))
+                        .docs(Documentation.of(""))
+                        .build())));
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, dealiasingVisitor))
                 .isInstanceOf(IllegalStateException.class)

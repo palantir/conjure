@@ -35,6 +35,7 @@ import com.palantir.conjure.exceptions.ConjureIllegalArgumentException;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.conjure.parser.LogSafetyDefinition;
 import com.palantir.conjure.parser.services.ParameterName;
 import com.palantir.conjure.parser.services.PathString;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
@@ -61,6 +62,7 @@ import com.palantir.conjure.spec.HeaderAuthType;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
+import com.palantir.conjure.spec.LogSafety;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
@@ -181,6 +183,7 @@ public final class ConjureParserUtils {
                 .typeName(name)
                 .alias(def.alias().visit(new ConjureTypeParserVisitor(typeResolver)))
                 .docs(def.docs().map(Documentation::of))
+                .safety(def.safety().map(ConjureParserUtils::parseLogSafety))
                 .build());
     }
 
@@ -375,11 +378,24 @@ public final class ConjureParserUtils {
                             .type(entry.getValue().type().visit(new ConjureTypeParserVisitor(typeResolver)))
                             .docs(entry.getValue().docs().map(Documentation::of))
                             .deprecated(entry.getValue().deprecated().map(Documentation::of))
+                            .safety(entry.getValue().safety().map(ConjureParserUtils::parseLogSafety))
                             .build();
                     FieldDefinitionValidator.validate(fieldDefinition);
                     return fieldDefinition;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private static LogSafety parseLogSafety(LogSafetyDefinition def) {
+        switch (def) {
+            case SAFE:
+                return LogSafety.SAFE;
+            case UNSAFE:
+                return LogSafety.UNSAFE;
+            case DO_NOT_LOG:
+                return LogSafety.DO_NOT_LOG;
+        }
+        throw new ConjureIllegalArgumentException("Unknown log safety type: " + def);
     }
 
     private static FieldName parseFieldName(com.palantir.conjure.parser.types.names.FieldName parserFieldName) {

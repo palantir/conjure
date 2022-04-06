@@ -35,4 +35,11 @@ conjure {
     typescript {
         nodeCompatibleModules = true
     }
+    java {
+        // Avoid warnings when java code is generated
+        useImmutableBytes = true
+        // Empty optionals are excluded from serialization by default,
+        // allowing for seamless rollout of new experimental features.
+        excludeEmptyOptionals = true
+    }
 }

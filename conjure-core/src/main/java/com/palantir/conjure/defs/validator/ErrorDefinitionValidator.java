@@ -16,8 +16,11 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.FieldName;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,5 +36,16 @@ public final class ErrorDefinitionValidator {
                 Stream.concat(definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
                         .map(FieldDefinition::getFieldName)
                         .collect(Collectors.toSet()));
+        ImmutableList<FieldName> fieldsDeclaringSafety = Stream.concat(
+                        definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
+                .filter(arg -> arg.getSafety().isPresent())
+                .map(FieldDefinition::getFieldName)
+                .collect(ImmutableList.toImmutableList());
+        if (!fieldsDeclaringSafety.isEmpty()) {
+            throw new ConjureIllegalStateException("ErrorDefinition field safety is defined by the key 'safeArgs' or "
+                    + "'unsafeArgs', safety cannot be declared: "
+                    + fieldsDeclaringSafety);
+        }
+        // TODO(ckozak): Resolve safety of all referenced types to ensure alignment with the encapsulating field.
     }
 }

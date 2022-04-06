@@ -5,7 +5,6 @@
       "name" : "Error1",
       "package" : "com.palantir.a"
     },
-    "docs" : null,
     "namespace" : "Test",
     "code" : "INVALID_ARGUMENT",
     "safeArgs" : [ {
@@ -13,9 +12,7 @@
       "type" : {
         "type" : "primitive",
         "primitive" : "INTEGER"
-      },
-      "docs" : null,
-      "deprecated" : null
+      }
     } ],
     "unsafeArgs" : [ ]
   }, {
@@ -23,7 +20,6 @@
       "name" : "Error2",
       "package" : "com.palantir.a"
     },
-    "docs" : null,
     "namespace" : "Test",
     "code" : "INVALID_ARGUMENT",
     "safeArgs" : [ {
@@ -31,9 +27,7 @@
       "type" : {
         "type" : "primitive",
         "primitive" : "INTEGER"
-      },
-      "docs" : null,
-      "deprecated" : null
+      }
     } ],
     "unsafeArgs" : [ ]
   } ],
@@ -49,11 +43,8 @@
         "type" : {
           "type" : "primitive",
           "primitive" : "STRING"
-        },
-        "docs" : null,
-        "deprecated" : null
-      } ],
-      "docs" : null
+        }
+      } ]
     }
   }, {
     "type" : "alias",
@@ -65,8 +56,7 @@
       "alias" : {
         "type" : "primitive",
         "primitive" : "STRING"
-      },
-      "docs" : null
+      }
     }
   }, {
     "type" : "alias",
@@ -78,8 +68,7 @@
       "alias" : {
         "type" : "primitive",
         "primitive" : "STRING"
-      },
-      "docs" : null
+      }
     }
   } ],
   "services" : [ {
@@ -91,15 +80,10 @@
       "endpointName" : "get",
       "httpMethod" : "GET",
       "httpPath" : "/get",
-      "auth" : null,
       "args" : [ ],
-      "returns" : null,
-      "docs" : null,
-      "deprecated" : null,
       "markers" : [ ],
       "tags" : [ ]
-    } ],
-    "docs" : null
+    } ]
   }, {
     "serviceName" : {
       "name" : "TestService2",
@@ -109,15 +93,10 @@
       "endpointName" : "get",
       "httpMethod" : "GET",
       "httpPath" : "/get",
-      "auth" : null,
       "args" : [ ],
-      "returns" : null,
-      "docs" : null,
-      "deprecated" : null,
       "markers" : [ ],
       "tags" : [ ]
-    } ],
-    "docs" : null
+    } ]
   } ],
   "extensions" : { }
 }
