@@ -40,7 +40,7 @@ public final class FieldDefinitionValidator {
         typeDef.getType().accept(new CheckForComplexTypeVisitor(typeDef));
     }
 
-    private static class CheckForComplexTypeVisitor implements Type.Visitor<Void> {
+    private static final class CheckForComplexTypeVisitor implements Type.Visitor<Void> {
         private final FieldDefinition typeDef;
 
         private CheckForComplexTypeVisitor(FieldDefinition typeDef) {
