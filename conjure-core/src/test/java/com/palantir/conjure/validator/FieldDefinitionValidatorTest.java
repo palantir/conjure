@@ -32,11 +32,47 @@ public class FieldDefinitionValidatorTest {
 
     @Test
     public void testNoComplexKeysInMaps() {
+        Type stringType = Type.primitive(PrimitiveType.STRING);
+
         String illegalFieldName = "asdf";
-        Type complexKeyType = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
+        Type complexKeyType = Type.list(ListType.of(stringType));
         FieldDefinition fieldDefinition = FieldDefinition.builder()
                 .fieldName(FieldName.of(illegalFieldName))
-                .type(Type.map(MapType.of(complexKeyType, Type.primitive(PrimitiveType.STRING))))
+                .type(Type.map(MapType.of(complexKeyType, stringType)))
+                .docs(Documentation.of("docs"))
+                .build();
+        assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(illegalFieldName)
+                .hasMessageContaining(complexKeyType.toString());
+    }
+
+    @Test
+    public void testNoComplexKeysInMapsInLists() {
+        Type stringType = Type.primitive(PrimitiveType.STRING);
+
+        String illegalFieldName = "asdf";
+        Type complexKeyType = Type.list(ListType.of(stringType));
+        FieldDefinition fieldDefinition = FieldDefinition.builder()
+                .fieldName(FieldName.of(illegalFieldName))
+                .type(Type.list(ListType.of(Type.map(MapType.of(complexKeyType, stringType)))))
+                .docs(Documentation.of("docs"))
+                .build();
+        assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(illegalFieldName)
+                .hasMessageContaining(complexKeyType.toString());
+    }
+
+    @Test
+    public void testNoComplexKeysInDeepMaps() {
+        Type stringType = Type.primitive(PrimitiveType.STRING);
+
+        String illegalFieldName = "asdf";
+        Type complexKeyType = Type.list(ListType.of(stringType));
+        FieldDefinition fieldDefinition = FieldDefinition.builder()
+                .fieldName(FieldName.of(illegalFieldName))
+                .type(Type.map(MapType.of(stringType, Type.map(MapType.of(complexKeyType, stringType)))))
                 .docs(Documentation.of("docs"))
                 .build();
         assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
