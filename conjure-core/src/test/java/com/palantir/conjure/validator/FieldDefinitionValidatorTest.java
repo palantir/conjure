@@ -29,19 +29,34 @@ import com.palantir.conjure.spec.Type;
 import org.junit.jupiter.api.Test;
 
 public class FieldDefinitionValidatorTest {
+    private static final Type STRING_TYPE = Type.primitive(PrimitiveType.STRING);
+    private static final Type COMPLEX_KEY_TYPE = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
 
     @Test
     public void testNoComplexKeysInMaps() {
+        assertInvalidType(Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)));
+    }
+
+    @Test
+    public void testNoComplexKeysInMapsInLists() {
+        assertInvalidType(Type.list(ListType.of(Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)))));
+    }
+
+    @Test
+    public void testNoComplexKeysInDeepMaps() {
+        assertInvalidType(Type.map(MapType.of(STRING_TYPE, Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)))));
+    }
+
+    private void assertInvalidType(Type type) {
         String illegalFieldName = "asdf";
-        Type complexKeyType = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
         FieldDefinition fieldDefinition = FieldDefinition.builder()
                 .fieldName(FieldName.of(illegalFieldName))
-                .type(Type.map(MapType.of(complexKeyType, Type.primitive(PrimitiveType.STRING))))
+                .type(type)
                 .docs(Documentation.of("docs"))
                 .build();
         assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(illegalFieldName)
-                .hasMessageContaining(complexKeyType.toString());
+                .hasMessageContaining(COMPLEX_KEY_TYPE.toString());
     }
 }

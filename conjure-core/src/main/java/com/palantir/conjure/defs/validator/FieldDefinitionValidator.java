@@ -17,8 +17,15 @@
 package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldDefinition;
+import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
+import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.SetType;
+import com.palantir.conjure.spec.Type;
+import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.TypeVisitor;
 
 public final class FieldDefinitionValidator {
@@ -30,12 +37,59 @@ public final class FieldDefinitionValidator {
     }
 
     private static void checkForComplexType(FieldDefinition typeDef) {
-        if (typeDef.getType().accept(TypeVisitor.IS_MAP)) {
-            MapType mapType = typeDef.getType().accept(TypeVisitor.MAP);
+        typeDef.getType().accept(new CheckForComplexTypeVisitor(typeDef));
+    }
+
+    private static final class CheckForComplexTypeVisitor implements Type.Visitor<Void> {
+        private final FieldDefinition typeDef;
+
+        private CheckForComplexTypeVisitor(FieldDefinition typeDef) {
+            this.typeDef = typeDef;
+        }
+
+        @Override
+        public Void visitPrimitive(PrimitiveType _value) {
+            return null;
+        }
+
+        @Override
+        public Void visitOptional(OptionalType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Void visitList(ListType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Void visitSet(SetType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Void visitMap(MapType mapType) {
             if (!mapType.getKeyType().accept(TypeVisitor.IS_PRIMITIVE_OR_REFERENCE)) {
                 throw new ConjureIllegalStateException(
                         String.format("Complex type '%s' not allowed in map key: %s.", mapType.getKeyType(), typeDef));
             }
+
+            return mapType.getValueType().accept(this);
+        }
+
+        @Override
+        public Void visitReference(TypeName _value) {
+            return null;
+        }
+
+        @Override
+        public Void visitExternal(ExternalReference _value) {
+            return null;
+        }
+
+        @Override
+        public Void visitUnknown(String _unknownType) {
+            return null;
         }
     }
 }
