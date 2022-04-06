@@ -29,55 +29,34 @@ import com.palantir.conjure.spec.Type;
 import org.junit.jupiter.api.Test;
 
 public class FieldDefinitionValidatorTest {
+    private static final Type STRING_TYPE = Type.primitive(PrimitiveType.STRING);
+    private static final Type COMPLEX_KEY_TYPE = Type.list(ListType.of(Type.primitive(PrimitiveType.STRING)));
 
     @Test
     public void testNoComplexKeysInMaps() {
-        Type stringType = Type.primitive(PrimitiveType.STRING);
-
-        String illegalFieldName = "asdf";
-        Type complexKeyType = Type.list(ListType.of(stringType));
-        FieldDefinition fieldDefinition = FieldDefinition.builder()
-                .fieldName(FieldName.of(illegalFieldName))
-                .type(Type.map(MapType.of(complexKeyType, stringType)))
-                .docs(Documentation.of("docs"))
-                .build();
-        assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(illegalFieldName)
-                .hasMessageContaining(complexKeyType.toString());
+        assertInvalidType(Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)));
     }
 
     @Test
     public void testNoComplexKeysInMapsInLists() {
-        Type stringType = Type.primitive(PrimitiveType.STRING);
-
-        String illegalFieldName = "asdf";
-        Type complexKeyType = Type.list(ListType.of(stringType));
-        FieldDefinition fieldDefinition = FieldDefinition.builder()
-                .fieldName(FieldName.of(illegalFieldName))
-                .type(Type.list(ListType.of(Type.map(MapType.of(complexKeyType, stringType)))))
-                .docs(Documentation.of("docs"))
-                .build();
-        assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(illegalFieldName)
-                .hasMessageContaining(complexKeyType.toString());
+        assertInvalidType(Type.list(ListType.of(Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)))));
     }
 
     @Test
     public void testNoComplexKeysInDeepMaps() {
-        Type stringType = Type.primitive(PrimitiveType.STRING);
+        assertInvalidType(Type.map(MapType.of(STRING_TYPE, Type.map(MapType.of(COMPLEX_KEY_TYPE, STRING_TYPE)))));
+    }
 
+    private void assertInvalidType(Type type) {
         String illegalFieldName = "asdf";
-        Type complexKeyType = Type.list(ListType.of(stringType));
         FieldDefinition fieldDefinition = FieldDefinition.builder()
                 .fieldName(FieldName.of(illegalFieldName))
-                .type(Type.map(MapType.of(stringType, Type.map(MapType.of(complexKeyType, stringType)))))
+                .type(type)
                 .docs(Documentation.of("docs"))
                 .build();
         assertThatThrownBy(() -> FieldDefinitionValidator.validate(fieldDefinition))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(illegalFieldName)
-                .hasMessageContaining(complexKeyType.toString());
+                .hasMessageContaining(COMPLEX_KEY_TYPE.toString());
     }
 }
