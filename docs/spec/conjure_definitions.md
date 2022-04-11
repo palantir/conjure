@@ -169,11 +169,12 @@ uuid
 [AliasDefinition]: #aliasdefinition
 Definition for an alias complex data type.
 
-Field | Type | Description
----|:---:|---
+Field |      Type       | Description
+---|:---------------:|---
 alias | [ConjureType][] | **REQUIRED**. The Conjure type to be aliased.
-docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
+safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitivies,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+docs |  [DocString][]  | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+package |    `string`     | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
 
 ## ObjectTypeDefinition
@@ -205,11 +206,12 @@ TypeAlias:
 [FieldDefinition]: #fielddefinition
 Definition for a field in a complex data type.
 
-Field | Type | Description
----|:---:|---
+Field |      Type       | Description
+---|:---------------:|---
 type | [ConjureType][] | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
-docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
-deprecated | [DocString][] | Documentation for why this field is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitivies,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+docs |  [DocString][]  | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+deprecated |  [DocString][]  | Documentation for why this field is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 
 ## UnionTypeDefinition
