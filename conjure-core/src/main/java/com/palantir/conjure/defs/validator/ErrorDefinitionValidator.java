@@ -44,8 +44,7 @@ public final class ErrorDefinitionValidator {
         if (!fieldsDeclaringSafety.isEmpty()) {
             throw new ConjureIllegalStateException("ErrorDefinition field safety is defined by the key 'safeArgs' or "
                     + "'unsafeArgs', safety cannot be declared: "
-                    + fieldsDeclaringSafety);
+                    + fieldsDeclaringSafety + " in error " + definition.getErrorName());
         }
-        // TODO(ckozak): Resolve safety of all referenced types to ensure alignment with the encapsulating field.
     }
 }

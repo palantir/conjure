@@ -114,7 +114,9 @@ public final class SafetyValidator {
         @Override
         public Void visitMap(MapType map) {
             throw new ConjureIllegalStateException(
-                    String.format("%s cannot declare log safety. Maps are not supported at this time.", map));
+                    "Maps cannot declare log safety. Consider using alias types for keys or values to "
+                            + "leverage the type system. Failing map: "
+                            + map);
         }
 
         @Override

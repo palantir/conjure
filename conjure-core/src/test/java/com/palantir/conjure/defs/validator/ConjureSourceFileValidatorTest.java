@@ -295,7 +295,7 @@ public class ConjureSourceFileValidatorTest {
                 .build();
         assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Maps are not supported at this time");
+                .hasMessageContainingAll("Maps cannot declare log safety", "Consider using alias types");
     }
 
     @Test
