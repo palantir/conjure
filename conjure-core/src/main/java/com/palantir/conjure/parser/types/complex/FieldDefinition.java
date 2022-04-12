@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.LogSafetyDefinition;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.conjure.parser.types.complex.FieldDefinition.FieldDefinitionDeserializer;
 import com.palantir.parsec.ParseException;
@@ -38,6 +39,8 @@ public interface FieldDefinition {
     Optional<String> docs();
 
     Optional<String> deprecated();
+
+    Optional<LogSafetyDefinition> safety();
 
     static FieldDefinition of(ConjureType type) {
         return ImmutableFieldDefinition.builder().type(type).build();

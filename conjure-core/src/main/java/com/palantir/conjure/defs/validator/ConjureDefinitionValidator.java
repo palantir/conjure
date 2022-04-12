@@ -53,7 +53,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
     UNIQUE_NAMES(new UniqueNamesValidator()),
     NO_NESTED_OPTIONAL(new NoNestedOptionalValidator()),
-    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator());
+    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator()),
+    LOG_SAFETY(new LogSafetyConjureDefinitionValidator());
 
     public static void validateAll(ConjureDefinition definition) {
         for (ConjureValidator<ConjureDefinition> validator : values()) {
@@ -426,6 +427,15 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                         || subType.accept(TypeVisitor.IS_ANY));
             }
             return false;
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class LogSafetyConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
+
+        @Override
+        public void validate(ConjureDefinition definition) {
+            definition.getTypes().forEach(SafetyValidator::validate);
         }
     }
 }

@@ -20,10 +20,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.LogSafetyDefinition;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import java.io.IOException;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = ImmutableAliasTypeDefinition.class)
@@ -32,6 +34,8 @@ import org.immutables.value.Value;
 public interface AliasTypeDefinition extends BaseObjectTypeDefinition {
 
     ConjureType alias();
+
+    Optional<LogSafetyDefinition> safety();
 
     @Override
     default <T> T visit(TypeDefinitionVisitor<T> visitor) {

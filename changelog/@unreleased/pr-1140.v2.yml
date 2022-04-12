@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: Conjure types may be declared with log-safety. Only conjure primitives
+    (and wrappers around these primitives) may declare safety, complex types calculate
+    safety based on the type graph.
+  links:
+  - https://github.com/palantir/conjure/pull/1140

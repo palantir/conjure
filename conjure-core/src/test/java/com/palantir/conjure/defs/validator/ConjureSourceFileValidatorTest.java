@@ -31,6 +31,7 @@ import com.palantir.conjure.spec.FieldName;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
 import com.palantir.conjure.spec.ListType;
+import com.palantir.conjure.spec.LogSafety;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.OptionalType;
@@ -232,6 +233,86 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in object Foo");
+    }
+
+    @Test
+    public void testNoSafetyOnComplexTypes() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(TypeName.of("AliasName", "package"))
+                        .alias(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.reference(TypeName.of("AliasName", "package")))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(
+                        "Only conjure primitives and wrappers around conjure primitives may declare safety");
+    }
+
+    @Test
+    public void testSafetyOnBearerToken() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.primitive(PrimitiveType.BEARERTOKEN))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("do-not-log by default and cannot be configured");
+    }
+
+    @Test
+    public void testSafetyOnMap() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
+                                        Type.primitive(PrimitiveType.STRING), Type.primitive(PrimitiveType.STRING))))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContainingAll("Maps cannot declare log safety", "Consider using alias types");
+    }
+
+    @Test
+    public void testNoSafetyOnPrimitive() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef);
     }
 
     private FieldDefinition field(FieldName name, String type) {
