@@ -172,7 +172,7 @@ Definition for an alias complex data type.
 Field |      Type       | Description
 ---|:---------------:|---
 alias | [ConjureType][] | **REQUIRED**. The Conjure type to be aliased.
-safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitivies,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitives,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
 docs |  [DocString][]  | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package |    `string`     | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -209,7 +209,7 @@ Definition for a field in a complex data type.
 Field |      Type       | Description
 ---|:---------------:|---
 type | [ConjureType][] | **REQUIRED**. The name of the type of the field. It MUST be a type name that exists within the Conjure definition.
-safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitivies,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitives,and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
 docs |  [DocString][]  | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 deprecated |  [DocString][]  | Documentation for why this field is deprecated. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
@@ -423,3 +423,41 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 [DocString]: #docstring
 Throughout the specification `docs` fields are noted as supporting CommonMark markdown formatting.
 Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
+
+## LogSafety
+[LogSafety]: #logSafety
+
+The safety of the type with regard to logging in accordance with the SLS specification.
+Allowed values are `safe`, `unsafe`, and `do-not-log`.
+Only conjure primitives and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+The exception is that `bearertoken` is always considered `do-not-log` and safety cannot be overridden.
+
+For example, the following 
+```yaml
+MySimpleAlias:
+  alias: string
+  safety: safe
+MyWrapperAlias:
+  alias: list<optional<string>>
+  safety: unsafe
+MyObject:
+  fields:
+    wrappedPrimitive:
+      type: set<rid>
+      safety: do-not-log
+    token:
+      # Safety cannot be declared for bearer-tokens, these are always
+      # considered 'do-not-log' because the bearer token is a credential
+      # type.
+      type: bearertoken
+    reference:
+      # Safety cannot be declared here, MySimpleAlias is responsible for
+      # declaring safety.
+      type: MySimpleAlias
+    mapField:
+      # Safety cannot be declared on maps, or wrappers around maps.
+      # Consider using alias types to declare safety in a way that
+      # integrates with the type system
+      # e.g. map<MySimpleAlias,MySimpleAlias>
+      type: map<string,string>
+```
