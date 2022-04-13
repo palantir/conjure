@@ -33,6 +33,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
       - [ArgumentDefinition][]
       - [ArgumentDefinition.ParamType][]
     - [DocString][]
+    - [LogSafety][]
 
 Note: All field names in the specification are **case sensitive**. In the following description, if a field is not explicitly **REQUIRED** or described with a MUST or SHALL, it can be considered OPTIONAL.
 
@@ -425,7 +426,7 @@ Throughout the specification `docs` fields are noted as supporting CommonMark ma
 Where Conjure tooling renders rich text it MUST support, at a minimum, markdown syntax as described by [CommonMark 0.27](http://spec.commonmark.org/0.27/).
 
 ## LogSafety
-[LogSafety]: #logSafety
+[LogSafety]: #logsafety
 
 The safety of the type with regard to logging in accordance with the SLS specification.
 Allowed values are `safe`, `unsafe`, and `do-not-log`.
