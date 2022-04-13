@@ -28,7 +28,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
 
     private static final ObjectMapper mapper = ConjureParser.createConjureParserObjectMapper();
 
-    private static final class ValidTarget {
+    static final class ValidTarget {
         String fooBar;
 
         @JsonProperty("foo-bar")
@@ -44,7 +44,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
                 .isEqualToComparingFieldByField(new ValidTarget().setFooBar("baz"));
     }
 
-    private static final class NoAnnotationInvalidTarget {
+    static final class NoAnnotationInvalidTarget {
         String fooBar;
 
         void setFooBar(String fooBar) {
@@ -60,7 +60,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
                         + "@JsonProperty annotations: setFooBar");
     }
 
-    private static final class NonKebabCaseAnnotationInvalidTarget {
+    static final class NonKebabCaseAnnotationInvalidTarget {
         String fooBar;
 
         @JsonProperty("fooBar")
