@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Implement consistent endpoint argument safety declarations matching
+    field, alias, and union safety
+  links:
+  - https://github.com/palantir/conjure/pull/1153
