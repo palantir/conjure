@@ -20,4 +20,8 @@ public class ConjureIllegalStateException extends IllegalStateException implemen
     public ConjureIllegalStateException(String reason) {
         super(reason);
     }
+
+    public ConjureIllegalStateException(String reason, Throwable cause) {
+        super(reason, cause);
+    }
 }

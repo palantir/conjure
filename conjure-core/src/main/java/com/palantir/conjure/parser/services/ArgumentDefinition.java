@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.LogSafetyDefinition;
 import com.palantir.conjure.parser.services.ArgumentDefinition.ArgumentDefinitionDeserializer;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.parsec.ParseException;
@@ -50,6 +51,8 @@ public interface ArgumentDefinition {
     default ParamType paramType() {
         return ParamType.AUTO;
     }
+
+    Optional<LogSafetyDefinition> safety();
 
     Set<ConjureType> markers();
 

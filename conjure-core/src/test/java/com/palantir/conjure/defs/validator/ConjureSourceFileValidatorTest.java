@@ -21,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ArgumentDefinition;
+import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.BodyParameterType;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -35,6 +38,7 @@ import com.palantir.conjure.spec.LogSafety;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.OptionalType;
+import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
 import com.palantir.conjure.spec.ServiceDefinition;
 import com.palantir.conjure.spec.SetType;
@@ -296,6 +300,81 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContainingAll("Maps cannot declare log safety", "Consider using alias types");
+    }
+
+    @Test
+    public void testInvalidSafetyArgument_bearertoken() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.primitive(PrimitiveType.BEARERTOKEN))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .safety(LogSafety.UNSAFE)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(
+                        "Service.end(arg): bearertoken values are do-not-log by default and cannot be configured");
+    }
+
+    @Test
+    public void testInvalidSafetyArgument_reference() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(
+                        ObjectDefinition.builder().typeName(FOO).build()))
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.reference(FOO))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .safety(LogSafety.UNSAFE)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(
+                        "Service.end(arg): package.Foo cannot declare log safety. Only conjure primitives and wrappers"
+                                + " around conjure primitives may declare safety.");
+    }
+
+    @Test
+    public void testValidArgumentSafety() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.primitive(PrimitiveType.STRING))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .safety(LogSafety.UNSAFE)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef);
     }
 
     @Test
