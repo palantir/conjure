@@ -200,6 +200,7 @@ types:
           argName: ArgumentName
           type: Type
           paramType: ParameterType
+          safety: optional<LogSafety>
           docs: optional<Documentation>
           markers: list<Type>
           tags: set<string>

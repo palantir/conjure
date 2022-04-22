@@ -436,6 +436,23 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         @Override
         public void validate(ConjureDefinition definition) {
             definition.getTypes().forEach(SafetyValidator::validate);
+            definition.getServices().forEach(serviceDefinition -> serviceDefinition
+                    .getEndpoints()
+                    .forEach(endpointDefinition -> endpointDefinition.getArgs().forEach(argumentDefinition -> {
+                        try {
+                            SafetyValidator.validateDefinition(
+                                    argumentDefinition.getSafety(), argumentDefinition.getType());
+                        } catch (RuntimeException e) {
+                            throw new ConjureIllegalStateException(
+                                    String.format(
+                                            "%s.%s(%s): %s",
+                                            serviceDefinition.getServiceName().getName(),
+                                            endpointDefinition.getEndpointName(),
+                                            argumentDefinition.getArgName(),
+                                            e.getMessage()),
+                                    e);
+                        }
+                    })));
         }
     }
 }

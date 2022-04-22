@@ -371,14 +371,13 @@ An object representing an argument to an endpoint.
 
 Field | Type | Description
 ---|:---:|---
-type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type. 
-If the param-type is `path` then the de-aliased type MUST be an enum or a primitive (except `binary`, and `bearertoken`).
-If the param-type is `query` then the de-aliased type MUST be an enum or a primitive (except `binary` and `bearertoken`), or a container (list, set, optional) of one of these.
-If the param-type is `header` then the de-aliased type MUST be an enum or a primitive (except binary), or an optional of one of these.
-markers | List[`string`] | List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Prefer to use tags instead of markers.
-tags | Set[`string`] | Set of tags that serves as additional metadata for the argument.
+type | [ConjureType][] | **REQUIRED**. The type of the value of the argument. The type name MUST exist within the Conjure definition. If this ArgumentDefinition has a param-type of `body` then there are no restrictions on the type. If the param-type is `path` then the de-aliased type MUST be an enum or a primitive (except `binary`, and `bearertoken`). If the param-type is `query` then the de-aliased type MUST be an enum or a primitive (except `binary` and `bearertoken`), or a container (list, set, optional) of one of these. If the param-type is `header` then the de-aliased type MUST be an enum or a primitive (except binary), or an optional of one of these.
 param&#8209;id | `string` | An identifier to use as a parameter value. If the param type is `header` or `query`, this field may be populated to define the identifier that is used over the wire. If this field is undefined for the `header` or `query` param types, the argument name is used as the wire identifier. Population of this field is invalid if the param type is not `header` or `query`.
 param&#8209;type | [ArgumentDefinition.ParamType][] | The type of the endpoint parameter. If omitted the default type is `auto`.
+safety |  [LogSafety][]  | The safety of the type in regards to logging in accordance with the SLS specification. Allowed values are `safe`, `unsafe`, and `do-not-log`. Only conjure primitives, and wrappers around conjure primitives may declare safety, the safety of complex types is computed based on the type graph.
+docs |  [DocString][]  | Documentation for the argument. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
+tags | Set[`string`] | Set of tags that serves as additional metadata for the argument.
+markers | List[`string`] | **DEPRECATED**. List of types that serve as additional metadata for the argument. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Prefer to use tags instead of markers.
 
 Arguments with parameter type `body` MUST NOT be of type `optional<binary>`, or, intuitively, of a type that reduces to `optional<binary>` via unfolding of alias definitions and nested `optional`.
 
@@ -435,30 +434,47 @@ The exception is that `bearertoken` is always considered `do-not-log` and safety
 
 For example, the following 
 ```yaml
-MySimpleAlias:
-  alias: string
-  safety: safe
-MyWrapperAlias:
-  alias: list<optional<string>>
-  safety: unsafe
-MyObject:
-  fields:
-    wrappedPrimitive:
-      type: set<rid>
-      safety: do-not-log
-    token:
-      # Safety cannot be declared for bearer-tokens, these are always
-      # considered 'do-not-log' because the bearer token is a credential
-      # type.
-      type: bearertoken
-    reference:
-      # Safety cannot be declared here, MySimpleAlias is responsible for
-      # declaring safety.
-      type: MySimpleAlias
-    mapField:
-      # Safety cannot be declared on maps, or wrappers around maps.
-      # Consider using alias types to declare safety in a way that
-      # integrates with the type system
-      # e.g. map<MySimpleAlias,MySimpleAlias>
-      type: map<string,string>
+types:
+  definitions:
+    default-package: com.palantir.product
+    objects:
+      MySimpleAlias:
+        alias: string
+        safety: safe
+      MyWrapperAlias:
+        alias: list<optional<string>>
+        safety: unsafe
+      MyObject:
+        fields:
+          wrappedPrimitive:
+            type: set<rid>
+            safety: do-not-log
+          token:
+            # Safety cannot be declared for bearer-tokens, these are always
+            # considered 'do-not-log' because the bearer token is a credential
+            # type.
+            type: bearertoken
+          reference:
+            # Safety cannot be declared here, MySimpleAlias is responsible for
+            # declaring safety.
+            type: MySimpleAlias
+          mapField:
+            # Safety cannot be declared on maps, or wrappers around maps.
+            # Consider using alias types to declare safety in a way that
+            # integrates with the type system
+            # e.g. map<MySimpleAlias,MySimpleAlias>
+            type: map<string,string>
+services:
+  MyService:
+    package: com.palantir.product
+    endpoints:
+      send:
+        http: POST /send
+        args:
+          arg:
+            type: string
+            param-type: body
+            # Safety may be declared on primitive endpoint arguments as well as
+            # aliases, object fields, and union types.
+            safety: safe
 ```

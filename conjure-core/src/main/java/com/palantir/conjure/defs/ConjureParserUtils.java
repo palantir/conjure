@@ -470,6 +470,7 @@ public final class ConjureParserUtils {
                     .type(original.type().visit(new ConjureTypeParserVisitor(typeResolver)))
                     .paramType(paramType)
                     .docs(original.docs().map(Documentation::of))
+                    .safety(original.safety().map(ConjureParserUtils::parseLogSafety))
                     .markers(parseMarkers(original.markers(), typeResolver))
                     .tags(original.tags().stream()
                             .peek(tag -> Preconditions.checkArgument(!tag.isEmpty(), "tag must not be empty"))

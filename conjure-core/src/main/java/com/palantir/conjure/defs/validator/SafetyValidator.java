@@ -41,11 +41,17 @@ public final class SafetyValidator {
         type.accept(TypeDefinitionSafetyVisitor.INSTANCE);
     }
 
-    private static ConjureIllegalStateException fail(Object typeDescription) {
+    public static void validateDefinition(Optional<LogSafety> declaredSafety, Type type) {
+        if (declaredSafety.isPresent()) {
+            type.accept(SafetyTypeVisitor.INSTANCE);
+        }
+    }
+
+    private static ConjureIllegalStateException fail(TypeName typeName) {
         return new ConjureIllegalStateException(String.format(
-                "%s cannot declare log safety. Only conjure primitives and "
+                "%s.%s cannot declare log safety. Only conjure primitives and "
                         + "wrappers around conjure primitives may declare safety.",
-                typeDescription));
+                typeName.getPackage(), typeName.getName()));
     }
 
     private enum TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Void> {
