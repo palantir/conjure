@@ -441,7 +441,9 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                     .forEach(endpointDefinition -> endpointDefinition.getArgs().forEach(argumentDefinition -> {
                         try {
                             SafetyValidator.validateDefinition(
-                                    argumentDefinition.getSafety(), argumentDefinition.getType());
+                                    endpointDefinition.getEndpointName(),
+                                    argumentDefinition.getSafety(),
+                                    argumentDefinition.getType());
                         } catch (RuntimeException e) {
                             throw new ConjureIllegalStateException(
                                     String.format(
