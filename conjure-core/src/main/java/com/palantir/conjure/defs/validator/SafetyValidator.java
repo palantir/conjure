@@ -18,7 +18,7 @@ package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
-import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldName;
@@ -43,16 +43,18 @@ public final class SafetyValidator {
         type.accept(TypeDefinitionSafetyVisitor.INSTANCE);
     }
 
-    public static void validateDefinition(EndpointName endpointName, Optional<LogSafety> declaredSafety, Type type) {
+    public static void validateDefinition(
+            EndpointDefinition endpointDefinition, Optional<LogSafety> declaredSafety, Type type) {
         if (declaredSafety.isPresent()) {
-            type.accept(new SafetyTypeVisitor(endpointName.get()));
+            type.accept(
+                    new SafetyTypeVisitor(endpointDefinition.getEndpointName().get()));
         }
     }
 
     private static ConjureIllegalStateException fail(String parentReference, TypeName nonPrimitiveType) {
         return new ConjureIllegalStateException(String.format(
                 "%s cannot declare log safety. Only conjure primitives and "
-                        + "wrappers around conjure primitives may declare safety. %s.%s is not a primitive type",
+                        + "wrappers around conjure primitives may declare safety. %s.%s is not a primitive type.",
                 parentReference, nonPrimitiveType.getPackage(), nonPrimitiveType.getName()));
     }
 
