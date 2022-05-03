@@ -104,7 +104,7 @@ public final class SafetyValidator {
         }
 
         private static String qualifyTypeReference(TypeName typeName, FieldName fieldName) {
-            return String.format("%s.%s::%s", typeName.getPackage(), typeName.getName(), fieldName);
+            return typeName.getPackage() + '.' + typeName.getName() + "::" + fieldName;
         }
 
         private static String qualifyTypeReference(TypeName typeName) {
