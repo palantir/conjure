@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Improve incorrect safety usage error message to reference proper type.
+  links:
+  - https://github.com/palantir/conjure/pull/1170

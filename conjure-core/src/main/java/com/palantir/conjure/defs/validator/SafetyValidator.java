@@ -18,8 +18,10 @@ package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
+import com.palantir.conjure.spec.FieldName;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.LogSafety;
 import com.palantir.conjure.spec.MapType;
@@ -41,17 +43,19 @@ public final class SafetyValidator {
         type.accept(TypeDefinitionSafetyVisitor.INSTANCE);
     }
 
-    public static void validateDefinition(Optional<LogSafety> declaredSafety, Type type) {
+    public static void validateDefinition(
+            EndpointDefinition endpointDefinition, Optional<LogSafety> declaredSafety, Type type) {
         if (declaredSafety.isPresent()) {
-            type.accept(SafetyTypeVisitor.INSTANCE);
+            type.accept(
+                    new SafetyTypeVisitor(endpointDefinition.getEndpointName().get()));
         }
     }
 
-    private static ConjureIllegalStateException fail(TypeName typeName) {
+    private static ConjureIllegalStateException fail(String parentReference, TypeName nonPrimitiveType) {
         return new ConjureIllegalStateException(String.format(
-                "%s.%s cannot declare log safety. Only conjure primitives and "
-                        + "wrappers around conjure primitives may declare safety.",
-                typeName.getPackage(), typeName.getName()));
+                "%s cannot declare log safety. Only conjure primitives and "
+                        + "wrappers around conjure primitives may declare safety. %s.%s is not a primitive type.",
+                parentReference, nonPrimitiveType.getPackage(), nonPrimitiveType.getName()));
     }
 
     private enum TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Void> {
@@ -59,7 +63,7 @@ public final class SafetyValidator {
 
         @Override
         public Void visitAlias(AliasDefinition value) {
-            validateType(value.getAlias(), value.getSafety());
+            validateType(value.getAlias(), value.getSafety(), qualifyTypeReference(value.getTypeName()));
             return null;
         }
 
@@ -70,13 +74,21 @@ public final class SafetyValidator {
 
         @Override
         public Void visitObject(ObjectDefinition value) {
-            value.getFields().forEach(field -> validateType(field.getType(), field.getSafety()));
+            value.getFields()
+                    .forEach(field -> validateType(
+                            field.getType(),
+                            field.getSafety(),
+                            qualifyTypeReference(value.getTypeName(), field.getFieldName())));
             return null;
         }
 
         @Override
         public Void visitUnion(UnionDefinition value) {
-            value.getUnion().forEach(field -> validateType(field.getType(), field.getSafety()));
+            value.getUnion()
+                    .forEach(field -> validateType(
+                            field.getType(),
+                            field.getSafety(),
+                            qualifyTypeReference(value.getTypeName(), field.getFieldName())));
             return null;
         }
 
@@ -85,16 +97,29 @@ public final class SafetyValidator {
             throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
 
-        private static void validateType(Type type, Optional<LogSafety> declaredSafety) {
+        private static void validateType(Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
             if (declaredSafety.isPresent()) {
-                type.accept(SafetyTypeVisitor.INSTANCE);
+                type.accept(new SafetyTypeVisitor(qualifiedTypeReference));
             }
+        }
+
+        private static String qualifyTypeReference(TypeName typeName, FieldName fieldName) {
+            return typeName.getPackage() + '.' + typeName.getName() + "::" + fieldName;
+        }
+
+        private static String qualifyTypeReference(TypeName typeName) {
+            return typeName.getPackage() + '.' + typeName.getName();
         }
     }
 
     /** Validates elements which declare safety. Fails if any non-primitive is referenced. */
-    private enum SafetyTypeVisitor implements Type.Visitor<Void> {
-        INSTANCE;
+    private static final class SafetyTypeVisitor implements Type.Visitor<Void> {
+
+        private final String parentReference;
+
+        SafetyTypeVisitor(String parentReference) {
+            this.parentReference = parentReference;
+        }
 
         @Override
         public Void visitPrimitive(PrimitiveType value) {
@@ -127,12 +152,12 @@ public final class SafetyValidator {
 
         @Override
         public Void visitReference(TypeName value) {
-            throw fail(value);
+            throw fail(parentReference, value);
         }
 
         @Override
         public Void visitExternal(ExternalReference value) {
-            throw fail(value.getExternalReference());
+            throw fail(parentReference, value.getExternalReference());
         }
 
         @Override

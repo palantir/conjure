@@ -351,8 +351,8 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
-                        "Service.end(arg): package.Foo cannot declare log safety. Only conjure primitives and wrappers"
-                                + " around conjure primitives may declare safety.");
+                        "Service.end(arg): end cannot declare log safety. Only conjure primitives and wrappers around"
+                                + " conjure primitives may declare safety. package.Foo is not a primitive type.");
     }
 
     @Test
