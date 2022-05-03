@@ -108,7 +108,7 @@ public final class SafetyValidator {
         }
 
         private static String qualifyTypeReference(TypeName typeName) {
-            return String.format("%s.%s", typeName.getPackage(), typeName.getName());
+            return typeName.getPackage() + '.' + typeName.getName();
         }
     }
 
