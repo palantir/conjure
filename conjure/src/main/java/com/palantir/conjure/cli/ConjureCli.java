@@ -25,6 +25,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.defs.ConjureArgs;
+import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureException;
 import com.palantir.conjure.parser.ConjureParser.CyclicImportException;
 import com.palantir.conjure.spec.ConjureDefinition;
@@ -145,6 +147,11 @@ public final class ConjureCli implements Runnable {
         @Nullable
         private String extensions;
 
+        @CommandLine.Option(
+                names = "--requireSafety",
+                description = "All components which allow safety declarations must declare safety.")
+        private boolean requireSafety;
+
         @CommandLine.Unmatched
         @Nullable
         private List<String> unmatchedOptions;
@@ -162,7 +169,13 @@ public final class ConjureCli implements Runnable {
         @VisibleForTesting
         static void generate(CliConfiguration config) {
             ConjureDefinition definition = ConjureDefinition.builder()
-                    .from(Conjure.parse(config.inputFiles()))
+                    .from(Conjure.parse(ConjureArgs.builder()
+                            .definitions(config.inputFiles())
+                            .safetyDeclarations(
+                                    config.requireSafety()
+                                            ? SafetyDeclarationRequirements.REQUIRED
+                                            : SafetyDeclarationRequirements.ALLOWED)
+                            .build()))
                     .extensions(config.extensions())
                     .build();
             try {
@@ -179,7 +192,8 @@ public final class ConjureCli implements Runnable {
                     output,
                     Optional.ofNullable(extensions)
                             .map(ConjureCli::parseExtensions)
-                            .orElseGet(Collections::emptyMap));
+                            .orElseGet(Collections::emptyMap),
+                    requireSafety);
         }
 
         @Override

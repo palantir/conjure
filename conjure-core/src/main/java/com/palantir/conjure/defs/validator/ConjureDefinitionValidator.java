@@ -22,6 +22,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
@@ -53,13 +54,13 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
     UNIQUE_NAMES(new UniqueNamesValidator()),
     NO_NESTED_OPTIONAL(new NoNestedOptionalValidator()),
-    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator()),
-    LOG_SAFETY(new LogSafetyConjureDefinitionValidator());
+    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator());
 
-    public static void validateAll(ConjureDefinition definition) {
+    public static void validateAll(ConjureDefinition definition, SafetyDeclarationRequirements requirements) {
         for (ConjureValidator<ConjureDefinition> validator : values()) {
             validator.validate(definition);
         }
+        new LogSafetyConjureDefinitionValidator(requirements).validate(definition);
     }
 
     private final ConjureValidator<ConjureDefinition> validator;
@@ -433,15 +434,25 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     @com.google.errorprone.annotations.Immutable
     private static final class LogSafetyConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
 
+        private final SafetyDeclarationRequirements safetyDeclarations;
+
+        LogSafetyConjureDefinitionValidator(SafetyDeclarationRequirements safetyDeclarations) {
+            this.safetyDeclarations = safetyDeclarations;
+        }
+
         @Override
         public void validate(ConjureDefinition definition) {
-            definition.getTypes().forEach(SafetyValidator::validate);
+            definition.getTypes().forEach(type -> SafetyValidator.validate(type, safetyDeclarations));
             definition.getServices().forEach(serviceDefinition -> serviceDefinition
                     .getEndpoints()
                     .forEach(endpointDefinition -> endpointDefinition.getArgs().forEach(argumentDefinition -> {
                         try {
                             SafetyValidator.validateDefinition(
-                                    endpointDefinition, argumentDefinition.getSafety(), argumentDefinition.getType());
+                                    endpointDefinition,
+                                    argumentDefinition.getArgName(),
+                                    argumentDefinition.getSafety(),
+                                    argumentDefinition.getType(),
+                                    safetyDeclarations);
                         } catch (RuntimeException e) {
                             throw new ConjureIllegalStateException(
                                     String.format(

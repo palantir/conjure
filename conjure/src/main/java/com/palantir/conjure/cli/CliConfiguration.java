@@ -35,11 +35,14 @@ public abstract class CliConfiguration {
 
     abstract Map<String, Object> extensions();
 
+    abstract boolean requireSafety();
+
     static Builder builder() {
         return new Builder();
     }
 
-    static CliConfiguration create(String input, String outputIrFile, Map<String, Object> extensions) {
+    static CliConfiguration create(
+            String input, String outputIrFile, Map<String, Object> extensions, boolean requireSafety) {
         File inputFile = new File(input);
 
         Collection<File> inputFiles;
@@ -58,6 +61,7 @@ public abstract class CliConfiguration {
                 .inputFiles(inputFiles)
                 .outputIrFile(outputFile)
                 .extensions(extensions)
+                .requireSafety(requireSafety)
                 .build();
     }
 
