@@ -27,7 +27,10 @@ public interface ConjureArgs {
     /** Input conjure YAML definition files. */
     List<File> definitions();
 
-    /** If {@link SafetyDeclarationRequirements#REQUIRED}, all components which allow safety declarations must declare safety. */
+    /**
+     * If {@link SafetyDeclarationRequirements#REQUIRED}, all components
+     * which allow safety declarations must declare safety.
+     */
     SafetyDeclarationRequirements safetyDeclarations();
 
     static Builder builder() {

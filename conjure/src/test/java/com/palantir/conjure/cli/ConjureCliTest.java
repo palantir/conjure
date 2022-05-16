@@ -58,6 +58,7 @@ public final class ConjureCliTest {
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
                 .putExtensions("foo", "bar")
+                .requireSafety(false)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
                 .parseArgs(args)
@@ -73,6 +74,7 @@ public final class ConjureCliTest {
         CliConfiguration expectedConfiguration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
+                .requireSafety(false)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
                 .parseArgs(args)
@@ -133,9 +135,21 @@ public final class ConjureCliTest {
                         new File("src/test/resources/complex/api.yml"),
                         new File("src/test/resources/complex/api-2.yml")))
                 .outputIrFile(outputFile)
+                .requireSafety(false)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
         assertThat(outputFile).exists();
+    }
+
+    @Test
+    public void canRequireSafetyInfo() {
+        CliConfiguration configuration = CliConfiguration.builder()
+                .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
+                .outputIrFile(outputFile)
+                .requireSafety(true)
+                .build();
+        assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
+                .hasMessageContaining("must declare log safety");
     }
 
     @Test
@@ -207,6 +221,7 @@ public final class ConjureCliTest {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(folder)
+                .requireSafety(false)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .getRootCause()
