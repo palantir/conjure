@@ -31,10 +31,23 @@ public final class Conjure {
 
     /**
      * Deserializes {@link ConjureDefinition} from their YAML representations in the given files.
+     *
+     * @deprecated in favor of {@link #parse(ConjureArgs)}
      */
+    @Deprecated
     public static ConjureDefinition parse(Collection<File> files) {
-        Map<String, AnnotatedConjureSourceFile> sourceFiles = ConjureParser.parseAnnotated(files);
-        ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles);
+        return parse(ConjureArgs.builder()
+                .definitions(files)
+                .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                .build());
+    }
+
+    /**
+     * Deserializes {@link ConjureDefinition} from their YAML representations in the given files.
+     */
+    public static ConjureDefinition parse(ConjureArgs args) {
+        Map<String, AnnotatedConjureSourceFile> sourceFiles = ConjureParser.parseAnnotated(args.definitions());
+        ConjureDefinition ir = ConjureParserUtils.parseConjureDef(sourceFiles, args.safetyDeclarations());
         return NormalizeDefinition.normalize(ir);
     }
 }

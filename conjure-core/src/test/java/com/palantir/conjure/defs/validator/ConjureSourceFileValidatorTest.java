@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.defs.SafetyDeclarationRequirements;
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -257,7 +259,8 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
                         "Only conjure primitives and wrappers around conjure primitives may declare safety");
@@ -277,7 +280,8 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("do-not-log by default and cannot be configured");
     }
@@ -297,7 +301,8 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContainingAll("Maps cannot declare log safety", "Consider using alias types");
     }
@@ -321,7 +326,8 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build())
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
                         "Service.end(arg): bearertoken values are do-not-log by default and cannot be configured");
@@ -348,7 +354,8 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build())
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(conjureDef))
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(
                         "Service.end(arg): end cannot declare log safety. Only conjure primitives and wrappers around"
@@ -374,11 +381,11 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build())
                 .build();
-        ConjureDefinitionValidator.validateAll(conjureDef);
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
     }
 
     @Test
-    public void testNoSafetyOnPrimitive() {
+    public void testSafetyOnPrimitive() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
@@ -391,7 +398,50 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        ConjureDefinitionValidator.validateAll(conjureDef);
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
+    }
+
+    @Test
+    public void testTypeMissingRequiredSafetyInformation() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageContaining("package.Foo::bad must declare log safety");
+    }
+
+    @Test
+    public void testArgumentMissingRequiredSafetyInformation() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.primitive(PrimitiveType.STRING))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageContaining("Endpoint end argument arg must declare log safety");
     }
 
     private FieldDefinition field(FieldName name, String type) {

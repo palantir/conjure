@@ -16,8 +16,10 @@
 
 package com.palantir.conjure.defs.validator;
 
+import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
@@ -36,18 +38,34 @@ import com.palantir.conjure.spec.UnionDefinition;
 import java.util.Optional;
 
 public final class SafetyValidator {
+    private static final TypeDefinition.Visitor<Void> SAFETY_VISITOR_DECLARATIONS_ALLOWED =
+            new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.ALLOWED);
+    private static final TypeDefinition.Visitor<Void> SAFETY_VISITOR_DECLARATIONS_REQUIRED =
+            new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.REQUIRED);
 
     private SafetyValidator() {}
 
-    public static void validate(TypeDefinition type) {
-        type.accept(TypeDefinitionSafetyVisitor.INSTANCE);
+    public static void validate(TypeDefinition type, SafetyDeclarationRequirements safetyDeclarations) {
+        type.accept(
+                safetyDeclarations.required()
+                        ? SAFETY_VISITOR_DECLARATIONS_REQUIRED
+                        : SAFETY_VISITOR_DECLARATIONS_ALLOWED);
     }
 
     public static void validateDefinition(
-            EndpointDefinition endpointDefinition, Optional<LogSafety> declaredSafety, Type type) {
+            EndpointDefinition endpointDefinition,
+            ArgumentName argumentName,
+            Optional<LogSafety> declaredSafety,
+            Type type,
+            SafetyDeclarationRequirements safetyDeclarations) {
         if (declaredSafety.isPresent()) {
             type.accept(
                     new SafetyTypeVisitor(endpointDefinition.getEndpointName().get()));
+        } else if (safetyDeclarations.required() && type.accept(TypeSafetyAllowedVisitor.INSTANCE)) {
+            throw new ConjureIllegalStateException(String.format(
+                    "Endpoint %s argument %s must declare log safety using 'safety: VALUE' "
+                            + "where VALUE may be safe, unsafe, or do-not-log.",
+                    endpointDefinition.getEndpointName(), argumentName));
         }
     }
 
@@ -58,8 +76,12 @@ public final class SafetyValidator {
                 parentReference, nonPrimitiveType.getPackage(), nonPrimitiveType.getName()));
     }
 
-    private enum TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Void> {
-        INSTANCE;
+    private static final class TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Void> {
+        private final SafetyDeclarationRequirements safetyRequirements;
+
+        TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements safetyRequirements) {
+            this.safetyRequirements = safetyRequirements;
+        }
 
         @Override
         public Void visitAlias(AliasDefinition value) {
@@ -97,9 +119,13 @@ public final class SafetyValidator {
             throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
 
-        private static void validateType(Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
+        private void validateType(Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
             if (declaredSafety.isPresent()) {
                 type.accept(new SafetyTypeVisitor(qualifiedTypeReference));
+            } else if (safetyRequirements.required() && type.accept(TypeSafetyAllowedVisitor.INSTANCE)) {
+                throw new ConjureIllegalStateException(
+                        qualifiedTypeReference + " must declare log safety using 'safety: VALUE' "
+                                + "where VALUE may be safe, unsafe, or do-not-log.");
             }
         }
 
@@ -231,6 +257,115 @@ public final class SafetyValidator {
 
         @Override
         public Void visitUnknown(String unknownValue) {
+            throw new ConjureIllegalStateException("Unknown primitive type: " + unknownValue);
+        }
+    }
+
+    private enum TypeSafetyAllowedVisitor implements Type.Visitor<Boolean> {
+        INSTANCE;
+
+        @Override
+        public Boolean visitPrimitive(PrimitiveType value) {
+            return value.accept(PrimitiveTypeSafetyAllowedVisitor.INSTANCE);
+        }
+
+        @Override
+        public Boolean visitOptional(OptionalType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Boolean visitList(ListType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Boolean visitSet(SetType value) {
+            return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Boolean visitMap(MapType _map) {
+            return false;
+        }
+
+        @Override
+        public Boolean visitReference(TypeName _value) {
+            return false;
+        }
+
+        @Override
+        public Boolean visitExternal(ExternalReference _value) {
+            return false;
+        }
+
+        @Override
+        public Boolean visitUnknown(String unknownType) {
+            throw new ConjureIllegalStateException("Unknown type: " + unknownType);
+        }
+    }
+
+    /** Returns whether the type allows safety information. */
+    private enum PrimitiveTypeSafetyAllowedVisitor implements PrimitiveType.Visitor<Boolean> {
+        INSTANCE;
+
+        @Override
+        public Boolean visitString() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitDatetime() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitInteger() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitDouble() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitSafelong() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitBinary() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitAny() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitBoolean() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitUuid() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitRid() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitBearertoken() {
+            return false;
+        }
+
+        @Override
+        public Boolean visitUnknown(String unknownValue) {
             throw new ConjureIllegalStateException("Unknown primitive type: " + unknownValue);
         }
     }

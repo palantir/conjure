@@ -206,7 +206,14 @@ public final class ConjureParserUtils {
                 .collect(Collectors.toMap(source -> source.sourceFile().getAbsolutePath(), Function.identity())));
     }
 
+    @Deprecated
     static ConjureDefinition parseConjureDef(Map<String, AnnotatedConjureSourceFile> annotatedParsedDefs) {
+        return parseConjureDef(annotatedParsedDefs, SafetyDeclarationRequirements.ALLOWED);
+    }
+
+    static ConjureDefinition parseConjureDef(
+            Map<String, AnnotatedConjureSourceFile> annotatedParsedDefs,
+            SafetyDeclarationRequirements safetyDeclarations) {
         ImmutableList.Builder<ServiceDefinition> servicesBuilder = ImmutableList.builder();
         ImmutableList.Builder<ErrorDefinition> errorsBuilder = ImmutableList.builder();
         ImmutableList.Builder<TypeDefinition> typesBuilder = ImmutableList.builder();
@@ -252,7 +259,7 @@ public final class ConjureParserUtils {
                 .services(servicesBuilder.build())
                 .build();
 
-        ConjureDefinitionValidator.validateAll(definition);
+        ConjureDefinitionValidator.validateAll(definition, safetyDeclarations);
         return definition;
     }
 
