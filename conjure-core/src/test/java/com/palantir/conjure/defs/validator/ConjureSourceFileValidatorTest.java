@@ -444,6 +444,72 @@ public class ConjureSourceFileValidatorTest {
                 .hasMessageContaining("Endpoint end argument arg must declare log safety");
     }
 
+    @Test
+    public void testSafetyTagsAreNotAllowedWhenSafetyIsRequired() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(TypeName.of("AliasName", "package"))
+                        .alias(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))
+                        .safety(LogSafety.SAFE)
+                        .build()))
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.reference(TypeName.of("AliasName", "package")))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .tags("safe")
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatCode(() -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageContaining("Service.end(arg): Safety tags have been replaced by the 'safety' field");
+    }
+
+    @Test
+    public void testSafetyMarkersAreNotAllowedWhenSafetyIsRequired() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(TypeName.of("AliasName", "package"))
+                        .alias(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))
+                        .safety(LogSafety.SAFE)
+                        .build()))
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("Service", "com.palantir.product"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("end"))
+                                .httpMethod(HttpMethod.PUT)
+                                .httpPath(HttpPath.of("/path"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("arg"))
+                                        .type(Type.reference(TypeName.of("AliasName", "package")))
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .markers(Type.external(ExternalReference.of(
+                                                TypeName.of("Safe", "com.palantir.logsafe"),
+                                                Type.primitive(PrimitiveType.STRING))))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatCode(() -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageContaining("Service.end(arg): Safety markers have been replaced by the 'safety' field");
+    }
+
     private FieldDefinition field(FieldName name, String type) {
         return FieldDefinition.builder()
                 .fieldName(name)
