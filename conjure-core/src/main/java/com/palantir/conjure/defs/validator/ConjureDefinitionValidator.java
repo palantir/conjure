@@ -463,7 +463,37 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                             e.getMessage()),
                                     e);
                         }
+                        // In strict mode we don't allow legacy safety tags or markers
+                        if (safetyDeclarations.required()) {
+                            if (argumentDefinition.getTags().contains("safe")
+                                    || argumentDefinition.getTags().contains("unsafe")) {
+                                throw new ConjureIllegalStateException(String.format(
+                                        "%s.%s(%s): Safety tags have been replaced by the 'safety' field "
+                                                + "and are no longer allowed when 'requireSafety' is enabled",
+                                        serviceDefinition.getServiceName().getName(),
+                                        endpointDefinition.getEndpointName(),
+                                        argumentDefinition.getArgName()));
+                            }
+                            if (argumentDefinition.getMarkers().stream()
+                                    .anyMatch(LogSafetyConjureDefinitionValidator::isSafetyMarker)) {
+                                throw new ConjureIllegalStateException(String.format(
+                                        "%s.%s(%s): Safety markers have been replaced by the 'safety' field "
+                                                + "and are no longer allowed when 'requireSafety' is enabled",
+                                        serviceDefinition.getServiceName().getName(),
+                                        endpointDefinition.getEndpointName(),
+                                        argumentDefinition.getArgName()));
+                            }
+                        }
                     })));
+        }
+
+        private static boolean isSafetyMarker(Type type) {
+            if (type.accept(TypeVisitor.IS_REFERENCE)) {
+                TypeName marker = type.accept(TypeVisitor.REFERENCE);
+                return "com.palantir.logsafe".equals(marker.getPackage())
+                        && ("Safe".equals(marker.getName()) || "Unsafe".equals(marker.getName()));
+            }
+            return false;
         }
     }
 }
