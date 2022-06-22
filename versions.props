@@ -1,7 +1,7 @@
 com.fasterxml.jackson.core:jackson-databind = 2.13.3
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.guava:guava = 31.1-jre
-com.palantir.conjure.java:* = 6.50.0
+com.palantir.conjure.java:* = 6.51.0
 com.palantir.conjure.typescript:* = 5.4.0
 com.palantir.conjure:* = 4.31.0
 com.palantir.syntactic-paths:syntactic-paths = 0.6.1
