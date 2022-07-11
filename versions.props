@@ -30,3 +30,6 @@ org.glassfish.jersey.core:jersey-common = 2.34
 # Do not push error_prone_annotations to later versions for consumers
 com.google.errorprone:error_prone_annotations = 2.7.1
 # dependency-upgrader:ON
+
+
+com.netflix.nebula:nebula-test = 10.2.0

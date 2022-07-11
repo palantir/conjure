@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "types": {
+      "description": "External type definitions heyo!",
+      "type": "object",
+      "properties": {
+        "conjure-imports": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}
