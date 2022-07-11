@@ -19,10 +19,14 @@ package com.palantir.jsonschemagenerator
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
 
+import java.nio.file.Path
+
 class JsonSchemaGeneratorIntegrationSpec extends IntegrationSpec {
     def works() {
+        Path classes = Path.of("build/classes/java/main").toAbsolutePath()
+
         // language=gradle
-        buildFile << '''
+        buildFile << """
             apply plugin: 'java'
             
             repositories {
@@ -32,17 +36,21 @@ class JsonSchemaGeneratorIntegrationSpec extends IntegrationSpec {
             dependencies {
                 annotationProcessor 'org.immutables:value:2.8.8'
                 compileOnly 'org.immutables:value:2.8.8:annotations'
-                annotationProcessor files('build/classes/java/main')
+                
+                annotationProcessor files('${classes}')
+                compileOnly files('${classes}')
             }
-        '''.stripIndent(true)
+        """.stripIndent(true)
 
         // language=java
         writeJavaSourceFile '''
             package foo;
 
             import org.immutables.value.Value;
+            import com.palantir.jsonschemagenerator.JsonSchema;
             
             @Value.Immutable
+            @JsonSchema(outputLocation = "schema.json")
             interface Pair {
                 String first();
                 

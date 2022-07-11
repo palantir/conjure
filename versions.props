@@ -33,3 +33,4 @@ com.google.errorprone:error_prone_annotations = 2.7.1
 
 
 com.netflix.nebula:nebula-test = 10.2.0
+com.google.auto.service:* = 1.0.1

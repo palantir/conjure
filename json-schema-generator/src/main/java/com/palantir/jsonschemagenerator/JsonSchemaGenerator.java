@@ -16,12 +16,20 @@
 
 package com.palantir.jsonschemagenerator;
 
+import com.google.auto.service.AutoService;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 
-final class JsonSchemaGenerator extends AbstractProcessor {
+@AutoService(Processor.class)
+public final class JsonSchemaGenerator extends AbstractProcessor {
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return Set.of(JsonSchema.class.getCanonicalName());
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         return false;
