@@ -18,12 +18,18 @@ package com.palantir.jsonschemagenerator
 
 import nebula.test.IntegrationSpec
 import nebula.test.functional.ExecutionResult
+import org.gradle.internal.impldep.com.google.common.base.Splitter
 
 import java.nio.file.Path
+import java.util.stream.Collectors
 
 class JsonSchemaGeneratorIntegrationSpec extends IntegrationSpec {
     def works() {
         Path classes = Path.of("build/classes/java/main").toAbsolutePath()
+        String runtimeJars = Splitter.on('\n')
+                .splitToStream(new File("build/runtimeClasspath").text)
+                .map(jarPath -> "annotationProcessor files('" + jarPath + "')")
+                .collect(Collectors.joining("\n"));
 
         // language=gradle
         buildFile << """
@@ -39,6 +45,8 @@ class JsonSchemaGeneratorIntegrationSpec extends IntegrationSpec {
                 
                 annotationProcessor files('${classes}')
                 compileOnly files('${classes}')
+
+                ${runtimeJars}
             }
         """.stripIndent(true)
 

@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 /*
  * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
  *
@@ -18,6 +20,8 @@ apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'groovy'
 
 dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
     annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
 
@@ -29,5 +33,14 @@ dependencies {
     testImplementation 'com.netflix.nebula:nebula-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation gradleApi()
-
 }
+
+task outputRuntimeClasspath {
+    doFirst {
+        file('build/runtimeClasspath').text = configurations.runtimeClasspath.resolve().stream()
+                .map(File::toString)
+                .collect(Collectors.joining('\n'))
+    }
+}
+
+tasks.test.dependsOn

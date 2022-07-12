@@ -16,15 +16,36 @@
 
 package com.palantir.jsonschemagenerator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.service.AutoService;
+import com.palantir.jsonschemagenerator.jsonschema.Part;
+import com.palantir.jsonschemagenerator.jsonschema.PartType;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 @AutoService(Processor.class)
 public final class JsonSchemaGenerator extends AbstractProcessor {
+    private ProcessingEnvironment processingEnvironment;
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        this.processingEnvironment = processingEnv;
+    }
+
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return Set.of(JsonSchema.class.getCanonicalName());
@@ -32,6 +53,39 @@ public final class JsonSchemaGenerator extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (annotations.isEmpty()) {
+            return false;
+        }
+
+        TypeElement annotation = annotations.iterator().next();
+        Set<? extends Element> entryPoints = roundEnv.getElementsAnnotatedWithAny(annotation);
+        Element entryPoint = entryPoints.iterator().next();
+        JsonSchema jsonSchema = entryPoint.getAnnotation(JsonSchema.class);
+        List<String> names = entryPoint.getEnclosedElements().stream()
+                .filter(element -> element.getKind().equals(ElementKind.METHOD))
+                .map(Element::getSimpleName)
+                .map(Name::toString)
+                .collect(Collectors.toList());
+
+        Part part = Part.builder()
+                .type(PartType.OBJECT)
+                .properties(names.stream().collect(Collectors.toMap(Function.identity(), _ignored -> Part.builder()
+                        .type(PartType.OBJECT)
+                        .build())))
+                .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            FileObject resource = processingEnvironment
+                    .getFiler()
+                    .createResource(StandardLocation.CLASS_OUTPUT, "", jsonSchema.outputLocation(), entryPoint);
+            try (Writer writer = resource.openWriter()) {
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(writer, part);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return false;
     }
 }
