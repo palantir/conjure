@@ -349,6 +349,7 @@ Conjure Errors are serialized as JSON objects with the following keys:
           code: NOT_FOUND
           safe-args:
             name: RecipeName
+            numbers: list<integer>
   ```
   Example error type in JSON presentation:
   ```json
@@ -357,7 +358,8 @@ Conjure Errors are serialized as JSON objects with the following keys:
       "errorName": "Recipe:RecipeNotFound",
       "errorInstanceId": "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
       "parameters": {
-          "name": "roasted broccoli with garlic"
+          "name": "roasted broccoli with garlic",
+          "numbers": [1, 2, 3]
       }
   }
   ```
