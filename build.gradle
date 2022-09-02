@@ -23,8 +23,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.25.0'
-        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.2.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.27.0'
+        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.4.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.11.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.153.0'
         classpath 'com.palantir.gradle.conjure:gradle-conjure:5.30.0'
