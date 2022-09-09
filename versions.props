@@ -4,8 +4,8 @@ com.google.guava:guava = 31.1-jre
 com.palantir.conjure.java:* = 6.62.0
 com.palantir.conjure.typescript:* = 5.4.0
 com.palantir.conjure:* = 4.31.0
-com.palantir.syntactic-paths:syntactic-paths = 0.6.1
-com.palantir.tokens:* = 3.15.0
+com.palantir.syntactic-paths:syntactic-paths = 0.7.0
+com.palantir.tokens:* = 3.16.0
 commons-io:commons-io = 2.11.0
 info.picocli:picocli = 4.6.3
 junit:junit = 4.13.2
@@ -16,7 +16,7 @@ org.hamcrest:hamcrest-core = 2.2
 org.immutables:value = 2.8.8
 org.junit.jupiter:* = 5.9.0
 org.junit.vintage:* = 5.9.0
-org.mockito:* = 4.6.1
+org.mockito:* = 4.8.0
 org.slf4j:* = 1.7.36
 
 # conflict resolution
