@@ -442,32 +442,33 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
 
         @Override
         public void validate(ConjureDefinition definition) {
-            definition.getTypes().forEach(type -> SafetyValidator.validate(type, safetyDeclarations));
+            List<String> errors = new ArrayList<>();
+
+            definition.getTypes().forEach(type -> SafetyValidator.validate(type, safetyDeclarations)
+                    .forEach(errors::add));
+
             definition.getServices().forEach(serviceDefinition -> serviceDefinition
                     .getEndpoints()
                     .forEach(endpointDefinition -> endpointDefinition.getArgs().forEach(argumentDefinition -> {
-                        try {
-                            SafetyValidator.validateDefinition(
-                                    endpointDefinition,
-                                    argumentDefinition.getArgName(),
-                                    argumentDefinition.getSafety(),
-                                    argumentDefinition.getType(),
-                                    safetyDeclarations);
-                        } catch (RuntimeException e) {
-                            throw new ConjureIllegalStateException(
-                                    String.format(
-                                            "%s.%s(%s): %s",
-                                            serviceDefinition.getServiceName().getName(),
-                                            endpointDefinition.getEndpointName(),
-                                            argumentDefinition.getArgName(),
-                                            e.getMessage()),
-                                    e);
-                        }
+                        SafetyValidator.validateDefinition(
+                                        endpointDefinition,
+                                        argumentDefinition.getArgName(),
+                                        argumentDefinition.getSafety(),
+                                        argumentDefinition.getType(),
+                                        safetyDeclarations)
+                                .map(message -> String.format(
+                                        "%s.%s(%s): %s",
+                                        serviceDefinition.getServiceName().getName(),
+                                        endpointDefinition.getEndpointName(),
+                                        argumentDefinition.getArgName(),
+                                        message))
+                                .forEach(errors::add);
+
                         // In strict mode we don't allow legacy safety tags or markers
                         if (safetyDeclarations.required()) {
                             if (argumentDefinition.getTags().contains("safe")
                                     || argumentDefinition.getTags().contains("unsafe")) {
-                                throw new ConjureIllegalStateException(String.format(
+                                errors.add(String.format(
                                         "%s.%s(%s): Safety tags have been replaced by the 'safety' field "
                                                 + "and are no longer allowed when 'requireSafety' is enabled",
                                         serviceDefinition.getServiceName().getName(),
@@ -476,7 +477,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             }
                             if (argumentDefinition.getMarkers().stream()
                                     .anyMatch(LogSafetyConjureDefinitionValidator::isSafetyMarker)) {
-                                throw new ConjureIllegalStateException(String.format(
+                                errors.add(String.format(
                                         "%s.%s(%s): Safety markers have been replaced by the 'safety' field "
                                                 + "and are no longer allowed when 'requireSafety' is enabled",
                                         serviceDefinition.getServiceName().getName(),
@@ -485,6 +486,10 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             }
                         }
                     })));
+
+            if (!errors.isEmpty()) {
+                throw new ConjureIllegalStateException(String.join("\n", errors));
+            }
         }
 
         private static boolean isSafetyMarker(Type type) {

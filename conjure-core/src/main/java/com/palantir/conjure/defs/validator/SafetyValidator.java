@@ -36,47 +36,50 @@ import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class SafetyValidator {
-    private static final TypeDefinition.Visitor<Void> SAFETY_VISITOR_DECLARATIONS_ALLOWED =
+    private static final TypeDefinition.Visitor<Stream<String>> SAFETY_VISITOR_DECLARATIONS_ALLOWED =
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.ALLOWED);
-    private static final TypeDefinition.Visitor<Void> SAFETY_VISITOR_DECLARATIONS_REQUIRED =
+    private static final TypeDefinition.Visitor<Stream<String>> SAFETY_VISITOR_DECLARATIONS_REQUIRED =
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.REQUIRED);
 
     private SafetyValidator() {}
 
-    public static void validate(TypeDefinition type, SafetyDeclarationRequirements safetyDeclarations) {
-        type.accept(
+    public static Stream<String> validate(TypeDefinition type, SafetyDeclarationRequirements safetyDeclarations) {
+        return type.accept(
                 safetyDeclarations.required()
                         ? SAFETY_VISITOR_DECLARATIONS_REQUIRED
                         : SAFETY_VISITOR_DECLARATIONS_ALLOWED);
     }
 
-    public static void validateDefinition(
+    public static Stream<String> validateDefinition(
             EndpointDefinition endpointDefinition,
             ArgumentName argumentName,
             Optional<LogSafety> declaredSafety,
             Type type,
             SafetyDeclarationRequirements safetyDeclarations) {
         if (declaredSafety.isPresent()) {
-            type.accept(
+            return type.accept(
                     new SafetyTypeVisitor(endpointDefinition.getEndpointName().get()));
         } else if (safetyDeclarations.required() && type.accept(TypeSafetyAllowedVisitor.INSTANCE)) {
-            throw new ConjureIllegalStateException(String.format(
+            return Stream.of(String.format(
                     "Endpoint %s argument %s must declare log safety using 'safety: VALUE' "
                             + "where VALUE may be safe, unsafe, or do-not-log.",
                     endpointDefinition.getEndpointName(), argumentName));
+        } else {
+            return Stream.empty();
         }
     }
 
-    private static ConjureIllegalStateException fail(String parentReference, TypeName nonPrimitiveType) {
-        return new ConjureIllegalStateException(String.format(
+    private static String fail(String parentReference, TypeName nonPrimitiveType) {
+        return String.format(
                 "%s cannot declare log safety. Only conjure primitives and "
                         + "wrappers around conjure primitives may declare safety. %s.%s is not a primitive type.",
-                parentReference, nonPrimitiveType.getPackage(), nonPrimitiveType.getName()));
+                parentReference, nonPrimitiveType.getPackage(), nonPrimitiveType.getName());
     }
 
-    private static final class TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Void> {
+    private static final class TypeDefinitionSafetyVisitor implements TypeDefinition.Visitor<Stream<String>> {
         private final SafetyDeclarationRequirements safetyRequirements;
 
         TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements safetyRequirements) {
@@ -84,48 +87,47 @@ public final class SafetyValidator {
         }
 
         @Override
-        public Void visitAlias(AliasDefinition value) {
-            validateType(value.getAlias(), value.getSafety(), qualifyTypeReference(value.getTypeName()));
-            return null;
+        public Stream<String> visitAlias(AliasDefinition value) {
+            return validateType(value.getAlias(), value.getSafety(), qualifyTypeReference(value.getTypeName()));
         }
 
         @Override
-        public Void visitEnum(EnumDefinition _value) {
-            return null;
+        public Stream<String> visitEnum(EnumDefinition _value) {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitObject(ObjectDefinition value) {
-            value.getFields()
-                    .forEach(field -> validateType(
+        public Stream<String> visitObject(ObjectDefinition value) {
+            return value.getFields().stream()
+                    .flatMap(field -> validateType(
                             field.getType(),
                             field.getSafety(),
                             qualifyTypeReference(value.getTypeName(), field.getFieldName())));
-            return null;
         }
 
         @Override
-        public Void visitUnion(UnionDefinition value) {
-            value.getUnion()
-                    .forEach(field -> validateType(
+        public Stream<String> visitUnion(UnionDefinition value) {
+            return value.getUnion().stream()
+                    .flatMap(field -> validateType(
                             field.getType(),
                             field.getSafety(),
                             qualifyTypeReference(value.getTypeName(), field.getFieldName())));
-            return null;
         }
 
         @Override
-        public Void visitUnknown(String unknownType) {
+        public Stream<String> visitUnknown(String unknownType) {
             throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
 
-        private void validateType(Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
+        private Stream<String> validateType(
+                Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
             if (declaredSafety.isPresent()) {
-                type.accept(new SafetyTypeVisitor(qualifiedTypeReference));
+                return type.accept(new SafetyTypeVisitor(qualifiedTypeReference));
             } else if (safetyRequirements.required() && type.accept(TypeSafetyAllowedVisitor.INSTANCE)) {
-                throw new ConjureIllegalStateException(
-                        qualifiedTypeReference + " must declare log safety using 'safety: VALUE' "
-                                + "where VALUE may be safe, unsafe, or do-not-log.");
+                return Stream.of(qualifiedTypeReference + " must declare log safety using 'safety: VALUE' "
+                        + "where VALUE may be safe, unsafe, or do-not-log.");
+            } else {
+                return Stream.empty();
             }
         }
 
@@ -139,7 +141,7 @@ public final class SafetyValidator {
     }
 
     /** Validates elements which declare safety. Fails if any non-primitive is referenced. */
-    private static final class SafetyTypeVisitor implements Type.Visitor<Void> {
+    private static final class SafetyTypeVisitor implements Type.Visitor<Stream<String>> {
 
         private final String parentReference;
 
@@ -148,46 +150,44 @@ public final class SafetyValidator {
         }
 
         @Override
-        public Void visitPrimitive(PrimitiveType value) {
-            value.accept(PrimitiveTypeSafetyVisitor.INSTANCE);
-            return null;
+        public Stream<String> visitPrimitive(PrimitiveType value) {
+            return value.accept(PrimitiveTypeSafetyVisitor.INSTANCE);
         }
 
         @Override
-        public Void visitOptional(OptionalType value) {
+        public Stream<String> visitOptional(OptionalType value) {
             return value.getItemType().accept(this);
         }
 
         @Override
-        public Void visitList(ListType value) {
+        public Stream<String> visitList(ListType value) {
             return value.getItemType().accept(this);
         }
 
         @Override
-        public Void visitSet(SetType value) {
+        public Stream<String> visitSet(SetType value) {
             return value.getItemType().accept(this);
         }
 
         @Override
-        public Void visitMap(MapType map) {
-            throw new ConjureIllegalStateException(
-                    "Maps cannot declare log safety. Consider using alias types for keys or values to "
-                            + "leverage the type system. Failing map: "
-                            + map);
+        public Stream<String> visitMap(MapType map) {
+            return Stream.of("Maps cannot declare log safety. Consider using alias types for keys or values to "
+                    + "leverage the type system. Failing map: "
+                    + map);
         }
 
         @Override
-        public Void visitReference(TypeName value) {
-            throw fail(parentReference, value);
+        public Stream<String> visitReference(TypeName value) {
+            return Stream.of(fail(parentReference, value));
         }
 
         @Override
-        public Void visitExternal(ExternalReference value) {
-            throw fail(parentReference, value.getExternalReference());
+        public Stream<String> visitExternal(ExternalReference value) {
+            return Stream.of(fail(parentReference, value.getExternalReference()));
         }
 
         @Override
-        public Void visitUnknown(String unknownType) {
+        public Stream<String> visitUnknown(String unknownType) {
             throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
     }
@@ -196,67 +196,66 @@ public final class SafetyValidator {
      * Validates elements which declare safety. Fails if any non-primitive is referenced.
      * Ensures bearer-token safety cannot be overridden from {@code do-not-log}.
      */
-    private enum PrimitiveTypeSafetyVisitor implements PrimitiveType.Visitor<Void> {
+    private enum PrimitiveTypeSafetyVisitor implements PrimitiveType.Visitor<Stream<String>> {
         INSTANCE;
 
         @Override
-        public Void visitString() {
-            return null;
+        public Stream<String> visitString() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitDatetime() {
-            return null;
+        public Stream<String> visitDatetime() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitInteger() {
-            return null;
+        public Stream<String> visitInteger() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitDouble() {
-            return null;
+        public Stream<String> visitDouble() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitSafelong() {
-            return null;
+        public Stream<String> visitSafelong() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitBinary() {
-            return null;
+        public Stream<String> visitBinary() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitAny() {
-            return null;
+        public Stream<String> visitAny() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitBoolean() {
-            return null;
+        public Stream<String> visitBoolean() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitUuid() {
-            return null;
+        public Stream<String> visitUuid() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitRid() {
-            return null;
+        public Stream<String> visitRid() {
+            return Stream.empty();
         }
 
         @Override
-        public Void visitBearertoken() {
-            throw new ConjureIllegalStateException(
-                    "bearertoken values are do-not-log by default and cannot be configured");
+        public Stream<String> visitBearertoken() {
+            return Stream.of("bearertoken values are do-not-log by default and cannot be configured");
         }
 
         @Override
-        public Void visitUnknown(String unknownValue) {
+        public Stream<String> visitUnknown(String unknownValue) {
             throw new ConjureIllegalStateException("Unknown primitive type: " + unknownValue);
         }
     }
