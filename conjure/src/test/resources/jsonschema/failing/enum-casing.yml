@@ -1,0 +1,6 @@
+types:
+  definitions:
+    objects:
+      MyEnum:
+        values:
+          - NOT_UPPER_case
