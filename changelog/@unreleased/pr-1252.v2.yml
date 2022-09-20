@@ -1,0 +1,24 @@
+type: improvement
+improvement:
+  description: |-
+    Create Conjure JSON schema
+
+    ## Before this PR
+    No IDE support at all for writing Conjure human-readable format
+
+    ## After this PR
+    JSON schema exists for the human readable format. I will follow up with a PR to schemastore.org to add this to their catalog.
+
+    See #1239
+
+    We get some auto-completion in IntelliJ:
+    <img width="696" alt="image" src="https://user-images.githubusercontent.com/1928052/191144274-330e7785-ffd2-4184-95e9-28e5358ff88b.png">
+
+    And some basic validation checks:
+    <img width="654" alt="image" src="https://user-images.githubusercontent.com/1928052/191144243-2bc3f6f0-d454-4199-bcee-267b5f598f34.png">
+
+
+    ## Possible downsides?
+    This format is defined only in Jackson/Immutables at the moment, so it can't easily be automatically converted to JSON without losing information. It's therefore (painstakingly!) hand-crafted. I figure it's a slow-moving spec, so shouldn't be an issue given the benefits we get from this.
+  links:
+  - https://github.com/palantir/conjure/pull/1252
