@@ -1,5 +1,4 @@
 com.fasterxml.jackson.core:jackson-databind = 2.13.3
-com.github.erosb:everit-json-schema = 1.14.1
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.guava:guava = 31.1-jre
 com.networknt:json-schema-validator = 1.0.73
