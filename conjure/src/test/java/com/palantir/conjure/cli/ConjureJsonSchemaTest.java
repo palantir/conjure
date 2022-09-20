@@ -24,6 +24,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion.VersionFlag;
+import com.networknt.schema.ValidationMessage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,29 +51,17 @@ public class ConjureJsonSchemaTest {
     }
 
     @ParameterizedTest
-    @MethodSource("passing")
-    void testPassingFiles(Path definitionPath) throws IOException {
-        assertThat(schema.validate(objectMapper.readTree(Files.newBufferedReader(definitionPath))))
-                .isEmpty();
+    @MethodSource("definitionFiles")
+    void testJsonSchema(Path definitionPath) throws IOException {
+        // If the definition file contains comments of the form "# FAIL(JSONSCHEMA): error message" then we assert
+        // that JSON schema validation fails.
+        Set<ValidationMessage> messages =
+                schema.validate(objectMapper.readTree(Files.newBufferedReader(definitionPath)));
+        assertThat(messages).isEmpty();
     }
 
-    @ParameterizedTest
-    @MethodSource("failing")
-    void testFailingFiles(Path definitionPath) throws IOException {
-        assertThat(schema.validate(objectMapper.readTree(Files.newBufferedReader(definitionPath))))
-                .isNotEmpty();
-    }
-
-    static Set<Path> passing() {
-        return walk(Paths.get("src/test/resources/jsonschema/passing"));
-    }
-
-    static Set<Path> failing() {
-        return walk(Paths.get("src/test/resources/jsonschema/failing"));
-    }
-
-    private static Set<Path> walk(Path rootDir) {
-        try (Stream<Path> paths = Files.walk(rootDir)) {
+    private static Set<Path> definitionFiles() {
+        try (Stream<Path> paths = Files.walk(Paths.get("src/test/resources"))) {
             return paths.filter(path -> path.toFile().isFile()).collect(Collectors.toSet());
         } catch (IOException e) {
             throw new RuntimeException(e);

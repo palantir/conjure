@@ -1,7 +1,0 @@
-services:
-  TestService:
-    name: Test Service
-    package: test.api
-    endpoints:
-      get:
-        http: WEIRD /
