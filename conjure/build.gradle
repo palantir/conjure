@@ -26,6 +26,7 @@ dependencies {
 
     testImplementation 'junit:junit'
     testImplementation 'org.assertj:assertj-core'
+    testImplementation 'com.jayway.jsonpath:json-path'
     testImplementation 'com.networknt:json-schema-validator'
 
     annotationProcessor 'org.immutables:value'
