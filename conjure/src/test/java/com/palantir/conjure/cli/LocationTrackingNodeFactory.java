@@ -33,7 +33,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -46,7 +45,7 @@ public final class LocationTrackingNodeFactory extends JsonNodeFactory {
 
     // The JsonNode's hashCode is calculated based on its children. During parsing the children haven't
     // yet been populated, so instead we use an identity hash map .
-    private final Map<JsonNode, JsonLocation> nodeLocations = new IdentityHashMap<>();
+    private final IdentityHashMap<JsonNode, JsonLocation> nodeLocations = new IdentityHashMap<>();
 
     public LocationTrackingNodeFactory(JsonNodeFactory delegate, Supplier<JsonParser> parserSupplier) {
         this.delegate = delegate;
