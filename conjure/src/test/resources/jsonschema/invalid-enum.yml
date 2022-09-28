@@ -1,0 +1,7 @@
+types:
+  definitions:
+    objects:
+      MyEnum:
+        values:
+          # SCHEMA(type, pattern): the enum value should be all upper case
+          - SHOULD_BE_lowercase

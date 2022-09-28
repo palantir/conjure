@@ -5,9 +5,10 @@ types:
       external:
         java: com.palantir.ri.ResourceIdentifier
 
-  definitions: 
+  definitions:
     default-package: test.api
     objects:
       InvalidJson:
         union:
+          # SCHEMA(type, enum): not a valid FieldDefinition or ConjureType
           optionA: { }

@@ -1,0 +1,8 @@
+services:
+  TestService:
+    name: Test Service
+    package: test.api
+    endpoints:
+      get:
+        # SCHEMA(pattern): The http method is invalid
+        http: NOT_AN_HTTP_METHOD /get
