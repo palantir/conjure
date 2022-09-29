@@ -497,7 +497,8 @@ public class ConjureSourceFileValidatorTest {
                                         .paramType(ParameterType.body(BodyParameterType.of()))
                                         .markers(Type.external(ExternalReference.of(
                                                 TypeName.of("Safe", "com.palantir.logsafe"),
-                                                Type.primitive(PrimitiveType.STRING))))
+                                                Type.primitive(PrimitiveType.STRING),
+                                                LogSafety.UNSAFE)))
                                         .build())
                                 .build())
                         .build())
