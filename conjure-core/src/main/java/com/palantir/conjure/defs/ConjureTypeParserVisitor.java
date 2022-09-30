@@ -103,6 +103,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                 return Type.external(ExternalReference.builder()
                         .externalReference(TypeName.of(typeName, conjurePackage))
                         .fallback(ConjureParserUtils.parsePrimitiveType(maybeExternalDef.baseType()))
+                        .safety(maybeExternalDef.safety().map(ConjureParserUtils::parseLogSafety))
                         .build());
             } else {
                 // Conjure-defined object

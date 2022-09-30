@@ -19,8 +19,10 @@ package com.palantir.conjure.parser.types.reference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.LogSafetyDefinition;
 import com.palantir.conjure.parser.types.ExternalImportDefinition;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
+import java.util.Optional;
 import org.immutables.value.Value;
 
 @JsonDeserialize(as = ImmutableExternalTypeDefinition.class)
@@ -35,6 +37,9 @@ public interface ExternalTypeDefinition {
     default PrimitiveType baseType() {
         return PrimitiveType.ANY;
     }
+
+    @JsonProperty("safety")
+    Optional<LogSafetyDefinition> safety();
 
     static ExternalTypeDefinition javaType(String external, PrimitiveType baseType) {
         return ImmutableExternalTypeDefinition.builder()
