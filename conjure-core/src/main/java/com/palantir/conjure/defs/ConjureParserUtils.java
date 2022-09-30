@@ -393,7 +393,7 @@ public final class ConjureParserUtils {
                 .collect(Collectors.toList());
     }
 
-    private static LogSafety parseLogSafety(LogSafetyDefinition def) {
+    public static LogSafety parseLogSafety(LogSafetyDefinition def) {
         switch (def) {
             case SAFE:
                 return LogSafety.SAFE;

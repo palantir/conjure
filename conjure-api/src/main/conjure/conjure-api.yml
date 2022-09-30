@@ -86,6 +86,8 @@ types:
             docs: >
               Other language generators may use the provided fallback if the non-Conjure type is not available.
               The ANY PrimitiveType is permissible for all external types, but a more specific definition is preferable.
+          safety:
+            type: optional<LogSafety>
       PrimitiveType:
         values:
           - STRING
