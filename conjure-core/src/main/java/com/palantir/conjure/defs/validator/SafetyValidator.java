@@ -35,6 +35,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -43,6 +44,8 @@ public final class SafetyValidator {
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.ALLOWED);
     private static final TypeDefinition.Visitor<Stream<String>> SAFETY_VISITOR_DECLARATIONS_REQUIRED =
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.REQUIRED);
+
+    private static final Map<String, String> allowedImports = Map.of("java.lang.Long", "string");
 
     private SafetyValidator() {}
 
@@ -70,6 +73,17 @@ public final class SafetyValidator {
         } else {
             return Stream.empty();
         }
+    }
+
+    public static boolean importSafetyAllowed(ExternalReference value) {
+        String importType = value.getExternalReference().getName();
+        if (allowedImports.containsKey(importType)) {
+            Type givenFallbackType = Type.primitive(PrimitiveType.valueOf(allowedImports.get(importType)));
+            if (givenFallbackType.equals(value.getFallback())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String fail(String parentReference, TypeName nonPrimitiveType) {
@@ -183,7 +197,11 @@ public final class SafetyValidator {
 
         @Override
         public Stream<String> visitExternal(ExternalReference value) {
-            return Stream.of(fail(parentReference, value.getExternalReference()));
+            if (importSafetyAllowed(value)) {
+                return Stream.empty();
+            } else {
+                return Stream.of(fail(parentReference, value.getExternalReference()));
+            }
         }
 
         @Override
@@ -295,7 +313,7 @@ public final class SafetyValidator {
 
         @Override
         public Boolean visitExternal(ExternalReference _value) {
-            return false;
+            return importSafetyAllowed(_value);
         }
 
         @Override
