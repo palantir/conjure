@@ -259,7 +259,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "oneOf": [
+            "anyOf": [
               {
                 "$ref": "#/definitions/UpperCase"
               },
