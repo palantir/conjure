@@ -1,21 +1,6 @@
 type: fix
 fix:
   description: |-
-    Fix Conjure enum mixing short-hand and fully-specified value types
-
-    ## Before this PR
-
-    For an array of `oneOf` types, JSON Schema picks a single type that the whole array must match. I'm not sure if this is correct JSON schema or just the implementation we're using. It seems a little odd?
-
-    In any case, the example fails the json schema test with:
-    ```
-    Unexpected JSON schema error 'oneOf' $.types.definitions.objects.MyEnum.values[1]: should be valid to one and only one of schema, but more than one are valid: {"$ref":"#/definitions/UpperCase"}{"$ref":"#/definitions/EnumValueDefinition"}
-    ```
-
-    ## After this PR
-
-    The example passes the test.
-
-    I've also renamed the directory the example YML files are in so they're picked up as Conjure files by the IDE.
+    Fix Conjure enums that mix short-hand and fully-specified value types.
   links:
   - https://github.com/palantir/conjure/pull/1268
