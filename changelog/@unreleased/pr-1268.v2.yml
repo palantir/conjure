@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: |-
+    Fix Conjure enums that mix short-hand and fully-specified value types.
+  links:
+  - https://github.com/palantir/conjure/pull/1268

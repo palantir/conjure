@@ -1,0 +1,10 @@
+types:
+  definitions:
+    objects:
+      MyEnum:
+        # The first value is matches the UpperCase schema, the second matches the EnumValueDefinition
+        # Test that the schema allows us to mix and match the two types.
+        values:
+          - FIRST
+          - value: SECOND
+            docs: Documentation for the second value
