@@ -515,7 +515,7 @@
       ]
     },
     "UpperCase": {
-      "pattern": "^[A-Z_]+$"
+      "pattern": "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"
     },
     "PascalCase": {
       "type": "string",
