@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Correct schema validation in json schema for enum types
+  links:
+  - https://github.com/palantir/conjure/pull/1273
