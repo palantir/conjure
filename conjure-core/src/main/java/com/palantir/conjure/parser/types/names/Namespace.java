@@ -47,6 +47,6 @@ public abstract class Namespace {
 
     @JsonCreator
     public static Namespace of(String name) {
-        return ImmutableNamespace.builder().name(name).build();
+        return ImmutableNamespace.builder().name(Names.intern(name)).build();
     }
 }
