@@ -328,7 +328,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                         .ifPresent(_arg -> {
                             throw new ConjureIllegalStateException(
                                     "Illegal map key found in one of the arguments of endpoint "
-                                            + endpoint.getEndpointName().get() + ". Map keys can only be primitive Conjure types.");
+                                            + endpoint.getEndpointName().get()
+                                            + ". Map keys can only be primitive Conjure types.");
                         });
                 endpoint.getReturns().ifPresent(returnType -> {
                     if (recursivelyFindIllegalKeys(returnType, definitionMap, false)) {
@@ -346,7 +347,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                     .findAny()
                     .ifPresent(_arg -> {
                         throw new ConjureIllegalStateException("Illegal map key found in one of arguments of error "
-                                + errorDef.getErrorName().getName() + ". Map keys can only be primitive Conjure types.");
+                                + errorDef.getErrorName().getName()
+                                + ". Map keys can only be primitive Conjure types.");
                     });
         }
 
@@ -373,7 +375,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .findAny()
                             .ifPresent(found -> {
                                 throw new ConjureIllegalStateException(String.format(
-                                        "Illegal map key found in object %s in field %s. Map keys can only be primitive Conjure types.",
+                                        "Illegal map key found in object %s in field %s. Map keys can only be"
+                                                + " primitive Conjure types.",
                                         objectDefinition.getTypeName().getName(),
                                         found.getFieldName().get()));
                             });
@@ -389,7 +392,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                             .findAny()
                             .ifPresent(found -> {
                                 throw new ConjureIllegalStateException(String.format(
-                                        "Illegal map key found in union %s in member %s. Map keys can only be primitive Conjure types.",
+                                        "Illegal map key found in union %s in member %s. Map keys can only be"
+                                                + " primitive Conjure types.",
                                         unionDefinition.getTypeName().getName(),
                                         found.getFieldName().get()));
                             });
