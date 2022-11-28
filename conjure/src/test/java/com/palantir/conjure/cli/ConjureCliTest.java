@@ -176,7 +176,9 @@ public final class ConjureCliTest {
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
         assertThat(stringWriter.toString().trim())
-                .isEqualTo("Illegal map key found in union SimpleUnion in member optionA");
+                .isEqualTo(
+                        "Illegal map key found in union SimpleUnion in member optionA. Map keys can only be primitive"
+                                + " Conjure types.");
         assertThat(outputFile).doesNotExist();
     }
 
