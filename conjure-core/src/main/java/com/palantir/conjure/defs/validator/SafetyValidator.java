@@ -35,7 +35,6 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.spec.UnionDefinition;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -44,8 +43,6 @@ public final class SafetyValidator {
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.ALLOWED);
     private static final TypeDefinition.Visitor<Stream<String>> SAFETY_VISITOR_DECLARATIONS_REQUIRED =
             new TypeDefinitionSafetyVisitor(SafetyDeclarationRequirements.REQUIRED);
-
-    private static final Map<String, String> allowedImports = Map.of("java.lang.Long", "string");
 
     private SafetyValidator() {}
 
@@ -75,15 +72,22 @@ public final class SafetyValidator {
         }
     }
 
-    public static boolean importSafetyAllowed(ExternalReference value) {
-        String importType = value.getExternalReference().getName();
-        if (allowedImports.containsKey(importType)) {
-            Type givenFallbackType = Type.primitive(PrimitiveType.valueOf(allowedImports.get(importType)));
+    public static Stream<String> importSafetyAllowed(ExternalReference value, String parentReference) {
+        String importType = value.getExternalReference().getPackage() + "."
+                + value.getExternalReference().getName();
+        if (ValidImportsForSafety.ALLOWED_IMPORTS.containsKey(importType)) {
+            Type givenFallbackType =
+                    Type.primitive(PrimitiveType.valueOf(ValidImportsForSafety.ALLOWED_IMPORTS.get(importType)));
             if (givenFallbackType.equals(value.getFallback())) {
-                return true;
+                return Stream.empty();
+            } else {
+                return Stream.of(String.format(
+                        "Mismatched base type. %s must have a base type of %s in order to declare safety.",
+                        importType, ValidImportsForSafety.ALLOWED_IMPORTS.get(importType)));
             }
+        } else {
+            return Stream.of(fail(parentReference, value.getExternalReference()));
         }
-        return false;
     }
 
     private static String fail(String parentReference, TypeName nonPrimitiveType) {
@@ -197,11 +201,7 @@ public final class SafetyValidator {
 
         @Override
         public Stream<String> visitExternal(ExternalReference value) {
-            if (importSafetyAllowed(value)) {
-                return Stream.empty();
-            } else {
-                return Stream.of(fail(parentReference, value.getExternalReference()));
-            }
+            return importSafetyAllowed(value, parentReference);
         }
 
         @Override
@@ -312,8 +312,8 @@ public final class SafetyValidator {
         }
 
         @Override
-        public Boolean visitExternal(ExternalReference _value) {
-            return importSafetyAllowed(_value);
+        public Boolean visitExternal(ExternalReference value) {
+            return importSafetyAllowed(value, "").findAny().isEmpty();
         }
 
         @Override

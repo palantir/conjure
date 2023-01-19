@@ -47,6 +47,7 @@ import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 public class ConjureSourceFileValidatorTest {
@@ -267,6 +268,21 @@ public class ConjureSourceFileValidatorTest {
     }
 
     @Test
+    public void testNoSafetyOnExternalImports() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(TypeName.of("UnsafeInt", "package"))
+                        .alias(Type.external(ExternalReference.builder()
+                                .externalReference(TypeName.of("Integer", "java.lang"))
+                                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                                .build()))
+                        .build()))
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
+    }
+
+    @Test
     public void testSafetyOnBearerToken() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
@@ -305,6 +321,75 @@ public class ConjureSourceFileValidatorTest {
                         () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContainingAll("Maps cannot declare log safety", "Consider using alias types");
+    }
+
+    @Test
+    public void testSafetyValidExternalImport() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("good"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .build()))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED);
+    }
+
+    @Test
+    public void testSafetyInvalidExternalImport() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Integer", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
+                                        .build()))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContainingAll(
+                        "package.Foo::bad cannot declare log safety", "java.lang.Integer is not a primitive type.");
+    }
+
+    @Test
+    public void testSafetyExternalImport_InvalidFallback() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
+                                        .build()))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(
+                        "Mismatched base type. java.lang.Long must have a base type of string in order to declare"
+                                + " safety.");
     }
 
     @Test
@@ -495,10 +580,11 @@ public class ConjureSourceFileValidatorTest {
                                         .argName(ArgumentName.of("arg"))
                                         .type(Type.reference(TypeName.of("AliasName", "package")))
                                         .paramType(ParameterType.body(BodyParameterType.of()))
-                                        .markers(Type.external(ExternalReference.of(
-                                                TypeName.of("Safe", "com.palantir.logsafe"),
-                                                Type.primitive(PrimitiveType.STRING),
-                                                LogSafety.UNSAFE)))
+                                        .markers(Type.external(ExternalReference.builder()
+                                                .externalReference(TypeName.of("Safe", "com.palantir.logsafe"))
+                                                .fallback(Type.primitive(PrimitiveType.STRING))
+                                                .safety(Optional.empty())
+                                                .build()))
                                         .build())
                                 .build())
                         .build())
