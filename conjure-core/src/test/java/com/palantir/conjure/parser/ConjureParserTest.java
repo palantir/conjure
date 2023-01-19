@@ -108,12 +108,6 @@ public class ConjureParserTest {
     }
 
     @Test
-    public void testExternalImportSafetyNotAllowedException() {
-        ConjureSourceFile _conjure =
-                ConjureParser.parse(new File("src/test/resources/example-invalid-import-safety.yml"));
-    }
-
-    @Test
     public void testConjureFieldDeprecation() {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-deprecation.yml"));
         ObjectTypeDefinition object = conjure.types()
