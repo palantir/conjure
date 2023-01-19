@@ -268,21 +268,6 @@ public class ConjureSourceFileValidatorTest {
     }
 
     @Test
-    public void testNoSafetyOnExternalImports() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.alias(AliasDefinition.builder()
-                        .typeName(TypeName.of("UnsafeInt", "package"))
-                        .alias(Type.external(ExternalReference.builder()
-                                .externalReference(TypeName.of("Integer", "java.lang"))
-                                .fallback(Type.primitive(PrimitiveType.INTEGER))
-                                .build()))
-                        .build()))
-                .build();
-        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
-    }
-
-    @Test
     public void testSafetyOnBearerToken() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
@@ -352,7 +337,7 @@ public class ConjureSourceFileValidatorTest {
                         .fields(FieldDefinition.builder()
                                 .fieldName(FieldName.of("bad"))
                                 .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Integer", "java.lang"))
+                                        .externalReference(TypeName.of("weirdType", "java.lang"))
                                         .fallback(Type.primitive(PrimitiveType.INTEGER))
                                         .build()))
                                 .safety(LogSafety.DO_NOT_LOG)
@@ -364,7 +349,7 @@ public class ConjureSourceFileValidatorTest {
                         () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContainingAll(
-                        "package.Foo::bad cannot declare log safety", "java.lang.Integer is not a primitive type.");
+                        "package.Foo::bad cannot declare log safety", "java.lang.weirdType is not a primitive type.");
     }
 
     @Test

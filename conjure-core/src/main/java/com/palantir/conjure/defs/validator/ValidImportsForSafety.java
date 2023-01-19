@@ -20,7 +20,18 @@ import java.util.Map;
 
 final class ValidImportsForSafety {
 
-    static final Map<String, String> ALLOWED_IMPORTS = Map.of("java.lang.Long", "string");
+    /*
+    Limiting to boxed primitives for now, but would eventually want to support more external imports.
+     */
+    static final Map<String, String> ALLOWED_IMPORTS = Map.ofEntries(
+            Map.entry("java.lang.Long", "string"),
+            Map.entry("java.lang.Integer", "integer"),
+            Map.entry("java.lang.Boolean", "boolean"),
+            Map.entry("java.lang.Character", "string"),
+            Map.entry("java.lang.Float", "double"),
+            Map.entry("java.lang.Short", "short"),
+            Map.entry("java.lang.Double", "double"),
+            Map.entry("java.lang.Byte", "binary"));
 
     private ValidImportsForSafety() {}
 }
