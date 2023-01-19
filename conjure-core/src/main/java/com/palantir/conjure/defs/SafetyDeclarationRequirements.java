@@ -18,9 +18,23 @@ package com.palantir.conjure.defs;
 
 public enum SafetyDeclarationRequirements {
     ALLOWED,
-    REQUIRED;
+    REQUIRED,
+
+    EXTERNAL_IMPORTS_REQUIRED;
 
     public boolean required() {
         return this == REQUIRED;
+    }
+
+    public boolean external_imports_required() {
+        return this == EXTERNAL_IMPORTS_REQUIRED;
+    }
+
+    public boolean allowed() {
+        return this == ALLOWED;
+    }
+
+    public boolean strictMode() {
+        return this == REQUIRED || this == EXTERNAL_IMPORTS_REQUIRED;
     }
 }

@@ -171,10 +171,7 @@ public final class ConjureCli implements Runnable {
             ConjureDefinition definition = ConjureDefinition.builder()
                     .from(Conjure.parse(ConjureArgs.builder()
                             .definitions(config.inputFiles())
-                            .safetyDeclarations(
-                                    config.requireSafety()
-                                            ? SafetyDeclarationRequirements.REQUIRED
-                                            : SafetyDeclarationRequirements.ALLOWED)
+                            .safetyDeclarations(getSafetyRequirements(config))
                             .build()))
                     .extensions(config.extensions())
                     .build();
@@ -182,6 +179,19 @@ public final class ConjureCli implements Runnable {
                 OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputIrFile(), definition);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to serialize IR file to " + config.outputIrFile(), e);
+            }
+        }
+
+        private static SafetyDeclarationRequirements getSafetyRequirements(CliConfiguration config) {
+            if (config.requireSafety() && config.requireSafetyExternalImports()) {
+                return SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED;
+            } else if (config.requireSafety() && !config.requireSafetyExternalImports()) {
+                return SafetyDeclarationRequirements.REQUIRED;
+            } else if (!config.requireSafety() && !config.requireSafetyExternalImports()) {
+                return SafetyDeclarationRequirements.ALLOWED;
+            } else {
+                System.err.println("If safety is required for external types, it must be required for all types.");
+                return SafetyDeclarationRequirements.ALLOWED;
             }
         }
 

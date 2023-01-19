@@ -23,6 +23,7 @@ import com.palantir.util.syntacticpath.Paths;
 import org.immutables.value.Value;
 
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
+@SuppressWarnings("SafeLoggingPropagation")
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class PathString {

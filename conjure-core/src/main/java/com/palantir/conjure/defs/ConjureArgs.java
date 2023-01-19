@@ -29,7 +29,10 @@ public interface ConjureArgs {
 
     /**
      * If {@link SafetyDeclarationRequirements#REQUIRED}, all components
-     * which allow safety declarations must declare safety.
+     * which allow safety declarations (except external imports) must declare safety.
+     *
+     * If {@link SafetyDeclarationRequirements#EXTERNAL_IMPORTS_REQUIRED}, all components
+     * which allow safety declarations, including external imports, must declare safety.
      */
     SafetyDeclarationRequirements safetyDeclarations();
 

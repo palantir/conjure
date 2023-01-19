@@ -465,7 +465,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                 .forEach(errors::add);
 
                         // In strict mode we don't allow legacy safety tags or markers
-                        if (safetyDeclarations.required()) {
+                        if (safetyDeclarations.strictMode() || safetyDeclarations.external_imports_required()) {
                             if (argumentDefinition.getTags().contains("safe")
                                     || argumentDefinition.getTags().contains("unsafe")) {
                                 errors.add(String.format(

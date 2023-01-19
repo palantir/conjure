@@ -37,6 +37,8 @@ public abstract class CliConfiguration {
 
     abstract boolean requireSafety();
 
+    abstract boolean requireSafetyExternalImports();
+
     static Builder builder() {
         return new Builder();
     }
