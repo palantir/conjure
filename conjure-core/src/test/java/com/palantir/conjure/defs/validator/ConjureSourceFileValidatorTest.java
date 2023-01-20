@@ -47,6 +47,7 @@ import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
+import com.palantir.conjure.spec.UnionDefinition;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +55,10 @@ public class ConjureSourceFileValidatorTest {
     private static final String PACKAGE = "package";
     private static final TypeName FOO = TypeName.of("Foo", PACKAGE);
     private static final TypeName BAR = TypeName.of("Bar", PACKAGE);
+
+    private static final TypeName BAZ = TypeName.of("Baz", PACKAGE);
+
+    private static final TypeName QUX = TypeName.of("Qux", PACKAGE);
     private static final Documentation DOCS = Documentation.of("docs");
 
     @Test
@@ -309,103 +314,6 @@ public class ConjureSourceFileValidatorTest {
     }
 
     @Test
-    public void testSafetyValidExternalImport() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("good"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.STRING))
-                                        .build()))
-                                .safety(LogSafety.DO_NOT_LOG)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED);
-    }
-
-    @Test
-    public void testNoSafety() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("primitive"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .safety(LogSafety.UNSAFE)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(BAR)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("import"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.STRING))
-                                        .build()))
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED);
-    }
-
-    @Test
-    public void testSafetyInvalidExternalImport() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("bad"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("weirdType", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
-                                        .build()))
-                                .safety(LogSafety.DO_NOT_LOG)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        assertThatThrownBy(
-                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContainingAll(
-                        "package.Foo::bad cannot declare log safety", "java.lang.weirdType is not a primitive type.");
-    }
-
-    @Test
-    public void testSafetyExternalImport_InvalidFallback() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("bad"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
-                                        .build()))
-                                .safety(LogSafety.DO_NOT_LOG)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        assertThatThrownBy(
-                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(
-                        "Mismatched base type. java.lang.Long must have a base type of string in order to declare"
-                                + " safety.");
-    }
-
-    @Test
     public void testInvalidSafetyArgument_bearertoken() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
@@ -630,114 +538,162 @@ public class ConjureSourceFileValidatorTest {
     }
 
     @Test
-    public void testRequiredSafetyForExternalImportAndPrimitive() {
+    public void testSafetyExternalImport_InvalidType() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
                         .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("primitive"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .safety(LogSafety.UNSAFE)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(BAR)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("import"))
+                                .fieldName(FieldName.of("bad"))
                                 .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.STRING))
-                                        .build()))
-                                .safety(LogSafety.DO_NOT_LOG)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED);
-    }
-
-    @Test
-    public void testStrictSafetyForPrimitive_NoExternalImport() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("primitive"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .safety(LogSafety.UNSAFE)
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(BAR)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("import"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.STRING))
-                                        .build()))
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(
-                        conjureDef, SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED))
-                .isInstanceOf(ConjureIllegalStateException.class)
-                .hasMessageContaining("package.Bar::import must declare log safety");
-    }
-
-    @Test
-    public void testRequiredSafetyForExternalImport_NoPrimitive() {
-        ConjureDefinition conjureDef = ConjureDefinition.builder()
-                .version(1)
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(FOO)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("primitive"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .docs(DOCS)
-                                .build())
-                        .build()))
-                .types(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(BAR)
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("import"))
-                                .type(Type.external(ExternalReference.builder()
-                                        .externalReference(TypeName.of("Long", "java.lang"))
-                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .externalReference(TypeName.of("weirdType", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
                                         .safety(LogSafety.DO_NOT_LOG)
                                         .build()))
                                 .docs(DOCS)
                                 .build())
                         .build()))
                 .build();
-        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(
-                        conjureDef, SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED))
-                .isInstanceOf(ConjureIllegalStateException.class)
-                .hasMessageContaining("package.Foo::primitive must declare log safety")
-                .hasMessageNotContaining("package.Bar::import must declare log safety");
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContainingAll(
+                        "package.Foo::bad cannot declare log safety", "java.lang.weirdType is not a primitive type.");
     }
 
     @Test
-    public void testRequiredSafetyForPrimitive_NoExternalImport() {
+    public void testSafetyExternalImport_InvalidFallback() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(FOO)
                         .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("primitive"))
-                                .type(Type.primitive(PrimitiveType.STRING))
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.INTEGER))
+                                        .safety(LogSafety.SAFE)
+                                        .build()))
                                 .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining(
+                        "Mismatched base type. java.lang.Long must have a base type of string in order to declare"
+                                + " safety.");
+    }
+
+    @Test
+    public void testSafetyExternalImport_EndpointNotAtImportTime() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("name", "package"))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("badEndpoint"))
+                                .httpMethod(HttpMethod.GET)
+                                .httpPath(HttpPath.of("/"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("testArgument"))
+                                        .type(Type.external(ExternalReference.builder()
+                                                .externalReference(TypeName.of("Long", "java.lang"))
+                                                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                                                .build()))
+                                        .safety(LogSafety.DO_NOT_LOG)
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(
+                        conjureDef, SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("External types must declare safety at import time");
+    }
+
+    @Test
+    public void testSafetyExternalImport_Alias() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(FOO)
+                        .alias(Type.external(ExternalReference.builder()
+                                .externalReference(TypeName.of("Long", "java.lang"))
+                                .fallback(Type.primitive(PrimitiveType.INTEGER))
                                 .safety(LogSafety.DO_NOT_LOG)
+                                .build()))
+                        .build()))
+                .build();
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("java.lang.Long must have a base type of string in order to declare safety");
+    }
+
+    @Test
+    public void testSafetyExternalImport_Union() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.union(UnionDefinition.builder()
+                        .union(FieldDefinition.builder()
+                                .fieldName(FieldName.of("badImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .safety(LogSafety.DO_NOT_LOG)
+                                        .build()))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .typeName(FOO)
+                        .build()))
+                .build();
+        assertThatThrownBy(
+                        () -> ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("External types must declare safety at import time, not at usage time");
+    }
+
+    @Test
+    public void testSafety_ExternalImportsRequired() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
                                 .build())
                         .build()))
                 .types(TypeDefinition.object(ObjectDefinition.builder()
                         .typeName(BAR)
                         .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("import"))
+                                .fieldName(FieldName.of("badPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(BAZ)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .build()))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(QUX)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("badImport"))
                                 .type(Type.external(ExternalReference.builder()
                                         .externalReference(TypeName.of("Long", "java.lang"))
                                         .fallback(Type.primitive(PrimitiveType.STRING))
@@ -746,7 +702,115 @@ public class ConjureSourceFileValidatorTest {
                                 .build())
                         .build()))
                 .build();
-        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
+        assertThatThrownBy(() -> ConjureDefinitionValidator.validateAll(
+                        conjureDef, SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageNotContaining("package.Foo::goodPrimitive must declare log safety")
+                .hasMessageContaining("package.Bar::badPrimitive must declare log safety")
+                .hasMessageNotContaining("package.Baz::goodImport must declare log safety")
+                .hasMessageContaining("package.Qux::badImport must declare log safety");
+    }
+
+    @Test
+    public void testSafety_Required() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(BAR)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("badPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(BAZ)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .build()))
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(QUX)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("alsoGoodImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .build()))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(ConjureIllegalStateException.class)
+                .hasMessageNotContaining("package.Foo::goodPrimitive must declare log safety")
+                .hasMessageContaining("package.Bar::badPrimitive must declare log safety")
+                .hasMessageNotContaining("package.Baz::goodImport must declare log safety")
+                .hasMessageNotContaining("package.Qux::alsoGoodImport must declare log safety");
+    }
+
+    @Test
+    public void testSafety_Allowed() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(BAR)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("alsoGoodPrimitive"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(BAZ)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("goodImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .safety(LogSafety.SAFE)
+                                        .build()))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(QUX)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("alsoGoodImport"))
+                                .type(Type.external(ExternalReference.builder()
+                                        .externalReference(TypeName.of("Long", "java.lang"))
+                                        .fallback(Type.primitive(PrimitiveType.STRING))
+                                        .build()))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.ALLOWED);
     }
 
     private FieldDefinition field(FieldName name, String type) {

@@ -16,14 +16,17 @@
 
 package com.palantir.conjure.cli;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicReference;
@@ -59,6 +62,7 @@ public final class ConjureCliTest {
                 .outputIrFile(outputFile)
                 .putExtensions("foo", "bar")
                 .requireSafety(false)
+                .requireSafetyExternalImports(false)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
                 .parseArgs(args)
@@ -75,6 +79,7 @@ public final class ConjureCliTest {
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(outputFile)
                 .requireSafety(false)
+                .requireSafetyExternalImports(false)
                 .build();
         ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
                 .parseArgs(args)
@@ -136,20 +141,64 @@ public final class ConjureCliTest {
                         new File("src/test/resources/complex/api-2.yml")))
                 .outputIrFile(outputFile)
                 .requireSafety(false)
+                .requireSafetyExternalImports(false)
                 .build();
         ConjureCli.CompileCommand.generate(configuration);
         assertThat(outputFile).exists();
     }
 
     @Test
-    public void canRequireSafetyInfo() {
+    public void canRequireSafetyInfo_WithoutExternalImports() {
         CliConfiguration configuration = CliConfiguration.builder()
                 .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
                 .outputIrFile(outputFile)
                 .requireSafety(true)
+                .requireSafetyExternalImports(false)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .hasMessageContaining("must declare log safety");
+    }
+
+    @Test
+    public void canRequireSafetyInfo_WithExternalImports() {
+        CliConfiguration configuration = CliConfiguration.builder()
+                .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
+                .outputIrFile(outputFile)
+                .requireSafety(true)
+                .requireSafetyExternalImports(false)
+                .build();
+        assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
+                .hasMessageContaining("must declare log safety");
+    }
+
+    @Test
+    public void canAllowSafetyInfo_WithoutExternalImports() {
+        CliConfiguration configuration = CliConfiguration.builder()
+                .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
+                .outputIrFile(outputFile)
+                .requireSafety(false)
+                .requireSafetyExternalImports(false)
+                .build();
+        ConjureCli.CompileCommand.generate(configuration);
+    }
+
+    @Test
+    public void mustRequireSafetyInfo_WithExternalImports() {
+        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+        PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(errContent));
+
+        CliConfiguration configuration = CliConfiguration.builder()
+                .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
+                .outputIrFile(outputFile)
+                .requireSafety(false)
+                .requireSafetyExternalImports(true)
+                .build();
+        ConjureCli.CompileCommand.generate(configuration);
+        assertThat(errContent.toString(UTF_8))
+                .contains("If safety is required for external types, it must be required for all types.");
+
+        System.setErr(originalErr);
     }
 
     @Test
@@ -222,6 +271,7 @@ public final class ConjureCliTest {
                 .inputFiles(ImmutableList.of(inputFile))
                 .outputIrFile(folder)
                 .requireSafety(false)
+                .requireSafetyExternalImports(false)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .getRootCause()

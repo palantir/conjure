@@ -17,13 +17,13 @@
 package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
+import com.palantir.conjure.defs.validator.ExternalReferenceVisitorUtils.ExternalReferenceSafetyVisitor;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
-import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.FieldName;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.LogSafety;
@@ -58,6 +58,24 @@ public final class SafetyValidator {
             Optional<LogSafety> declaredSafety,
             Type type,
             SafetyDeclarationRequirements safetyDeclarations) {
+        safetyAllowedVisitor = new TypeSafetyAllowedVisitor(safetyDeclarations.external_imports_required());
+        Optional<LogSafety> safetyToEvaluate = declaredSafety;
+        Optional<ExternalReference> maybeExternalType = type.accept(ExternalReferenceSafetyVisitor.INSTANCE);
+        if (maybeExternalType.isPresent()) {
+            if (declaredSafety.isPresent()) {
+                return Stream.of("External types must declare safety at import time, not at usage time.");
+            }
+            safetyToEvaluate = maybeExternalType.get().getSafety();
+        }
+        return validateDefinitionInternal(endpointDefinition, argumentName, safetyToEvaluate, type, safetyDeclarations);
+    }
+
+    private static Stream<String> validateDefinitionInternal(
+            EndpointDefinition endpointDefinition,
+            ArgumentName argumentName,
+            Optional<LogSafety> declaredSafety,
+            Type type,
+            SafetyDeclarationRequirements safetyDeclarations) {
         if (declaredSafety.isPresent()) {
             return type.accept(
                     new SafetyTypeVisitor(endpointDefinition.getEndpointName().get()));
@@ -71,7 +89,7 @@ public final class SafetyValidator {
         }
     }
 
-    public static Stream<String> importSafetyAllowed(ExternalReference value, String parentReference) {
+    public static Stream<String> importSafetyValidate(ExternalReference value, String parentReference) {
         String importType = value.getExternalReference().getPackage() + "."
                 + value.getExternalReference().getName();
         if (ValidImportsForSafety.ALLOWED_IMPORTS.containsKey(importType)) {
@@ -87,6 +105,12 @@ public final class SafetyValidator {
         } else {
             return Stream.of(fail(parentReference, value.getExternalReference()));
         }
+    }
+
+    public static boolean importSafetyAllowed(ExternalReference value) {
+        String importType = value.getExternalReference().getPackage() + "."
+                + value.getExternalReference().getName();
+        return ValidImportsForSafety.ALLOWED_IMPORTS.containsKey(importType);
     }
 
     private static String fail(String parentReference, TypeName nonPrimitiveType) {
@@ -118,7 +142,7 @@ public final class SafetyValidator {
             return value.getFields().stream()
                     .flatMap(field -> validateType(
                             field.getType(),
-                            getObjectSafety(field),
+                            field.getSafety(),
                             qualifyTypeReference(value.getTypeName(), field.getFieldName())));
         }
 
@@ -136,12 +160,20 @@ public final class SafetyValidator {
             throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
 
-        private Optional<LogSafety> getObjectSafety(FieldDefinition field) {
-            Optional<LogSafety> maybeLogSafety = field.getType().accept(ExternalReferenceSafetyVisitor.INSTANCE);
-            return maybeLogSafety.isPresent() ? maybeLogSafety : field.getSafety();
+        private Stream<String> validateType(
+                Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
+            Optional<LogSafety> safetyToEvaluate = declaredSafety;
+            Optional<ExternalReference> maybeExternalType = type.accept(ExternalReferenceSafetyVisitor.INSTANCE);
+            if (maybeExternalType.isPresent()) {
+                if (declaredSafety.isPresent()) {
+                    return Stream.of("External types must declare safety at import time, not at usage time.");
+                }
+                safetyToEvaluate = maybeExternalType.get().getSafety();
+            }
+            return validateTypeInternal(type, safetyToEvaluate, qualifiedTypeReference);
         }
 
-        private Stream<String> validateType(
+        private Stream<String> validateTypeInternal(
                 Type type, Optional<LogSafety> declaredSafety, String qualifiedTypeReference) {
             if (declaredSafety.isPresent()) {
                 return type.accept(new SafetyTypeVisitor(qualifiedTypeReference));
@@ -205,7 +237,7 @@ public final class SafetyValidator {
 
         @Override
         public Stream<String> visitExternal(ExternalReference value) {
-            return importSafetyAllowed(value, parentReference);
+            return importSafetyValidate(value, parentReference);
         }
 
         @Override
@@ -282,50 +314,6 @@ public final class SafetyValidator {
         }
     }
 
-    private enum ExternalReferenceSafetyVisitor implements Type.Visitor<Optional<LogSafety>> {
-        INSTANCE;
-
-        @Override
-        public Optional<LogSafety> visitPrimitive(PrimitiveType _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitOptional(OptionalType _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitList(ListType _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitSet(SetType _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitMap(MapType _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitReference(TypeName _value) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<LogSafety> visitExternal(ExternalReference value) {
-            return value.getSafety();
-        }
-
-        @Override
-        public Optional<LogSafety> visitUnknown(String _unknownType) {
-            return Optional.empty();
-        }
-    }
-
     private static final class TypeSafetyAllowedVisitor implements Type.Visitor<Boolean> {
 
         private boolean externalImportsRequired;
@@ -366,8 +354,7 @@ public final class SafetyValidator {
 
         @Override
         public Boolean visitExternal(ExternalReference value) {
-            return externalImportsRequired
-                    && importSafetyAllowed(value, "").findAny().isEmpty();
+            return externalImportsRequired && importSafetyAllowed(value);
         }
 
         @Override

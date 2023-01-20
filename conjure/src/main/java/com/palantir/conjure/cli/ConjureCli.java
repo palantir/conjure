@@ -149,8 +149,15 @@ public final class ConjureCli implements Runnable {
 
         @CommandLine.Option(
                 names = "--requireSafety",
-                description = "All components which allow safety declarations must declare safety.")
+                description =
+                        "All components which allow safety declarations must declare safety, except for external imports.")
         private boolean requireSafety;
+
+        @CommandLine.Option(
+                names = "--requireSafetyExternalImports",
+                description =
+                        "All components which allow safety declarations must declare safet, including accepted external imports.")
+        private boolean requireSafetyExternalImports;
 
         @CommandLine.Unmatched
         @Nullable
@@ -203,7 +210,8 @@ public final class ConjureCli implements Runnable {
                     Optional.ofNullable(extensions)
                             .map(ConjureCli::parseExtensions)
                             .orElseGet(Collections::emptyMap),
-                    requireSafety);
+                    requireSafety,
+                    requireSafetyExternalImports);
         }
 
         @Override

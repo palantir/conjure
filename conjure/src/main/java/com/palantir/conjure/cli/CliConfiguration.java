@@ -44,7 +44,11 @@ public abstract class CliConfiguration {
     }
 
     static CliConfiguration create(
-            String input, String outputIrFile, Map<String, Object> extensions, boolean requireSafety) {
+            String input,
+            String outputIrFile,
+            Map<String, Object> extensions,
+            boolean requireSafety,
+            boolean requireSafetyExternalImports) {
         File inputFile = new File(input);
 
         Collection<File> inputFiles;
@@ -64,6 +68,7 @@ public abstract class CliConfiguration {
                 .outputIrFile(outputFile)
                 .extensions(extensions)
                 .requireSafety(requireSafety)
+                .requireSafetyExternalImports(requireSafetyExternalImports)
                 .build();
     }
 
