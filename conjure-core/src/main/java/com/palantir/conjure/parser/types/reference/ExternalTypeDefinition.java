@@ -38,7 +38,6 @@ public interface ExternalTypeDefinition {
         return PrimitiveType.ANY;
     }
 
-    @JsonProperty("safety")
     Optional<LogSafetyDefinition> safety();
 
     static ExternalTypeDefinition javaType(String external, PrimitiveType baseType) {

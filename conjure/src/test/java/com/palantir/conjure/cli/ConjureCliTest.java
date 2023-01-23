@@ -165,7 +165,7 @@ public final class ConjureCliTest {
                 .inputFiles(ImmutableList.of(new File("src/test/resources/complex/api.yml")))
                 .outputIrFile(outputFile)
                 .requireSafety(true)
-                .requireSafetyExternalImports(false)
+                .requireSafetyExternalImports(true)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .hasMessageContaining("must declare log safety");

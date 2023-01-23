@@ -149,14 +149,14 @@ public final class ConjureCli implements Runnable {
 
         @CommandLine.Option(
                 names = "--requireSafety",
-                description =
-                        "All components which allow safety declarations must declare safety, except for external imports.")
+                description = "All components which allow safety declarations must declare safety, except for external"
+                        + " imports.")
         private boolean requireSafety;
 
         @CommandLine.Option(
                 names = "--requireSafetyExternalImports",
-                description =
-                        "All components which allow safety declarations must declare safet, including accepted external imports.")
+                description = "All components which allow safety declarations must declare safet, including accepted"
+                        + " external imports.")
         private boolean requireSafetyExternalImports;
 
         @CommandLine.Unmatched
@@ -189,6 +189,7 @@ public final class ConjureCli implements Runnable {
             }
         }
 
+        @SuppressWarnings("BanSystemErr")
         private static SafetyDeclarationRequirements getSafetyRequirements(CliConfiguration config) {
             if (config.requireSafety() && config.requireSafetyExternalImports()) {
                 return SafetyDeclarationRequirements.EXTERNAL_IMPORTS_REQUIRED;
