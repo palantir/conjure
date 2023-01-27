@@ -26,7 +26,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
 import java.util.Optional;
 
-enum ExternalReferenceVisitor implements Type.Visitor<Optional<ExternalReference>> {
+enum ExtractExternalReferenceVisitor implements Type.Visitor<Optional<ExternalReference>> {
     INSTANCE;
 
     @Override

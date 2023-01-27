@@ -155,7 +155,7 @@ public final class ConjureCli implements Runnable {
 
         @CommandLine.Option(
                 names = "--requireSafetyExternalImports",
-                description = "All components which allow safety declarations must declare safet, including accepted"
+                description = "All components which allow safety declarations must declare safety, including accepted"
                         + " external imports.")
         private boolean requireSafetyExternalImports;
 

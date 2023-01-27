@@ -455,26 +455,6 @@ public class ConjureSourceFileValidatorTest {
                 .hasMessageContainingAll("cannot declare log safety", "java.lang.weirdType is not a primitive type.");
     }
 
-    private static Stream<Arguments> provideExternalImports_InvalidFallback() {
-        Type badExternalReference = Type.external(ExternalReference.builder()
-                .externalReference(TypeName.of("Long", "java.lang"))
-                .fallback(Type.primitive(PrimitiveType.INTEGER))
-                .safety(LogSafety.DO_NOT_LOG)
-                .build());
-        return getAllTypesToTest_SafetyAtImportTime(badExternalReference);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideExternalImports_InvalidFallback")
-    public void testSafetyExternalImport_InvalidFallback(ConjureDefinition definition) {
-        assertThatThrownBy(
-                        () -> ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.ALLOWED))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining(
-                        "Mismatched base type. java.lang.Long must have a base type of string in order to declare"
-                                + " safety.");
-    }
-
     private static Stream<Arguments> provideExternalImports_NotAtImportTime() {
         Type external = Type.external(ExternalReference.builder()
                 .externalReference(TypeName.of("Long", "java.lang"))

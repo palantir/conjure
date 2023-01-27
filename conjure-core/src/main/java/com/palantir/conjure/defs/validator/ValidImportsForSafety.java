@@ -16,22 +16,14 @@
 
 package com.palantir.conjure.defs.validator;
 
-import java.util.Map;
+import java.util.List;
 
 final class ValidImportsForSafety {
 
     /*
-    Limiting to boxed primitives for now, but would eventually want to support more external imports.
+    Limiting to java.lang.Long for now, but would eventually want to support more external imports.
      */
-    static final Map<String, String> ALLOWED_IMPORTS = Map.ofEntries(
-            Map.entry("java.lang.Long", "string"),
-            Map.entry("java.lang.Integer", "integer"),
-            Map.entry("java.lang.Boolean", "boolean"),
-            Map.entry("java.lang.Character", "string"),
-            Map.entry("java.lang.Float", "double"),
-            Map.entry("java.lang.Short", "short"),
-            Map.entry("java.lang.Double", "double"),
-            Map.entry("java.lang.Byte", "binary"));
+    static final List<String> ALLOWED_IMPORTS = List.of("java.lang.Long");
 
     private ValidImportsForSafety() {}
 }

@@ -26,7 +26,7 @@ public enum SafetyDeclarationRequirements {
         return this == REQUIRED;
     }
 
-    public boolean external_imports_required() {
+    public boolean externalImportsRequired() {
         return this == EXTERNAL_IMPORTS_REQUIRED;
     }
 
