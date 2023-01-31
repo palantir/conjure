@@ -193,7 +193,7 @@ public final class ConjureParserUtils {
         return Type.primitive(PrimitiveType.valueOf(primitiveType.name()));
     }
 
-    public static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
+    static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
         return Type.external(ExternalReference.builder()
                 .externalReference(TypeName.of(typeName, conjurePackage))
                 .fallback(ConjureParserUtils.parsePrimitiveType(externalType.baseType()))
