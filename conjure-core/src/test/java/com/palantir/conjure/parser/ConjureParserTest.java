@@ -99,6 +99,15 @@ public class ConjureParserTest {
     }
 
     @Test
+    public void testConjureExternalImportSafety() {
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
+        assertThat(conjure.types().imports().get(TypeName.of("ExampleLong")).safety())
+                .isNotEmpty()
+                .get()
+                .isEqualTo(LogSafetyDefinition.SAFE);
+    }
+
+    @Test
     public void testConjureFieldDeprecation() {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-deprecation.yml"));
         ObjectTypeDefinition object = conjure.types()

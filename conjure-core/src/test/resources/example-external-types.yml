@@ -8,6 +8,11 @@ types:
       base-type: string
       external:
         java: com.palantir.example.ExternalIntegerImport
+    ExampleLong:
+      base-type: string
+      external:
+        java: java.lang.Long
+      safety: safe
 
   # Required otherwise imports are ignored by the compiler
   definitions:
