@@ -194,11 +194,24 @@ public final class ConjureParserUtils {
     }
 
     static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
+        if (incorrectlyMarksBearerToken(externalType)) {
+            throw new ConjureRuntimeException("Bearer tokens must have a safety of Do Not Log.");
+        }
         return Type.external(ExternalReference.builder()
                 .externalReference(TypeName.of(typeName, conjurePackage))
                 .fallback(ConjureParserUtils.parsePrimitiveType(externalType.baseType()))
                 .safety(externalType.safety().map(ConjureParserUtils::parseLogSafety))
                 .build());
+    }
+
+    private static boolean incorrectlyMarksBearerToken(ExternalTypeDefinition externalTypeDefinition) {
+        return externalTypeDefinition
+                        .baseType()
+                        .equals(com.palantir.conjure.parser.types.primitive.PrimitiveType.BEARERTOKEN)
+                && externalTypeDefinition
+                        .safety()
+                        .map(safety -> !safety.equals(LogSafetyDefinition.DO_NOT_LOG))
+                        .orElse(false);
     }
 
     public static TypeName createTypeName(

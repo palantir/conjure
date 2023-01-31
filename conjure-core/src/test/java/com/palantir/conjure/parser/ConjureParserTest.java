@@ -17,9 +17,14 @@
 package com.palantir.conjure.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.defs.Conjure;
+import com.palantir.conjure.defs.ConjureArgs;
+import com.palantir.conjure.defs.SafetyDeclarationRequirements;
+import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
@@ -101,10 +106,33 @@ public class ConjureParserTest {
     @Test
     public void testConjureExternalImportSafety() {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-external-types.yml"));
-        assertThat(conjure.types().imports().get(TypeName.of("ExampleLong")).safety())
+        assertThat(conjure.types()
+                        .imports()
+                        .get(TypeName.of("ExampleLongImport"))
+                        .safety())
                 .isNotEmpty()
                 .get()
                 .isEqualTo(LogSafetyDefinition.SAFE);
+    }
+
+    @Test
+    public void testConjureExternalImportSafety_BearerTokenFail() {
+        assertThatThrownBy(() -> Conjure.parse(ConjureArgs.builder()
+                        .definitions(ImmutableList.of(new File("src/test/resources/example-bad-external-type.yml")))
+                        .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                        .build()))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .hasMessageContaining("Bearer tokens must have a safety of Do Not Log");
+    }
+
+    @Test
+    public void testConjureExternalImportSafety_BearerTokenSuccess() {
+        assertThatNoException()
+                .isThrownBy(() -> Conjure.parse(ConjureArgs.builder()
+                        .definitions(ImmutableList.of(new File("src/test/resources/example-external-types.yml")))
+                        .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                        .build()));
     }
 
     @Test

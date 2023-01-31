@@ -1,0 +1,15 @@
+types:
+  imports:
+    ExampleBearerTokenImport:
+      base-type: bearertoken
+      external:
+        java: java.lang.Long
+      safety: safe
+
+  # Required otherwise imports are ignored by the compiler
+  definitions:
+    default-package: test.api.with.external.types
+    objects:
+      ComplexObjectWithImports:
+        fields:
+          bearerTokenImport: ExampleBearerTokenImport
