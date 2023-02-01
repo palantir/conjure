@@ -511,6 +511,28 @@ public class ConjureSourceFileValidatorTest {
                 .hasMessageContaining("Service.end(arg): Safety markers have been replaced by the 'safety' field");
     }
 
+    @Test
+    public void testSafetyOnExternalImport() {
+        ExternalReference external = ExternalReference.builder()
+                .safety(LogSafety.DO_NOT_LOG)
+                .externalReference(TypeName.of("Long", "java.lang"))
+                .fallback(Type.primitive(PrimitiveType.BOOLEAN))
+                .build();
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.external(external))
+                                .safety(LogSafety.UNSAFE)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED);
+    }
+
     private FieldDefinition field(FieldName name, String type) {
         return FieldDefinition.builder()
                 .fieldName(name)

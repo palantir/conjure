@@ -182,8 +182,9 @@ public final class SafetyValidator {
         }
 
         @Override
-        public Stream<String> visitExternal(ExternalReference value) {
-            return Stream.of(fail(parentReference, value.getExternalReference()));
+        public Stream<String> visitExternal(ExternalReference _value) {
+            // ignore safety declarations on external imports
+            return Stream.empty();
         }
 
         @Override
