@@ -194,7 +194,7 @@ public final class ConjureParserUtils {
     }
 
     static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
-        if (isBearerToken(externalType)) {
+        if (isBearerToken(externalType) && externalType.safety().isPresent()) {
             throw new ConjureRuntimeException(
                     "Cannot mark safety of external import with base type BearerToken. BearerToken assumes Do Not"
                             + " Log.");

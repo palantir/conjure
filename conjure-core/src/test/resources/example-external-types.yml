@@ -13,6 +13,10 @@ types:
       external:
         java: java.lang.Long
       safety: safe
+    ExampleBearerTokenImport:
+      base-type: bearertoken
+      external:
+        java: java.lang.Long
 
   # Required otherwise imports are ignored by the compiler
   definitions:
@@ -23,3 +27,4 @@ types:
           anyImport: ExampleAnyImport
           integerImport:  ExampleIntegerImport
           longImport: ExampleLongImport
+          bearerTokenImport: ExampleBearerTokenImport
