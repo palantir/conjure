@@ -34,7 +34,6 @@ import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
-import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeName;
 import java.util.Map;
@@ -88,7 +87,6 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
             BaseObjectTypeDefinition maybeDirectDef =
                     types.definitions().objects().get(name);
             String conjurePackage;
-            String typeName;
             if (maybeDirectDef == null) {
                 ExternalTypeDefinition maybeExternalDef = types.imports().get(name);
                 if (maybeExternalDef == null) {
@@ -98,12 +96,9 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                 String externalPath = maybeExternalDef.external().java();
                 int lastIndex = externalPath.lastIndexOf(".");
                 conjurePackage = externalPath.substring(0, lastIndex);
-                typeName = externalPath.substring(lastIndex + 1);
+                String typeName = externalPath.substring(lastIndex + 1);
 
-                return Type.external(ExternalReference.builder()
-                        .externalReference(TypeName.of(typeName, conjurePackage))
-                        .fallback(ConjureParserUtils.parsePrimitiveType(maybeExternalDef.baseType()))
-                        .build());
+                return ConjureParserUtils.parseExternalType(maybeExternalDef, conjurePackage, typeName);
             } else {
                 // Conjure-defined object
                 conjurePackage =

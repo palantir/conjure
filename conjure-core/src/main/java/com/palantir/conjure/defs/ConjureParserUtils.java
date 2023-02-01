@@ -42,6 +42,7 @@ import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.reference.ConjureImports;
+import com.palantir.conjure.parser.types.reference.ExternalTypeDefinition;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
@@ -56,6 +57,7 @@ import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.ErrorNamespace;
+import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.FieldName;
 import com.palantir.conjure.spec.HeaderAuthType;
@@ -189,6 +191,25 @@ public final class ConjureParserUtils {
 
     public static Type parsePrimitiveType(com.palantir.conjure.parser.types.primitive.PrimitiveType primitiveType) {
         return Type.primitive(PrimitiveType.valueOf(primitiveType.name()));
+    }
+
+    static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
+        if (isBearerToken(externalType) && externalType.safety().isPresent()) {
+            throw new ConjureRuntimeException(
+                    "Cannot mark safety of external import with base type BearerToken. BearerToken assumes Do Not"
+                            + " Log.");
+        }
+        return Type.external(ExternalReference.builder()
+                .externalReference(TypeName.of(typeName, conjurePackage))
+                .fallback(ConjureParserUtils.parsePrimitiveType(externalType.baseType()))
+                .safety(externalType.safety().map(ConjureParserUtils::parseLogSafety))
+                .build());
+    }
+
+    private static boolean isBearerToken(ExternalTypeDefinition externalTypeDefinition) {
+        return externalTypeDefinition
+                .baseType()
+                .equals(com.palantir.conjure.parser.types.primitive.PrimitiveType.BEARERTOKEN);
     }
 
     public static TypeName createTypeName(
