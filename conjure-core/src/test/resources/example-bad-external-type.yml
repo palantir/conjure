@@ -4,7 +4,7 @@ types:
       base-type: bearertoken
       external:
         java: java.lang.Long
-      safety: safe
+      safety: do-not-log
 
   # Required otherwise imports are ignored by the compiler
   definitions:

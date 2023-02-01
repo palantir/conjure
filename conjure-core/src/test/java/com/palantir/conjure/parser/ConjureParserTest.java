@@ -123,7 +123,9 @@ public class ConjureParserTest {
                         .build()))
                 .isInstanceOf(ConjureRuntimeException.class)
                 .rootCause()
-                .hasMessageContaining("Bearer tokens must have a safety of Do Not Log");
+                .hasMessageContaining(
+                        "Cannot mark safety of external import with base type BearerToken. BearerToken assumes Do Not"
+                                + " Log.");
     }
 
     @Test
