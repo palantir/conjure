@@ -186,7 +186,9 @@ public final class SafetyValidator {
             String referenceName = value.getExternalReference().getPackage() + "."
                     + value.getExternalReference().getName();
             return Stream.of(String.format(
-                    "External import %s must declare safety at import time, not at usage time.", referenceName));
+                    "If external import %s is eligible to declare safety, it must do so at import time, not at usage"
+                            + " time.",
+                    referenceName));
         }
 
         @Override

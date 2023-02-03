@@ -532,7 +532,7 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() ->
                         ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("External import java.lang.Long must declare safety at import time");
+                .hasMessageContaining("If external import java.lang.Long is eligible to declare safety,");
     }
 
     private static Stream<Arguments> provideExternalImports_UsageAndImportTime() {
@@ -550,7 +550,7 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() ->
                         ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("External import java.lang.Long must declare safety at import time");
+                .hasMessageContaining("If external import java.lang.Long is eligible to declare safety,");
     }
 
     private static Stream<Arguments> provideExternalImports_ImportTimeOnly() {
