@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
@@ -47,7 +48,13 @@ import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
+import com.palantir.conjure.spec.UnionDefinition;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ConjureSourceFileValidatorTest {
     private static final String PACKAGE = "package";
@@ -509,6 +516,192 @@ public class ConjureSourceFileValidatorTest {
                         ConjureDefinitionValidator.validateAll(conjureDef, SafetyDeclarationRequirements.REQUIRED))
                 .isInstanceOf(ConjureIllegalStateException.class)
                 .hasMessageContaining("Service.end(arg): Safety markers have been replaced by the 'safety' field");
+    }
+
+    private static Stream<Arguments> provideExternalImports_UsageTimeOnly() {
+        Type external = Type.external(ExternalReference.builder()
+                .externalReference(TypeName.of("Long", "java.lang"))
+                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                .build());
+        return getAllTypesToTest_SafetyAtUsageTime(external);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideExternalImports_UsageTimeOnly")
+    public void testSafetyExternalImport_UsageTimeOnly(ConjureDefinition definition) {
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("If external import java.lang.Long is eligible to declare safety,");
+    }
+
+    private static Stream<Arguments> provideExternalImports_UsageAndImportTime() {
+        Type external = Type.external(ExternalReference.builder()
+                .externalReference(TypeName.of("Long", "java.lang"))
+                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                .safety(LogSafety.DO_NOT_LOG)
+                .build());
+        return getAllTypesToTest_SafetyAtUsageTime(external);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideExternalImports_UsageAndImportTime")
+    public void testSafetyExternalImport_UsageAndImportTime(ConjureDefinition definition) {
+        assertThatThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("If external import java.lang.Long is eligible to declare safety,");
+    }
+
+    private static Stream<Arguments> provideExternalImports_ImportTimeOnly() {
+        Type external = Type.external(ExternalReference.builder()
+                .externalReference(TypeName.of("Long", "java.lang"))
+                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                .safety(LogSafety.DO_NOT_LOG)
+                .build());
+        return getAllTypesToTest_SafetyAtImportTime(external);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideExternalImports_ImportTimeOnly")
+    public void testSafetyExternalImport_ImportTimeOnly(ConjureDefinition definition) {
+        assertThatNoException()
+                .isThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED));
+    }
+
+    private static Stream<Arguments> provideExternalImports_NoSafety() {
+        Type external = Type.external(ExternalReference.builder()
+                .externalReference(TypeName.of("Long", "java.lang"))
+                .fallback(Type.primitive(PrimitiveType.INTEGER))
+                .build());
+        return getAllTypesToTest_SafetyAtImportTime(external);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideExternalImports_NoSafety")
+    public void testSafetyExternalImport_NoSafety(ConjureDefinition definition) {
+        assertThatNoException()
+                .isThrownBy(() ->
+                        ConjureDefinitionValidator.validateAll(definition, SafetyDeclarationRequirements.REQUIRED));
+    }
+
+    private static Stream<Arguments> getAllTypesToTest_SafetyAtImportTime(Type externalReference) {
+        ConjureDefinition conjureDefObject = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("externalImport"))
+                                .type(externalReference)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefAlias = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(FOO)
+                        .alias(externalReference)
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefUnion = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.union(UnionDefinition.builder()
+                        .union(FieldDefinition.builder()
+                                .fieldName(FieldName.of("externalImport"))
+                                .type(externalReference)
+                                .docs(DOCS)
+                                .build())
+                        .typeName(FOO)
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefEndpoint = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(FOO)
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("externalImportEndpoint"))
+                                .httpMethod(HttpMethod.GET)
+                                .httpPath(HttpPath.of("/"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("externalImport"))
+                                        .type(externalReference)
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        return Stream.of(
+                Arguments.of(Named.of("Object", conjureDefObject)),
+                Arguments.of(Named.of("Alias", conjureDefAlias)),
+                Arguments.of(Named.of("Union", conjureDefUnion)),
+                Arguments.of(Named.of("Endpoint", conjureDefEndpoint)));
+    }
+
+    private static Stream<Arguments> getAllTypesToTest_SafetyAtUsageTime(Type primitive) {
+        ConjureDefinition conjureDefObject = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("externalImport"))
+                                .type(primitive)
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefAlias = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(FOO)
+                        .alias(primitive)
+                        .safety(LogSafety.DO_NOT_LOG)
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefUnion = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.union(UnionDefinition.builder()
+                        .union(FieldDefinition.builder()
+                                .fieldName(FieldName.of("externalImport"))
+                                .type(primitive)
+                                .safety(LogSafety.DO_NOT_LOG)
+                                .docs(DOCS)
+                                .build())
+                        .typeName(FOO)
+                        .build()))
+                .build();
+
+        ConjureDefinition conjureDefEndpoint = ConjureDefinition.builder()
+                .version(1)
+                .services(ServiceDefinition.builder()
+                        .serviceName(FOO)
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("externalImportEndpoint"))
+                                .httpMethod(HttpMethod.GET)
+                                .httpPath(HttpPath.of("/"))
+                                .args(ArgumentDefinition.builder()
+                                        .argName(ArgumentName.of("externalImport"))
+                                        .type(primitive)
+                                        .safety(LogSafety.DO_NOT_LOG)
+                                        .paramType(ParameterType.body(BodyParameterType.of()))
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        return Stream.of(
+                Arguments.of(Named.of("Object", conjureDefObject)),
+                Arguments.of(Named.of("Alias", conjureDefAlias)),
+                Arguments.of(Named.of("Union", conjureDefUnion)),
+                Arguments.of(Named.of("Endpoint", conjureDefEndpoint)));
     }
 
     private FieldDefinition field(FieldName name, String type) {

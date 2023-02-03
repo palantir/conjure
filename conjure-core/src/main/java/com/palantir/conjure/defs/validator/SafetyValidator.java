@@ -183,7 +183,12 @@ public final class SafetyValidator {
 
         @Override
         public Stream<String> visitExternal(ExternalReference value) {
-            return Stream.of(fail(parentReference, value.getExternalReference()));
+            String referenceName = value.getExternalReference().getPackage() + "."
+                    + value.getExternalReference().getName();
+            return Stream.of(String.format(
+                    "If external import %s is eligible to declare safety, it must do so at import time, not at usage"
+                            + " time.",
+                    referenceName));
         }
 
         @Override
