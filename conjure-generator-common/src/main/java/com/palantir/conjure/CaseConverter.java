@@ -99,6 +99,8 @@ public final class CaseConverter {
                 return nameCase;
             }
         }
-        throw new IllegalArgumentException("Unexpected case for: " + name);
+
+        throw new IllegalArgumentException("Unexpected case for: '" + name
+                + "'. Expected to be in one of these case formats: [lowerCamelCase, kebab-case, snake_case]");
     }
 }
