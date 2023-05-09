@@ -76,10 +76,18 @@ public class CaseConverterTest {
     }
 
     @Test
-    public void testConversionFailure() {
+    public void testConversionFailure_acronym() {
         String nonCase = "myCIDRs";
         assertThatThrownBy(() -> CaseConverter.toCase(nonCase, CaseConverter.Case.KEBAB_CASE))
                 .hasMessage("Unexpected case for: 'myCIDRs'. Expected one to be in one of these case formats: "
+                        + "[lowerCamelCase, kebab-case, snake_case]");
+    }
+
+    @Test
+    public void testConversionFailure_upperSnakeCase() {
+        String nonCase = "UPPER_SNAKE_CASE";
+        assertThatThrownBy(() -> CaseConverter.toCase(nonCase, CaseConverter.Case.KEBAB_CASE))
+                .hasMessage("Unexpected case for: 'UPPER_SNAKE_CASE'. Expected one to be in one of these case formats: "
                         + "[lowerCamelCase, kebab-case, snake_case]");
     }
 }
