@@ -18,7 +18,6 @@ package com.palantir.conjure;
 
 import com.google.common.base.CaseFormat;
 import com.google.errorprone.annotations.Immutable;
-import java.util.List;
 
 @Immutable
 public final class CaseConverter {
@@ -102,16 +101,6 @@ public final class CaseConverter {
         }
 
         throw new IllegalArgumentException("Unexpected case for: '" + name
-                + "'. Expected to be in one of these case formats: "
-                + List.of(
-                        CaseFormat.UPPER_UNDERSCORE
-                                .converterTo(CaseFormat.LOWER_CAMEL)
-                                .convert(Case.LOWER_CAMEL_CASE.name()),
-                        CaseFormat.UPPER_UNDERSCORE
-                                .converterTo(CaseFormat.LOWER_HYPHEN)
-                                .convert(Case.KEBAB_CASE.name()),
-                        CaseFormat.UPPER_UNDERSCORE
-                                .converterTo(CaseFormat.LOWER_UNDERSCORE)
-                                .convert(Case.SNAKE_CASE.name())));
+                + "'. Expected to be in one of these case formats: [lowerCamelCase, kebab-case, snake_case]");
     }
 }
