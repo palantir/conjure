@@ -17,6 +17,7 @@
 package com.palantir.conjure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ public class CaseConverterTest {
     }
 
     @Test
-    public void testConversion() throws Exception {
+    public void testConversion() {
         String camelCase = "fooBar";
         String kebabCase = "foo-bar";
         String snakeCase = "foo_bar";
@@ -72,5 +73,13 @@ public class CaseConverterTest {
                 .isEqualTo(kebabCase);
         assertThat(CaseConverter.toCase(snakeCase, CaseConverter.Case.SNAKE_CASE))
                 .isEqualTo(snakeCase);
+    }
+
+    @Test
+    public void testConversionFailure() {
+        String nonCase = "myCIDRs";
+        assertThatThrownBy(() -> CaseConverter.toCase(nonCase, CaseConverter.Case.KEBAB_CASE))
+                .hasMessage("Unexpected case for: 'myCIDRs'. Expected one to be in one of these case formats: "
+                        + "[LOWER_CAMEL_CASE, KEBAB_CASE, SNAKE_CASE]");
     }
 }

@@ -18,6 +18,8 @@ package com.palantir.conjure;
 
 import com.google.common.base.CaseFormat;
 import com.google.errorprone.annotations.Immutable;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Immutable
 public final class CaseConverter {
@@ -99,6 +101,8 @@ public final class CaseConverter {
                 return nameCase;
             }
         }
-        throw new IllegalArgumentException("Unexpected case for: " + name);
+        throw new IllegalArgumentException("Unexpected case for: '" + name
+                + "'. Expected one to be in one of these case formats: "
+                + Arrays.stream(Case.values()).map(Enum::name).collect(Collectors.toList()));
     }
 }
