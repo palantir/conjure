@@ -80,6 +80,6 @@ public class CaseConverterTest {
         String nonCase = "myCIDRs";
         assertThatThrownBy(() -> CaseConverter.toCase(nonCase, CaseConverter.Case.KEBAB_CASE))
                 .hasMessage("Unexpected case for: 'myCIDRs'. Expected one to be in one of these case formats: "
-                        + "[LOWER_CAMEL_CASE, KEBAB_CASE, SNAKE_CASE]");
+                        + "[lowerCamelCase, kebab-case, snake_case]");
     }
 }
