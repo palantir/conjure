@@ -102,7 +102,7 @@ public final class CaseConverter {
         }
 
         throw new IllegalArgumentException("Unexpected case for: '" + name
-                + "'. Expected one to be in one of these case formats: "
+                + "'. Expected to be in one of these case formats: "
                 + List.of(
                         CaseFormat.UPPER_UNDERSCORE
                                 .converterTo(CaseFormat.LOWER_CAMEL)
