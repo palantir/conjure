@@ -27,6 +27,7 @@ import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
+import com.palantir.conjure.spec.HttpMethod.Value;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.OptionalType;
@@ -463,7 +464,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         @Override
         public void validate(EndpointDefinition definition) {
             Preconditions.checkState(
-                    HttpMethod.values().contains(definition.getHttpMethod()),
+                    !HttpMethod.Value.UNKNOWN.equals(definition.getHttpMethod().get()),
                     "HTTP method must be (%s), but received '%s' in endpoint '%s'.",
                     HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|")),
                     definition.getHttpMethod().toString(),
