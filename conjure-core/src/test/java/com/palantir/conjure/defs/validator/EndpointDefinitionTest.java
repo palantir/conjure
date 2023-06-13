@@ -43,6 +43,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 public final class EndpointDefinitionTest {
@@ -335,5 +336,19 @@ public final class EndpointDefinitionTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Header parameters must be enums, primitives, aliases or optional primitive: "
                         + "\"someName\" is not allowed on endpoint test{http: GET /a/path}");
+    }
+
+    @Test
+    public void testNoUnsupportedHttpMethod() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.valueOf("UNKNOWN"))
+                .httpPath(HttpPath.of("/"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("HTTP method must be ("
+                        + HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|"))
+                        + "), but received 'UNKNOWN' in endpoint 'test{http: UNKNOWN /}'.");
     }
 }
