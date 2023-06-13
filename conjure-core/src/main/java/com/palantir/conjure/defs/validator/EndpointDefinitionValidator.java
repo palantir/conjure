@@ -27,7 +27,6 @@ import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
-import com.palantir.conjure.spec.HttpMethod.Value;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
 import com.palantir.conjure.spec.OptionalType;
