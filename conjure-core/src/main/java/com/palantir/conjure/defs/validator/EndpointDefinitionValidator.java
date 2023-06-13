@@ -63,7 +63,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_GET_BODY_VALIDATOR(new NoGetBodyParamValidator()),
     NO_OPTIONAL_BINARY_BODY_PARAM_VALIDATOR(new NoOptionalBinaryBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
-    PARAM_ID(new ParamIdValidator());
+    PARAM_ID(new ParamIdValidator()),
+    NO_UNSUPPORTED_HTTP_METHOD(new NoUnsupportedHttpMethodValidator());
 
     private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
@@ -454,6 +455,19 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     throw new IllegalStateException("Validation for paramType does not exist: " + arg.getParamType());
                 }
             });
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoUnsupportedHttpMethodValidator implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            Preconditions.checkState(
+                    HttpMethod.values().contains(definition.getHttpMethod()),
+                    "HTTP method must be (%s), but received '%s' in endpoint '%s'.",
+                    HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|")),
+                    definition.getHttpMethod().toString(),
+                    describe(definition));
         }
     }
 
