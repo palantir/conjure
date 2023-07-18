@@ -22,7 +22,7 @@ org.mockito:* = 5.4.0
 org.slf4j:* = 1.7.36
 
 # conflict resolution
-com.palantir.safe-logging:* = 3.5.0
+com.palantir.safe-logging:* = 3.6.0
 
 # dependency-upgrader:OFF
 # Avoid forcing consumers to upgrade jackson
