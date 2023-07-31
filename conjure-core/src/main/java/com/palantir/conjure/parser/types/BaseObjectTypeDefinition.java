@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition.BaseObjectTypeDefinitionDeserializer;
+import com.palantir.conjure.parser.types.complex.ConstantDefinition;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
@@ -52,6 +53,8 @@ public interface BaseObjectTypeDefinition {
                 return ObjectTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("values") != null) {
                 return EnumTypeDefinition.fromJson(parser, tree);
+            } else if (tree.get("value") != null) {
+                return ConstantDefinition.fromJson(parser, tree);
             } else if (tree.get("alias") != null) {
                 return AliasTypeDefinition.fromJson(parser, tree);
             } else if (tree.get("union") != null) {

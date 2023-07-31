@@ -49,6 +49,7 @@ import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.AuthType;
 import com.palantir.conjure.spec.BodyParameterType;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.CookieAuthType;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
@@ -379,6 +380,17 @@ public final class ConjureParserUtils {
                 })
                 .collect(Collectors.toList()));
         return errorsBuidler.build();
+    }
+
+    static ConstantDefinition parseConstants(com.palantir.conjure.parser.types.complex.ConstantDefinition def) {
+        ConstantDefinition constant = com.palantir.conjure.spec.ConstantDefinition.builder()
+                .value(def.value())
+                .type(PrimitiveType.valueOf(def.type().name()))
+                .docs(def.docs().map(Documentation::of))
+                .build();
+
+        // TODO: Add validation here
+        return constant;
     }
 
     private static EnumValueDefinition parseEnumValue(

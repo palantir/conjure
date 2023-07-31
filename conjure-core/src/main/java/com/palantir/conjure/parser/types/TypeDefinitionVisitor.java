@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.parser.types;
 
+import com.palantir.conjure.parser.types.complex.ConstantDefinition;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
@@ -25,6 +26,8 @@ public interface TypeDefinitionVisitor<T> {
     T visit(AliasTypeDefinition def);
 
     T visit(EnumTypeDefinition def);
+
+    T visit(ConstantDefinition def);
 
     T visit(ObjectTypeDefinition def);
 

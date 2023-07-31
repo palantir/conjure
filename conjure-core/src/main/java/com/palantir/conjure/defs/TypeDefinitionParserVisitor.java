@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs;
 
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
+import com.palantir.conjure.parser.types.complex.ConstantDefinition;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
@@ -49,6 +50,11 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
     @Override
     public TypeDefinition visit(EnumTypeDefinition def) {
         return ConjureParserUtils.parseEnumType(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
+    }
+
+    @Override
+    public TypeDefinition visit(ConstantDefinition def) {
+        return ConjureParserUtils.parseConstants(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
     }
 
     @Override
