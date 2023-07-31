@@ -146,6 +146,7 @@ types:
           docs: optional<Documentation>
       ConstantDefinition:
         fields:
+          typeName: TypeName
           value: string
           type: PrimitiveType
           docs: optional<Documentation>
