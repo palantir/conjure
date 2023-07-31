@@ -122,6 +122,7 @@ types:
           enum: EnumDefinition
           object: ObjectDefinition
           union: UnionDefinition
+          constant: ConstantDefinition
       AliasDefinition:
         fields:
           typeName: TypeName
@@ -142,6 +143,11 @@ types:
         fields:
           typeName: TypeName
           union: list<FieldDefinition>
+          docs: optional<Documentation>
+      ConstantDefinition:
+        fields:
+          value: string
+          type: PrimitiveType
           docs: optional<Documentation>
       EnumValueDefinition:
         fields:
