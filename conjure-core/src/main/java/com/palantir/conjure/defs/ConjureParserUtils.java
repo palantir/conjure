@@ -150,6 +150,19 @@ public final class ConjureParserUtils {
         return TypeDefinition.enum_(enumType);
     }
 
+    static TypeDefinition parseConstants(
+            TypeName name, com.palantir.conjure.parser.types.complex.ConstantDefinition def) {
+        ConstantDefinition constant = ConstantDefinition.builder()
+                .typeName(name)
+                .value(def.value())
+                .type(PrimitiveType.valueOf(def.type().name()))
+                .docs(def.docs().map(Documentation::of))
+                .build();
+
+        // TODO: Add validation here
+        return TypeDefinition.constant(constant);
+    }
+
     public static TypeDefinition parseUnionType(
             TypeName name,
             com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
@@ -380,17 +393,6 @@ public final class ConjureParserUtils {
                 })
                 .collect(Collectors.toList()));
         return errorsBuidler.build();
-    }
-
-    static ConstantDefinition parseConstants(com.palantir.conjure.parser.types.complex.ConstantDefinition def) {
-        ConstantDefinition constant = com.palantir.conjure.spec.ConstantDefinition.builder()
-                .value(def.value())
-                .type(PrimitiveType.valueOf(def.type().name()))
-                .docs(def.docs().map(Documentation::of))
-                .build();
-
-        // TODO: Add validation here
-        return constant;
     }
 
     private static EnumValueDefinition parseEnumValue(

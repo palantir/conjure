@@ -26,6 +26,7 @@ import com.palantir.conjure.defs.ConjureArgs;
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
+import com.palantir.conjure.parser.types.complex.ConstantDefinition;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
@@ -156,6 +157,11 @@ public class ConjureParserTest {
                     }
 
                     @Override
+                    public ObjectTypeDefinition visit(ConstantDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                    }
+
+                    @Override
                     public ObjectTypeDefinition visit(ObjectTypeDefinition def) {
                         return def;
                     }
@@ -184,6 +190,11 @@ public class ConjureParserTest {
                     @Override
                     public EnumTypeDefinition visit(EnumTypeDefinition def) {
                         return def;
+                    }
+
+                    @Override
+                    public EnumTypeDefinition visit(ConstantDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 
                     @Override
@@ -219,6 +230,11 @@ public class ConjureParserTest {
 
                     @Override
                     public UnionTypeDefinition visit(EnumTypeDefinition _def) {
+                        throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
+                    }
+
+                    @Override
+                    public UnionTypeDefinition visit(ConstantDefinition _def) {
                         throw new SafeIllegalArgumentException("Expected EnumTypeDefinition");
                     }
 

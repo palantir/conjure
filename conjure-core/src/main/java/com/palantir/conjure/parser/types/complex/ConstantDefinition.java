@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
+import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.complex.ConstantDefinition.ConstantDeserializer;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import java.io.IOException;
-import java.util.Optional;
 import org.immutables.value.Value;
 
 @JsonDeserialize(using = ConstantDeserializer.class)
@@ -38,7 +38,10 @@ public interface ConstantDefinition extends BaseObjectTypeDefinition {
 
     PrimitiveType type();
 
-    Optional<String> docs();
+    @Override
+    default <T> T visit(TypeDefinitionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 
     static ConstantDefinition.Builder builder() {
         return new Builder();
@@ -51,6 +54,7 @@ public interface ConstantDefinition extends BaseObjectTypeDefinition {
     class Builder extends ImmutableConstantDefinition.Builder {}
 
     final class ConstantDeserializer extends JsonDeserializer<ConstantDefinition> {
+        @SuppressWarnings("deprecation")
         @Override
         public ConstantDefinition deserialize(JsonParser parser, DeserializationContext _ctxt) throws IOException {
             String candidate = parser.getValueAsString();
