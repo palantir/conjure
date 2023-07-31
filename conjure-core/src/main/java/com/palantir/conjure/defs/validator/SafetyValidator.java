@@ -20,6 +20,7 @@ import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
@@ -112,6 +113,11 @@ public final class SafetyValidator {
                             field.getType(),
                             field.getSafety(),
                             qualifyTypeReference(value.getTypeName(), field.getFieldName())));
+        }
+
+        @Override
+        public Stream<String> visitConstant(ConstantDefinition _value) {
+            return Stream.empty();
         }
 
         @Override

@@ -17,6 +17,7 @@
 package com.palantir.conjure.visitor;
 
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ObjectDefinition;
 import com.palantir.conjure.spec.TypeDefinition;
@@ -32,11 +33,13 @@ public final class TypeDefinitionVisitor {
     public static final ObjectDefinitionVisitor OBJECT = new ObjectDefinitionVisitor();
     public static final EnumDefinitionVisitor ENUM = new EnumDefinitionVisitor();
     public static final UnionDefinitionVisitor UNION = new UnionDefinitionVisitor();
+    public static final ConstantDefinitionVisitor CONSTANT = new ConstantDefinitionVisitor();
 
     public static final IsAliasDefinitionVisitor IS_ALIAS = new IsAliasDefinitionVisitor();
     public static final IsObjectDefinitionVisitor IS_OBJECT = new IsObjectDefinitionVisitor();
     public static final IsEnumDefinitionVisitor IS_ENUM = new IsEnumDefinitionVisitor();
     public static final IsUnionDefinitionVisitor IS_UNION = new IsUnionDefinitionVisitor();
+    public static final IsConstantDefinitionVisitor IS_CONSTANT = new IsConstantDefinitionVisitor();
 
     private static final class TypeNameVisitor implements TypeDefinition.Visitor<TypeName> {
 
@@ -57,6 +60,11 @@ public final class TypeDefinitionVisitor {
 
         @Override
         public TypeName visitUnion(UnionDefinition value) {
+            return value.getTypeName();
+        }
+
+        @Override
+        public TypeName visitConstant(ConstantDefinition value) {
             return value.getTypeName();
         }
 
@@ -94,6 +102,13 @@ public final class TypeDefinitionVisitor {
         }
     }
 
+    private static final class ConstantDefinitionVisitor extends DefaultDefinitionVisitor<ConstantDefinition> {
+        @Override
+        public ConstantDefinition visitConstant(ConstantDefinition value) {
+            return value;
+        }
+    }
+
     private static class DefaultDefinitionVisitor<T> implements TypeDefinition.Visitor<T> {
 
         @Override
@@ -113,6 +128,11 @@ public final class TypeDefinitionVisitor {
 
         @Override
         public T visitUnion(UnionDefinition value) {
+            throw new IllegalStateException("Unknown type: " + value);
+        }
+
+        @Override
+        public T visitConstant(ConstantDefinition value) {
             throw new IllegalStateException("Unknown type: " + value);
         }
 
@@ -150,6 +170,13 @@ public final class TypeDefinitionVisitor {
         }
     }
 
+    private static final class IsConstantDefinitionVisitor extends DefaultIsTypeDefinitionVisitor {
+        @Override
+        public Boolean visitConstant(ConstantDefinition _value) {
+            return true;
+        }
+    }
+
     private static class DefaultIsTypeDefinitionVisitor implements TypeDefinition.Visitor<Boolean> {
         @Override
         public Boolean visitAlias(AliasDefinition _value) {
@@ -168,6 +195,11 @@ public final class TypeDefinitionVisitor {
 
         @Override
         public Boolean visitUnion(UnionDefinition _value) {
+            return false;
+        }
+
+        @Override
+        public Boolean visitConstant(ConstantDefinition _value) {
             return false;
         }
 

@@ -19,6 +19,7 @@ package com.palantir.conjure.visitor;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.ListType;
@@ -77,6 +78,11 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
             @Override
             public Either<TypeDefinition, Type> visitUnion(UnionDefinition value) {
                 return Either.left(TypeDefinition.union(value));
+            }
+
+            @Override
+            public Either<TypeDefinition, Type> visitConstant(ConstantDefinition value) {
+                return Either.left(TypeDefinition.constant(value));
             }
 
             @Override

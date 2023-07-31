@@ -26,6 +26,7 @@ import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ErrorDefinition;
 import com.palantir.conjure.spec.FieldDefinition;
@@ -275,6 +276,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
 
                 @Override
+                public Void visitConstant(ConstantDefinition _value) {
+                    return null;
+                }
+
+                @Override
                 public Void visitEnum(EnumDefinition _value) {
                     return null;
                 }
@@ -397,6 +403,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                                         unionDefinition.getTypeName().getName(),
                                         found.getFieldName().get()));
                             });
+                    return null;
+                }
+
+                @Override
+                public Void visitConstant(ConstantDefinition _value) {
                     return null;
                 }
 
