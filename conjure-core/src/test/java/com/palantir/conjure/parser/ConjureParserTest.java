@@ -51,6 +51,12 @@ public class ConjureParserTest {
     public Path temporaryFolder;
 
     @Test
+    public void testConjureConstants() throws IOException {
+        ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-constants.yml"));
+        assertThat(conjure.types().definitions().constants()).containsKey(TypeName.of("ConstantOne"));
+    }
+
+    @Test
     public void testConjureInlinedImports() throws IOException {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-conjure-imports.yml"));
         assertThat(conjure.types().conjureImports()).containsKey(Namespace.of("imports"));

@@ -1,0 +1,7 @@
+types:
+  definitions:
+    default-package: test.api.with.circular
+    constants:
+      ConstantOne:
+        value: hello
+        type: string

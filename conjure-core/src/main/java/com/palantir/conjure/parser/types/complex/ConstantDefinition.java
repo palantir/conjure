@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.parser.types.complex;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -24,18 +25,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
-import com.palantir.conjure.parser.types.complex.ConstantDefinition.ConstantDeserializer;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import java.io.IOException;
 import org.immutables.value.Value;
 
-@JsonDeserialize(using = ConstantDeserializer.class)
+@JsonDeserialize(as = ImmutableConstantDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface ConstantDefinition extends BaseObjectTypeDefinition {
 
+    @JsonProperty("value")
     String value();
 
+    @JsonProperty("type")
     PrimitiveType type();
 
     @Override

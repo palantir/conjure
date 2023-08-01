@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.types.complex.ConstantDefinition;
 import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
 import com.palantir.conjure.parser.types.names.TypeName;
@@ -39,6 +40,8 @@ public interface NamedTypesDefinition {
     Map<TypeName, BaseObjectTypeDefinition> objects();
 
     Map<TypeName, ErrorTypeDefinition> errors();
+
+    Map<TypeName, ConstantDefinition> constants();
 
     static Builder builder() {
         return new Builder();
