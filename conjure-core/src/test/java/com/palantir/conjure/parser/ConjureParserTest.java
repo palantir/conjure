@@ -53,7 +53,38 @@ public class ConjureParserTest {
     @Test
     public void testConjureConstants() throws IOException {
         ConjureSourceFile conjure = ConjureParser.parse(new File("src/test/resources/example-constants.yml"));
-        assertThat(conjure.types().definitions().constants()).containsKey(TypeName.of("ConstantOne"));
+        assertThat(conjure.types().definitions().constants())
+                .containsEntry(
+                        TypeName.of("ConstantString"),
+                        ConstantDefinition.builder()
+                                .type(PrimitiveType.STRING)
+                                .value("hello\"\"s")
+                                .build());
+        assertThat(conjure.types().definitions().constants())
+                .containsEntry(
+                        TypeName.of("ConstantInteger"),
+                        ConstantDefinition.builder()
+                                .type(PrimitiveType.INTEGER)
+                                .value("123")
+                                .build());
+        assertThat(conjure.types().definitions().constants())
+                .containsEntry(
+                        TypeName.of("ConstantBoolean"),
+                        ConstantDefinition.builder()
+                                .type(PrimitiveType.BOOLEAN)
+                                .value("true")
+                                .build());
+    }
+
+    @Test
+    public void testConjureConstantsBadBoolean() throws IOException {
+        assertThatThrownBy(() -> Conjure.parse(ConjureArgs.builder()
+                        .definitions(ImmutableList.of(new File("src/test/resources/example-bad-boolean-constant.yml")))
+                        .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                        .build()))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .hasMessageContaining("");
     }
 
     @Test

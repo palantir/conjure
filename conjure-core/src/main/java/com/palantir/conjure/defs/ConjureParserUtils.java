@@ -19,6 +19,7 @@ package com.palantir.conjure.defs;
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
+import com.palantir.conjure.defs.validator.ConstantDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
 import com.palantir.conjure.defs.validator.EnumDefinitionValidator;
 import com.palantir.conjure.defs.validator.EnumValueDefinitionValidator;
@@ -150,7 +151,7 @@ public final class ConjureParserUtils {
         return TypeDefinition.enum_(enumType);
     }
 
-    static TypeDefinition parseConstants(
+    static TypeDefinition parseConstant(
             TypeName name, com.palantir.conjure.parser.types.complex.ConstantDefinition def) {
         ConstantDefinition constant = ConstantDefinition.builder()
                 .typeName(name)
@@ -159,7 +160,7 @@ public final class ConjureParserUtils {
                 .docs(def.docs().map(Documentation::of))
                 .build();
 
-        // TODO: Add validation here
+        ConstantDefinitionValidator.validateAll(constant);
         return TypeDefinition.constant(constant);
     }
 
@@ -374,10 +375,18 @@ public final class ConjureParserUtils {
 
         // no need to use validator here since TypeDefinitionParserVisitor calls each TypeDefinition parser that
         // validates its type.
-        return parsed.definitions().objects().entrySet().stream()
+        Map<TypeName, TypeDefinition> allParsedObjects = new HashMap<>();
+        Map<TypeName, TypeDefinition> parsedConstants = parsed.definitions().constants().entrySet().stream()
                 .map(entry -> entry.getValue()
                         .visit(new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
                 .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
+        Map<TypeName, TypeDefinition> parsedObjects = parsed.definitions().objects().entrySet().stream()
+                .map(entry -> entry.getValue()
+                        .visit(new TypeDefinitionParserVisitor(entry.getKey().name(), defaultPackage, typeResolver)))
+                .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
+        allParsedObjects.putAll(parsedConstants);
+        allParsedObjects.putAll(parsedObjects);
+        return allParsedObjects;
     }
 
     static List<ErrorDefinition> parseErrors(

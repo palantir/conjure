@@ -54,7 +54,7 @@ public final class TypeDefinitionParserVisitor implements TypeDefinitionVisitor<
 
     @Override
     public TypeDefinition visit(ConstantDefinition def) {
-        return ConjureParserUtils.parseConstants(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
+        return ConjureParserUtils.parseConstant(ConjureParserUtils.createTypeName(name, def, defaultPackage), def);
     }
 
     @Override

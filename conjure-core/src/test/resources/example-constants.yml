@@ -1,7 +1,13 @@
 types:
   definitions:
-    default-package: test.api.with.circular
+    default-package: test.api.with.constants
     constants:
-      ConstantOne:
-        value: hello
+      ConstantString:
+        value: hello""s
         type: string
+      ConstantInteger:
+        value: 123
+        type: integer
+      ConstantBoolean:
+        value: true
+        type: boolean
