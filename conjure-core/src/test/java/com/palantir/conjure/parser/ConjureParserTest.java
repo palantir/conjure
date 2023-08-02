@@ -76,6 +76,20 @@ public class ConjureParserTest {
                                 .type(PrimitiveType.BOOLEAN)
                                 .value("true")
                                 .build());
+        assertThat(conjure.types().definitions().constants())
+                .containsEntry(
+                        TypeName.of("ConstantDouble"),
+                        ConstantDefinition.builder()
+                                .type(PrimitiveType.DOUBLE)
+                                .value("123.123")
+                                .build());
+        assertThat(conjure.types().definitions().constants())
+                .containsEntry(
+                        TypeName.of("ConstantSafeLong"),
+                        ConstantDefinition.builder()
+                                .type(PrimitiveType.SAFELONG)
+                                .value("123123123")
+                                .build());
     }
 
     @Test
@@ -91,6 +105,7 @@ public class ConjureParserTest {
 
     @Test
     public void testConjureValidConstants() throws IOException {
+        String packageName = "test.api.with.constants";
         ConjureDefinition def = Conjure.parse(ConjureArgs.builder()
                 .definitions(ImmutableList.of(new File("src/test/resources/example-constants.yml")))
                 .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
@@ -102,7 +117,15 @@ public class ConjureParserTest {
                                 .value("true")
                                 .typeName(com.palantir.conjure.spec.TypeName.builder()
                                         .name("ConstantBoolean")
-                                        .package_("test.api.with.constants")
+                                        .package_(packageName)
+                                        .build())
+                                .build()),
+                        TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
+                                .type(com.palantir.conjure.spec.PrimitiveType.DOUBLE)
+                                .value("123.123")
+                                .typeName(com.palantir.conjure.spec.TypeName.builder()
+                                        .name("ConstantDouble")
+                                        .package_(packageName)
                                         .build())
                                 .build()),
                         TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
@@ -110,7 +133,15 @@ public class ConjureParserTest {
                                 .value("123")
                                 .typeName(com.palantir.conjure.spec.TypeName.builder()
                                         .name("ConstantInteger")
-                                        .package_("test.api.with.constants")
+                                        .package_(packageName)
+                                        .build())
+                                .build()),
+                        TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
+                                .type(com.palantir.conjure.spec.PrimitiveType.SAFELONG)
+                                .value("123123123")
+                                .typeName(com.palantir.conjure.spec.TypeName.builder()
+                                        .name("ConstantSafeLong")
+                                        .package_(packageName)
                                         .build())
                                 .build()),
                         TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
@@ -118,7 +149,7 @@ public class ConjureParserTest {
                                 .value("hello\"\"s")
                                 .typeName(com.palantir.conjure.spec.TypeName.builder()
                                         .name("ConstantString")
-                                        .package_("test.api.with.constants")
+                                        .package_(packageName)
                                         .build())
                                 .build())));
     }

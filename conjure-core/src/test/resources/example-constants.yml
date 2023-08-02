@@ -11,3 +11,9 @@ types:
       ConstantBoolean:
         value: true
         type: boolean
+      ConstantDouble:
+        value: 123.123
+        type: double
+      ConstantSafeLong:
+        value: 123123123
+        type: safelong
