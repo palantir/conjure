@@ -36,6 +36,8 @@ import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +86,41 @@ public class ConjureParserTest {
                         .build()))
                 .isInstanceOf(ConjureRuntimeException.class)
                 .rootCause()
-                .hasMessageContaining("");
+                .hasMessageContaining("Constant of type boolean must have value of true or false: ConstantDefinition");
+    }
+
+    @Test
+    public void testConjureValidConstants() throws IOException {
+        ConjureDefinition def = Conjure.parse(ConjureArgs.builder()
+                .definitions(ImmutableList.of(new File("src/test/resources/example-constants.yml")))
+                .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                .build());
+        assertThat(def.getTypes())
+                .isEqualTo(List.of(
+                        TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
+                                .type(com.palantir.conjure.spec.PrimitiveType.BOOLEAN)
+                                .value("true")
+                                .typeName(com.palantir.conjure.spec.TypeName.builder()
+                                        .name("ConstantBoolean")
+                                        .package_("test.api.with.constants")
+                                        .build())
+                                .build()),
+                        TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
+                                .type(com.palantir.conjure.spec.PrimitiveType.INTEGER)
+                                .value("123")
+                                .typeName(com.palantir.conjure.spec.TypeName.builder()
+                                        .name("ConstantInteger")
+                                        .package_("test.api.with.constants")
+                                        .build())
+                                .build()),
+                        TypeDefinition.constant(com.palantir.conjure.spec.ConstantDefinition.builder()
+                                .type(com.palantir.conjure.spec.PrimitiveType.STRING)
+                                .value("hello\"\"s")
+                                .typeName(com.palantir.conjure.spec.TypeName.builder()
+                                        .name("ConstantString")
+                                        .package_("test.api.with.constants")
+                                        .build())
+                                .build())));
     }
 
     @Test

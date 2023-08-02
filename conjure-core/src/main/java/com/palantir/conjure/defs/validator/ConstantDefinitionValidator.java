@@ -16,9 +16,13 @@
 
 package com.palantir.conjure.defs.validator;
 
+import static com.google.common.base.Strings.lenientFormat;
+
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.java.lib.SafeLong;
 import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 
 @com.google.errorprone.annotations.Immutable
 public enum ConstantDefinitionValidator implements ConjureValidator<ConstantDefinition> {
@@ -46,13 +50,36 @@ public enum ConstantDefinitionValidator implements ConjureValidator<ConstantDefi
 
         @Override
         public void validate(ConstantDefinition definition) {
-
             if (definition.getType().equals(PrimitiveType.BOOLEAN)) {
                 Preconditions.checkArgument(
                         definition.getValue().equalsIgnoreCase("true")
                                 || definition.getValue().equalsIgnoreCase("false"),
                         "Constant of type boolean must have value of true or false: %s",
                         ConstantDefinition.class.getSimpleName());
+            } else if (definition.getType().equals(PrimitiveType.INTEGER)) {
+                try {
+                    Integer.parseInt(definition.getValue());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(lenientFormat(
+                            "Constant of type integer must have value of an integer: %s",
+                            ConstantDefinition.class.getSimpleName()));
+                }
+            } else if (definition.getType().equals(PrimitiveType.DOUBLE)) {
+                try {
+                    Double.parseDouble(definition.getValue());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(lenientFormat(
+                            "Constant of type integer must have value of a double: %s",
+                            ConstantDefinition.class.getSimpleName()));
+                }
+            } else if (definition.getType().equals(PrimitiveType.SAFELONG)) {
+                try {
+                    SafeLong.valueOf(definition.getValue());
+                } catch (SafeIllegalArgumentException e) {
+                    throw new IllegalArgumentException(
+                            "Constant of type safelong must be safely representable in javascript i.e. "
+                                    + "lie between -9007199254740991 and 9007199254740991");
+                }
             }
         }
     }
