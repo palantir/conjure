@@ -16,9 +16,8 @@
 
 package com.palantir.conjure.defs.validator;
 
-import static com.google.common.base.Strings.lenientFormat;
-
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.palantir.conjure.java.lib.SafeLong;
 import com.palantir.conjure.spec.ConstantDefinition;
 import com.palantir.conjure.spec.PrimitiveType;
@@ -60,7 +59,7 @@ public enum ConstantDefinitionValidator implements ConjureValidator<ConstantDefi
                 try {
                     Integer.parseInt(definition.getValue());
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(lenientFormat(
+                    throw new IllegalArgumentException(Strings.lenientFormat(
                             "Constant of type integer must have value of an integer: %s",
                             ConstantDefinition.class.getSimpleName()));
                 }
@@ -68,7 +67,7 @@ public enum ConstantDefinitionValidator implements ConjureValidator<ConstantDefi
                 try {
                     Double.parseDouble(definition.getValue());
                 } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(lenientFormat(
+                    throw new IllegalArgumentException(Strings.lenientFormat(
                             "Constant of type integer must have value of a double: %s",
                             ConstantDefinition.class.getSimpleName()));
                 }
