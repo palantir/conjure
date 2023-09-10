@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fixing map key validation
+  links:
+  - https://github.com/palantir/conjure/pull/1448
