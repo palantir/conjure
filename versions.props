@@ -18,7 +18,7 @@ org.hamcrest:hamcrest-core = 2.2
 org.immutables:value = 2.10.0
 org.junit.jupiter:* = 5.10.0
 org.junit.vintage:* = 5.10.0
-org.mockito:* = 5.6.0
+org.mockito:* = 5.7.0
 org.slf4j:* = 1.7.36
 
 # conflict resolution
