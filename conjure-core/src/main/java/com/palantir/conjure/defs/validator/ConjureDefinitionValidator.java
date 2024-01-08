@@ -420,7 +420,7 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                 }
                 return recursivelyFindIllegalKeys(type.accept(TypeVisitor.MAP).getKeyType(), definitionMap, true)
                         || recursivelyFindIllegalKeys(
-                                type.accept(TypeVisitor.MAP).getKeyType(), definitionMap, false);
+                                type.accept(TypeVisitor.MAP).getValueType(), definitionMap, false);
             }
 
             if (isMapKey) {

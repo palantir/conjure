@@ -249,6 +249,28 @@ public class ConjureSourceFileValidatorTest {
     }
 
     @Test
+    public void testNoIllegalMapKeys_IllegalKeyInsideMapValue() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .types(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(FOO)
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("bad"))
+                                .type(Type.map(MapType.of(
+                                        Type.primitive(PrimitiveType.STRING),
+                                        Type.map(MapType.of(
+                                                Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))),
+                                                Type.primitive(PrimitiveType.STRING))))))
+                                .docs(DOCS)
+                                .build())
+                        .build()))
+                .build();
+        assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Illegal map key found in object Foo");
+    }
+
+    @Test
     public void testNoSafetyOnComplexTypes() {
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
