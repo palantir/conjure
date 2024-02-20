@@ -40,8 +40,9 @@ public final class TypeNameValidatorTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(
                             "TypeNames must be a primitive type"
-                                    + " [STRING, DATETIME, INTEGER, DOUBLE, SAFELONG, BINARY, ANY, BOOLEAN, UUID, RID,"
-                                    + " BEARERTOKEN, UNKNOWN] or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s",
+                                    + " [STRING, DATETIME, INTEGER, F32, DOUBLE, SAFELONG, BINARY, ANY, BOOLEAN,"
+                                    + " UUID, RID, BEARERTOKEN, UNKNOWN]"
+                                    + " or match pattern ^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: %s",
                             invalid);
         }
     }

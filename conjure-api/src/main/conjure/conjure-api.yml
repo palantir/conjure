@@ -93,6 +93,7 @@ types:
           - STRING
           - DATETIME
           - INTEGER
+          - F32
           - DOUBLE
           - SAFELONG
           - BINARY

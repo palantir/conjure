@@ -12,6 +12,9 @@ positive:
             IntegerExample:
               fields:
                 integer: integer
+            F32Example:
+              fields:
+                f32: f32
             DoubleExample:
               fields:
                 double: double

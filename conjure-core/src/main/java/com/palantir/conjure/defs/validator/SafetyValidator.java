@@ -220,6 +220,11 @@ public final class SafetyValidator {
         }
 
         @Override
+        public Stream<String> visitF32() {
+            return Stream.empty();
+        }
+
+        @Override
         public Stream<String> visitDouble() {
             return Stream.empty();
         }
@@ -325,6 +330,11 @@ public final class SafetyValidator {
 
         @Override
         public Boolean visitInteger() {
+            return true;
+        }
+
+        @Override
+        public Boolean visitF32() {
             return true;
         }
 
