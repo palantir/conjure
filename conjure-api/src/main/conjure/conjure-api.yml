@@ -122,6 +122,7 @@ types:
           enum: EnumDefinition
           object: ObjectDefinition
           union: UnionDefinition
+          record: RecordDefinition
       AliasDefinition:
         fields:
           typeName: TypeName
@@ -143,6 +144,26 @@ types:
           typeName: TypeName
           union: list<FieldDefinition>
           docs: optional<Documentation>
+      RecordDefinition:
+        fields:
+          typeName: TypeName
+          prefix: optional<TypeDefinition>
+          recordEntry: RecordEntryDefinition
+          docs: optional<Documentation>
+      RecordEntryDefinition:
+        union:
+          known: KnownRecordEntryDefinition
+          dynamic: DynamicRecordEntryDefinition
+      KnownRecordEntryDefinition:
+        docs: |
+          Well-known data.
+        fields:
+          fields: list<FieldDefinition>
+      DynamicRecordEntryDefinition:
+        docs: |
+          The record entries aren't typed. This is used to e.g. send back query results, where the fields & types
+          contained in the entry aren't known at compile time at all.
+        fields: {}
       EnumValueDefinition:
         fields:
           value: string

@@ -298,6 +298,7 @@ Conjure&nbsp;Type | JSON&nbsp;Type | Comments |
 _Object_          | Object         | Keys are obtained from the Conjure object's fields and values using `JSON(v)`. For any (key,value) pair where the value is of `optional<?>` type, the key must be omitted from the JSON Object if the value is absent.
 _Enum_            | String         | String representation of the enum value
 _Union_           | Object         | (See union JSON format below)
+_Record_          | Object         | Equivalent to an object of shape `{ prefix, records: record[] }`, but supports encoding 
 _Alias_(x)        | `JSON(x)`      | Aliases are serialized exactly the same way as their corresponding de-aliased Conjure types.
 
 ### 5.4. Union JSON format
@@ -332,7 +333,75 @@ Conjure Union types are serialized as JSON objects with exactly two keys:
   }
   ```
 
-### 5.5. Conjure Errors
+### 5.5. Record
+
+Records are specialized/restricted data types that are used to represent a collection of fields more efficiently.
+The expectation is that the 
+
+#### 5.5.1. Restrictions of record values
+
+None! All conjure types are supported.
+
+#### 5.5.2. Record JSON format
+
+When encoded in JSON the record format are converted to an equivalent object conjure type which has `prefix` and `records` keys at the root, containing the `prefix` object and the array of record entries respectively.
+
+For example (conjure pseudo-code for compactness):
+```yaml
+types:
+definitions:
+objects:
+
+      MyRecord:
+        record:
+          prefix: MyPrefixObject
+          recordEntry:
+            known:
+              colA: number
+      MyDynamicRecord:
+        record:
+          prefix: MyPrefixObject
+          recordEntry:
+            dynamic: {}
+```
+
+will encode the same as:
+
+```yaml
+types:
+definitions:
+objects:
+
+      MyRecord:
+        fields:
+          prefix: MyPrefixObject
+          records: list<MyRecordEntry>
+      MyRecordEntry:
+        fields:
+          colA: number
+      MyDynamicRecord:
+        fields:
+          prefix: MyPrefixObject
+          records: list<MyDynamicRecordEntry>
+      MyDynamicRecordEntry:
+        fields:
+          fields: map<string, MyDynamicRecordEntryTypedValue>
+      MyDynamicRecordEntryTypedValue:
+        union:
+          /* One entry per supported conjure type */
+```
+
+Note that conjure will behave as if it generated helper functions. Implementations are free to choose how they generate non-conflicting names.  
+
+#### 5.5.3. Record arrow format
+
+For known formats, as much as possible is unrolled to the upper level as possible. For example, a nested field with no further indirection will be given its own column.
+However, when unions, lists, map types are used, the sub-object may be converted into structs or other appropriate types. This will lead to a higher overhead, so implementations
+are free to add optional flags to help the developer keep their types simple/efficient.
+
+An actual description of the behavior is TODO!
+
+### 5.6. Conjure Errors
 Conjure Errors are serialized as JSON objects with the following keys:
 1. `errorCode` - the JSON string representation of one of the supported [Conjure error codes](/docs/spec/conjure_definitions.md#errorcode).
 1. `errorName` - a JSON string identifying the error, e.g. `Recipe:RecipeNotFound`.
@@ -362,8 +431,8 @@ Conjure Errors are serialized as JSON objects with the following keys:
   }
   ```
 
-### 5.6. Deserialization
-#### 5.6.1. Coercing JSON `null` / absent to Conjure types
+### 5.7. Deserialization
+#### 5.7.1. Coercing JSON `null` / absent to Conjure types
 If a JSON key is absent or the value is `null`, two rules apply:
 
 - Conjure `optional`, `list`, `set`, `map` types must be initialized to their empty variants,
@@ -371,7 +440,7 @@ If a JSON key is absent or the value is `null`, two rules apply:
 
 _Note: this rule means that the Conjure type `optional<optional<T>>` would be ambiguously deserialized from `null`: it could be  `Optional.empty()` or `Optional.of(Optional.empty())`. To avoid this ambiguity, Conjure ensures definitions do not contain this type._
 
-#### 5.6.2. No automatic casting
+#### 5.7.2. No automatic casting
 Unexpected JSON types should not be automatically coerced to a different expected type. For example, if a Conjure definition specifies a field is `boolean`, the JSON strings `"true"` and `"false"` should not be accepted.
 
 ## 6. Smile format
