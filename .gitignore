@@ -38,6 +38,7 @@ fileeditor
 *.iws
 .idea/
 out/
+.profileconfig.json
 
 # Eclipse/IntelliJ APT
 generated_src/

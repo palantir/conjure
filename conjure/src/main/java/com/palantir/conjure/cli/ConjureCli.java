@@ -72,7 +72,7 @@ public final class ConjureCli implements Runnable {
 
     public static final class ExceptionHandler implements IExecutionExceptionHandler {
 
-        private Optional<Exception> thrownException;
+        private Optional<Exception> thrownException = Optional.empty();
 
         @Override
         public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult _parseResult)
