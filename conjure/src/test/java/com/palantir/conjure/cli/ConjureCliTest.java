@@ -165,20 +165,32 @@ public final class ConjureCliTest {
                 .contains("src/test/resources/simple-error.yml")
                 .contains("Unknown LocalReferenceType: TypeName{name=UnknownType}");
         assertThat(outputFile).doesNotExist();
+
+        assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Encountered error trying to parse file")
+                .hasMessageContaining("src/test/resources/simple-error.yml")
+                .hasMessageContaining("Unknown LocalReferenceType: TypeName{name=UnknownType}");
+        assertThat(outputFile).doesNotExist();
     }
 
     @Test
     public void generatesCleanError_map() {
         String[] args = {"compile", "src/test/resources/key-error.yml", outputFile.getAbsolutePath()};
 
+        String expectedErrorMessage =
+                "Illegal map key found in union SimpleUnion in member optionA. Map keys can only be primitive"
+                        + " Conjure types.";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString().trim())
-                .isEqualTo(
-                        "Illegal map key found in union SimpleUnion in member optionA. Map keys can only be primitive"
-                                + " Conjure types.");
+        assertThat(stringWriter.toString().trim()).isEqualTo(expectedErrorMessage);
+        assertThat(outputFile).doesNotExist();
+
+        assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
     }
 
@@ -186,18 +198,23 @@ public final class ConjureCliTest {
     public void generatesCleanError_unique_name() {
         String[] args = {"compile", "src/test/resources/unique-name-error", outputFile.getAbsolutePath()};
 
+        String expectedErrorMessage = "Type, error, and service names must be unique across locally defined and "
+                + "imported types/errors:\n"
+                + "Found duplicate name: test.api.ConflictingName\n"
+                + "Known names:\n"
+                + " - test.api.UniqueName\n"
+                + " - test.api.UniqueName2\n"
+                + " - test.api.ConflictingName";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString())
-                .isEqualTo("Type, error, and service names must be unique across locally defined and "
-                        + "imported types/errors:\n"
-                        + "Found duplicate name: test.api.ConflictingName\n"
-                        + "Known names:\n"
-                        + " - test.api.UniqueName\n"
-                        + " - test.api.UniqueName2\n"
-                        + " - test.api.ConflictingName\n");
+        assertThat(stringWriter.toString()).contains(expectedErrorMessage);
+        assertThat(outputFile).doesNotExist();
+
+        assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
     }
 
@@ -205,16 +222,20 @@ public final class ConjureCliTest {
     public void generatesCleanError_invalid_json() {
         String[] args = {"compile", "src/test/resources/invalid-json.yml", outputFile.getAbsolutePath()};
 
+        String expectedErrorMessage = "src/test/resources/invalid-json.yml:\n"
+                + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
+                + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
+                + "Cannot build FieldDefinition, some of required attributes are not set [type]";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString())
-                .startsWith("Error while parsing")
-                .endsWith("src/test/resources/invalid-json.yml:\n"
-                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
-                        + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
-                        + "Cannot build FieldDefinition, some of required attributes are not set [type]\n");
+        assertThat(stringWriter.toString()).startsWith("Error while parsing").endsWith(expectedErrorMessage + "\n");
+        assertThat(outputFile).doesNotExist();
+
+        assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
     }
 
