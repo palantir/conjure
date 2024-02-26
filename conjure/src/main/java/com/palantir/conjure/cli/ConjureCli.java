@@ -33,7 +33,6 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,60 +57,80 @@ public final class ConjureCli implements Runnable {
         System.exit(prepareCommand().execute(args));
     }
 
+    public static void inProcessExecution(String[] args) {
+        ExceptionHandler exceptionHandler = new ExceptionHandler();
+        new CommandLine(new ConjureCli())
+                .setExecutionExceptionHandler(exceptionHandler)
+                .execute(args);
+        exceptionHandler.maybeRethrowException();
+    }
+
     @VisibleForTesting
     static CommandLine prepareCommand() {
         return new CommandLine(new ConjureCli()).setExecutionExceptionHandler(new ExceptionHandler());
     }
 
     public static final class ExceptionHandler implements IExecutionExceptionHandler {
+
+        private Optional<Exception> thrownException;
+
         @Override
         public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult _parseResult)
                 throws Exception {
+
             if (ex == null) {
+                thrownException = Optional.ofNullable(ex);
                 return 0;
             }
             if (!(commandLine.getCommand() instanceof ConjureCliCommand)) {
+                thrownException = Optional.ofNullable(ex);
                 throw ex;
             }
             ConjureCliCommand cmd = commandLine.getCommand();
             if (cmd.isVerbose()) {
                 // If the command is verbose, print the full stack trace
+                thrownException = Optional.ofNullable(ex);
                 throw ex;
             }
             List<Throwable> chain = Throwables.getCausalChain(ex);
 
             // For known internal errors, change logging, as they're signaling errors on the input, not in the code
             if (chain.stream().noneMatch(ExceptionHandler::isConjureThrowable)) {
+                thrownException = Optional.ofNullable(ex);
                 throw ex;
             }
 
             // Unpack errors; we don't care about where in the code the error comes from: the issue is in the supplied
             // conjure code. The stack doesn't help.
-            chain.forEach(exception -> {
-                if (exception instanceof JsonMappingException) {
-                    handleJsonMappingException(commandLine.getErr(), (JsonMappingException) exception);
-                } else {
-                    commandLine.getErr().println(exception.getMessage());
-                }
-            });
+            String message = chain.stream()
+                    .map(exception -> (exception instanceof JsonMappingException)
+                            ? handleJsonMappingException((JsonMappingException) exception)
+                            : exception.getMessage())
+                    .collect(Collectors.joining("\n"));
+            commandLine.getErr().println(message);
+            thrownException = Optional.ofNullable(new RuntimeException(message, ex));
 
             return -1;
         }
 
-        private void handleJsonMappingException(PrintWriter err, JsonMappingException jsonException) {
+        private static String handleJsonMappingException(JsonMappingException jsonException) {
             String message = jsonException.getOriginalMessage();
 
             String path = jsonException.getPath().stream()
                     .map(Reference::getFieldName)
                     .collect(Collectors.joining(" -> "));
 
-            err.println(String.format("%s\n  @ %s", message, path));
+            return String.format("%s\n  @ %s", message, path);
         }
 
         private static boolean isConjureThrowable(Throwable rootCause) {
             return (rootCause instanceof ConjureException)
                     || (rootCause instanceof ParseException)
                     || (rootCause instanceof CyclicImportException);
+        }
+
+        private void maybeRethrowException() {
+            thrownException.ifPresent(Throwables::throwIfUnchecked);
         }
     }
 
