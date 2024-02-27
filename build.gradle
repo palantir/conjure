@@ -23,7 +23,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.6.0'
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.36.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.13.0'
@@ -43,7 +42,6 @@ apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.consistent-versions'
 apply plugin: 'com.palantir.baseline-java-versions'
 apply plugin: 'com.palantir.jdks.latest'
-apply plugin: 'com.palantir.failure-reports'
 
 version gitVersion()
 
