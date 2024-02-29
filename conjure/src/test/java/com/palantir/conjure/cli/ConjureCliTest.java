@@ -126,6 +126,10 @@ public final class ConjureCliTest {
         assertThatThrownBy(cmd::getConfiguration)
                 .isInstanceOf(SafeIllegalArgumentException.class)
                 .hasMessage("Failed to parse extensions");
+
+        assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
+                .isInstanceOf(SafeIllegalArgumentException.class)
+                .hasMessage("Failed to parse extensions");
     }
 
     @Test
@@ -249,5 +253,11 @@ public final class ConjureCliTest {
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
                 .getRootCause()
                 .isInstanceOf(MismatchedInputException.class);
+    }
+
+    @Test
+    public void doesNotThrowWhenCommandIsSuccessful() {
+        String[] args = {"compile", "src/test/resources/test-service.yml", outputFile.getAbsolutePath()};
+        ConjureCli.inProcessExecution(args);
     }
 }
