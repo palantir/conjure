@@ -184,12 +184,12 @@ public final class ConjureCliTest {
 
         String expectedErrorMessage =
                 "Illegal map key found in union SimpleUnion in member optionA. Map keys can only be primitive"
-                        + " Conjure types.";
+                        + " Conjure types.\n";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString().trim()).isEqualTo(expectedErrorMessage);
+        assertThat(stringWriter.toString()).isEqualTo(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
 
         assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
@@ -208,12 +208,12 @@ public final class ConjureCliTest {
                 + "Known names:\n"
                 + " - test.api.UniqueName\n"
                 + " - test.api.UniqueName2\n"
-                + " - test.api.ConflictingName";
+                + " - test.api.ConflictingName\n";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString()).contains(expectedErrorMessage);
+        assertThat(stringWriter.toString()).isEqualTo(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
 
         assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))
