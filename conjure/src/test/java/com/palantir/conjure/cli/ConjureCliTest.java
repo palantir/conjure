@@ -229,12 +229,12 @@ public final class ConjureCliTest {
         String expectedErrorMessage = "src/test/resources/invalid-json.yml:\n"
                 + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
                 + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
-                + "Cannot build FieldDefinition, some of required attributes are not set [type]";
+                + "Cannot build FieldDefinition, some of required attributes are not set [type]\n";
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         ConjureCli.prepareCommand().setErr(printWriter).execute(args);
         printWriter.flush();
-        assertThat(stringWriter.toString()).startsWith("Error while parsing").endsWith(expectedErrorMessage + "\n");
+        assertThat(stringWriter.toString()).startsWith("Error while parsing").endsWith(expectedErrorMessage);
         assertThat(outputFile).doesNotExist();
 
         assertThatThrownBy(() -> ConjureCli.inProcessExecution(args))

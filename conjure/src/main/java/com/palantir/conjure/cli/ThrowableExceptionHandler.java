@@ -33,7 +33,7 @@ import picocli.CommandLine.ParseResult;
 public final class ThrowableExceptionHandler implements IExecutionExceptionHandler {
 
     private Optional<Exception> thrownException = Optional.empty();
-    private IExecutionExceptionHandler delegate;
+    private final IExecutionExceptionHandler delegate;
 
     public ThrowableExceptionHandler(IExecutionExceptionHandler delegate) {
         this.delegate = delegate;
