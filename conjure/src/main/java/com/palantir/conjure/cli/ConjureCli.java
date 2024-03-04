@@ -79,7 +79,6 @@ public final class ConjureCli implements Runnable {
                 throws Exception {
 
             if (ex == null) {
-                thrownException = Optional.ofNullable(ex);
                 return 0;
             }
             if (!(commandLine.getCommand() instanceof ConjureCliCommand)) {
