@@ -58,6 +58,14 @@ public final class ConjureCli implements Runnable {
         System.exit(prepareCommand().execute(args));
     }
 
+    public static void inProcessExecution(String[] args) {
+        ThrowableExceptionHandler exceptionHandler = new ThrowableExceptionHandler(new ExceptionHandler());
+        new CommandLine(new ConjureCli())
+                .setExecutionExceptionHandler(exceptionHandler)
+                .execute(args);
+        exceptionHandler.maybeRethrowException();
+    }
+
     @VisibleForTesting
     static CommandLine prepareCommand() {
         return new CommandLine(new ConjureCli()).setExecutionExceptionHandler(new ExceptionHandler());

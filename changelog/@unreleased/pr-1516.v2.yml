@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Add inProcessExecution that propagates the conjure exceptions
+  links:
+  - https://github.com/palantir/conjure/pull/1516
