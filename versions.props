@@ -1,6 +1,6 @@
 com.fasterxml.jackson.core:jackson-databind = 2.15.3
 com.google.code.findbugs:jsr305 = 3.0.2
-com.google.guava:guava = 33.0.0-jre
+com.google.guava:guava = 33.1.0-jre
 com.jayway.jsonpath:json-path = 2.9.0
 com.networknt:json-schema-validator = 1.0.73
 com.palantir.conjure.java:* = 8.11.0
