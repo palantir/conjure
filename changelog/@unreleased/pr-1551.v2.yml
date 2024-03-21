@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Bump gradle-conjure to get gradle8 fixes
+  links:
+  - https://github.com/palantir/conjure/pull/1551
