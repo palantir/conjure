@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Temporarily Disable TS Publishing
+  links:
+  - https://github.com/palantir/conjure/pull/1554
