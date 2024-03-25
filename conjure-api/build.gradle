@@ -26,9 +26,7 @@ project (':conjure-api:conjure-api-objects') {
 }
 
 project (':conjure-api:conjure-api-typescript') {
-    publishTypeScript.doFirst {
-        file('src/.npmrc') << "//registry.npmjs.org/:_authToken=${System.env.NPM_AUTH_TOKEN}"
-    }
+    generateNpmrc.token = System.env.NPM_AUTH_TOKEN;
 }
 
 conjure {
