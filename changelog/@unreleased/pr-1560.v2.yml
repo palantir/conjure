@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Re-enable typescript publishing
+  links:
+  - https://github.com/palantir/conjure/pull/1560

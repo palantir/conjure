@@ -29,11 +29,6 @@ project (':conjure-api:conjure-api-typescript') {
     publishTypeScript.doFirst {
         file('src/.npmrc') << "//registry.npmjs.org/:_authToken=${System.env.NPM_AUTH_TOKEN}"
     }
-
-    // The OSS CI images have an exceedingly old version of NPM and this is (likely) causing publishing issues
-    // fortunately (unfortunately) this hasn't successfully published in 2 years so disabling this is a non issue
-    // in the near term, but we do need the java code to continue publishing.
-    publishTypeScript.enabled = false
 }
 
 conjure {
