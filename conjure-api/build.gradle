@@ -26,7 +26,7 @@ project (':conjure-api:conjure-api-objects') {
 }
 
 project (':conjure-api:conjure-api-typescript') {
-    generateNpmrc.token = System.env.NPM_AUTH_TOKEN;
+    generateNpmrc.token = System.env.NPM_AUTH_TOKEN
 }
 
 conjure {
