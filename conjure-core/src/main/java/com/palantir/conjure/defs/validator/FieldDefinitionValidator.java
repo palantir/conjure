@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
+import com.palantir.conjure.spec.ArrayType;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.ListType;
@@ -60,6 +61,11 @@ public final class FieldDefinitionValidator {
         @Override
         public Void visitList(ListType value) {
             return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Void visitArray(ArrayType value) {
+            return this.visitPrimitive(value.getItemType());
         }
 
         @Override

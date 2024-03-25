@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.visitor;
 
+import com.palantir.conjure.spec.ArrayType;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.ListType;
 import com.palantir.conjure.spec.MapType;
@@ -142,6 +143,11 @@ public final class TypeVisitor {
         }
 
         @Override
+        public Boolean visitArray(ArrayType _value) {
+            return false;
+        }
+
+        @Override
         public Boolean visitSet(SetType _value) {
             return false;
         }
@@ -181,6 +187,11 @@ public final class TypeVisitor {
 
         @Override
         public T visitList(ListType value) {
+            throw new IllegalStateException("Unsupported type: " + value);
+        }
+
+        @Override
+        public T visitArray(ArrayType value) {
             throw new IllegalStateException("Unsupported type: " + value);
         }
 

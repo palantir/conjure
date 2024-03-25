@@ -24,6 +24,7 @@ import com.palantir.conjure.either.Either;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.ArrayType;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
@@ -33,6 +34,7 @@ import com.palantir.conjure.spec.OptionalType;
 import com.palantir.conjure.spec.ParameterId;
 import com.palantir.conjure.spec.ParameterType;
 import com.palantir.conjure.spec.PrimitiveType;
+import com.palantir.conjure.spec.PrimitiveType.Value;
 import com.palantir.conjure.spec.SetType;
 import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
@@ -313,6 +315,11 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                                 @Override
                                 public Boolean visitList(ListType value) {
                                     return recursivelyValidate(value.getItemType(), visitor);
+                                }
+
+                                @Override
+                                public Boolean visitArray(ArrayType value) {
+                                    return value.getItemType().get() != Value.ANY;
                                 }
 
                                 @Override

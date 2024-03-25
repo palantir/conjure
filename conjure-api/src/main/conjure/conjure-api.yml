@@ -70,6 +70,7 @@ types:
           primitive: PrimitiveType
           optional: OptionalType
           list: ListType
+          array: ArrayType
           set: SetType
           map: MapType
           reference:
@@ -115,6 +116,10 @@ types:
         fields:
           keyType: Type
           valueType: Type
+      ArrayType:
+        docs: Arrays are an ordered list of primitive types that are non-null
+        fields:
+          itemType: PrimitiveType
 
       # objects
       TypeDefinition:

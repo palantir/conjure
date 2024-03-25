@@ -20,6 +20,7 @@ import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ArgumentName;
+import com.palantir.conjure.spec.ArrayType;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
@@ -165,6 +166,11 @@ public final class SafetyValidator {
         }
 
         @Override
+        public Stream<String> visitArray(ArrayType value) {
+            return this.visitPrimitive(value.getItemType());
+        }
+
+        @Override
         public Stream<String> visitSet(SetType value) {
             return value.getItemType().accept(this);
         }
@@ -286,6 +292,11 @@ public final class SafetyValidator {
         @Override
         public Boolean visitList(ListType value) {
             return value.getItemType().accept(this);
+        }
+
+        @Override
+        public Boolean visitArray(ArrayType value) {
+            return this.visitPrimitive(value.getItemType());
         }
 
         @Override
