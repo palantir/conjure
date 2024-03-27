@@ -207,6 +207,7 @@ The representation of a primitive type must have a "type" key with a string valu
 1. STRING
 1. DATETIME
 1. INTEGER
+1. F32
 1. DOUBLE
 1. SAFELONG
 1. BINARY

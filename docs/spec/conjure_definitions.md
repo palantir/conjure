@@ -158,6 +158,7 @@ bearertoken
 binary
 boolean
 datetime
+f32
 double
 integer
 rid
