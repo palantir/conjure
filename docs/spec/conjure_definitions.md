@@ -300,7 +300,6 @@ A service is a collection of endpoints.
 
 Field | Type | Description
 ---|:---:|---
-name | [TypeName][] | **REQUIRED** A human readable name for the service.
 package | `string` | **REQUIRED** The package of the service.
 base&#8209;path | [PathString][] | **REQUIRED** The base path of the service. The path MUST have a leading `/`. The base path is prepended to each endpoint path to construct the final URL. [Path parameters][] are not allowed.
 default&#8209;auth | [AuthDefinition][] | **REQUIRED** The default authentication mechanism for all endpoints in the service.
