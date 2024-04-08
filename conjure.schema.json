@@ -390,7 +390,6 @@
         }
       },
       "required": [
-        "name",
         "package",
         "endpoints"
       ]
