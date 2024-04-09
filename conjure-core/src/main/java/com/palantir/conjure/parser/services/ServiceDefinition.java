@@ -37,7 +37,10 @@ public interface ServiceDefinition {
     // TODO(rfink): This is unused. Remove?
     @Deprecated
     @JsonProperty("name")
-    String doNotUseName();
+    @Value.Default
+    default String doNotUseName() {
+        return "";
+    }
 
     @JsonProperty("package")
     ConjurePackage conjurePackage();

@@ -64,4 +64,11 @@ public class ConjureDefTest {
         ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/example-external-types.yml")));
     }
+
+    @Test
+    public void namelessService() {
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/nameless-test-service.yml")));
+        assertThat(conjureDefinition.getServices()).hasSize(1);
+    }
 }
