@@ -135,7 +135,7 @@ demoEndpoint:
       param-type: body
 ```
 
-In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
+In this case, if `newName` is not present, then the [JSON format][] requires clients to send a HTTP body containing `null`.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
 ### 2.4. Headers
 Conjure `header` parameters must be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
@@ -287,7 +287,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 ### 5.2. Container types
 Conjure&nbsp;Type | JSON&nbsp;Type                | Comments |
 ----------------- | ----------------------------- | -------- |
-`optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, must be serialized as `JSON(e)`. If the value appears inside a JSON Object, then the corresponding key should be omitted. Alternatively, the field may be set to `null`. Inside JSON Array, a non-present Conjure optional value must be serialized as JSON `null`.
+`optional<T>`     | `JSON(T)`&nbsp;or&nbsp;`null` | If present, must be serialized as `JSON(e)`. If empty and inside a JSON Object, then the corresponding key should be omitted but it may also be set to `null`. If empty and not inside a JSON Object, then the value must be serialized as JSON `null`.
 `list<T>`         | Array                         | Each element, e, of the list is serialized using `JSON(e)`. Order must be maintained.
 `set<T>`          | Array                         | Each element, e, of the set is serialized using `JSON(e)`. Order is insignificant but it is recommended to preserve order where possible.
 `map<K, V>`       | Object                        | A key k is serialized as a string with contents `PLAIN(k)`. Values are serialized using `JSON(v)`. For any (key,value) pair where the value is of de-aliased type `optional<?>`, the key should be omitted from the JSON Object if the value is absent, however, the key may remain if the value is set to `null`.
