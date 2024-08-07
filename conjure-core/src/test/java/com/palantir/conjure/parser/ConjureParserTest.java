@@ -21,10 +21,12 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.ConjureArgs;
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
+import com.palantir.conjure.java.lib.SafeLong;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
@@ -35,17 +37,46 @@ import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
+import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.DefaultValue;
+import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
+import com.palantir.ri.ResourceIdentifier;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 public class ConjureParserTest {
+    private static final TypeDefinitionVisitor<ObjectTypeDefinition> EXTRACT_OBJECT_TYPE_DEFINITION =
+            new TypeDefinitionVisitor<ObjectTypeDefinition>() {
+                @Override
+                public ObjectTypeDefinition visit(AliasTypeDefinition _def) {
+                    throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                }
+
+                @Override
+                public ObjectTypeDefinition visit(EnumTypeDefinition _def) {
+                    throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                }
+
+                @Override
+                public ObjectTypeDefinition visit(ObjectTypeDefinition def) {
+                    return def;
+                }
+
+                @Override
+                public ObjectTypeDefinition visit(UnionTypeDefinition _def) {
+                    throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
+                }
+            };
+
     @TempDir
     public Path temporaryFolder;
 
@@ -144,27 +175,7 @@ public class ConjureParserTest {
                 .definitions()
                 .objects()
                 .get(TypeName.of("BeanWithDeprecatedField"))
-                .visit(new TypeDefinitionVisitor<ObjectTypeDefinition>() {
-                    @Override
-                    public ObjectTypeDefinition visit(AliasTypeDefinition _def) {
-                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
-                    }
-
-                    @Override
-                    public ObjectTypeDefinition visit(EnumTypeDefinition _def) {
-                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
-                    }
-
-                    @Override
-                    public ObjectTypeDefinition visit(ObjectTypeDefinition def) {
-                        return def;
-                    }
-
-                    @Override
-                    public ObjectTypeDefinition visit(UnionTypeDefinition _def) {
-                        throw new SafeIllegalArgumentException("Expected ObjectTypeDefinition");
-                    }
-                });
+                .visit(EXTRACT_OBJECT_TYPE_DEFINITION);
         assertThat(object.fields().get(FieldName.of("old")).deprecated()).hasValue("Test deprecated.");
     }
 
@@ -264,6 +275,60 @@ public class ConjureParserTest {
         ConjureSourceFile result =
                 ConjureParser.parse(temporaryFolder.resolve(root + ".yml").toFile());
         assertThat(result.types().conjureImports()).isNotEmpty();
+    }
+
+    /* TODO(cfleming): tests for failure modes: invalid enum value, invalid enum type  */
+    @Test
+    public void testConjureFieldDefaultValue() {
+        ConjureDefinition conjureDefinition = Conjure.parse(ConjureArgs.builder()
+                .definitions(ImmutableList.of(new File("src/test/resources/example-defaults.yml")))
+                .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                .build());
+        assertThat(conjureDefinition.getTypes().stream()
+                        .flatMap(typeDefinition ->
+                                typeDefinition.accept(TypeDefinition.Visitor.<Stream<DefaultValue>>builder()
+                                        .alias(_alias -> Stream.empty())
+                                        .enum_(_enum -> Stream.empty())
+                                        .object(object ->
+                                                Iterables.getOnlyElement(object.getFields()).getDefault().stream())
+                                        .union(_union -> Stream.empty())
+                                        .throwOnUnknown()
+                                        .build())))
+                .containsExactlyInAnyOrder(
+                        DefaultValue.enum_("TWO"),
+                        DefaultValue.enum_("THREE"),
+                        DefaultValue.rid(ResourceIdentifier.valueOf("ri.foundry.fake.dataset.fake")),
+                        DefaultValue.uuid(UUID.fromString("cc92c9f3-4f16-44c5-b14d-c3cc54f56315")),
+                        DefaultValue.string("default"),
+                        DefaultValue.safelong(SafeLong.of(9007199254740990L)),
+                        DefaultValue.integer(0),
+                        DefaultValue.double_(0.5),
+                        DefaultValue.boolean_(false));
+    }
+
+    @Test
+    public void testConjureFieldDefaultValue_badEnumValue() {
+        assertThatThrownBy(() -> Conjure.parse(ConjureArgs.builder()
+                        .definitions(
+                                ImmutableList.of(new File("src/test/resources/example-bad-defaults-enum-value.yml")))
+                        .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                        .build()))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .hasMessageContaining("'FOUR' is not a legal default value for type 'EnumType'");
+    }
+
+    @Test
+    public void testConjureFieldDefaultValue_illegalType() {
+        assertThatThrownBy(() -> Conjure.parse(ConjureArgs.builder()
+                        .definitions(
+                                ImmutableList.of(new File("src/test/resources/example-bad-defaults-illegal-type.yml")))
+                        .safetyDeclarations(SafetyDeclarationRequirements.ALLOWED)
+                        .build()))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .hasMessageContaining(
+                        "Only fields of primitive or enum type may have default values, not 'EnumObject'");
     }
 
     private void generateFiles(List<String> names, List<String> importedNamespaces) throws IOException {

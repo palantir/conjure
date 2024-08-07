@@ -1,0 +1,19 @@
+types:
+  definitions:
+    default-package: com.palantir.defaults
+    objects:
+      EnumType:
+        values:
+          - ONE
+          - TWO
+          - THREE
+      EnumObject:
+        fields:
+          enumField:
+            type: EnumType
+            default: TWO
+      EnumObjectTwo:
+        fields:
+          enumField:
+            type: EnumObject
+            default: ONE

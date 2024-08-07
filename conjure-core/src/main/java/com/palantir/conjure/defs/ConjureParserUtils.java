@@ -405,6 +405,9 @@ public final class ConjureParserUtils {
                             .fieldName(parseFieldName(entry.getKey()))
                             .type(entry.getValue().type().visit(new ConjureTypeParserVisitor(typeResolver)))
                             .docs(entry.getValue().docs().map(Documentation::of))
+                            .default_(entry.getValue().default_().map(defaultValue -> entry.getValue()
+                                    .type()
+                                    .visit(new DefaultValueParserVisitor(typeResolver, defaultValue))))
                             .deprecated(entry.getValue().deprecated().map(Documentation::of))
                             .safety(entry.getValue().safety().map(ConjureParserUtils::parseLogSafety))
                             .build();
