@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Add default values for primitives and enums to the IR compiler
+  links:
+  - https://github.com/palantir/conjure/pull/1615
