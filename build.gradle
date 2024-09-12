@@ -26,7 +26,7 @@ buildscript {
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.46.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.15.0'
-        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.17.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.18.0'
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.12.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:5.28.0'
         classpath 'com.palantir.gradle.conjure:gradle-conjure:5.50.0'
