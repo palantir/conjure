@@ -71,3 +71,6 @@ pytest.xml
 
 # JQwik
 .jqwik-database
+
+# Gradle JDKs setup
+!gradle/*
