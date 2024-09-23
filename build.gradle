@@ -41,6 +41,7 @@ apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.failure-reports'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.git-version'
+apply plugin: 'com.palantir.jdks'
 apply plugin: 'com.palantir.consistent-versions'
 apply plugin: 'com.palantir.baseline-java-versions'
 apply plugin: 'com.palantir.jdks.latest'
@@ -84,4 +85,8 @@ configure(subprojects - project(':conjure-api')) {
 javaVersions {
     libraryTarget = 11
     runtime = 21
+}
+
+jdks {
+    daemonTarget = 17
 }
