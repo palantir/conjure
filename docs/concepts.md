@@ -30,7 +30,7 @@ Users may define the following kinds of named types. These can be referenced by 
   - `bearertoken` - a string [Json Web Token (JWT)](https://jwt.io/)
   - `binary` - a sequence of binary.
   - `boolean` - `true` or `false`
-  - `datetime` - an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) value e.g. `2018-07-25T10:20:32+01:00`
+  - `datetime` - an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) value (up to nanosecond precision) e.g. `2018-07-25T10:20:32.012+01:00`
   - `double` - a floating point number specified by [IEEE 754](https://ieeexplore.ieee.org/document/4610935/), which includes NaN, +/-Infinity and signed zero.
   - `integer` - a signed 32-bit integer value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
   - `rid` - a [Resource Identifier](https://github.com/palantir/resource-identifier), e.g. `ri.recipes.main.ingredient.1234`
