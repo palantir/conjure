@@ -26,6 +26,17 @@ types:
       Documentation:
         alias: string
 
+      DefaultValue:
+        union:
+          enum: string
+          string: string
+          integer: integer
+          double: double
+          safelong: safelong
+          boolean: boolean
+          uuid: uuid
+          rid: rid
+
       LogSafety:
         docs: >
           Safety with regards to logging based on [safe-logging](https://github.com/palantir/safe-logging) concepts.
@@ -153,6 +164,7 @@ types:
           fieldName: FieldName
           type: Type
           docs: optional<Documentation>
+          default: optional<DefaultValue>
           deprecated: optional<Documentation>
           safety: optional<LogSafety>
       FieldName:
