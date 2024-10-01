@@ -83,7 +83,7 @@ configure(subprojects - project(':conjure-api')) {
 }
 
 javaVersions {
-    libraryTarget = 11
+    libraryTarget = 17
     runtime = 21
 }
 
