@@ -21,8 +21,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.logsafe.Unsafe;
 import org.immutables.value.Value;
 
+@Unsafe
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface RequestLineDefinition {
