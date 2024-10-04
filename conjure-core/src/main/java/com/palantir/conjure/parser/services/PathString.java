@@ -18,11 +18,13 @@ package com.palantir.conjure.parser.services;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.logsafe.Unsafe;
 import com.palantir.util.syntacticpath.Path;
 import com.palantir.util.syntacticpath.Paths;
 import org.immutables.value.Value;
 
 /** Represents a HTTP path in a {@link ServiceDefinition conjure service definition}. */
+@Unsafe
 @Value.Immutable
 @ConjureImmutablesStyle
 public abstract class PathString {
@@ -52,6 +54,7 @@ public abstract class PathString {
         return ImmutablePathString.builder().path(parsed).build();
     }
 
+    @Unsafe
     @Override
     public final String toString() {
         return path().toString();
