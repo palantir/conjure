@@ -20,10 +20,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
+import com.palantir.logsafe.Unsafe;
 import java.util.Map;
 import java.util.Optional;
 import org.immutables.value.Value;
 
+@Unsafe
 @JsonDeserialize(as = ImmutableServiceDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
