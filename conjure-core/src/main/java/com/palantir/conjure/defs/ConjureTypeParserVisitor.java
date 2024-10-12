@@ -46,6 +46,10 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
         Type resolve(LocalReferenceType reference);
 
         Type resolve(ForeignReferenceType reference);
+
+        Optional<BaseObjectTypeDefinition> extractDefinition(LocalReferenceType reference);
+
+        Optional<BaseObjectTypeDefinition> extractDefinition(ForeignReferenceType reference);
     }
 
     // TODO(rfink): Add explicit test coverage
@@ -71,13 +75,26 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
         @Override
         public Type resolve(ForeignReferenceType reference) {
+            return resolveFromTypeName(reference.type(), loadForeignTypes(reference));
+        }
+
+        @Override
+        public Optional<BaseObjectTypeDefinition> extractDefinition(LocalReferenceType reference) {
+            return extractDefinitionFromTypeName(reference.type(), types);
+        }
+
+        @Override
+        public Optional<BaseObjectTypeDefinition> extractDefinition(ForeignReferenceType reference) {
+            return extractDefinitionFromTypeName(reference.type(), loadForeignTypes(reference));
+        }
+
+        private TypesDefinition loadForeignTypes(ForeignReferenceType reference) {
             String namespaceFile = importProviders.get(reference.namespace());
             Preconditions.checkNotNull(namespaceFile, "Import not found for namespace: %s", reference.namespace());
             AnnotatedConjureSourceFile externalFile = externalTypes.get(namespaceFile);
             Preconditions.checkNotNull(
                     externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespaceFile);
-            return resolveFromTypeName(
-                    reference.type(), externalFile.conjureSourceFile().types());
+            return externalFile.conjureSourceFile().types();
         }
 
         private static Type resolveFromTypeName(
@@ -105,6 +122,11 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                         ConjureParserUtils.parsePackageOrElseThrow(maybeDirectDef.conjurePackage(), defaultPackage);
                 return Type.reference(TypeName.of(name.name(), conjurePackage));
             }
+        }
+
+        private static Optional<BaseObjectTypeDefinition> extractDefinitionFromTypeName(
+                com.palantir.conjure.parser.types.names.TypeName name, TypesDefinition types) {
+            return Optional.ofNullable(types.definitions().objects().get(name));
         }
     }
 

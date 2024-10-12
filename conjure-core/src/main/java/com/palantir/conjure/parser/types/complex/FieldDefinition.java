@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.parser.types.complex;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -37,6 +38,9 @@ public interface FieldDefinition {
     ConjureType type();
 
     Optional<String> docs();
+
+    @JsonProperty("default")
+    Optional<String> default_();
 
     Optional<String> deprecated();
 
