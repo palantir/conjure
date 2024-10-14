@@ -21,9 +21,11 @@ import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.services.ServiceDefinition;
 import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.conjure.parser.types.names.TypeName;
+import com.palantir.logsafe.Unsafe;
 import java.util.Map;
 import org.immutables.value.Value;
 
+@Unsafe
 @JsonDeserialize(as = ImmutableConjureSourceFile.class)
 @Value.Immutable
 @ConjureImmutablesStyle
