@@ -19,11 +19,13 @@ package com.palantir.conjure.parser.services;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.ConjureType;
+import com.palantir.logsafe.Unsafe;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.immutables.value.Value;
 
+@Unsafe
 @JsonDeserialize(as = ImmutableEndpointDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
