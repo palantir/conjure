@@ -66,7 +66,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
 
         @Override
         public Type resolve(LocalReferenceType reference) {
-            return resolveFromTypeName(reference.type(), types);
+            return resolveFromTypeName(reference.type(), this, types);
         }
 
         @Override
@@ -77,11 +77,13 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
             Preconditions.checkNotNull(
                     externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespaceFile);
             return resolveFromTypeName(
-                    reference.type(), externalFile.conjureSourceFile().types());
+                    reference.type(), this, externalFile.conjureSourceFile().types());
         }
 
         private static Type resolveFromTypeName(
-                com.palantir.conjure.parser.types.names.TypeName name, TypesDefinition types) {
+                com.palantir.conjure.parser.types.names.TypeName name,
+                ReferenceTypeResolver nameResolver,
+                TypesDefinition types) {
             Optional<String> defaultPackage =
                     types.definitions().defaultConjurePackage().map(ConjureParserUtils::parseConjurePackage);
             BaseObjectTypeDefinition maybeDirectDef =
@@ -98,7 +100,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                 conjurePackage = externalPath.substring(0, lastIndex);
                 String typeName = externalPath.substring(lastIndex + 1);
 
-                return ConjureParserUtils.parseExternalType(maybeExternalDef, conjurePackage, typeName);
+                return ConjureParserUtils.parseExternalType(maybeExternalDef, nameResolver, conjurePackage, typeName);
             } else {
                 // Conjure-defined object
                 conjurePackage =
