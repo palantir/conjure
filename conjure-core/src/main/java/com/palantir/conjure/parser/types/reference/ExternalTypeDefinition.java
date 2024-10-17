@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.LogSafetyDefinition;
+import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.conjure.parser.types.ExternalImportDefinition;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public interface ExternalTypeDefinition {
 
     @JsonProperty("base-type")
     @Value.Default
-    default PrimitiveType baseType() {
+    default ConjureType baseType() {
         return PrimitiveType.ANY;
     }
 
