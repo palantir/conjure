@@ -92,12 +92,11 @@ public final class TypeParserTests {
 
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("1_bar.Foo"))
                 .isInstanceOf(ParseException.class)
-                .hasMessage(
-                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary, "
-                                + "safelong, integer, rid, any, uuid] or match pattern "
-                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: 1_bar\n"
-                                + "1_bar.Foo\n"
-                                + "^");
+                .hasMessage("TypeNames must be a primitive type [datetime, boolean, string, f32, double, bearertoken, "
+                        + "binary, safelong, integer, rid, any, uuid] or match pattern "
+                        + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$: 1_bar\n"
+                        + "1_bar.Foo\n"
+                        + "^");
     }
 
     @Test
@@ -243,8 +242,8 @@ public final class TypeParserTests {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse(invalid))
                 .isInstanceOf(ParseException.class)
                 .hasMessage(
-                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern "
+                        "TypeNames must be a primitive type [datetime, boolean, string, f32, double, bearertoken,"
+                                + " binary, safelong, integer, rid, any, uuid] or match pattern "
                                 + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
                                 + " %s\n"
                                 + "bytes\n"
@@ -257,12 +256,11 @@ public final class TypeParserTests {
         String invalid = "list<bytes>";
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse(invalid))
                 .isInstanceOf(ParseException.class)
-                .hasMessage(
-                        "TypeNames must be a primitive type [datetime, boolean, string, double, bearertoken, binary,"
-                                + " safelong, integer, rid, any, uuid] or match pattern "
-                                + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
-                                + " bytes\n"
-                                + "list<bytes>\n"
-                                + "     ^");
+                .hasMessage("TypeNames must be a primitive type [datetime, boolean, string, f32, double, bearertoken,"
+                        + " binary, safelong, integer, rid, any, uuid] or match pattern "
+                        + "^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$:"
+                        + " bytes\n"
+                        + "list<bytes>\n"
+                        + "     ^");
     }
 }

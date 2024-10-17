@@ -277,6 +277,7 @@ Conjure&nbsp;Type | JSON Type                                          | Comment
 `boolean`         | Boolean                                            |
 `datetime`        | String                                             | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
 `double`          | Number or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
+`f32`             | Number or `"NaN"` or `"Infinity"` or `"-Infinity"` | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 `integer`         | Number                                             | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 `rid`             | String                                             | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
 `safelong`        | Number                                             | Integer with value ranging from -2<sup>53</sup> + 1 to 2<sup>53</sup> - 1.
@@ -381,11 +382,12 @@ Serializers may use optional Smile features: raw binary encoding, string dedupli
 
 ### 6.1. Built-in types
 Conjure&nbsp;Type | Smile Type | Comments |
------------------ | ---------- | ---------|
+----------------- |------------| ---------|
 `bearertoken`     | String     |
 `binary`          | Binary     | Smile natively supports binary data, so no Base64 encoding is necessary.
 `boolean`         | Boolean    |
 `datetime`        | String     |
+`f32`             | Float      | Non-finite values are not handled specially.
 `double`          | Double     | Non-finite values are not handled specially.
 `integer`         | Integer    |
 `rid`             | String     |
@@ -426,6 +428,7 @@ Conjure&nbsp;Type | PLAIN&nbsp;Representation                     | Comments |
 `binary`          | unquoted String                               | Represented as a Base64 encoded string in accordance with [RFC 4648](https://tools.ietf.org/html/rfc4648#section-4).
 `boolean`         | `true` or `false`                             |
 `datetime`        | unquoted String                               | In accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601).
+`f32`             | Number or `NaN` or `Infinity` or `-Infinity`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 `double`          | Number or `NaN` or `Infinity` or `-Infinity`  | As defined by [IEEE 754 standard](http://ieeexplore.ieee.org/document/4610935/).
 `integer`         | Number                                        | Signed 32 bits, value ranging from -2<sup>31</sup> to 2<sup>31</sup> - 1.
 `rid`             | unquoted String                               | In accordance with the [Resource Identifier](https://github.com/palantir/resource-identifier) definition.
