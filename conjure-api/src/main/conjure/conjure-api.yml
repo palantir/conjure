@@ -57,6 +57,11 @@ types:
           - CUSTOM_SERVER
       ErrorDefinition:
         fields:
+          # TODO(pm): Should there be a message here? The docs aren't the same thing: devs can add more context to them,
+          #  like remediation steps, which wouldn't be appropriate in a message. Concretely, without a message each
+          #  client needs to decide how it'll display the error to the user - could lead to inconsistency in what the
+          #  user sees. Alternatively, this is intentional and the client *should* decide how to display the error?
+          # message: Message [alias of string]
           errorName: TypeName
           docs: optional<Documentation>
           namespace: ErrorNamespace
@@ -172,7 +177,18 @@ types:
           httpPath: HttpPath
           auth: optional<AuthType>
           args: list<ArgumentDefinition>
+          # How do we make it clear that the "errors" should be specifically related to the handling of the endpoint
+          #  (e.g. we don't want people adding AuthError to nearly every endpoint)?
+          # responses:
+          #   union:
+          #     - success: optional<Type>
+          #     - errors: set<TypeName>
           returns: optional<Type>
+          # TODO(pm): put up commit where ErrorName is alias for TypeName.
+          # TODO(pm): Maybe this should actually be `TypeName | ErrorDefinition` to allow devs to create new errors
+          #  inline. Think about if we want to disallow this behavior.
+          #  Let's not allow error types to be imported from other languages. Only Conjure-imports allowed.
+          errors: set<TypeName>
           docs: optional<Documentation>
           deprecated: optional<Documentation>
           markers: list<Type>

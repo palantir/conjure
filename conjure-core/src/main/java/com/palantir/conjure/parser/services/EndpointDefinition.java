@@ -19,6 +19,7 @@ package com.palantir.conjure.parser.services;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.ConjureType;
+import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.logsafe.Unsafe;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +43,8 @@ public interface EndpointDefinition {
     Set<ConjureType> markers();
 
     Optional<ConjureType> returns();
+
+    Set<TypeName> errors();
 
     Optional<String> docs();
 

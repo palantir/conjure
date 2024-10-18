@@ -77,7 +77,7 @@ public final class ConjureParser {
     }
 
     /**
-     * Parse file & all imports (recursively).
+     * Parse file & all imports (breadth-first).
      */
     public static Map<String, AnnotatedConjureSourceFile> parseAnnotated(File file) {
         return parseAnnotated(ImmutableList.of(file));

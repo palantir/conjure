@@ -81,6 +81,7 @@
       "httpMethod" : "GET",
       "httpPath" : "/get",
       "args" : [ ],
+      "errors" : [ ],
       "markers" : [ ],
       "tags" : [ ]
     } ]
@@ -94,6 +95,7 @@
       "httpMethod" : "GET",
       "httpPath" : "/get",
       "args" : [ ],
+      "errors" : [ ],
       "markers" : [ ],
       "tags" : [ ]
     } ]

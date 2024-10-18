@@ -337,6 +337,7 @@ public final class ConjureParserUtils {
         parsed.endpoints()
                 .forEach((name, def) -> endpoints.add(ConjureParserUtils.parseEndpoint(
                         name,
+                        parsed.conjurePackage(),
                         def,
                         parsed.basePath(),
                         parseAuthType(parsed.defaultAuth()),
@@ -435,12 +436,12 @@ public final class ConjureParserUtils {
 
     private static EndpointDefinition parseEndpoint(
             String name,
+            ConjurePackage conjurePackage,
             com.palantir.conjure.parser.services.EndpointDefinition def,
             PathString basePath,
             Optional<AuthType> defaultAuth,
             ReferenceTypeResolver typeResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
-
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
@@ -453,6 +454,11 @@ public final class ConjureParserUtils {
                         .collect(Collectors.toSet()))
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
+                .errors(def.errors().stream()
+                        // For the prototype, let's require the error be defined in the same package as the endpoint.
+                        // For prod, we can allow conjure-imports using something similar to typeResolver.
+                        .map(t -> TypeName.of(t.name(), conjurePackage.name()))
+                        .collect(Collectors.toSet()))
                 .docs(def.docs().map(Documentation::of))
                 .deprecated(def.deprecated().map(Documentation::of))
                 .build();
