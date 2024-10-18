@@ -18,10 +18,12 @@ package com.palantir.conjure.parser;
 
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.names.Namespace;
+import com.palantir.logsafe.Unsafe;
 import java.io.File;
 import java.util.Map;
 import org.immutables.value.Value;
 
+@Unsafe
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface AnnotatedConjureSourceFile {
