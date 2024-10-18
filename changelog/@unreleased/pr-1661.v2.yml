@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: '[FR] Allow ConjureTypes to be the ''base-type'' on an External Import'
+  links:
+  - https://github.com/palantir/conjure/pull/1661

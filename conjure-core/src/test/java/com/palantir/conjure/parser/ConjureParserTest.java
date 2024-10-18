@@ -26,6 +26,7 @@ import com.palantir.conjure.defs.ConjureArgs;
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypeDefinitionVisitor;
+import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
@@ -33,7 +34,6 @@ import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.names.FieldName;
 import com.palantir.conjure.parser.types.names.Namespace;
 import com.palantir.conjure.parser.types.names.TypeName;
-import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.AliasTypeDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
@@ -100,7 +100,7 @@ public class ConjureParserTest {
                         .imports()
                         .get(TypeName.of("ExampleAnyImport"))
                         .baseType())
-                .isEqualTo(PrimitiveType.fromString("any"));
+                .isEqualTo(AnyType.of());
     }
 
     @Test

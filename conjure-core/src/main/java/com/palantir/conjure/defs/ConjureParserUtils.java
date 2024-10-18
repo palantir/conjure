@@ -193,15 +193,20 @@ public final class ConjureParserUtils {
         return Type.primitive(PrimitiveType.valueOf(primitiveType.name()));
     }
 
-    static Type parseExternalType(ExternalTypeDefinition externalType, String conjurePackage, String typeName) {
+    static Type parseExternalType(
+            ExternalTypeDefinition externalType,
+            ReferenceTypeResolver nameResolver,
+            String conjurePackage,
+            String typeName) {
         if (isBearerToken(externalType) && externalType.safety().isPresent()) {
             throw new ConjureRuntimeException(
                     "Cannot mark safety of external import with base type BearerToken. BearerToken assumes Do Not"
                             + " Log.");
         }
+
         return Type.external(ExternalReference.builder()
                 .externalReference(TypeName.of(typeName, conjurePackage))
-                .fallback(ConjureParserUtils.parsePrimitiveType(externalType.baseType()))
+                .fallback(externalType.baseType().visit(new ConjureTypeParserVisitor(nameResolver)))
                 .safety(externalType.safety().map(ConjureParserUtils::parseLogSafety))
                 .build());
     }
