@@ -17,10 +17,14 @@
 package com.palantir.conjure.defs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.EndpointError;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
@@ -70,5 +74,48 @@ public class ConjureDefTest {
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/nameless-test-service.yml")));
         assertThat(conjureDefinition.getServices()).hasSize(1);
+    }
+
+    @Test
+    public void testThrowsWhenEndpointErrorDefinitionNotAReference() {
+        assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(
+                        new File("src/test/resources/example-non-reference-endpoint-error.yml"))))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .isInstanceOf(SafeIllegalArgumentException.class)
+                .hasMessage("Unsupported endpoint error type. Endpoint errors must be references to a Conjure-defined "
+                        + "error type: {type=INTEGER}");
+    }
+
+    @Test
+    public void testThrowsWhenEndpointErrorIsUndefined() {
+        assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(
+                        new File("src/test/resources/example-non-existent-endpoint-error.yml"))))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .isInstanceOf(SafeIllegalArgumentException.class)
+                .hasMessage("Unknown error: {error=NonExistentError}");
+    }
+
+    @Test
+    public void testEndpointErrorsCanBeImported() {
+        ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
+                ConjureParser.parseAnnotated(new File("src/test/resources/example-imported-endpoint-error.yml")));
+
+        assertThat(conjureDefinition.getServices())
+                .filteredOn(serviceDefinition ->
+                        serviceDefinition.getServiceName().getName().equals("TestService"))
+                .singleElement()
+                .satisfies(serviceDefinition -> {
+                    assertThat(serviceDefinition.getEndpoints())
+                            .singleElement()
+                            .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
+                                    .extracting(EndpointError::getErrorName)
+                                    .containsExactlyInAnyOrder(
+                                            // Invalid argument should be from the `test.api` package that was imported.
+                                            com.palantir.conjure.spec.TypeName.of("InvalidArgument", "test.api"),
+                                            com.palantir.conjure.spec.TypeName.of(
+                                                    "Error2", "test.api.with.imported.errors")));
+                });
     }
 }

@@ -52,6 +52,7 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.CookieAuthType;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.EnumValueDefinition;
@@ -247,6 +248,12 @@ public final class ConjureParserUtils {
                         new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(
                                 parsed.types(), annotatedParsed.importProviders(), annotatedParsedDefs);
 
+                EndpointErrorResolver endpointErrorResolver = new EndpointErrorResolver(
+                        parsed.types().definitions().errors(),
+                        parsed.types().definitions().defaultConjurePackage(),
+                        annotatedParsed.importProviders(),
+                        annotatedParsedDefs);
+
                 // Resolve objects first, so we can use them in service validations
                 Map<TypeName, TypeDefinition> objects = parseObjects(parsed.types(), typeResolver);
                 Map<TypeName, TypeDefinition> importedObjects =
@@ -262,6 +269,7 @@ public final class ConjureParserUtils {
                             service,
                             TypeName.of(serviceName.name(), parseConjurePackage(service.conjurePackage())),
                             typeResolver,
+                            endpointErrorResolver,
                             dealiasingVisitor));
                 });
 
@@ -332,6 +340,7 @@ public final class ConjureParserUtils {
             com.palantir.conjure.parser.services.ServiceDefinition parsed,
             TypeName serviceName,
             ReferenceTypeResolver typeResolver,
+            EndpointErrorResolver endpointErrorResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
         List<EndpointDefinition> endpoints = new ArrayList<>();
         parsed.endpoints()
@@ -341,6 +350,7 @@ public final class ConjureParserUtils {
                         parsed.basePath(),
                         parseAuthType(parsed.defaultAuth()),
                         typeResolver,
+                        endpointErrorResolver,
                         dealiasingVisitor)));
         ServiceDefinition service = ServiceDefinition.builder()
                 .serviceName(serviceName)
@@ -439,8 +449,8 @@ public final class ConjureParserUtils {
             PathString basePath,
             Optional<AuthType> defaultAuth,
             ReferenceTypeResolver typeResolver,
+            EndpointErrorResolver endpointErrorResolver,
             DealiasingTypeVisitor dealiasingVisitor) {
-
         HttpPath httpPath = parseHttpPath(def, basePath);
         EndpointDefinition endpoint = EndpointDefinition.builder()
                 .endpointName(EndpointName.of(name))
@@ -453,6 +463,12 @@ public final class ConjureParserUtils {
                         .collect(Collectors.toSet()))
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
+                .errors(def.errors().stream()
+                        .map(endpointError -> EndpointError.builder()
+                                .errorName(endpointErrorResolver.resolve(endpointError.errorName()))
+                                .docs(endpointError.docs().map(Documentation::of))
+                                .build())
+                        .toList())
                 .docs(def.docs().map(Documentation::of))
                 .deprecated(def.deprecated().map(Documentation::of))
                 .build();

@@ -1,0 +1,10 @@
+services:
+  MyService:
+    name: Test Service
+    package: test.api
+    endpoints:
+      get:
+        http: GET /get
+        returns: string
+        errors:
+          - integer

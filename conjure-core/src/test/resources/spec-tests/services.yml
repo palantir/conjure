@@ -235,6 +235,38 @@ positive:
                   param-id: ParamId
                   param-type: header
                   type: optional<Long>
+  allowEndpointErrors:
+    conjure:
+      types:
+        definitions:
+          default-package: foo
+          errors:
+            InvalidUserSuppliedArg:
+              namespace: TestErrors
+              code: INVALID_ARGUMENT
+              safe-args:
+                field: string
+              unsafe-args:
+                value: string
+            ResourceNotFound:
+              namespace: TestErrors
+              code: NOT_FOUND
+              safe-args:
+                resource: string
+              unsafe-args:
+                user: optional<string>
+      services:
+        Unused:
+          name: Unused
+          package: unused
+          endpoints:
+            getString:
+              http: GET /string
+              returns: string
+              errors:
+                - InvalidUserSuppliedArg
+                - error-name: ResourceNotFound
+                  docs: Some endpoint documentation here.
 
 negative:
   disallowBearerTokenInPathParams:

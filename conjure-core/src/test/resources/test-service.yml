@@ -14,7 +14,14 @@ types:
 
       StringAlias:
         alias: string
-
+    errors:
+      InvalidArgument:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          field: string
+        unsafe-args:
+          value: string
 services:
   MyTestService:
     name: Test Service
@@ -23,6 +30,8 @@ services:
     endpoints:
       get:
         http: GET /get
+        errors:
+          - InvalidArgument
 
       post:
         tags: ['test-tag']

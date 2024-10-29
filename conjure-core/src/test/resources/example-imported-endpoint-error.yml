@@ -1,0 +1,24 @@
+types:
+  conjure-imports:
+    imports: test-service.yml
+  definitions:
+    default-package: test.api.with.imported.errors
+    errors:
+        Error2:
+          namespace: Test
+          code: INVALID_ARGUMENT
+          safe-args:
+            id: integer
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api.with.imported.errors
+    base-path: /test
+    endpoints:
+      getWithImportedError:
+        http: GET /string
+        returns: string
+        errors:
+          - imports.InvalidArgument
+          - Error2

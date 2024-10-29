@@ -173,6 +173,7 @@ types:
           auth: optional<AuthType>
           args: list<ArgumentDefinition>
           returns: optional<Type>
+          errors: list<EndpointError>
           docs: optional<Documentation>
           deprecated: optional<Documentation>
           markers: list<Type>
@@ -180,6 +181,10 @@ types:
       EndpointName:
         alias: string
         docs: Should be in lowerCamelCase.
+      EndpointError:
+        fields:
+          errorName: TypeName
+          docs: optional<Documentation>
       HttpMethod:
         values:
           - GET
