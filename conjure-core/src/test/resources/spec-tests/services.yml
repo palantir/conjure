@@ -265,7 +265,7 @@ positive:
               returns: string
               errors:
                 - InvalidUserSuppliedArg
-                - error-name: ResourceNotFound
+                - error: ResourceNotFound
                   docs: Some endpoint documentation here.
 
 negative:

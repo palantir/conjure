@@ -16,7 +16,6 @@
 
 package com.palantir.conjure.parser.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -33,13 +32,12 @@ import org.immutables.value.Value;
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EndpointError {
-    @JsonProperty("error-name")
-    ConjureType errorName();
+    ConjureType error();
 
     Optional<String> docs();
 
     static EndpointError of(ConjureType errorName) {
-        return ImmutableEndpointError.builder().errorName(errorName).build();
+        return ImmutableEndpointError.builder().error(errorName).build();
     }
 
     // TODO(pm): see if there's something we can do with @JsonCreator.

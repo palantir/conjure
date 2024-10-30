@@ -465,7 +465,7 @@ public final class ConjureParserUtils {
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .errors(def.errors().stream()
                         .map(endpointError -> EndpointError.builder()
-                                .errorName(endpointErrorResolver.resolve(endpointError.errorName()))
+                                .error(endpointErrorResolver.resolve(endpointError.error()))
                                 .docs(endpointError.docs().map(Documentation::of))
                                 .build())
                         .toList())

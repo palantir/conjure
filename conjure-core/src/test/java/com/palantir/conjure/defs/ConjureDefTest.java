@@ -110,7 +110,7 @@ public class ConjureDefTest {
                     assertThat(serviceDefinition.getEndpoints())
                             .singleElement()
                             .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
-                                    .extracting(EndpointError::getErrorName)
+                                    .extracting(EndpointError::getError)
                                     .containsExactlyInAnyOrder(
                                             // Invalid argument should be from the `test.api` package that was imported.
                                             com.palantir.conjure.spec.TypeName.of("InvalidArgument", "test.api"),

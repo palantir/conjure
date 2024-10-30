@@ -183,7 +183,7 @@ types:
         docs: Should be in lowerCamelCase.
       EndpointError:
         fields:
-          errorName: TypeName
+          error: TypeName
           docs: optional<Documentation>
       HttpMethod:
         values:

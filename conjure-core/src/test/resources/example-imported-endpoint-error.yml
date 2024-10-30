@@ -4,11 +4,11 @@ types:
   definitions:
     default-package: test.api.with.imported.errors
     errors:
-        Error2:
-          namespace: Test
-          code: INVALID_ARGUMENT
-          safe-args:
-            id: integer
+      Error2:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
 
 services:
   TestService:
