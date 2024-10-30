@@ -42,7 +42,8 @@ import java.util.Optional;
 
 /**
  * Endpoint error definitions are either references to errors defined in the same file as the endpoint definition, or in
- * imported Conjure files. This class resolved the reference to the error type populating the package name if necessary.
+ * imported Conjure files. This class creates a {@link com.palantir.conjure.spec.TypeName} object from a
+ * {@link com.palantir.conjure.parser.types.reference.ReferenceType} to a Conjure defined error definition.
  */
 public final class EndpointErrorResolver implements ConjureTypeVisitor<com.palantir.conjure.spec.TypeName> {
     private static final String UNSUPPORTED_TYPE_MESSAGE =
