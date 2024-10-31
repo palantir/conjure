@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.spec.ConjureDefinition;
+import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointError;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
@@ -110,12 +111,17 @@ public class ConjureDefTest {
                     assertThat(serviceDefinition.getEndpoints())
                             .singleElement()
                             .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
-                                    .extracting(EndpointError::getError)
+                                    // .extracting(EndpointError::getError)
                                     .containsExactlyInAnyOrder(
-                                            // Invalid argument should be from the `test.api` package that was imported.
-                                            com.palantir.conjure.spec.TypeName.of("InvalidArgument", "test.api"),
-                                            com.palantir.conjure.spec.TypeName.of(
-                                                    "Error2", "test.api.with.imported.errors")));
+                                            EndpointError.builder()
+                                                    .error(com.palantir.conjure.spec.TypeName.of(
+                                                            "Error2", "test.api.with.imported.errors"))
+                                                    .build(),
+                                            // The InvalidArgument is imported from the `test.api` package.
+                                            EndpointError.of(
+                                                    com.palantir.conjure.spec.TypeName.of(
+                                                            "InvalidArgument", "test.api"),
+                                                    Documentation.of("Docs for the imported error"))));
                 });
     }
 }

@@ -30,6 +30,7 @@ The Conjure compiler requires each file to conform to the [ConjureSourceFile][] 
     - [ServiceDefinition][]
       - [AuthDefinition][]
       - [EndpointDefinition][]
+      - [EndpointError][]
       - [ArgumentDefinition][]
       - [ArgumentDefinition.ParamType][]
     - [DocString][]
@@ -278,6 +279,15 @@ safe&#8209;args | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;[ConjureT
 unsafe&#8209;args | Map[`string` &rarr; [FieldDefinition][]&nbsp;or&nbsp;[ConjureType][]] | **REQUIRED**. A map from argument names to type names. These arguments are considered unsafe in accordance with the SLS specification. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition.
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
+**Example:**
+
+```yaml
+CategoryNotFound:
+  namespace: com.example
+  code: NOT_FOUND
+  safe-args:
+    allCategories: list<CategoryId>
+```
 
 ## ErrorCode
 [ErrorCode]: #errorcode
@@ -347,6 +357,7 @@ Field | Type | Description
 http | `string` | **REQUIRED** The operation and path for the endpoint. It MUST follow the shorthand `<method> <path>`, where `<method>` is one of GET, DELETE, POST, or PUT, and `<path>` is a [PathString][].
 auth | [AuthDefinition][] | The authentication mechanism for the endpoint. Overrides `default-auth` in [ServiceDefinition][].
 returns | [ConjureType][] | The name of the return type of the endpoint. The value MUST be a type name that exists within the Conjure definition. If not specified, then the endpoint does not return a value.
+errors | List[[EndpointError][]] | The errors that this endpoint may return. The errors listed here should be closely tied to problems that uniquely arise from the generating a response to the endpoint, which clients are expected to handle.
 args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] | A map between argument names and argument definitions. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Furthermore, if a `string` the argument will default to `auto` [ArgumentDefinition.ParamType][].
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
@@ -362,7 +373,11 @@ createRecipe:
       param-type: body
       type: Recipe
   returns: RecipeId
+  errors:
+    - error: CategoryNotFound
+      docs: A category with the provided category ID was not found.
 ```
+See the example in the [ErrorDefinition][] section for the definition of `CategoryNotFound`
 
 ## ArgumentDefinition
 [ArgumentDefinition]: #argumentdefinition
@@ -417,6 +432,14 @@ A field describing the type of an endpoint parameter. It is a `string` which MUS
 - `header`: defined as a header parameter.
 - `query`: defined as a querystring parameter.
 
+## EndpointError
+[EndpointError]: #endpointerror
+A reference to an [ErrorDefinition][] associated with a service endpoint.
+
+Field | Type | Description
+---|:---:|---
+error |  [TypeName][] | **REQUIRED**. A reference to a Conjure-defined [ErrorDefinition][].
+docs |  [DocString][]  | Documentation for the argument. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 
 ## DocString
 [DocString]: #docstring

@@ -26,6 +26,7 @@ import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
@@ -43,6 +44,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -350,5 +352,28 @@ public final class EndpointDefinitionTest {
                 .hasMessage("HTTP method must be ("
                         + HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|"))
                         + "), but received 'UNKNOWN' in endpoint 'test{http: UNKNOWN /}'.");
+    }
+
+    @Test
+    public void testDuplicateEndpointErrorsAreInvalid() {
+        TypeName errorType = TypeName.of("Error1", "test.api");
+        EndpointDefinition definition = EndpointDefinition.builder()
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/get"))
+                .errors(List.of(
+                        EndpointError.builder()
+                                .error(errorType)
+                                .docs(Documentation.of("docs"))
+                                .build(),
+                        EndpointError.builder()
+                                .error(errorType)
+                                .docs(Documentation.of("different docs but same error"))
+                                .build()))
+                .build();
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Error 'Error1' is declared multiple times in endpoint 'test{http: GET /get}'");
     }
 }

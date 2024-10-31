@@ -16,19 +16,14 @@
 
 package com.palantir.conjure.parser.services;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.conjure.parser.services.EndpointError.EndpointErrorDeserializer;
+import com.palantir.conjure.parser.services.ImmutableEndpointError.Json;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.parsec.ParseException;
-import java.io.IOException;
 import java.util.Optional;
 import org.immutables.value.Value;
 
-@JsonDeserialize(using = EndpointErrorDeserializer.class)
 @Value.Immutable
 @ConjureImmutablesStyle
 public interface EndpointError {
@@ -40,21 +35,17 @@ public interface EndpointError {
         return ImmutableEndpointError.builder().error(errorName).build();
     }
 
-    // TODO(pm): see if there's something we can do with @JsonCreator.
-    final class EndpointErrorDeserializer extends JsonDeserializer<EndpointError> {
-        @Override
-        public EndpointError deserialize(JsonParser parser, DeserializationContext _context) throws IOException {
-
-            String candidate = parser.getValueAsString();
-            if (candidate != null) {
-                try {
-                    return EndpointError.of(ConjureType.fromString(candidate));
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            return ImmutableEndpointError.fromJson(parser.readValueAs(ImmutableEndpointError.Json.class));
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    static EndpointError fromString(String error) {
+        try {
+            return EndpointError.of(ConjureType.fromString(error));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    static EndpointError fromJson(Json json) {
+        return ImmutableEndpointError.fromJson(json);
     }
 }

@@ -20,5 +20,6 @@ services:
         http: GET /string
         returns: string
         errors:
-          - imports.InvalidArgument
+          - error: imports.InvalidArgument
+            docs: Docs for the imported error
           - Error2

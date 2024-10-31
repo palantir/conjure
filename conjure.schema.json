@@ -526,7 +526,10 @@
         "docs": {
           "$ref": "#/definitions/DocString"
         }
-      }
+      },
+      "required": [
+        "error"
+      ]
     },
     "DocString": {
       "type": "string"
