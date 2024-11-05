@@ -428,7 +428,7 @@
         "errors": {
           "type": "array",
             "items": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "$ref": "#/definitions/TypeName"
                 },

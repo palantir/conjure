@@ -111,17 +111,25 @@ public class ConjureDefTest {
                     assertThat(serviceDefinition.getEndpoints())
                             .singleElement()
                             .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
-                                    // .extracting(EndpointError::getError)
                                     .containsExactlyInAnyOrder(
                                             EndpointError.builder()
                                                     .error(com.palantir.conjure.spec.TypeName.of(
                                                             "Error2", "test.api.with.imported.errors"))
+                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
+                                                            "TestNamespace"))
                                                     .build(),
                                             // The InvalidArgument is imported from the `test.api` package.
                                             EndpointError.of(
                                                     com.palantir.conjure.spec.TypeName.of(
                                                             "InvalidArgument", "test.api"),
-                                                    Documentation.of("Docs for the imported error"))));
+                                                    com.palantir.conjure.spec.ErrorNamespace.of("Test"),
+                                                    Documentation.of("Docs for the imported error")),
+                                            EndpointError.of(
+                                                    com.palantir.conjure.spec.TypeName.of(
+                                                            "InvalidArgument", "test.api.with.imported.errors"),
+                                                    com.palantir.conjure.spec.ErrorNamespace.of("OtherNamespace"),
+                                                    Documentation.of("An error with the same name is imported from "
+                                                            + "test-service.yml, but has a different namespace."))));
                 });
     }
 }

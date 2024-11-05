@@ -5,10 +5,17 @@ types:
     default-package: test.api.with.imported.errors
     errors:
       Error2:
-        namespace: Test
+        namespace: TestNamespace
         code: INVALID_ARGUMENT
         safe-args:
           id: integer
+      InvalidArgument:
+        namespace: OtherNamespace
+        code: INVALID_ARGUMENT
+        safe-args:
+          field: string
+        unsafe-args:
+          value: string
 
 services:
   TestService:
@@ -23,3 +30,5 @@ services:
           - error: imports.InvalidArgument
             docs: Docs for the imported error
           - Error2
+          - error: InvalidArgument
+            docs: An error with the same name is imported from test-service.yml, but has a different namespace.

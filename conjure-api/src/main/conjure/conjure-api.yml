@@ -184,6 +184,7 @@ types:
       EndpointError:
         fields:
           error: TypeName
+          namespace: ErrorNamespace
           docs: optional<Documentation>
       HttpMethod:
         values:

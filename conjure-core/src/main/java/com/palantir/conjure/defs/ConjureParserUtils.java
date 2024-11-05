@@ -18,6 +18,7 @@ package com.palantir.conjure.defs;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
+import com.palantir.conjure.defs.EndpointErrorResolver.ErrorResolutionResult;
 import com.palantir.conjure.defs.validator.ConjureDefinitionValidator;
 import com.palantir.conjure.defs.validator.EndpointDefinitionValidator;
 import com.palantir.conjure.defs.validator.EnumDefinitionValidator;
@@ -464,10 +465,15 @@ public final class ConjureParserUtils {
                 .markers(parseMarkers(def.markers(), typeResolver))
                 .returns(def.returns().map(t -> t.visit(new ConjureTypeParserVisitor(typeResolver))))
                 .errors(def.errors().stream()
-                        .map(endpointError -> EndpointError.builder()
-                                .error(endpointErrorResolver.resolve(endpointError.error()))
-                                .docs(endpointError.docs().map(Documentation::of))
-                                .build())
+                        .map(endpointError -> {
+                            ErrorResolutionResult errorResolutionResult =
+                                    endpointErrorResolver.resolve(endpointError.error());
+                            return EndpointError.builder()
+                                    .error(errorResolutionResult.typeName())
+                                    .namespace(errorResolutionResult.namespace())
+                                    .docs(endpointError.docs().map(Documentation::of))
+                                    .build();
+                        })
                         .toList())
                 .docs(def.docs().map(Documentation::of))
                 .deprecated(def.deprecated().map(Documentation::of))

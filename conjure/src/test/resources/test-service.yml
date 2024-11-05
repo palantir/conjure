@@ -36,6 +36,5 @@ services:
       get:
         http: GET /get
         errors:
-          - EndpointError
           - error: EndpointError2
             docs: Some docs here.

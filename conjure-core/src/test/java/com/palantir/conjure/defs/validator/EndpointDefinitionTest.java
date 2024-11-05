@@ -28,6 +28,7 @@ import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.ErrorNamespace;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
@@ -365,15 +366,41 @@ public final class EndpointDefinitionTest {
                         EndpointError.builder()
                                 .error(errorType)
                                 .docs(Documentation.of("docs"))
+                                .namespace(ErrorNamespace.of("Test"))
                                 .build(),
                         EndpointError.builder()
                                 .error(errorType)
+                                .namespace(ErrorNamespace.of("Test"))
                                 .docs(Documentation.of("different docs but same error"))
                                 .build()))
                 .build();
 
         assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Error 'Error1' is declared multiple times in endpoint 'test{http: GET /get}'");
+                .hasMessage(
+                        "Error 'Error1' with namespace 'Test' is declared multiple times in endpoint 'test{http: GET"
+                                + " /get}'");
+    }
+
+    @Test
+    public void testErrorsAreIdentifiedByNameAndNamespace() {
+        TypeName errorType = TypeName.of("Error1", "test.api");
+        EndpointDefinition definition = EndpointDefinition.builder()
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/get"))
+                .errors(List.of(
+                        EndpointError.builder()
+                                .error(errorType)
+                                .namespace(ErrorNamespace.of("Test"))
+                                .build(),
+                        EndpointError.builder()
+                                .error(errorType)
+                                .namespace(ErrorNamespace.of("TestTwo"))
+                                .build()))
+                .build();
+
+        // Should not throw exception
+        EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor);
     }
 }

@@ -17,8 +17,8 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.base.Preconditions;
+import com.palantir.conjure.defs.EndpointErrorResolver.ErrorResolutionResult;
 import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
-import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.conjure.parser.types.ConjureTypeVisitor;
 import com.palantir.conjure.parser.types.builtin.AnyType;
@@ -45,7 +45,7 @@ import java.util.Optional;
  * imported Conjure files. This class creates a {@link com.palantir.conjure.spec.TypeName} object from a
  * {@link com.palantir.conjure.parser.types.reference.ReferenceType} to a Conjure defined error definition.
  */
-public final class EndpointErrorResolver implements ConjureTypeVisitor<com.palantir.conjure.spec.TypeName> {
+final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionResult> {
     private static final String UNSUPPORTED_TYPE_MESSAGE =
             "Unsupported endpoint error type. Endpoint errors must be references to a Conjure-defined error type";
 
@@ -54,7 +54,7 @@ public final class EndpointErrorResolver implements ConjureTypeVisitor<com.palan
     private final Map<Namespace, String> importProviders;
     private final Map<String, AnnotatedConjureSourceFile> externalTypes;
 
-    public EndpointErrorResolver(
+    EndpointErrorResolver(
             Map<TypeName, ErrorTypeDefinition> parsedErrors,
             Optional<ConjurePackage> defaultConjurePackage,
             Map<Namespace, String> importProviders,
@@ -65,15 +65,18 @@ public final class EndpointErrorResolver implements ConjureTypeVisitor<com.palan
         this.externalTypes = externalTypes;
     }
 
-    public com.palantir.conjure.spec.TypeName resolve(ConjureType conjureType) {
+    record ErrorResolutionResult(
+            com.palantir.conjure.spec.TypeName typeName, com.palantir.conjure.spec.ErrorNamespace namespace) {}
+
+    ErrorResolutionResult resolve(ConjureType conjureType) {
         return conjureType.visit(this);
     }
 
-    private com.palantir.conjure.spec.TypeName resolveReferenceType(LocalReferenceType localReferenceType) {
+    private ErrorResolutionResult resolveReferenceType(LocalReferenceType localReferenceType) {
         return resolveInternal(localReferenceType.type(), parsedErrors, defaultConjurePackage);
     }
 
-    private com.palantir.conjure.spec.TypeName resolveReferenceType(ForeignReferenceType foreignReferenceType) {
+    private ErrorResolutionResult resolveReferenceType(ForeignReferenceType foreignReferenceType) {
         String namespaceFile = importProviders.get(foreignReferenceType.namespace());
         Preconditions.checkNotNull(
                 namespaceFile, "Import not found for namespace: %s", foreignReferenceType.namespace());
@@ -86,68 +89,71 @@ public final class EndpointErrorResolver implements ConjureTypeVisitor<com.palan
                 externalFile.conjureSourceFile().types().definitions().defaultConjurePackage());
     }
 
-    private static com.palantir.conjure.spec.TypeName resolveInternal(
+    private static ErrorResolutionResult resolveInternal(
             TypeName name,
             Map<TypeName, ErrorTypeDefinition> parsedErrorDefinitions,
             Optional<ConjurePackage> defaultConjurePackage) {
-        BaseObjectTypeDefinition errorDefinition = parsedErrorDefinitions.get(name);
+        ErrorTypeDefinition errorDefinition = parsedErrorDefinitions.get(name);
         if (errorDefinition == null) {
             throw new SafeIllegalArgumentException("Unknown error", SafeArg.of("error", name.name()));
         }
-        return com.palantir.conjure.spec.TypeName.of(
-                name.name(),
-                ConjureParserUtils.parsePackageOrElseThrow(
-                        errorDefinition.conjurePackage(),
-                        defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage)));
+        return new ErrorResolutionResult(
+                com.palantir.conjure.spec.TypeName.of(
+                        name.name(),
+                        ConjureParserUtils.parsePackageOrElseThrow(
+                                errorDefinition.conjurePackage(),
+                                defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage))),
+                com.palantir.conjure.spec.ErrorNamespace.of(
+                        errorDefinition.namespace().name()));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitAny(AnyType type) {
+    public ErrorResolutionResult visitAny(AnyType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitList(ListType type) {
+    public ErrorResolutionResult visitList(ListType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitMap(MapType type) {
+    public ErrorResolutionResult visitMap(MapType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitOptional(OptionalType type) {
+    public ErrorResolutionResult visitOptional(OptionalType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitPrimitive(PrimitiveType type) {
+    public ErrorResolutionResult visitPrimitive(PrimitiveType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitLocalReference(LocalReferenceType type) {
+    public ErrorResolutionResult visitLocalReference(LocalReferenceType type) {
         return resolveReferenceType(type);
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitForeignReference(ForeignReferenceType type) {
+    public ErrorResolutionResult visitForeignReference(ForeignReferenceType type) {
         return resolveReferenceType(type);
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitSet(SetType type) {
+    public ErrorResolutionResult visitSet(SetType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitBinary(BinaryType type) {
+    public ErrorResolutionResult visitBinary(BinaryType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public com.palantir.conjure.spec.TypeName visitDateTime(DateTimeType type) {
+    public ErrorResolutionResult visitDateTime(DateTimeType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 }

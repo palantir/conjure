@@ -477,13 +477,16 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     private static final class NoDuplicateEndpointErrorsValidation implements ConjureValidator<EndpointDefinition> {
         @Override
         public void validate(EndpointDefinition definition) {
-            Set<String> endpointErrorNames = new HashSet<>();
+            Set<String> endpointErrorNameAndNamespaces = new HashSet<>();
             for (EndpointError endpointErrorDef : definition.getErrors()) {
                 String errorName = endpointErrorDef.getError().getName();
+                String errorNamespace = endpointErrorDef.getNamespace().get();
+                String errorUniqueId = errorName + ":" + errorNamespace;
                 Preconditions.checkArgument(
-                        endpointErrorNames.add(errorName),
-                        "Error '%s' is declared multiple times in endpoint '%s'",
+                        endpointErrorNameAndNamespaces.add(errorUniqueId),
+                        "Error '%s' with namespace '%s' is declared multiple times in endpoint '%s'",
                         errorName,
+                        errorNamespace,
                         describe(definition));
             }
         }
