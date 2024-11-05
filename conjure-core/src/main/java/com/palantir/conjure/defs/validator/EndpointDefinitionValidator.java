@@ -479,7 +479,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition) {
             Set<String> endpointErrorNameAndNamespaces = new HashSet<>();
             for (EndpointError endpointErrorDef : definition.getErrors()) {
-                String errorName = endpointErrorDef.getError().getName();
+                String errorName = endpointErrorDef.getName();
                 String errorNamespace = endpointErrorDef.getNamespace().get();
                 String errorUniqueId = errorName + ":" + errorNamespace;
                 Preconditions.checkArgument(

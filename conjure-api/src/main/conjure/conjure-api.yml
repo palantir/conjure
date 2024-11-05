@@ -183,7 +183,12 @@ types:
         docs: Should be in lowerCamelCase.
       EndpointError:
         fields:
-          error: TypeName
+          name:
+            type: string
+            docs: A reference to an error definition.
+          package:
+            type: string
+            docs: A period-delimited string of package names.
           namespace: ErrorNamespace
           docs: optional<Documentation>
       HttpMethod:

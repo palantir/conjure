@@ -469,7 +469,8 @@ public final class ConjureParserUtils {
                             ErrorResolutionResult errorResolutionResult =
                                     endpointErrorResolver.resolve(endpointError.error());
                             return EndpointError.builder()
-                                    .error(errorResolutionResult.typeName())
+                                    .name(errorResolutionResult.errorName())
+                                    .package_(errorResolutionResult.package_())
                                     .namespace(errorResolutionResult.namespace())
                                     .docs(endpointError.docs().map(Documentation::of))
                                     .build();

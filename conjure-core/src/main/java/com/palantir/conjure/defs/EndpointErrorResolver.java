@@ -66,7 +66,7 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionR
     }
 
     record ErrorResolutionResult(
-            com.palantir.conjure.spec.TypeName typeName, com.palantir.conjure.spec.ErrorNamespace namespace) {}
+            String errorName, String package_, com.palantir.conjure.spec.ErrorNamespace namespace) {}
 
     ErrorResolutionResult resolve(ConjureType conjureType) {
         return conjureType.visit(this);
@@ -98,11 +98,10 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionR
             throw new SafeIllegalArgumentException("Unknown error", SafeArg.of("error", name.name()));
         }
         return new ErrorResolutionResult(
-                com.palantir.conjure.spec.TypeName.of(
-                        name.name(),
-                        ConjureParserUtils.parsePackageOrElseThrow(
-                                errorDefinition.conjurePackage(),
-                                defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage))),
+                name.name(),
+                ConjureParserUtils.parsePackageOrElseThrow(
+                        errorDefinition.conjurePackage(),
+                        defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage)),
                 com.palantir.conjure.spec.ErrorNamespace.of(
                         errorDefinition.namespace().name()));
     }

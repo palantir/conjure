@@ -113,23 +113,26 @@ public class ConjureDefTest {
                             .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
                                     .containsExactlyInAnyOrder(
                                             EndpointError.builder()
-                                                    .error(com.palantir.conjure.spec.TypeName.of(
-                                                            "Error2", "test.api.with.imported.errors"))
+                                                    .name("Error2")
+                                                    .package_("test.api.with.imported.errors")
                                                     .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
                                                             "TestNamespace"))
                                                     .build(),
                                             // The InvalidArgument is imported from the `test.api` package.
-                                            EndpointError.of(
-                                                    com.palantir.conjure.spec.TypeName.of(
-                                                            "InvalidArgument", "test.api"),
-                                                    com.palantir.conjure.spec.ErrorNamespace.of("Test"),
-                                                    Documentation.of("Docs for the imported error")),
-                                            EndpointError.of(
-                                                    com.palantir.conjure.spec.TypeName.of(
-                                                            "InvalidArgument", "test.api.with.imported.errors"),
-                                                    com.palantir.conjure.spec.ErrorNamespace.of("OtherNamespace"),
-                                                    Documentation.of("An error with the same name is imported from "
-                                                            + "test-service.yml, but has a different namespace."))));
+                                            EndpointError.builder()
+                                                    .name("InvalidArgument")
+                                                    .package_("test.api")
+                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of("Test"))
+                                                    .docs(Documentation.of("Docs for the imported error"))
+                                                    .build(),
+                                            EndpointError.builder()
+                                                    .name("InvalidArgument")
+                                                    .package_("test.api.with.imported.errors")
+                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
+                                                            "OtherNamespace"))
+                                                    .docs(Documentation.of("An error with the same name is imported"
+                                                            + " from test-service.yml, but has a different namespace."))
+                                                    .build()));
                 });
     }
 }

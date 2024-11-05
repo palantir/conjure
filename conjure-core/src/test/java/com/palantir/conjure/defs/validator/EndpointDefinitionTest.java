@@ -357,19 +357,20 @@ public final class EndpointDefinitionTest {
 
     @Test
     public void testDuplicateEndpointErrorsAreInvalid() {
-        TypeName errorType = TypeName.of("Error1", "test.api");
         EndpointDefinition definition = EndpointDefinition.builder()
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/get"))
                 .errors(List.of(
                         EndpointError.builder()
-                                .error(errorType)
+                                .name("Error1")
+                                .package_("test.api")
                                 .docs(Documentation.of("docs"))
                                 .namespace(ErrorNamespace.of("Test"))
                                 .build(),
                         EndpointError.builder()
-                                .error(errorType)
+                                .name("Error1")
+                                .package_("test.api")
                                 .namespace(ErrorNamespace.of("Test"))
                                 .docs(Documentation.of("different docs but same error"))
                                 .build()))
@@ -384,18 +385,19 @@ public final class EndpointDefinitionTest {
 
     @Test
     public void testErrorsAreIdentifiedByNameAndNamespace() {
-        TypeName errorType = TypeName.of("Error1", "test.api");
         EndpointDefinition definition = EndpointDefinition.builder()
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/get"))
                 .errors(List.of(
                         EndpointError.builder()
-                                .error(errorType)
+                                .name("Error1")
+                                .package_("test.api")
                                 .namespace(ErrorNamespace.of("Test"))
                                 .build(),
                         EndpointError.builder()
-                                .error(errorType)
+                                .name("Error1")
+                                .package_("test.api")
                                 .namespace(ErrorNamespace.of("TestTwo"))
                                 .build()))
                 .build();
