@@ -17,7 +17,6 @@
 package com.palantir.conjure.defs;
 
 import com.google.common.base.Preconditions;
-import com.palantir.conjure.defs.EndpointErrorResolver.ErrorResolutionResult;
 import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.types.ConjureType;
 import com.palantir.conjure.parser.types.ConjureTypeVisitor;
@@ -35,6 +34,7 @@ import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
 import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
 import com.palantir.conjure.parser.types.reference.LocalReferenceType;
+import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.Map;
@@ -42,10 +42,10 @@ import java.util.Optional;
 
 /**
  * Endpoint error definitions are either references to errors defined in the same file as the endpoint definition, or in
- * imported Conjure files. This class creates a {@link com.palantir.conjure.spec.TypeName} object from a
+ * imported Conjure files. This class creates a {@link com.palantir.conjure.spec.ErrorTypeName} object from a
  * {@link com.palantir.conjure.parser.types.reference.ReferenceType} to a Conjure defined error definition.
  */
-final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionResult> {
+final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorTypeName> {
     private static final String UNSUPPORTED_TYPE_MESSAGE =
             "Unsupported endpoint error type. Endpoint errors must be references to a Conjure-defined error type";
 
@@ -65,18 +65,15 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionR
         this.externalTypes = externalTypes;
     }
 
-    record ErrorResolutionResult(
-            String errorName, String package_, com.palantir.conjure.spec.ErrorNamespace namespace) {}
-
-    ErrorResolutionResult resolve(ConjureType conjureType) {
+    ErrorTypeName resolve(ConjureType conjureType) {
         return conjureType.visit(this);
     }
 
-    private ErrorResolutionResult resolveReferenceType(LocalReferenceType localReferenceType) {
+    private ErrorTypeName resolveReferenceType(LocalReferenceType localReferenceType) {
         return resolveInternal(localReferenceType.type(), parsedErrors, defaultConjurePackage);
     }
 
-    private ErrorResolutionResult resolveReferenceType(ForeignReferenceType foreignReferenceType) {
+    private ErrorTypeName resolveReferenceType(ForeignReferenceType foreignReferenceType) {
         String namespaceFile = importProviders.get(foreignReferenceType.namespace());
         Preconditions.checkNotNull(
                 namespaceFile, "Import not found for namespace: %s", foreignReferenceType.namespace());
@@ -89,7 +86,7 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionR
                 externalFile.conjureSourceFile().types().definitions().defaultConjurePackage());
     }
 
-    private static ErrorResolutionResult resolveInternal(
+    private static ErrorTypeName resolveInternal(
             TypeName name,
             Map<TypeName, ErrorTypeDefinition> parsedErrorDefinitions,
             Optional<ConjurePackage> defaultConjurePackage) {
@@ -97,62 +94,63 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorResolutionR
         if (errorDefinition == null) {
             throw new SafeIllegalArgumentException("Unknown error", SafeArg.of("error", name.name()));
         }
-        return new ErrorResolutionResult(
-                name.name(),
-                ConjureParserUtils.parsePackageOrElseThrow(
+        return ErrorTypeName.builder()
+                .name(name.name())
+                .package_(ConjureParserUtils.parsePackageOrElseThrow(
                         errorDefinition.conjurePackage(),
-                        defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage)),
-                com.palantir.conjure.spec.ErrorNamespace.of(
-                        errorDefinition.namespace().name()));
+                        defaultConjurePackage.map(ConjureParserUtils::parseConjurePackage)))
+                .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
+                        errorDefinition.namespace().name()))
+                .build();
     }
 
     @Override
-    public ErrorResolutionResult visitAny(AnyType type) {
+    public ErrorTypeName visitAny(AnyType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitList(ListType type) {
+    public ErrorTypeName visitList(ListType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitMap(MapType type) {
+    public ErrorTypeName visitMap(MapType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitOptional(OptionalType type) {
+    public ErrorTypeName visitOptional(OptionalType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitPrimitive(PrimitiveType type) {
+    public ErrorTypeName visitPrimitive(PrimitiveType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitLocalReference(LocalReferenceType type) {
+    public ErrorTypeName visitLocalReference(LocalReferenceType type) {
         return resolveReferenceType(type);
     }
 
     @Override
-    public ErrorResolutionResult visitForeignReference(ForeignReferenceType type) {
+    public ErrorTypeName visitForeignReference(ForeignReferenceType type) {
         return resolveReferenceType(type);
     }
 
     @Override
-    public ErrorResolutionResult visitSet(SetType type) {
+    public ErrorTypeName visitSet(SetType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitBinary(BinaryType type) {
+    public ErrorTypeName visitBinary(BinaryType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 
     @Override
-    public ErrorResolutionResult visitDateTime(DateTimeType type) {
+    public ErrorTypeName visitDateTime(DateTimeType type) {
         throw new SafeIllegalArgumentException(UNSUPPORTED_TYPE_MESSAGE, SafeArg.of("type", type));
     }
 }

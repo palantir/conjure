@@ -181,7 +181,7 @@ types:
       EndpointName:
         alias: string
         docs: Should be in lowerCamelCase.
-      EndpointError:
+      ErrorTypeName:
         fields:
           name:
             type: string
@@ -190,6 +190,9 @@ types:
             type: string
             docs: A period-delimited string of package names.
           namespace: ErrorNamespace
+      EndpointError:
+        fields:
+          error: ErrorTypeName
           docs: optional<Documentation>
       HttpMethod:
         values:

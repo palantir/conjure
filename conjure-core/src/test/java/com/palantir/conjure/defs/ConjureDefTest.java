@@ -25,6 +25,8 @@ import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointError;
+import com.palantir.conjure.spec.ErrorNamespace;
+import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.io.File;
 import org.junit.Ignore;
@@ -113,23 +115,27 @@ public class ConjureDefTest {
                             .satisfies(endpointDefinition -> assertThat(endpointDefinition.getErrors())
                                     .containsExactlyInAnyOrder(
                                             EndpointError.builder()
-                                                    .name("Error2")
-                                                    .package_("test.api.with.imported.errors")
-                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
-                                                            "TestNamespace"))
+                                                    .error(ErrorTypeName.builder()
+                                                            .name("Error2")
+                                                            .package_("test.api.with.imported.errors")
+                                                            .namespace(ErrorNamespace.of("TestNamespace"))
+                                                            .build())
                                                     .build(),
                                             // The InvalidArgument is imported from the `test.api` package.
                                             EndpointError.builder()
-                                                    .name("InvalidArgument")
-                                                    .package_("test.api")
-                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of("Test"))
+                                                    .error(ErrorTypeName.builder()
+                                                            .name("InvalidArgument")
+                                                            .package_("test.api")
+                                                            .namespace(ErrorNamespace.of("Test"))
+                                                            .build())
                                                     .docs(Documentation.of("Docs for the imported error"))
                                                     .build(),
                                             EndpointError.builder()
-                                                    .name("InvalidArgument")
-                                                    .package_("test.api.with.imported.errors")
-                                                    .namespace(com.palantir.conjure.spec.ErrorNamespace.of(
-                                                            "OtherNamespace"))
+                                                    .error(ErrorTypeName.builder()
+                                                            .name("InvalidArgument")
+                                                            .package_("test.api.with.imported.errors")
+                                                            .namespace(ErrorNamespace.of("OtherNamespace"))
+                                                            .build())
                                                     .docs(Documentation.of("An error with the same name is imported"
                                                             + " from test-service.yml, but has a different namespace."))
                                                     .build()));

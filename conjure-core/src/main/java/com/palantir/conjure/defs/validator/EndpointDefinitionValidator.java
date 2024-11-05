@@ -26,6 +26,7 @@ import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointError;
+import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.ListType;
@@ -479,8 +480,9 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         public void validate(EndpointDefinition definition) {
             Set<String> endpointErrorNameAndNamespaces = new HashSet<>();
             for (EndpointError endpointErrorDef : definition.getErrors()) {
-                String errorName = endpointErrorDef.getName();
-                String errorNamespace = endpointErrorDef.getNamespace().get();
+                ErrorTypeName errorTypeName = endpointErrorDef.getError();
+                String errorName = errorTypeName.getName();
+                String errorNamespace = errorTypeName.getNamespace().get();
                 String errorUniqueId = errorName + ":" + errorNamespace;
                 Preconditions.checkArgument(
                         endpointErrorNameAndNamespaces.add(errorUniqueId),
