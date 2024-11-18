@@ -18,9 +18,13 @@ package com.palantir.conjure.defs.validator;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.palantir.conjure.defs.Conjure;
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
 import com.palantir.conjure.exceptions.ConjureIllegalStateException;
@@ -39,6 +43,7 @@ import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 import com.palantir.conjure.visitor.TypeDefinitionVisitor;
 import com.palantir.conjure.visitor.TypeVisitor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +59,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
     NO_RECURSIVE_TYPES(new NoRecursiveTypesValidator()),
     UNIQUE_NAMES(new UniqueNamesValidator()),
     NO_NESTED_OPTIONAL(new NoNestedOptionalValidator()),
-    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator());
+    ILLEGAL_MAP_KEYS(new IllegalMapKeyValidator()),
+    UNIQUE_ERROR_NAMES(UniqueErrorNameValidator.INSTANCE);
 
     public static void validateAll(ConjureDefinition definition, SafetyDeclarationRequirements requirements) {
         for (ConjureValidator<ConjureDefinition> validator : values()) {
@@ -503,6 +509,47 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
                         && ("Safe".equals(marker.getName()) || "Unsafe".equals(marker.getName()));
             }
             return false;
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private enum UniqueErrorNameValidator implements ConjureValidator<ConjureDefinition> {
+        INSTANCE;
+
+        @Override
+        public void validate(ConjureDefinition definition) {
+            ListMultimap<String, ErrorDefinition> errors = definition.getErrors().stream()
+                    .collect(Multimaps.toMultimap(
+                            errorDefinition -> errorDefinition.getNamespace().get()
+                                    + ':'
+                                    + errorDefinition.getErrorName().getName(),
+                            errorDefinition -> errorDefinition,
+                            ArrayListMultimap::create));
+
+            Map<String, Collection<ErrorDefinition>> duplicateErrors =
+                    Maps.filterValues(errors.asMap(), value -> value.size() > 1);
+            if (!duplicateErrors.isEmpty()) {
+                throw new IllegalStateException("Error names are made up of a namespace and name, "
+                        + "used to uniquely identify error types over the wire. "
+                        + "The following errors are defined multiple times:\n"
+                        + duplicateErrors.entrySet().stream()
+                                .map(entry ->
+                                        String.format("'%s': %s", entry.getKey(), describeDuplicates(entry.getValue())))
+                                .collect(Collectors.joining("\n")));
+            }
+        }
+
+        private static String describeDuplicates(Collection<ErrorDefinition> definitions) {
+            List<String> packages = definitions.stream()
+                    .map(errorDef -> errorDef.getErrorName().getPackage())
+                    .distinct()
+                    .toList();
+            if (definitions.size() == packages.size()) {
+                return packages.stream().collect(Collectors.joining(", ", "in packages: ", ""));
+            }
+            return definitions.stream()
+                    .map(ErrorDefinition::toString)
+                    .collect(Collectors.joining("\n\t", "defined %n times:\n\t", ""));
         }
     }
 }
