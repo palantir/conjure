@@ -25,6 +25,8 @@ import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.spec.ArgumentDefinition;
 import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointError;
+import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.ListType;
@@ -64,7 +66,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     NO_OPTIONAL_BINARY_BODY_PARAM_VALIDATOR(new NoOptionalBinaryBodyParamValidator()),
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator()),
-    NO_UNSUPPORTED_HTTP_METHOD(new NoUnsupportedHttpMethodValidator());
+    NO_UNSUPPORTED_HTTP_METHOD(new NoUnsupportedHttpMethodValidator()),
+    NO_DUPLICATE_ENDPOINT_ERRORS(new NoDuplicateEndpointErrorsValidation());
 
     private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
@@ -468,6 +471,26 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|")),
                     definition.getHttpMethod().toString(),
                     describe(definition));
+        }
+    }
+
+    @com.google.errorprone.annotations.Immutable
+    private static final class NoDuplicateEndpointErrorsValidation implements ConjureValidator<EndpointDefinition> {
+        @Override
+        public void validate(EndpointDefinition definition) {
+            Set<String> endpointErrorNameAndNamespaces = new HashSet<>();
+            for (EndpointError endpointErrorDef : definition.getErrors()) {
+                ErrorTypeName errorTypeName = endpointErrorDef.getError();
+                String errorName = errorTypeName.getName();
+                String errorNamespace = errorTypeName.getNamespace().get();
+                String errorUniqueId = errorName + ":" + errorNamespace;
+                Preconditions.checkArgument(
+                        endpointErrorNameAndNamespaces.add(errorUniqueId),
+                        "Error '%s' with namespace '%s' is declared multiple times in endpoint '%s'",
+                        errorName,
+                        errorNamespace,
+                        describe(definition));
+            }
         }
     }
 

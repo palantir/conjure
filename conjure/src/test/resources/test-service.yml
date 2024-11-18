@@ -11,6 +11,21 @@ types:
       SimpleObject:
         fields:
           stringField: string
+    errors:
+      EndpointError:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+        unsafe-args:
+          unsafeId: integer
+      EndpointError2:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+        unsafe-args:
+          unsafeId: integer
 
 services:
   TestService:
@@ -20,3 +35,6 @@ services:
     endpoints:
       get:
         http: GET /get
+        errors:
+          - error: EndpointError2
+            docs: Some docs here.

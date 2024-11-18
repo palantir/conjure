@@ -1,0 +1,34 @@
+types:
+  conjure-imports:
+    imports: test-service.yml
+  definitions:
+    default-package: test.api.with.imported.errors
+    errors:
+      Error2:
+        namespace: TestNamespace
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+      InvalidArgument:
+        namespace: OtherNamespace
+        code: INVALID_ARGUMENT
+        safe-args:
+          field: string
+        unsafe-args:
+          value: string
+
+services:
+  TestService:
+    name: Test Service
+    package: test.api.with.imported.errors
+    base-path: /test
+    endpoints:
+      getWithImportedError:
+        http: GET /string
+        returns: string
+        errors:
+          - error: imports.InvalidArgument
+            docs: Docs for the imported error
+          - Error2
+          - error: InvalidArgument
+            docs: An error with the same name is imported from test-service.yml, but has a different namespace.

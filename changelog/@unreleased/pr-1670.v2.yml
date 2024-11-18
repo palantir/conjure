@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Support specifying errors on endpoints
+  links:
+  - https://github.com/palantir/conjure/pull/1670

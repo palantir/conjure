@@ -173,6 +173,7 @@ types:
           auth: optional<AuthType>
           args: list<ArgumentDefinition>
           returns: optional<Type>
+          errors: list<EndpointError>
           docs: optional<Documentation>
           deprecated: optional<Documentation>
           markers: list<Type>
@@ -180,6 +181,19 @@ types:
       EndpointName:
         alias: string
         docs: Should be in lowerCamelCase.
+      ErrorTypeName:
+        fields:
+          name:
+            type: string
+            docs: A reference to an error definition.
+          package:
+            type: string
+            docs: A period-delimited string of package names.
+          namespace: ErrorNamespace
+      EndpointError:
+        fields:
+          error: ErrorTypeName
+          docs: optional<Documentation>
       HttpMethod:
         values:
           - GET

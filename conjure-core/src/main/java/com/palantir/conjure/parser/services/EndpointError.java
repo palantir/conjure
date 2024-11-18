@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2018 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2024 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,43 +16,36 @@
 
 package com.palantir.conjure.parser.services;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
+import com.palantir.conjure.parser.services.ImmutableEndpointError.Json;
 import com.palantir.conjure.parser.types.ConjureType;
-import com.palantir.logsafe.Unsafe;
-import java.util.List;
-import java.util.Map;
+import com.palantir.parsec.ParseException;
 import java.util.Optional;
-import java.util.Set;
 import org.immutables.value.Value;
 
-@Unsafe
-@JsonDeserialize(as = ImmutableEndpointDefinition.class)
 @Value.Immutable
 @ConjureImmutablesStyle
-public interface EndpointDefinition {
-
-    RequestLineDefinition http();
-
-    Optional<AuthDefinition> auth();
-
-    Map<ParameterName, ArgumentDefinition> args();
-
-    Set<String> tags();
-
-    Set<ConjureType> markers();
-
-    Optional<ConjureType> returns();
-
-    List<EndpointError> errors();
+public interface EndpointError {
+    ConjureType error();
 
     Optional<String> docs();
 
-    Optional<String> deprecated();
-
-    static Builder builder() {
-        return new Builder();
+    static EndpointError of(ConjureType errorName) {
+        return ImmutableEndpointError.builder().error(errorName).build();
     }
 
-    class Builder extends ImmutableEndpointDefinition.Builder {}
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    static EndpointError fromString(String error) {
+        try {
+            return EndpointError.of(ConjureType.fromString(error));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    static EndpointError fromJson(Json json) {
+        return ImmutableEndpointError.fromJson(json);
+    }
 }

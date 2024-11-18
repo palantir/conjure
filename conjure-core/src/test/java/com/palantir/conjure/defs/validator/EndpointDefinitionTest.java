@@ -26,7 +26,10 @@ import com.palantir.conjure.spec.ArgumentName;
 import com.palantir.conjure.spec.BodyParameterType;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
+import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.ErrorNamespace;
+import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.conjure.spec.HeaderParameterType;
 import com.palantir.conjure.spec.HttpMethod;
 import com.palantir.conjure.spec.HttpPath;
@@ -43,6 +46,7 @@ import com.palantir.conjure.spec.Type;
 import com.palantir.conjure.spec.TypeDefinition;
 import com.palantir.conjure.spec.TypeName;
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -350,5 +354,55 @@ public final class EndpointDefinitionTest {
                 .hasMessage("HTTP method must be ("
                         + HttpMethod.values().stream().map(HttpMethod::toString).collect(Collectors.joining("|"))
                         + "), but received 'UNKNOWN' in endpoint 'test{http: UNKNOWN /}'.");
+    }
+
+    @Test
+    public void testDuplicateEndpointErrorsAreInvalid() {
+        ErrorTypeName errorTypeName = ErrorTypeName.builder()
+                .name("Error1")
+                .package_("test.api")
+                .namespace(ErrorNamespace.of("Test"))
+                .build();
+        EndpointDefinition definition = EndpointDefinition.builder()
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/get"))
+                .errors(List.of(
+                        EndpointError.builder()
+                                .error(errorTypeName)
+                                .docs(Documentation.of("docs"))
+                                .build(),
+                        EndpointError.builder()
+                                .error(errorTypeName)
+                                .docs(Documentation.of("different docs but same error"))
+                                .build()))
+                .build();
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Error 'Error1' with namespace 'Test' is declared multiple times in endpoint 'test{http: GET"
+                                + " /get}'");
+    }
+
+    @Test
+    public void testErrorsAreIdentifiedByNameAndNamespace() {
+        ErrorTypeName errorTypeName = ErrorTypeName.of("Error1", "test.api", ErrorNamespace.of("Test"));
+        EndpointDefinition definition = EndpointDefinition.builder()
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/get"))
+                .errors(List.of(
+                        EndpointError.builder().error(errorTypeName).build(),
+                        EndpointError.builder()
+                                .error(ErrorTypeName.builder()
+                                        .from(errorTypeName)
+                                        .namespace(ErrorNamespace.of("Other"))
+                                        .build())
+                                .build()))
+                .build();
+
+        // Should not throw exception since the errors have different namespaces
+        EndpointDefinitionValidator.validateAll(definition, emptyDealiasingVisitor);
     }
 }

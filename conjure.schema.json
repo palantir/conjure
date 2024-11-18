@@ -425,6 +425,19 @@
         "returns": {
           "$ref": "#/definitions/ConjureType"
         },
+        "errors": {
+          "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/TypeName"
+                },
+                {
+                  "$ref": "#/definitions/EndpointError"
+                }
+              ]
+            }
+        },
         "args": {
           "type": "object",
           "additionalProperties": {
@@ -501,6 +514,21 @@
         "body",
         "header",
         "query"
+      ]
+    },
+    "EndpointError": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/TypeName"
+        },
+        "docs": {
+          "$ref": "#/definitions/DocString"
+        }
+      },
+      "required": [
+        "error"
       ]
     },
     "DocString": {

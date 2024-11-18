@@ -26,6 +26,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.palantir.conjure.parser.ConjureParser;
 import com.palantir.conjure.parser.ConjureSourceFile;
+import com.palantir.conjure.parser.services.ArgumentDefinition.ParamType;
 import com.palantir.conjure.parser.types.BaseObjectTypeDefinition;
 import com.palantir.conjure.parser.types.NamedTypesDefinition;
 import com.palantir.conjure.parser.types.TypesDefinition;
@@ -33,10 +34,13 @@ import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.complex.EnumTypeDefinition;
 import com.palantir.conjure.parser.types.complex.EnumValueDefinition;
+import com.palantir.conjure.parser.types.complex.ErrorTypeDefinition;
 import com.palantir.conjure.parser.types.complex.FieldDefinition;
 import com.palantir.conjure.parser.types.complex.ObjectTypeDefinition;
 import com.palantir.conjure.parser.types.complex.UnionTypeDefinition;
 import com.palantir.conjure.parser.types.names.ConjurePackage;
+import com.palantir.conjure.parser.types.names.ErrorCode;
+import com.palantir.conjure.parser.types.names.ErrorNamespace;
 import com.palantir.conjure.parser.types.names.FieldName;
 import com.palantir.conjure.parser.types.names.TypeName;
 import com.palantir.conjure.parser.types.primitive.PrimitiveType;
@@ -46,6 +50,7 @@ import com.palantir.conjure.parser.types.reference.LocalReferenceType;
 import com.palantir.parsec.ParseException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public final class ServiceDefinitionTests {
@@ -266,6 +271,18 @@ public final class ServiceDefinitionTests {
                                                 AliasTypeDefinition.builder()
                                                         .alias(PrimitiveType.STRING)
                                                         .build())
+                                        .putErrors(
+                                                TypeName.of("InvalidArgument"),
+                                                ErrorTypeDefinition.builder()
+                                                        .namespace(ErrorNamespace.of("Test"))
+                                                        .code(ErrorCode.of("INVALID_ARGUMENT"))
+                                                        .safeArgs(ImmutableMap.of(
+                                                                FieldName.of("field"),
+                                                                FieldDefinition.of(PrimitiveType.STRING)))
+                                                        .unsafeArgs(ImmutableMap.of(
+                                                                FieldName.of("value"),
+                                                                FieldDefinition.of(PrimitiveType.STRING)))
+                                                        .build())
                                         .build())
                                 .build())
                         .putServices(
@@ -277,6 +294,8 @@ public final class ServiceDefinitionTests {
                                                 "get",
                                                 EndpointDefinition.builder()
                                                         .http(RequestLineDefinition.of("GET", PathString.of("/get")))
+                                                        .errors(List.of(EndpointError.of(
+                                                                LocalReferenceType.of(TypeName.of("InvalidArgument")))))
                                                         .build())
                                         .putEndpoints(
                                                 "post",
@@ -287,7 +306,7 @@ public final class ServiceDefinitionTests {
                                                                 ParameterName.of("foo"),
                                                                 ArgumentDefinition.builder()
                                                                         .paramId(ParameterName.of("Foo"))
-                                                                        .paramType(ArgumentDefinition.ParamType.HEADER)
+                                                                        .paramType(ParamType.HEADER)
                                                                         .type(LocalReferenceType.of(
                                                                                 TypeName.of("StringAlias")))
                                                                         .addTags("safe")

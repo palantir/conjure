@@ -364,6 +364,9 @@ parameter name. Each argument definition may have a "docs" key containing string
 Each argument definition may also have a "markers" key, consisting of a list of [types](#representation-of-conjure-types)
 that serve as additional metadata for the argument.
 - "returns": a [representation](#representation-of-conjure-types) of the return type of the endpoint
+- "errors": a list of endpoint errors. Each endpoint error is a reference to a Conjure-defined [error type](#errors).  
+The endpoint error is either a string representing the name of the referenced error, or an object with an "error" field 
+representing the name of the error and an optional "docs" field containing a string with documentation for the error.
 - "docs": string documentation for the endpoint
 - "deprecated": a string explanation indicating the endpoint is deprecated and why
 

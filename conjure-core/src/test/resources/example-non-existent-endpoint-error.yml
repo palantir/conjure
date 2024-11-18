@@ -1,0 +1,21 @@
+types:
+  definitions:
+    default-package: test.api
+    errors:
+      Error1:
+        namespace: Test
+        code: INVALID_ARGUMENT
+        safe-args:
+          id: integer
+
+services:
+  MyService:
+    name: Test Service
+    package: test.api
+    endpoints:
+      get:
+        http: GET /get
+        returns: string
+        errors:
+          - Error1
+          - NonExistentError
