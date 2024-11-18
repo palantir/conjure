@@ -549,7 +549,8 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             }
             return definitions.stream()
                     .map(ErrorDefinition::toString)
-                    .collect(Collectors.joining("\n\t", "defined %n times:\n\t", ""));
+                    .collect(
+                            Collectors.joining("\n\t", String.format("defined %s times:\n\t", definitions.size()), ""));
         }
     }
 }

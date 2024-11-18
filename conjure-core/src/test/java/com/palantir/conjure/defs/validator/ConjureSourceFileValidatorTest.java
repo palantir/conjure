@@ -327,6 +327,7 @@ public class ConjureSourceFileValidatorTest {
                 .hasMessageContainingAll(
                         "errors are defined multiple times",
                         "'Namespace:Name'",
+                        "defined 2 times",
                         fieldOne.toString(),
                         fieldTwo.toString());
     }
