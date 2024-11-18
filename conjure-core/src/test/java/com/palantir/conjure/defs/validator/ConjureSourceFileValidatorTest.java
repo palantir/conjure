@@ -31,6 +31,9 @@ import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.ErrorCode;
+import com.palantir.conjure.spec.ErrorDefinition;
+import com.palantir.conjure.spec.ErrorNamespace;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.FieldDefinition;
 import com.palantir.conjure.spec.FieldName;
@@ -268,6 +271,65 @@ public class ConjureSourceFileValidatorTest {
         assertThatThrownBy(() -> ConjureDefinitionValidator.ILLEGAL_MAP_KEYS.validate(conjureDef))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageStartingWith("Illegal map key found in object Foo");
+    }
+
+    @Test
+    public void testDuplicateErrorNames_differentPackages() {
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .errors(ErrorDefinition.builder()
+                        .namespace(ErrorNamespace.of("Namespace"))
+                        .code(ErrorCode.CUSTOM_SERVER)
+                        .errorName(TypeName.of("Name", "com.palantir.one"))
+                        .build())
+                .errors(ErrorDefinition.builder()
+                        .namespace(ErrorNamespace.of("Namespace"))
+                        .code(ErrorCode.CUSTOM_CLIENT)
+                        .errorName(TypeName.of("Name", "com.palantir.two"))
+                        .build())
+                .build();
+
+        assertThatThrownBy(() -> ConjureDefinitionValidator.UNIQUE_ERROR_NAMES.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContainingAll(
+                        "errors are defined multiple times",
+                        "'Namespace:Name': in packages: com.palantir.one, com.palantir.two");
+    }
+
+    @Test
+    public void testDuplicateErrorNames_differentArgs() {
+        FieldDefinition fieldOne = FieldDefinition.builder()
+                .fieldName(FieldName.of("field"))
+                .type(Type.primitive(PrimitiveType.STRING))
+                .build();
+        FieldDefinition fieldTwo = FieldDefinition.builder()
+                .fieldName(FieldName.of("different"))
+                .type(Type.primitive(PrimitiveType.INTEGER))
+                .build();
+        ConjureDefinition conjureDef = ConjureDefinition.builder()
+                .version(1)
+                .errors(ErrorDefinition.builder()
+                        .namespace(ErrorNamespace.of("Namespace"))
+                        .code(ErrorCode.CUSTOM_SERVER)
+                        .errorName(TypeName.of("Name", "com.palantir"))
+                        .safeArgs(fieldOne)
+                        .build())
+                .errors(ErrorDefinition.builder()
+                        .namespace(ErrorNamespace.of("Namespace"))
+                        .code(ErrorCode.CUSTOM_SERVER)
+                        .errorName(TypeName.of("Name", "com.palantir"))
+                        .safeArgs(fieldTwo)
+                        .build())
+                .build();
+
+        assertThatThrownBy(() -> ConjureDefinitionValidator.UNIQUE_ERROR_NAMES.validate(conjureDef))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContainingAll(
+                        "errors are defined multiple times",
+                        "'Namespace:Name'",
+                        "defined 2 times",
+                        fieldOne.toString(),
+                        fieldTwo.toString());
     }
 
     @Test
