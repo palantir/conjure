@@ -25,6 +25,7 @@ import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.builtin.BinaryType;
 import com.palantir.conjure.parser.types.builtin.DateTimeType;
+import com.palantir.conjure.parser.types.collect.ArrayType;
 import com.palantir.conjure.parser.types.collect.ListType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.collect.OptionalType;
@@ -122,6 +123,12 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
     @Override
     public Type visitList(ListType type) {
         return Type.list(com.palantir.conjure.spec.ListType.of(type.itemType().visit(this)));
+    }
+
+    @Override
+    public Type visitArray(ArrayType type) {
+        return Type.array(com.palantir.conjure.spec.ArrayType.of(
+                com.palantir.conjure.spec.PrimitiveType.valueOf(type.itemType().name())));
     }
 
     @Override
