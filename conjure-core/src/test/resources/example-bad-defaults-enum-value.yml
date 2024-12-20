@@ -1,0 +1,14 @@
+types:
+  definitions:
+    default-package: com.palantir.defaults
+    objects:
+      EnumType:
+        values:
+          - ONE
+          - TWO
+          - THREE
+      BadEnumObject:
+        fields:
+          enumField:
+            type: EnumType
+            default: FOUR
