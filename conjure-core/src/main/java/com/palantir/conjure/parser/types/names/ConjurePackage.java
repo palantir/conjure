@@ -58,7 +58,7 @@ public abstract class ConjurePackage {
 
     @JsonCreator
     public static ConjurePackage of(String name) {
-        return ImmutableConjurePackage.builder().name(name).build();
+        return ImmutableConjurePackage.builder().name(Names.intern(name)).build();
     }
 
     public static ConjurePackage of(Iterable<String> components) {
