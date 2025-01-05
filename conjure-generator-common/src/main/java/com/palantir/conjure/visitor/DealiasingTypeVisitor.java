@@ -19,6 +19,7 @@ package com.palantir.conjure.visitor;
 import com.google.common.base.Preconditions;
 import com.palantir.conjure.either.Either;
 import com.palantir.conjure.spec.AliasDefinition;
+import com.palantir.conjure.spec.ArrayType;
 import com.palantir.conjure.spec.EnumDefinition;
 import com.palantir.conjure.spec.ExternalReference;
 import com.palantir.conjure.spec.ListType;
@@ -101,6 +102,11 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
     @Override
     public Either<TypeDefinition, Type> visitList(ListType value) {
         return Either.right(Type.list(value));
+    }
+
+    @Override
+    public Either<TypeDefinition, Type> visitArray(ArrayType value) {
+        return Either.right(Type.array(value));
     }
 
     @Override
