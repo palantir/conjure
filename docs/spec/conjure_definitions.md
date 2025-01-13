@@ -233,8 +233,8 @@ It is common for a generator to also generate a visitor interface for each union
 Payload:
   package: com.palantir.example
   union:
-    serviceLog: ServiceLog
-    notAServiceLog: RequestLog
+    ServiceLog: ServiceLog
+    NotAServiceLog: RequestLog
 ```
 
 
