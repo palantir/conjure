@@ -40,7 +40,7 @@ public final class FieldNameValidatorTest {
     }
 
     @Test
-    public void testInvalidNames() throws Exception {
+    public void testInvalidNames() {
         for (String invalid : new String[] {
             "UpperCamelCase",
             "Upper-Kebab-Case",
@@ -55,18 +55,20 @@ public final class FieldNameValidatorTest {
         }) {
             assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of(invalid)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining(
-                            String.format("FieldName \"%s\" must follow one of the following patterns", invalid));
+                    .hasMessageContainingAll(
+                            String.format("FieldName \"%s\" must follow one of the following patterns: ", invalid),
+                            "LOWER_CAMEL_CASE",
+                            "[A-Z]");
         }
     }
 
     @Test
-    public void capitalize_should_turn_camel_case_into_sensible_class_name() throws Exception {
+    public void capitalize_should_turn_camel_case_into_sensible_class_name() {
         assertThat(FieldNameValidator.capitalize(FieldName.of("myVariant"))).isEqualTo("MyVariant");
     }
 
     @Test
-    public void capitalize_capture_unused_behavior() throws Exception {
+    public void capitalize_capture_unused_behavior() {
         assertThat(FieldNameValidator.capitalize(FieldName.of("my-variant"))).isEqualTo("My-variant");
         assertThat(FieldNameValidator.capitalize(FieldName.of("my_variant"))).isEqualTo("My_variant");
     }

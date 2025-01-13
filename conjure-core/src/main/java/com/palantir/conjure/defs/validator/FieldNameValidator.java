@@ -16,8 +16,8 @@
 
 package com.palantir.conjure.defs.validator;
 
-import com.google.common.base.Preconditions;
 import com.palantir.conjure.CaseConverter;
+import com.palantir.conjure.CaseConverter.Case;
 import com.palantir.conjure.spec.FieldName;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
@@ -47,13 +47,14 @@ public final class FieldNameValidator {
     public static void validate(FieldName fieldName) {
         boolean matchesCamelCase = CaseConverter.CAMEL_CASE_PATTERN.matches(fieldName.get());
 
-        Preconditions.checkArgument(
-                matchesCamelCase
-                        || CaseConverter.KEBAB_CASE_PATTERN.matches(fieldName.get())
-                        || CaseConverter.SNAKE_CASE_PATTERN.matches(fieldName.get()),
-                "FieldName \"%s\" must follow one of the following patterns: %s",
-                fieldName,
-                Arrays.toString(CaseConverter.Case.values()));
+        if (!matchesCamelCase
+                && !CaseConverter.KEBAB_CASE_PATTERN.matches(fieldName.get())
+                && !CaseConverter.SNAKE_CASE_PATTERN.matches(fieldName.get())) {
+            // using if-throw instead of Preconditions to avoid recomputing the `Arrays.toString()` every time
+            throw new IllegalArgumentException(String.format(
+                    "FieldName \"%s\" must follow one of the following patterns: %s",
+                    fieldName, Arrays.toString(Case.values())));
+        }
 
         if (!matchesCamelCase) {
             log.warn(
