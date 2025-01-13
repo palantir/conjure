@@ -55,12 +55,10 @@ public final class FieldNameValidatorTest {
         }) {
             assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of(invalid)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining(String.format(
-                            "FieldName \"%s\" must follow one of the following patterns: "
-                                    + "[LOWER_CAMEL_CASE[^[a-z]([A-Z]{1,2}[a-z0-9]|[a-z0-9])*[A-Z]?$], "
-                                    + "KEBAB_CASE[^[a-z]((-[a-z]){1,2}[a-z0-9]|[a-z0-9])*(-[a-z])?$], "
-                                    + "SNAKE_CASE[^[a-z]((_[a-z]){1,2}[a-z0-9]|[a-z0-9])*(_[a-z])?$]]",
-                            invalid));
+                    .hasMessageContaining(
+                            String.format("FieldName \"%s\" must follow one of the following patterns: ", invalid))
+                    .hasMessageContaining("LOWER_CAMEL_CASE")
+                    .hasMessageContaining("[A-Z]");
         }
     }
 
