@@ -55,10 +55,10 @@ public final class FieldNameValidatorTest {
         }) {
             assertThatThrownBy(() -> FieldNameValidator.validate(FieldName.of(invalid)))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining(
-                            String.format("FieldName \"%s\" must follow one of the following patterns: ", invalid))
-                    .hasMessageContaining("LOWER_CAMEL_CASE")
-                    .hasMessageContaining("[A-Z]");
+                    .hasMessageContainingAll(
+                            String.format("FieldName \"%s\" must follow one of the following patterns: ", invalid),
+                            "LOWER_CAMEL_CASE",
+                            "[A-Z]");
         }
     }
 
