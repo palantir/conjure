@@ -222,7 +222,7 @@ Definition for a union complex data type.
 
 Field | Type | Description
 ---------- | ---- | -----------
-union | Map[`string` &rarr; [FieldDefinition][] or [ConjureType][]] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in PascalCase.
+union | Map[`string` &rarr; [FieldDefinition][] or [ConjureType][]] | **REQUIRED**. A map from union names to type names. If the value of the field is a `string` it MUST be a type name that exists within the Conjure definition. Union names MUST be in [camelCase](https://developer.mozilla.org/en-US/docs/Glossary/Camel_case).
 docs | [DocString][] | Documentation for the type. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 package | `string` | **REQUIRED** if `default-package` is not specified. Overrides the `default-package` in [NamedTypesDefinition][].
 
@@ -233,8 +233,8 @@ It is common for a generator to also generate a visitor interface for each union
 Payload:
   package: com.palantir.example
   union:
-    ServiceLog: ServiceLog
-    NotAServiceLog: RequestLog
+    serviceLog: ServiceLog
+    notAServiceLog: RequestLog
 ```
 
 
