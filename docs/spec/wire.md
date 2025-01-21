@@ -135,7 +135,7 @@ demoEndpoint:
       param-type: body
 ```
 
-In this case, if `newName` is not present, then the [JSON format][] allows clients to send a HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
+In this case, if `newName` is not present, then the [JSON format][] allows clients to send an HTTP body containing `null` or send an empty body.  If `newName` is present, then the body will include JSON quotes, e.g. `"Joe blogs"`.
 
 ### 2.4. Headers
 Conjure `header` parameters must be serialized in the [PLAIN format][] and transferred as [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers). Header names are case insensitive. Parameters of Conjure type `optional<T>` must be omitted entirely if the value is not present, otherwise just serialized using the [PLAIN Format][].
@@ -148,7 +148,7 @@ A `Content-Type` header must be added if the endpoint defines a `body` argument.
 _Note that the default encoding for `application/json` content type is [`UTF-8`](http://www.ietf.org/rfc/rfc4627.txt)._
 
 #### 2.4.2. Accept header
-Clients must send an `Accept` header for all requests. For requests the endpoints returning binary, it must declare that the `application/octet-stream` MIME type is acceptable. For all other requests, it must declare that the `application/json` MIME type is acceptable. Clients may also optionally declare that the `application/x-jackson-smile` MIME type is acceptable to request the server use Smile instead of JSON.
+Clients must send an `Accept` header for all requests. For requests to endpoints returning binary, clients must declare that the `application/octet-stream` MIME type is acceptable. For all other requests, clients must declare that the `application/json` MIME type is acceptable. Clients may also optionally declare that the `application/x-jackson-smile` MIME type is acceptable to request the server use Smile instead of JSON.
 
 For example, the following are valid `Accept` headers:
 ```
@@ -228,7 +228,7 @@ Conjure servers must send a `Content-Type` header according to the endpoint's re
   - or `Content-Type: application/x-jackson-smile` if encoding the response as Smile.
 
 ### 3.4. Conjure errors
-In order to send a Conjure error, servers must serialize the error using the [JSON format][] (even if the client has indicated that a Smile response is also acceptable). In addition, servers must send a http status code corresponding to the error's code.
+In order to send a Conjure error, servers must serialize the error using the [JSON format][] (even if the client has indicated that a Smile response is also acceptable). In addition, servers must send an HTTP status code corresponding to the error's code.
 
 Conjure Error code         | HTTP Status code |
 -------------------------- | ---------------- |
