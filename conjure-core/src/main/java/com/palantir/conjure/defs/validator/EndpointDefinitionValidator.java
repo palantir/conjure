@@ -289,10 +289,10 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(argDefinition -> {
                         boolean isValid = recursivelyValidate(argDefinition.getType(), dealiasingTypeVisitor, false);
-                        Preconditions.checkState(
+                        Preconditions.checkArgument(
                                 isValid,
                                 "Query parameters must be enums or primitives when de-aliased, or containers of these"
-                                        + " (list, sets, optionals): \"%s\" is not allowed on endpoint %s",
+                                        + " (list, sets, optionals): '%s' is not allowed on endpoint '%s'",
                                 argDefinition.getArgName(),
                                 describe(definition));
                     });
