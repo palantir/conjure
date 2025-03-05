@@ -28,6 +28,8 @@ import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.EnumValueDefinition;
 import com.palantir.conjure.spec.ErrorNamespace;
 import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.conjure.spec.HeaderParameterType;
@@ -370,6 +372,7 @@ public final class EndpointDefinitionTest {
     @Test
     public void testQueryParamValidatorContainerIsValid() {
         TypeName typeName = TypeName.of("OptionalAlias", "com.palantir.foo");
+        TypeName enumTypeName = TypeName.of("ExampleEnum", "com.palantir.foo");
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ImmutableList.of(ArgumentDefinition.builder()
                         .argName(ArgumentName.of("aliasParam"))
@@ -391,6 +394,11 @@ public final class EndpointDefinitionTest {
                         .type(Type.set(SetType.of(Type.primitive(PrimitiveType.STRING))))
                         .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
                         .build()))
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("listEnum"))
+                        .type(Type.list(ListType.of(Type.reference(enumTypeName))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
                 .endpointName(ENDPOINT_NAME)
                 .httpMethod(HttpMethod.GET)
                 .httpPath(HttpPath.of("/path"));
@@ -401,6 +409,12 @@ public final class EndpointDefinitionTest {
                         .typeName(typeName)
                         .alias(Type.list(
                                 ListType.of(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .build()),
+                enumTypeName,
+                TypeDefinition.enum_(EnumDefinition.builder()
+                        .typeName(enumTypeName)
+                        .values(List.of(
+                                EnumValueDefinition.builder().value("FOO").build()))
                         .build())));
 
         EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
