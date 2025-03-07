@@ -28,6 +28,8 @@ import com.palantir.conjure.spec.Documentation;
 import com.palantir.conjure.spec.EndpointDefinition;
 import com.palantir.conjure.spec.EndpointError;
 import com.palantir.conjure.spec.EndpointName;
+import com.palantir.conjure.spec.EnumDefinition;
+import com.palantir.conjure.spec.EnumValueDefinition;
 import com.palantir.conjure.spec.ErrorNamespace;
 import com.palantir.conjure.spec.ErrorTypeName;
 import com.palantir.conjure.spec.HeaderParameterType;
@@ -251,6 +253,171 @@ public final class EndpointDefinitionTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Non body parameters cannot contain the 'binary' type. Parameter 'paramName' "
                         + "from endpoint 'test{http: GET /path}' violates this constraint.");
+    }
+
+    @Test
+    public void testQueryParamValidatorNestedContainer_list_optional() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(
+                                ListType.of(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Query parameters must be enums or primitives when de-aliased, or containers of these (list,"
+                                + " sets, optionals): 'paramName' is not allowed on endpoint 'test{http: GET /path}'");
+    }
+
+    @Test
+    public void testQueryParamValidatorNestedContainer_optional_list() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.optional(
+                                OptionalType.of(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Query parameters must be enums or primitives when de-aliased, or containers of these (list,"
+                                + " sets, optionals): 'paramName' is not allowed on endpoint 'test{http: GET /path}'");
+    }
+
+    @Test
+    public void testQueryParamValidatorNestedContainer_list_set() {
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(ListType.of(Type.set(SetType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), emptyDealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Query parameters must be enums or primitives when de-aliased, or containers of these (list,"
+                                + " sets, optionals): 'paramName' is not allowed on endpoint 'test{http: GET /path}'");
+    }
+
+    @Test
+    public void testQueryParamValidatorNestedContainer_list_aliased_optional() {
+        TypeName typeName = TypeName.of("OptionalAlias", "com.palantir.foo");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.list(ListType.of(Type.reference(typeName))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName,
+                TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(typeName)
+                        .alias(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))
+                        .build())));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Query parameters must be enums or primitives when de-aliased, or containers of these (list,"
+                                + " sets, optionals): 'paramName' is not allowed on endpoint 'test{http: GET /path}'");
+    }
+
+    @Test
+    public void testQueryParamValidatorNestedContainer_aliased_list_optional() {
+        TypeName typeName = TypeName.of("ListOptionalAlias", "com.palantir.foo");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("paramName"))
+                        .type(Type.reference(typeName))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName,
+                TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(typeName)
+                        .alias(Type.list(
+                                ListType.of(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .build())));
+
+        assertThatThrownBy(() -> EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "Query parameters must be enums or primitives when de-aliased, or containers of these (list,"
+                                + " sets, optionals): 'paramName' is not allowed on endpoint 'test{http: GET /path}'");
+    }
+
+    @Test
+    public void testQueryParamValidatorContainerIsValid() {
+        TypeName typeName = TypeName.of("OptionalAlias", "com.palantir.foo");
+        TypeName enumTypeName = TypeName.of("ExampleEnum", "com.palantir.foo");
+        EndpointDefinition.Builder definition = EndpointDefinition.builder()
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("aliasParam"))
+                        .type(Type.reference(typeName))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("optionalParam"))
+                        .type(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("listParam"))
+                        .type(Type.list(ListType.of(Type.primitive(PrimitiveType.STRING))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("setParam"))
+                        .type(Type.set(SetType.of(Type.primitive(PrimitiveType.STRING))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .args(ImmutableList.of(ArgumentDefinition.builder()
+                        .argName(ArgumentName.of("listEnum"))
+                        .type(Type.list(ListType.of(Type.reference(enumTypeName))))
+                        .paramType(ParameterType.query(QueryParameterType.of(ParameterId.of("value"))))
+                        .build()))
+                .endpointName(ENDPOINT_NAME)
+                .httpMethod(HttpMethod.GET)
+                .httpPath(HttpPath.of("/path"));
+
+        DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of(
+                typeName,
+                TypeDefinition.alias(AliasDefinition.builder()
+                        .typeName(typeName)
+                        .alias(Type.list(
+                                ListType.of(Type.optional(OptionalType.of(Type.primitive(PrimitiveType.STRING))))))
+                        .build()),
+                enumTypeName,
+                TypeDefinition.enum_(EnumDefinition.builder()
+                        .typeName(enumTypeName)
+                        .values(List.of(
+                                EnumValueDefinition.builder().value("FOO").build()))
+                        .build())));
+
+        EndpointDefinitionValidator.validateAll(definition.build(), dealiasingVisitor);
     }
 
     @Test
