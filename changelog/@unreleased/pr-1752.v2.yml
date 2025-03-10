@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Conjure endpoint validator throws for nested container query arguments.
+  links:
+  - https://github.com/palantir/conjure/pull/1752
