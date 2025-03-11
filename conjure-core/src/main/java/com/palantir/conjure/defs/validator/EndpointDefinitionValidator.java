@@ -288,17 +288,17 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
             definition.getArgs().stream()
                     .filter(entry -> entry.getParamType().accept(ParameterTypeVisitor.IS_QUERY))
                     .forEach(argDefinition -> {
-                        boolean isValid = recursivelyValidate(argDefinition.getType(), dealiasingTypeVisitor);
-                        Preconditions.checkState(
+                        boolean isValid = recursivelyValidate(argDefinition.getType(), dealiasingTypeVisitor, false);
+                        Preconditions.checkArgument(
                                 isValid,
-                                "Query parameters must be enums, primitives, aliases, list, sets "
-                                        + "or optional of primitive: \"%s\" is not allowed on endpoint %s",
+                                "Query parameters must be enums or primitives when de-aliased, or containers of these"
+                                        + " (list, sets, optionals): '%s' is not allowed on endpoint '%s'",
                                 argDefinition.getArgName(),
                                 describe(definition));
                     });
         }
 
-        private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor) {
+        private static Boolean recursivelyValidate(Type type, DealiasingTypeVisitor visitor, boolean isNested) {
             return visitor.dealias(type)
                     .fold(
                             typeDefinition -> typeDefinition.accept(TypeDefinitionVisitor.IS_ENUM),
@@ -310,17 +310,17 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
                                 @Override
                                 public Boolean visitOptional(OptionalType value) {
-                                    return recursivelyValidate(value.getItemType(), visitor);
+                                    return !isNested && recursivelyValidate(value.getItemType(), visitor, true);
                                 }
 
                                 @Override
                                 public Boolean visitList(ListType value) {
-                                    return recursivelyValidate(value.getItemType(), visitor);
+                                    return !isNested && recursivelyValidate(value.getItemType(), visitor, true);
                                 }
 
                                 @Override
                                 public Boolean visitSet(SetType value) {
-                                    return recursivelyValidate(value.getItemType(), visitor);
+                                    return !isNested && recursivelyValidate(value.getItemType(), visitor, true);
                                 }
 
                                 @Override

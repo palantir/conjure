@@ -392,7 +392,7 @@ negative:
               args:
                 foo: set<string>
   disallowMapInQueryParams:
-    expected-error: 'Query parameters must be enums, primitives, aliases, list, sets or optional of primitive: "foo" is not allowed'
+    expected-error: "Query parameters must be enums or primitives when de-aliased, or containers of these (list, sets, optionals): 'foo' is not allowed"
     conjure:
       services:
         Unused:
@@ -430,7 +430,7 @@ negative:
               http: GET /myEndpoint
               returns: optional<optional<string>>
   disallowQueryParamWithNestedOptional:
-      expected-error: "Illegal nested optionals found in one of the arguments of endpoint testEndpoint"
+      expected-error: "Query parameters must be enums or primitives when de-aliased, or containers of these (list, sets, optionals): 'queryName' is not allowed"
       conjure:
         services:
           TestService:
