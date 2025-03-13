@@ -1,0 +1,66 @@
+types:
+  definitions:
+    default-package: com.palantir.defaults
+    objects:
+      EnumType:
+        values:
+          - ONE
+          - TWO
+          - THREE
+      OtherEnumType:
+        alias: EnumType
+      EnumObject:
+        fields:
+          enumField:
+            type: EnumType
+            default: TWO
+      OtherEnumObject:
+        fields:
+          enumField:
+            type: OtherEnumType
+            default: THREE
+#      BadEnumObject:
+#        fields:
+#          enumField:
+#            type: EnumType
+#            default: FOUR
+#      BadEnumObjectTwo:
+#        fields:
+#          enumField:
+#            type: EnumObject
+#            default: ONE
+      RidObject:
+        fields:
+          ridField:
+            type: rid
+            default: ri.foundry.fake.dataset.fake
+      UuidObject:
+        fields:
+          uuidField:
+            type: uuid
+            default: cc92c9f3-4f16-44c5-b14d-c3cc54f56315
+      StringObject:
+        fields:
+          stringField:
+            type: string
+            default: default
+      SafeLongObject:
+        fields:
+          safeLongField:
+            type: safelong
+            default: 9007199254740990
+      IntegerObject:
+        fields:
+          intField:
+            type: integer
+            default: 0
+      DoubleObject:
+        fields:
+          doubleField:
+            type: double
+            default: 0.5
+      BooleanObject:
+        fields:
+          booleanField:
+            type: boolean
+            default: false
