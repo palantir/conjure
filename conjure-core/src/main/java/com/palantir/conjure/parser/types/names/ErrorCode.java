@@ -62,6 +62,6 @@ public abstract class ErrorCode {
 
     @JsonCreator
     public static ErrorCode of(String name) {
-        return ImmutableErrorCode.builder().name(name).build();
+        return ImmutableErrorCode.builder().name(Names.intern(name)).build();
     }
 }

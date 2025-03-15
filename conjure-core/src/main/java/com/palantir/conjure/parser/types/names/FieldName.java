@@ -81,7 +81,7 @@ public abstract class FieldName {
 
     @JsonCreator
     public static FieldName of(String name) {
-        return ImmutableFieldName.builder().name(name).build();
+        return ImmutableFieldName.builder().name(Names.intern(name)).build();
     }
 
     /** Converts this {@link FieldName} to a {@link FieldName} with the given case. */
