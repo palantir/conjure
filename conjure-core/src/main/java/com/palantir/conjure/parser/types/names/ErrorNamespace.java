@@ -49,6 +49,6 @@ public abstract class ErrorNamespace {
 
     @JsonCreator
     public static ErrorNamespace of(String name) {
-        return ImmutableErrorNamespace.builder().name(name).build();
+        return ImmutableErrorNamespace.builder().name(Names.intern(name)).build();
     }
 }
