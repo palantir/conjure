@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public enum PrimitiveType implements LocalReferenceType {
     STRING(TypeName.of("string")),
     INTEGER(TypeName.of("integer")),
+    F32(TypeName.of("f32")),
     DOUBLE(TypeName.of("double")),
     BOOLEAN(TypeName.of("boolean")),
     SAFELONG(TypeName.of("safelong")),
