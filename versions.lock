@@ -34,8 +34,8 @@ org.glassfish.jersey.core:jersey-common:2.34 (1 constraints: dd04fd30)
 org.immutables:value:2.10.1 (2 constraints: fc1456c1)
 org.jetbrains:annotations:26.0.2 (3 constraints: 35262d98)
 org.jspecify:jspecify:1.0.0 (1 constraints: 130ae0b4)
-org.slf4j:slf4j-api:2.0.11 (6 constraints: 764a993b)
-org.slf4j:slf4j-simple:2.0.11 (1 constraints: 43054b3b)
+org.slf4j:slf4j-api:2.0.17 (6 constraints: 754aeb35)
+org.slf4j:slf4j-simple:2.0.17 (1 constraints: 3c05323b)
 org.yaml:snakeyaml:2.3 (1 constraints: 3d178c10)
 
 [Test dependencies]
