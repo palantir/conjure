@@ -20,7 +20,7 @@ org.junit.jupiter:* = 5.12.2
 org.junit.platform:* = 1.12.2
 org.junit.vintage:* = 5.12.2
 org.mockito:* = 5.17.0
-org.slf4j:* = 1.7.36
+org.slf4j:* = 2.0.17
 
 # conflict resolution
 com.palantir.safe-logging:* = 3.9.0
