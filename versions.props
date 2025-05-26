@@ -3,7 +3,7 @@ com.google.code.findbugs:jsr305 = 3.0.2
 com.google.guava:guava = 33.4.8-jre
 com.jayway.jsonpath:json-path = 2.9.0
 com.networknt:json-schema-validator = 1.0.73
-com.palantir.conjure.java:* = 8.45.0
+com.palantir.conjure.java:* = 8.46.0
 com.palantir.conjure.typescript:* = 5.11.0
 com.palantir.conjure:* = 4.51.0
 com.palantir.syntactic-paths:syntactic-paths = 0.9.0
@@ -19,7 +19,7 @@ org.immutables:value = 2.10.1
 org.junit.jupiter:* = 5.12.2
 org.junit.platform:* = 1.12.2
 org.junit.vintage:* = 5.12.2
-org.mockito:* = 5.17.0
+org.mockito:* = 5.18.0
 org.slf4j:* = 2.0.17
 
 # conflict resolution
