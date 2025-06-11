@@ -29,6 +29,7 @@ public final class TypeNameValidator {
 
     private static final Pattern CUSTOM_TYPE_PATTERN = Pattern.compile("^[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$");
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     static final List<String> PRIMITIVE_TYPES =
             Lists.transform(java.util.Arrays.asList(PrimitiveType.Value.values()), PrimitiveType.Value::name);
 

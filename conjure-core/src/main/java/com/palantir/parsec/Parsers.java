@@ -46,7 +46,9 @@ public final class Parsers {
      * @param parser the target parser to run
      * @return the specified parser
      */
-    public static <T> Parser<T> prefix(final Parser<?> prefix, final Parser<T> parser) {
+    public static <T> Parser<T> prefix(
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final Parser<?> prefix,
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final Parser<T> parser) {
         return new Parser<T>() {
             @Override
             public T parse(ParserState input) throws ParseException {
@@ -89,7 +91,7 @@ public final class Parsers {
      * @param parser the target parser to run
      * @return the specified parser
      */
-    public static <T> Parser<T> gingerly(final Parser<T> parser) {
+    public static <T> Parser<T> gingerly(@SuppressWarnings("for-rollout:UnnecessaryFinal") final Parser<T> parser) {
         return new Parser<T>() {
             @Override
             public T parse(ParserState input) throws ParseException {
@@ -122,9 +124,9 @@ public final class Parsers {
      */
     @SafeVarargs
     public static <T> Parser<T> or(
-            final String description,
-            final Parser<? extends T> firstOption,
-            final Parser<? extends T>... otherOptions) {
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final String description,
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final Parser<? extends T> firstOption,
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final Parser<? extends T>... otherOptions) {
         return new Parser<T>() {
             @Override
             public T parse(ParserState input) throws ParseException {

@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.defs.validator;
 
+@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public interface ConjureValidator<T> {
     /**

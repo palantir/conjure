@@ -30,6 +30,7 @@ import org.immutables.value.Value;
 /**
  * Represents the name of a conjure {@link NamedTypesDefinition#objects() object}.
  */
+@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 @Value.Immutable
 @ConjureImmutablesStyle

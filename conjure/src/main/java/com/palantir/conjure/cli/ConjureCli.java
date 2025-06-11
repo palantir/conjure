@@ -58,7 +58,7 @@ public final class ConjureCli implements Runnable {
         System.exit(prepareCommand().execute(args));
     }
 
-    public static void inProcessExecution(String[] args) {
+    public static void inProcessExecution(@SuppressWarnings("for-rollout:AvoidObjectArrays") String[] args) {
         ThrowableExceptionHandler exceptionHandler = new ThrowableExceptionHandler(new ExceptionHandler());
         new CommandLine(new ConjureCli())
                 .setExecutionExceptionHandler(exceptionHandler)
@@ -96,8 +96,8 @@ public final class ConjureCli implements Runnable {
             // Unpack errors; we don't care about where in the code the error comes from: the issue is in the supplied
             // conjure code. The stack doesn't help.
             chain.forEach(exception -> {
-                if (exception instanceof JsonMappingException) {
-                    handleJsonMappingException(commandLine.getErr(), (JsonMappingException) exception);
+                if (exception instanceof JsonMappingException jsonMappingException) {
+                    handleJsonMappingException(commandLine.getErr(), jsonMappingException);
                 } else {
                     commandLine.getErr().println(exception.getMessage());
                 }
@@ -123,6 +123,7 @@ public final class ConjureCli implements Runnable {
         }
     }
 
+    @SuppressWarnings("for-rollout:SystemOut")
     @Override
     public void run() {
         CommandLine.usage(this, System.out);
@@ -164,7 +165,7 @@ public final class ConjureCli implements Runnable {
         @Nullable
         private List<String> unmatchedOptions;
 
-        @SuppressWarnings("BanSystemErr")
+        @SuppressWarnings({"BanSystemErr", "for-rollout:SystemOut"})
         @Override
         public void run() {
             if (unmatchedOptions != null && !unmatchedOptions.isEmpty()) {
@@ -174,6 +175,7 @@ public final class ConjureCli implements Runnable {
             generate(config);
         }
 
+        @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
         @VisibleForTesting
         static void generate(CliConfiguration config) {
             ConjureDefinition definition = ConjureDefinition.builder()

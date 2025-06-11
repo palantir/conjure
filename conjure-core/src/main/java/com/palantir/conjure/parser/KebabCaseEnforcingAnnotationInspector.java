@@ -56,8 +56,8 @@ public final class KebabCaseEnforcingAnnotationInspector extends AnnotationIntro
                     jsonFieldName);
         }
 
-        if (annotatedEntity instanceof AnnotatedMethod) {
-            AnnotatedMethod maybeSetter = (AnnotatedMethod) annotatedEntity;
+        if (annotatedEntity instanceof AnnotatedMethod maybeSetter) {
+
             if (maybeSetter.getName().startsWith("set")) {
                 // As a pre-caution, require that all setters have a JsonProperty annotation.
                 Preconditions.checkArgument(

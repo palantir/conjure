@@ -156,6 +156,7 @@ public final class TypeParserTests {
                 .isEqualTo(MapType.of(PrimitiveType.STRING, AnyType.of()));
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_invalidSuffixType() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("string[]"))
@@ -163,6 +164,7 @@ public final class TypeParserTests {
                 .hasMessage("Couldn't fully parse input\n" + "string[]\n" + "      ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_badList() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list string"))
@@ -170,6 +172,7 @@ public final class TypeParserTests {
                 .hasMessage("Expected start token \"<\" for list\n" + "list string\n" + "    ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_sensibleErrorForMultiLine() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<\n  map\n    string,\n    integer>\n  \n>"))
@@ -183,6 +186,7 @@ public final class TypeParserTests {
                         + "  "); // Note that the ">" is cut off due to the line limit
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_missingSeparator() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<string"))
@@ -190,6 +194,7 @@ public final class TypeParserTests {
                 .hasMessage("Missing separator \",\"\n" + "map<string\n" + "          ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_emptyList() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<>"))
@@ -197,6 +202,7 @@ public final class TypeParserTests {
                 .hasMessage("Didn't match conjureType inside of list\n" + "list<>\n" + "     ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_emptyMap() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("map<>"))
@@ -204,6 +210,7 @@ public final class TypeParserTests {
                 .hasMessage("Didn't match conjureType \",\" conjureType inside of map\n" + "map<>\n" + "    ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_missingEnd() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string"))
@@ -211,6 +218,7 @@ public final class TypeParserTests {
                 .hasMessage("Expected end token \">\" for list\n" + "list<string\n" + "           ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_doubleClosed() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string>>"))
@@ -218,6 +226,7 @@ public final class TypeParserTests {
                 .hasMessageContaining("Couldn't fully parse input\n" + "list<string>>\n" + "            ^");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testParser_forcesFullConsumption() throws ParseException {
         assertThatThrownBy(() -> TypeParser.INSTANCE.parse("list<string>a"))
