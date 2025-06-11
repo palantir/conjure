@@ -43,6 +43,7 @@ public enum PrimitiveType implements LocalReferenceType {
     private static final Map<TypeName, PrimitiveType> types =
             EnumSet.allOf(PrimitiveType.class).stream().collect(Collectors.toMap(PrimitiveType::type, t -> t));
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private static final Set<TypeName> reservedTypes = ImmutableSortedSet.copyOf(
             Comparator.comparing(TypeName::name, String.CASE_INSENSITIVE_ORDER), types.keySet());
 

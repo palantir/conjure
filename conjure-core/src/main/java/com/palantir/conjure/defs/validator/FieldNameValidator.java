@@ -39,7 +39,8 @@ public final class FieldNameValidator {
     }
 
     /** Converts this {@link FieldName} to a {@link FieldName} with the given case. */
-    public static FieldName toCase(FieldName fieldName, CaseConverter.Case targetCase) {
+    public static FieldName toCase(
+            FieldName fieldName, @SuppressWarnings("for-rollout:DifferentNameButSame") CaseConverter.Case targetCase) {
         return FieldName.of(nameCase(fieldName).convertTo(fieldName.get(), targetCase));
     }
 
@@ -65,8 +66,10 @@ public final class FieldNameValidator {
         }
     }
 
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     private static CaseConverter.Case nameCase(FieldName fieldName) {
-        for (CaseConverter.Case nameCase : CaseConverter.Case.values()) {
+        for (@SuppressWarnings("for-rollout:DifferentNameButSame")
+        CaseConverter.Case nameCase : CaseConverter.Case.values()) {
             if (nameCase.getPattern().matches(fieldName.get())) {
                 return nameCase;
             }

@@ -35,6 +35,7 @@ public final class DefaultingDispatchingParser<T> implements Parser<T> {
         this(description, parsers, new RawStringParser(), whitespaceParser);
     }
 
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public DefaultingDispatchingParser(
             String description,
             Map<String, Parser<T>> parsers,

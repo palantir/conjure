@@ -177,6 +177,7 @@ public final class TestUnitParsers {
                 .isEqualTo("abcdef");
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testOrParserErrorPassthrough() throws ParseException {
         Parser<String> alwaysThrows = new Parser<String>() {

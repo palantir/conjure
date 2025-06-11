@@ -23,6 +23,7 @@ import com.palantir.conjure.spec.EnumValueDefinition;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> {
     UniqueEnumValues(new UniqueEnumValuesValidator()),
@@ -45,6 +46,7 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
         validator.validate(definition);
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueEnumValuesValidator implements ConjureValidator<EnumDefinition> {
 
@@ -62,6 +64,7 @@ public enum EnumDefinitionValidator implements ConjureValidator<EnumDefinition> 
         }
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class ValuesValidator implements ConjureValidator<EnumDefinition> {
 

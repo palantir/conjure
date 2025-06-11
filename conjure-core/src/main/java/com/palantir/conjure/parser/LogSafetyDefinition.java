@@ -32,6 +32,7 @@ public enum LogSafetyDefinition {
         this.name = name;
     }
 
+    @SuppressWarnings({"for-rollout:MissingDefault", "for-rollout:StatementSwitchToExpressionSwitch"})
     @JsonCreator(mode = Mode.DELEGATING)
     public static LogSafetyDefinition parse(String value) {
         switch (Preconditions.checkNotNull(value, "String value is required")) {

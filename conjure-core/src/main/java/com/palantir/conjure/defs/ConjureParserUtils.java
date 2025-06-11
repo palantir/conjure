@@ -120,8 +120,10 @@ public final class ConjureParserUtils {
 
     public static ErrorDefinition parseErrorType(
             TypeName name,
-            com.palantir.conjure.parser.types.complex.ErrorTypeDefinition def,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.complex.ErrorTypeDefinition def,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         ErrorDefinition errorType = ErrorDefinition.builder()
                 .errorName(name)
                 .namespace(ErrorNamespace.of(def.namespace().name()))
@@ -136,7 +138,9 @@ public final class ConjureParserUtils {
     }
 
     public static TypeDefinition parseEnumType(
-            TypeName name, com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
+            TypeName name,
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.complex.EnumTypeDefinition def) {
 
         EnumDefinition enumType = EnumDefinition.builder()
                 .typeName(name)
@@ -152,8 +156,10 @@ public final class ConjureParserUtils {
 
     public static TypeDefinition parseUnionType(
             TypeName name,
-            com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.complex.UnionTypeDefinition def,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         UnionDefinition unionType = UnionDefinition.builder()
                 .typeName(name)
                 .union(parseField(def.union(), typeResolver))
@@ -166,8 +172,10 @@ public final class ConjureParserUtils {
 
     public static TypeDefinition parseObjectType(
             TypeName name,
-            com.palantir.conjure.parser.types.complex.ObjectTypeDefinition def,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.complex.ObjectTypeDefinition def,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         ObjectDefinition objectType = ObjectDefinition.builder()
                 .typeName(name)
                 .fields(parseField(def.fields(), typeResolver))
@@ -180,8 +188,10 @@ public final class ConjureParserUtils {
 
     public static TypeDefinition parseAliasType(
             TypeName name,
-            com.palantir.conjure.parser.types.reference.AliasTypeDefinition def,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.reference.AliasTypeDefinition def,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return TypeDefinition.alias(AliasDefinition.builder()
                 .typeName(name)
                 .alias(def.alias().visit(new ConjureTypeParserVisitor(typeResolver)))
@@ -215,7 +225,8 @@ public final class ConjureParserUtils {
 
     public static TypeName createTypeName(
             String name,
-            com.palantir.conjure.parser.types.BaseObjectTypeDefinition def,
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.BaseObjectTypeDefinition def,
             Optional<String> defaultPackage) {
         TypeName type = TypeName.of(name, parsePackageOrElseThrow(def.conjurePackage(), defaultPackage));
         TypeNameValidator.validate(type);
@@ -244,6 +255,7 @@ public final class ConjureParserUtils {
             ConjureSourceFile parsed = annotatedParsed.conjureSourceFile();
 
             try {
+                @SuppressWarnings("for-rollout:DifferentNameButSame")
                 ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver =
                         new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(
                                 parsed.types(), annotatedParsed.importProviders(), annotatedParsedDefs);
@@ -363,8 +375,10 @@ public final class ConjureParserUtils {
     }
 
     static Map<TypeName, TypeDefinition> parseObjects(
-            com.palantir.conjure.parser.types.TypesDefinition parsed,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.types.TypesDefinition parsed,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage =
                 parsed.definitions().defaultConjurePackage().map(ConjurePackage::name);
 
@@ -376,8 +390,11 @@ public final class ConjureParserUtils {
                 .collect(Collectors.toMap(td -> td.accept(TypeDefinitionVisitor.TYPE_NAME), td -> td));
     }
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     static List<ErrorDefinition> parseErrors(
-            NamedTypesDefinition defs, ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            NamedTypesDefinition defs,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         Optional<String> defaultPackage = defs.defaultConjurePackage().map(ConjurePackage::name);
         ImmutableList.Builder<ErrorDefinition> errorsBuidler = ImmutableList.builder();
         errorsBuidler.addAll(defs.errors().entrySet().stream()
@@ -408,7 +425,8 @@ public final class ConjureParserUtils {
                             com.palantir.conjure.parser.types.names.FieldName,
                             com.palantir.conjure.parser.types.complex.FieldDefinition>
                     def,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return def.entrySet().stream()
                 .map(entry -> {
                     FieldDefinition fieldDefinition = FieldDefinition.builder()
@@ -424,6 +442,7 @@ public final class ConjureParserUtils {
                 .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static LogSafety parseLogSafety(LogSafetyDefinition def) {
         switch (def) {
             case SAFE:
@@ -484,8 +503,10 @@ public final class ConjureParserUtils {
         return httpPath;
     }
 
+    @SuppressWarnings({"for-rollout:StatementSwitchToExpressionSwitch", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
     private static Optional<AuthType> parseAuthType(
-            com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
 
         switch (authDefinition.type()) {
             case HEADER:
@@ -499,6 +520,7 @@ public final class ConjureParserUtils {
         }
     }
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private static List<ArgumentDefinition> parseArgs(
             Map<ParameterName, com.palantir.conjure.parser.services.ArgumentDefinition> args,
             HttpPath httpPath,
@@ -524,6 +546,7 @@ public final class ConjureParserUtils {
         return resultBuilder.build();
     }
 
+    @SuppressWarnings({"for-rollout:StatementSwitchToExpressionSwitch", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
     private static ParameterType parseParameterType(
             com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
             ArgumentName argName,
@@ -558,8 +581,10 @@ public final class ConjureParserUtils {
     }
 
     private static Set<Type> parseMarkers(
-            Set<com.palantir.conjure.parser.types.ConjureType> markers,
-            ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
+            @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
+                    Set<com.palantir.conjure.parser.types.ConjureType> markers,
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
+                    ConjureTypeParserVisitor.ReferenceTypeResolver typeResolver) {
         return markers.stream()
                 .map(m -> m.visit(new ConjureTypeParserVisitor(typeResolver)))
                 .collect(Collectors.toSet());

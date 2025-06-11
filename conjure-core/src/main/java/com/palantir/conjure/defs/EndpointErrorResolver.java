@@ -86,6 +86,7 @@ final class EndpointErrorResolver implements ConjureTypeVisitor<ErrorTypeName> {
                 externalFile.conjureSourceFile().types().definitions().defaultConjurePackage());
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     private static ErrorTypeName resolveInternal(
             TypeName name,
             Map<TypeName, ErrorTypeDefinition> parsedErrorDefinitions,

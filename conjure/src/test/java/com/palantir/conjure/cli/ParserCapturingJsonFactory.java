@@ -44,36 +44,43 @@ public final class ParserCapturingJsonFactory extends JsonFactory {
         return Optional.ofNullable(parserReference.get()).orElseThrow();
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(File file) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(file));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(URL url) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(url));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(InputStream in) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(in));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(Reader reader) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(reader));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(byte[] data) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(data));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(byte[] data, int offset, int len) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(data, offset, len));
     }
 
+    @SuppressWarnings("for-rollout:RedundantThrows")
     @Override
     public JsonParser createParser(String content) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(content));

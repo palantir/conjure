@@ -32,6 +32,7 @@ public final class PackageValidator {
 
     private static final PackagePattern VALID_PACKAGE = PackagePattern.get();
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     public static List<String> components(String name) {
         return ImmutableList.copyOf(Splitter.on('.').split(name));
     }

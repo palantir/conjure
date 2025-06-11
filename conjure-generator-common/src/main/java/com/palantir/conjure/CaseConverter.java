@@ -29,6 +29,7 @@ public final class CaseConverter {
 
     public enum Case {
         LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN) {
+            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
                 switch (targetCase) {
@@ -43,6 +44,7 @@ public final class CaseConverter {
             }
         },
         KEBAB_CASE(KEBAB_CASE_PATTERN) {
+            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
                 switch (targetCase) {
@@ -57,6 +59,7 @@ public final class CaseConverter {
             }
         },
         SNAKE_CASE(SNAKE_CASE_PATTERN) {
+            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
                 switch (targetCase) {

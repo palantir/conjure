@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.palantir.conjure.spec.UnionDefinition;
 
+@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition> {
     KEY_SYNTAX(new KeySyntaxValidator()),
@@ -43,6 +44,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
         validator.validate(definition);
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoTrailingUnderscoreValidator implements ConjureValidator<UnionDefinition> {
 
@@ -57,6 +59,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
         }
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class KeySyntaxValidator implements ConjureValidator<UnionDefinition> {
 
@@ -85,6 +88,7 @@ public enum UnionDefinitionValidator implements ConjureValidator<UnionDefinition
         }
     }
 
+    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoClobberTypeValidator implements ConjureValidator<UnionDefinition> {
 

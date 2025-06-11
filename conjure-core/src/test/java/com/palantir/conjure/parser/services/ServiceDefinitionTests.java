@@ -77,6 +77,7 @@ public final class ServiceDefinitionTests {
                         .build());
     }
 
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     @Test
     public void testEndpointDefinition_fullySpecified() throws IOException, ParseException {
         assertThat(mapper.readValue(
@@ -247,7 +248,7 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "for-rollout:SuppressWarningsWithoutExplanation"})
     public void testParseConjureFile() throws IOException {
         ConjureSourceFile def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def)

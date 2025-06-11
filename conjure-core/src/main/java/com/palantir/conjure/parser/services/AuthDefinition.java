@@ -61,6 +61,7 @@ public interface AuthDefinition {
         return ImmutableAuthDefinition.builder().type(AuthType.COOKIE).id(id).build();
     }
 
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     @JsonCreator
     static AuthDefinition fromString(String value) {
         String[] parts = value.split(":", 2);

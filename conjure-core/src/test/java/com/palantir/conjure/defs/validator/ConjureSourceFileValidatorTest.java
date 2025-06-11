@@ -141,6 +141,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testNoIllegalMapKeys_returns() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .services(ServiceDefinition.builder()
@@ -183,6 +184,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testNoIllegalMapKeys_intermediateAlias() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.alias(AliasDefinition.builder()
@@ -207,6 +209,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testNoIllegalMapKeys_allowsExternalImport() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
@@ -230,6 +233,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testNoIllegalMapKeys_faileInvalidExternalImport() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.object(ObjectDefinition.builder()
@@ -334,6 +338,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testNoSafetyOnComplexTypes() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.alias(AliasDefinition.builder()
@@ -537,6 +542,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testSafetyTagsAreNotAllowedWhenSafetyIsRequired() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.alias(AliasDefinition.builder()
@@ -569,6 +575,7 @@ public class ConjureSourceFileValidatorTest {
 
     @Test
     public void testSafetyMarkersAreNotAllowedWhenSafetyIsRequired() {
+        @SuppressWarnings("for-rollout:DeduplicateConstants")
         ConjureDefinition conjureDef = ConjureDefinition.builder()
                 .version(1)
                 .types(TypeDefinition.alias(AliasDefinition.builder()
