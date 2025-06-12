@@ -37,7 +37,6 @@ public abstract class PathString {
      * path {@code /abc/def}.
      */
     public PathString resolve(PathString other) {
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final Path newPath;
         if (other.path().equals(Path.ROOT_PATH)) {
             // special-case since Path#relativize() only works on proper prefixes

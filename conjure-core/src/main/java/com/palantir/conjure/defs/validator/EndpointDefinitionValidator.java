@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum EndpointDefinitionValidator implements ConjureContextualValidator<EndpointDefinition> {
     ARGUMENT_TYPE(new NonBodyArgumentTypeValidator()),
@@ -99,7 +98,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         validator.validate(definition, dealiasingTypeVisitor);
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NonBodyArgumentTypeValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
@@ -135,7 +133,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class SingleBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -152,7 +149,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoGetBodyParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -168,7 +164,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoOptionalBinaryBodyParamValidator
             implements ConjureContextualValidator<EndpointDefinition> {
@@ -196,7 +191,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class PathParamValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -234,7 +228,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexPathParamValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
@@ -256,7 +249,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexHeaderParamValidator implements ConjureContextualValidator<EndpointDefinition> {
 
@@ -289,7 +281,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoComplexQueryParamValidator implements ConjureContextualValidator<EndpointDefinition> {
         @Override
@@ -360,7 +351,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoBearerTokenPathOrQueryParams
             implements ConjureContextualValidator<EndpointDefinition> {
@@ -399,7 +389,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class ParameterNameValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -418,7 +407,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class ParamIdValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -473,7 +461,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoUnsupportedHttpMethodValidator implements ConjureValidator<EndpointDefinition> {
         @Override
@@ -487,7 +474,6 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoDuplicateEndpointErrorsValidation implements ConjureValidator<EndpointDefinition> {
         @Override

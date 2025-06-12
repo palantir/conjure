@@ -57,7 +57,6 @@ public final class ParamIdValidatorTest {
     @Test
     @SuppressWarnings("CheckReturnValue")
     public void testValidHeader() {
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         List<String> paramIds = ImmutableList.of(
                 HttpHeaders.AUTHORIZATION, HttpHeaders.X_XSS_PROTECTION, HttpHeaders.P3P, HttpHeaders.SET_COOKIE2);
         for (String paramId : paramIds) {

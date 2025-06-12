@@ -240,7 +240,6 @@ public class ConjureParserTest {
     public void testConjureRevisitedImports() throws IOException {
         // create a hierarchy of dependencies such that a significant amount of files is visited repeatedly
         // each file depends on all files from the previous level
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         List<String> inners = ImmutableList.of(
                 "innerOne",
                 "innerTwo",
@@ -252,9 +251,7 @@ public class ConjureParserTest {
                 "innerEight",
                 "innerNine",
                 "innerTen");
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         List<String> mid = ImmutableList.of("midOne", "midTwo", "midThree", "midFour", "midFive");
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         List<String> top = ImmutableList.of("topOne", "topTwo", "topThree", "topFour", "topFive", "topSix");
 
         String root = "root";

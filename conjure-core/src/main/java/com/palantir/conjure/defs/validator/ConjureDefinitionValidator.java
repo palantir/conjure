@@ -52,7 +52,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
     UNIQUE_SERVICE_NAMES(new UniqueServiceNamesValidator()),
@@ -81,7 +80,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         validator.validate(definition);
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueServiceNamesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
@@ -97,7 +95,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class IllegalVersionValidator implements ConjureValidator<ConjureDefinition> {
         @Override
@@ -110,7 +107,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class UniqueNamesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
@@ -140,13 +136,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class NoRecursiveTypesValidator implements ConjureValidator<ConjureDefinition> {
         @Override
         public void validate(ConjureDefinition definition) {
             // create mapping from object type name -> names of reference types that are fields of that type
-            @SuppressWarnings("for-rollout:PreferredInterfaceType")
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
             definition.getTypes().forEach(type -> getReferenceType(type)
@@ -199,7 +193,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     public static final class NoNestedOptionalValidator implements ConjureValidator<ConjureDefinition> {
         @Override
@@ -319,7 +312,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class IllegalMapKeyValidator implements ConjureValidator<ConjureDefinition> {
 
@@ -449,7 +441,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class LogSafetyConjureDefinitionValidator implements ConjureValidator<ConjureDefinition> {
 
@@ -521,7 +512,6 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private enum UniqueErrorNameValidator implements ConjureValidator<ConjureDefinition> {
         INSTANCE;

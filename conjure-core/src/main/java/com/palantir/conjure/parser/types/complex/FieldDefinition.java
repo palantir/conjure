@@ -48,11 +48,7 @@ public interface FieldDefinition {
 
     // solve Jackson sad-times for multiple parser
     final class FieldDefinitionDeserializer extends JsonDeserializer<FieldDefinition> {
-        @SuppressWarnings({
-            "deprecation",
-            "for-rollout:SuppressWarningsWithoutExplanation",
-            "for-rollout:ThrowSpecificExceptions"
-        })
+        @SuppressWarnings({"deprecation", "for-rollout:SuppressWarningsWithoutExplanation"})
         @Override
         public FieldDefinition deserialize(JsonParser parser, DeserializationContext _context) throws IOException {
 

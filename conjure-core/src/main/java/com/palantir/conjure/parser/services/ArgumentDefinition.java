@@ -106,8 +106,7 @@ public interface ArgumentDefinition {
             "deprecation",
             "for-rollout:CheckedExceptionNotThrown",
             "for-rollout:RedundantThrows",
-            "for-rollout:SuppressWarningsWithoutExplanation",
-            "for-rollout:ThrowSpecificExceptions"
+            "for-rollout:SuppressWarningsWithoutExplanation"
         })
         @Override
         public ArgumentDefinition deserialize(JsonParser parser, DeserializationContext _context)

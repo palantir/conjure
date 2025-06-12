@@ -35,7 +35,6 @@ public interface EndpointError {
         return ImmutableEndpointError.builder().error(errorName).build();
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     static EndpointError fromString(String error) {
         try {

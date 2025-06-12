@@ -41,7 +41,6 @@ public abstract class CliConfiguration {
         return new Builder();
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static CliConfiguration create(
             String input, String outputIrFile, Map<String, Object> extensions, boolean requireSafety) {
         File inputFile = new File(input);
@@ -67,7 +66,6 @@ public abstract class CliConfiguration {
     }
 
     private static Collection<File> resolveInputFiles(File input) throws IOException {
-        @SuppressWarnings({"for-rollout:PreferredInterfaceType", "for-rollout:UnnecessaryFinal"})
         final Collection<File> inputFiles;
         if (input.isDirectory()) {
             try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {

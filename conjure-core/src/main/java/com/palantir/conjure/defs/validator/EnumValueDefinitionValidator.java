@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.palantir.conjure.EnumPattern;
 import com.palantir.conjure.spec.EnumValueDefinition;
 
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDefinition> {
     UnknownValueNotUsed(new UnknownValueNotUsedValidator()),
@@ -43,7 +42,6 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
         validator.validate(definition);
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class UnknownValueNotUsedValidator implements ConjureValidator<EnumValueDefinition> {
 
@@ -56,7 +54,6 @@ public enum EnumValueDefinitionValidator implements ConjureValidator<EnumValueDe
         }
     }
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class FormatValidator implements ConjureValidator<EnumValueDefinition> {
         private static final EnumPattern REQUIRED_FORMAT = EnumPattern.get();
