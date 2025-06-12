@@ -27,7 +27,6 @@ import java.util.Set;
  * Verifies that field names are unique modulo normalization to
  * {@link CaseConverter.Case#LOWER_CAMEL_CASE lower camel case}.
  */
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public final class UniqueFieldNamesValidator implements ConjureValidator<Set<FieldName>> {
 

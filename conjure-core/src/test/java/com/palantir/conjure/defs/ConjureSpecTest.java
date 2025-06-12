@@ -39,7 +39,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public final class ConjureSpecTest {
 
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     @Parameterized.Parameters(name = "{0} is valid Conjure YML: {1}")
     public static Collection<Object[]> data() {
         return getTestFiles(new File("src/test/resources/spec-tests"));

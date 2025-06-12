@@ -23,7 +23,6 @@ import com.palantir.conjure.spec.ServiceDefinition;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefinition> {
     UNIQUE_PATH_METHODS(new UniquePathMethodsValidator()),
@@ -49,12 +48,10 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     // The ? is for reluctant matching, i.e. matching as few characters as possible.
     private static final Pattern PATHVAR_PATTERN = Pattern.compile(Pattern.quote("{") + ".+?" + Pattern.quote("}"));
 
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
         @Override
         public void validate(ServiceDefinition definition) {
-            @SuppressWarnings("for-rollout:PreferredInterfaceType")
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
             definition.getEndpoints().forEach(entry -> {
                 String methodPath =
@@ -80,7 +77,6 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
     /**
      * This ensures that ExperimentalFeatures.DisambiguateRetrofitServices won't cause collisions.
      */
-    @SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
     @com.google.errorprone.annotations.Immutable
     private static final class IllegalSuffixesValidator implements ConjureValidator<ServiceDefinition> {
         private static final String RETROFIT_SUFFIX = "Retrofit";

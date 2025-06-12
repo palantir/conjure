@@ -18,7 +18,6 @@ package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.visitor.DealiasingTypeVisitor;
 
-@SuppressWarnings("for-rollout:UnnecessarilyFullyQualified")
 @com.google.errorprone.annotations.Immutable
 public interface ConjureContextualValidator<T> {
     /**

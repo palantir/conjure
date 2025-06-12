@@ -175,7 +175,6 @@ public final class ConjureCli implements Runnable {
             generate(config);
         }
 
-        @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
         @VisibleForTesting
         static void generate(CliConfiguration config) {
             ConjureDefinition definition = ConjureDefinition.builder()

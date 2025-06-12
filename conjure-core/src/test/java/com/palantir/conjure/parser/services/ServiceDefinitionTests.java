@@ -77,7 +77,6 @@ public final class ServiceDefinitionTests {
                         .build());
     }
 
-    @SuppressWarnings("for-rollout:DifferentNameButSame")
     @Test
     public void testEndpointDefinition_fullySpecified() throws IOException, ParseException {
         assertThat(mapper.readValue(
