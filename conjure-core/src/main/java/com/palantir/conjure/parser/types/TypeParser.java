@@ -249,7 +249,6 @@ public enum TypeParser implements Parser<ConjureType> {
             this.instance = instance;
         }
 
-        @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
         @Override
         public T parse(ParserState input) throws ParseException {
             ExpectationResult result = Parsers.expect(type).parse(input);

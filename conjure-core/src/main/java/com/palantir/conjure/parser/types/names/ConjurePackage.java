@@ -48,7 +48,6 @@ public abstract class ConjurePackage {
     @Value.Check
     protected final void check() {
         // TODO(rfink): NPE when the pattern is static !?!?
-        @SuppressWarnings("for-rollout:ConstantPatternCompile")
         Pattern validPackage = Pattern.compile("^([a-z][a-z0-9]+(\\.[a-z][a-z0-9]*)*)?$");
         Preconditions.checkArgument(
                 validPackage.matcher(name()).matches(),

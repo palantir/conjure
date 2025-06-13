@@ -39,7 +39,6 @@ public final class ThrowableExceptionHandler implements IExecutionExceptionHandl
         this.delegate = delegate;
     }
 
-    @SuppressWarnings("for-rollout:SystemOut")
     @Override
     public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult)
             throws Exception {

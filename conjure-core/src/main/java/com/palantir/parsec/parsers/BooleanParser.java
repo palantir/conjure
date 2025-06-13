@@ -23,7 +23,6 @@ import com.palantir.parsec.Parsers;
 
 public final class BooleanParser implements Parser<Boolean> {
 
-    @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
     @Override
     public Boolean parse(ParserState input) throws ParseException {
         String val = new RawStringParser().parse(input);
