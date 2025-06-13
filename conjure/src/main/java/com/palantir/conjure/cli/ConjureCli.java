@@ -58,7 +58,7 @@ public final class ConjureCli implements Runnable {
         System.exit(prepareCommand().execute(args));
     }
 
-    public static void inProcessExecution(@SuppressWarnings("for-rollout:AvoidObjectArrays") String[] args) {
+    public static void inProcessExecution(String[] args) {
         ThrowableExceptionHandler exceptionHandler = new ThrowableExceptionHandler(new ExceptionHandler());
         new CommandLine(new ConjureCli())
                 .setExecutionExceptionHandler(exceptionHandler)
@@ -123,7 +123,6 @@ public final class ConjureCli implements Runnable {
         }
     }
 
-    @SuppressWarnings("for-rollout:SystemOut")
     @Override
     public void run() {
         CommandLine.usage(this, System.out);
@@ -165,7 +164,7 @@ public final class ConjureCli implements Runnable {
         @Nullable
         private List<String> unmatchedOptions;
 
-        @SuppressWarnings({"BanSystemErr", "for-rollout:SystemOut"})
+        @SuppressWarnings("BanSystemErr")
         @Override
         public void run() {
             if (unmatchedOptions != null && !unmatchedOptions.isEmpty()) {

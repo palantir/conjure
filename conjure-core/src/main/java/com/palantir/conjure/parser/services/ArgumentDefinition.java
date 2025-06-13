@@ -102,12 +102,7 @@ public interface ArgumentDefinition {
 
     // solve Jackson sad-times for multiple parser
     final class ArgumentDefinitionDeserializer extends JsonDeserializer<ArgumentDefinition> {
-        @SuppressWarnings({
-            "deprecation",
-            "for-rollout:CheckedExceptionNotThrown",
-            "for-rollout:RedundantThrows",
-            "for-rollout:SuppressWarningsWithoutExplanation"
-        })
+        @SuppressWarnings("deprecation")
         @Override
         public ArgumentDefinition deserialize(JsonParser parser, DeserializationContext _context)
                 throws IOException, JsonProcessingException {

@@ -485,7 +485,7 @@ public final class ConjureParserUtils {
         return httpPath;
     }
 
-    @SuppressWarnings({"for-rollout:StatementSwitchToExpressionSwitch", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static Optional<AuthType> parseAuthType(
             com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
 
@@ -526,7 +526,7 @@ public final class ConjureParserUtils {
         return resultBuilder.build();
     }
 
-    @SuppressWarnings({"for-rollout:StatementSwitchToExpressionSwitch", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static ParameterType parseParameterType(
             com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
             ArgumentName argName,

@@ -247,7 +247,7 @@ public final class ServiceDefinitionTests {
     }
 
     @Test
-    @SuppressWarnings({"deprecation", "for-rollout:SuppressWarningsWithoutExplanation"})
+    @SuppressWarnings("deprecation")
     public void testParseConjureFile() throws IOException {
         ConjureSourceFile def = ConjureParser.parse(new File("src/test/resources/test-service.yml"));
         assertThat(def)
