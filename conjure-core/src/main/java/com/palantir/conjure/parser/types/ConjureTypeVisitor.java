@@ -19,6 +19,7 @@ package com.palantir.conjure.parser.types;
 import com.palantir.conjure.parser.types.builtin.AnyType;
 import com.palantir.conjure.parser.types.builtin.BinaryType;
 import com.palantir.conjure.parser.types.builtin.DateTimeType;
+import com.palantir.conjure.parser.types.collect.ArrayType;
 import com.palantir.conjure.parser.types.collect.ListType;
 import com.palantir.conjure.parser.types.collect.MapType;
 import com.palantir.conjure.parser.types.collect.OptionalType;
@@ -31,6 +32,8 @@ public interface ConjureTypeVisitor<T> {
     T visitAny(AnyType type);
 
     T visitList(ListType type);
+
+    T visitArray(ArrayType type);
 
     T visitMap(MapType type);
 
