@@ -1,9 +1,9 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file
-com.fasterxml.jackson.core:jackson-annotations:2.18.3 (5 constraints: 8e530618)
-com.fasterxml.jackson.core:jackson-core:2.18.3 (4 constraints: 89508af1)
-com.fasterxml.jackson.core:jackson-databind:2.18.3 (7 constraints: c070e0ef)
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.3 (1 constraints: 3905393b)
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.3 (1 constraints: 3905393b)
+com.fasterxml.jackson.core:jackson-annotations:2.19.1 (5 constraints: 8d534c17)
+com.fasterxml.jackson.core:jackson-core:2.19.1 (4 constraints: 865042f0)
+com.fasterxml.jackson.core:jackson-databind:2.19.1 (7 constraints: bd700ced)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.1 (1 constraints: 3905393b)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.1 (1 constraints: 3905393b)
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 com.google.errorprone:error_prone_annotations:2.36.0 (8 constraints: 3c6e9c41)
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
@@ -36,7 +36,7 @@ org.jetbrains:annotations:26.0.2 (3 constraints: 3826c998)
 org.jspecify:jspecify:1.0.0 (1 constraints: 130ae0b4)
 org.slf4j:slf4j-api:2.0.17 (6 constraints: 754aeb35)
 org.slf4j:slf4j-simple:2.0.17 (1 constraints: 3c05323b)
-org.yaml:snakeyaml:2.3 (1 constraints: 3d178c10)
+org.yaml:snakeyaml:2.4 (1 constraints: 3e178d10)
 
 [Test dependencies]
 com.ethlo.time:itu:1.7.0 (1 constraints: 7e0ff07d)
