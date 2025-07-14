@@ -463,6 +463,7 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
 
     @com.google.errorprone.annotations.Immutable
     private static final class NoUnsupportedHttpMethodValidator implements ConjureValidator<EndpointDefinition> {
+        @SuppressWarnings("for-rollout:FloggerArgumentToString")
         @Override
         public void validate(EndpointDefinition definition) {
             Preconditions.checkState(
