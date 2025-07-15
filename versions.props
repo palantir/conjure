@@ -1,4 +1,4 @@
-com.fasterxml.jackson.core:jackson-databind = 2.19.1
+com.fasterxml.jackson.*:* = 2.19.1
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.guava:guava = 33.4.8-jre
 com.jayway.jsonpath:json-path = 2.9.0
@@ -27,7 +27,6 @@ com.palantir.safe-logging:* = 3.9.0
 
 # dependency-upgrader:OFF
 # Avoid forcing consumers to upgrade jackson
-com.fasterxml.jackson.*:jackson-* = 2.13.1
 # Match conjure-java-runtime jersey version
 org.glassfish.jersey.core:jersey-common = 2.34
 # Do not push error_prone_annotations to later versions for consumers
