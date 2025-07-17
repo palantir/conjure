@@ -33,6 +33,7 @@ import com.networknt.schema.SpecVersion.VersionFlag;
 import com.networknt.schema.ValidationMessage;
 import com.networknt.schema.ValidatorTypeCode;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,7 +66,7 @@ public class ConjureJsonSchemaTest {
             schema = JsonSchemaFactory.getInstance(VersionFlag.V7)
                     .getSchema(Files.newInputStream(Paths.get("../conjure.schema.json")));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -129,7 +130,7 @@ public class ConjureJsonSchemaTest {
         try (Stream<Path> paths = Files.walk(Paths.get("src/test/resources"))) {
             return paths.filter(path -> path.toFile().isFile()).collect(Collectors.toSet());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 }

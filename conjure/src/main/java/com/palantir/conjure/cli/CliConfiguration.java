@@ -19,6 +19,7 @@ package com.palantir.conjure.cli;
 import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -49,7 +50,7 @@ public abstract class CliConfiguration {
         try {
             inputFiles = resolveInputFiles(inputFile);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to resolve input files from " + inputFile, e);
+            throw new UncheckedIOException("Failed to resolve input files from " + inputFile, e);
         }
 
         File outputFile = new File(outputIrFile);

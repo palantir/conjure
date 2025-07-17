@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.conjure.exceptions.ConjureRuntimeException;
 import com.palantir.conjure.parser.types.TypesDefinition;
 import com.palantir.logsafe.exceptions.SafeIllegalStateException;
-import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -99,7 +99,7 @@ public final class ConjureParser {
             try {
                 nextFile = nextFileWithProvenance.file().getCanonicalFile();
             } catch (IOException e) {
-                throw new SafeRuntimeException("Couldn't canonicalize file path", e);
+                throw new SafeUncheckedIoException("Couldn't canonicalize file path", e);
             }
             String key = nextFile.getAbsolutePath();
 
