@@ -19,7 +19,7 @@ package com.palantir.conjure.parser.types.reference;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
-import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,7 +55,7 @@ public interface ConjureImports {
                     .absoluteFile(baseDir.resolve(file()).toFile().getCanonicalFile())
                     .build();
         } catch (IOException e) {
-            throw new SafeRuntimeException("Couldn't canonicalize file path", e);
+            throw new SafeUncheckedIoException("Couldn't canonicalize file path", e);
         }
     }
 }

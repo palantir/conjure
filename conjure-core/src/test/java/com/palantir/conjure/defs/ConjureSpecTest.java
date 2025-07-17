@@ -26,6 +26,7 @@ import com.palantir.conjure.parser.AnnotatedConjureSourceFile;
 import com.palantir.conjure.parser.ConjureSourceFile;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,7 +54,7 @@ public final class ConjureSpecTest {
             try {
                 definition = MAPPER.readValue(f, TestCaseDefinition.class);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new UncheckedIOException(e);
             }
             objects.add(new Object[] {definition});
         }
@@ -114,7 +115,7 @@ public final class ConjureSpecTest {
         try {
             yml = MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(String.format("failed to parse YML for %s", testName), e);
+            throw new UncheckedIOException(String.format("failed to parse YML for %s", testName), e);
         }
         return yml;
     }

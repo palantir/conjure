@@ -34,6 +34,7 @@ import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import com.palantir.parsec.ParseException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,7 @@ public final class ConjureCli implements Runnable {
             try {
                 OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(config.outputIrFile(), definition);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to serialize IR file to " + config.outputIrFile(), e);
+                throw new UncheckedIOException("Failed to serialize IR file to " + config.outputIrFile(), e);
             }
         }
 
