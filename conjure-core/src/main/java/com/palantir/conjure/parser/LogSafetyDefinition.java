@@ -32,16 +32,18 @@ public enum LogSafetyDefinition {
         this.name = name;
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     @JsonCreator(mode = Mode.DELEGATING)
     public static LogSafetyDefinition parse(String value) {
         switch (Preconditions.checkNotNull(value, "String value is required")) {
-            case "safe":
+            case "safe" -> {
                 return SAFE;
-            case "unsafe":
+            }
+            case "unsafe" -> {
                 return UNSAFE;
-            case "do-not-log":
+            }
+            case "do-not-log" -> {
                 return DO_NOT_LOG;
+            }
         }
         throw new ConjureIllegalArgumentException("Unknown value: " + value);
     }

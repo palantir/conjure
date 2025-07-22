@@ -29,48 +29,33 @@ public final class CaseConverter {
 
     public enum Case {
         LOWER_CAMEL_CASE(CAMEL_CASE_PATTERN) {
-            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return name;
-                    case KEBAB_CASE:
-                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name);
-                    case SNAKE_CASE:
-                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
-                }
-                throw new IllegalArgumentException("Unexpected case: " + targetCase);
+                return switch (targetCase) {
+                    case LOWER_CAMEL_CASE -> name;
+                    case KEBAB_CASE -> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, name);
+                    case SNAKE_CASE -> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+                };
             }
         },
         KEBAB_CASE(KEBAB_CASE_PATTERN) {
-            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
-                    case KEBAB_CASE:
-                        return name;
-                    case SNAKE_CASE:
-                        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, name);
-                }
-                throw new IllegalArgumentException("Unexpected case: " + targetCase);
+                return switch (targetCase) {
+                    case LOWER_CAMEL_CASE -> CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
+                    case KEBAB_CASE -> name;
+                    case SNAKE_CASE -> CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_UNDERSCORE, name);
+                };
             }
         },
         SNAKE_CASE(SNAKE_CASE_PATTERN) {
-            @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
             @Override
             public String convertTo(String name, Case targetCase) {
-                switch (targetCase) {
-                    case LOWER_CAMEL_CASE:
-                        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name);
-                    case KEBAB_CASE:
-                        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_HYPHEN, name);
-                    case SNAKE_CASE:
-                        return name;
-                }
-                throw new IllegalArgumentException("Unexpected case: " + targetCase);
+                return switch (targetCase) {
+                    case LOWER_CAMEL_CASE -> CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name);
+                    case KEBAB_CASE -> CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_HYPHEN, name);
+                    case SNAKE_CASE -> name;
+                };
             }
         };
 

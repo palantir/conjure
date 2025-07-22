@@ -61,25 +61,19 @@ public interface AuthDefinition {
         return ImmutableAuthDefinition.builder().type(AuthType.COOKIE).id(id).build();
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     @JsonCreator
     static AuthDefinition fromString(String value) {
         String[] parts = value.split(":", 2);
         AuthType type = AuthType.fromString(parts[0]);
         String id;
         switch (type) {
-            case HEADER:
-                id = AUTH_HEADER;
-                break;
-            case NONE:
-                id = "NONE";
-                break;
-            case COOKIE:
+            case HEADER -> id = AUTH_HEADER;
+            case NONE -> id = "NONE";
+            case COOKIE -> {
                 Preconditions.checkArgument(parts.length == 2, "Cookie authorization type must include a cookie name");
                 id = parts[1];
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown authorization type: " + type);
+            }
+            default -> throw new IllegalArgumentException("Unknown authorization type: " + type);
         }
         return ImmutableAuthDefinition.builder().type(type).id(id).build();
     }
