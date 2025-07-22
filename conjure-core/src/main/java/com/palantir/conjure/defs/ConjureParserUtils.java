@@ -424,17 +424,12 @@ public final class ConjureParserUtils {
                 .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static LogSafety parseLogSafety(LogSafetyDefinition def) {
-        switch (def) {
-            case SAFE:
-                return LogSafety.SAFE;
-            case UNSAFE:
-                return LogSafety.UNSAFE;
-            case DO_NOT_LOG:
-                return LogSafety.DO_NOT_LOG;
-        }
-        throw new ConjureIllegalArgumentException("Unknown log safety type: " + def);
+        return switch (def) {
+            case SAFE -> LogSafety.SAFE;
+            case UNSAFE -> LogSafety.UNSAFE;
+            case DO_NOT_LOG -> LogSafety.DO_NOT_LOG;
+        };
     }
 
     private static FieldName parseFieldName(com.palantir.conjure.parser.types.names.FieldName parserFieldName) {
@@ -485,20 +480,15 @@ public final class ConjureParserUtils {
         return httpPath;
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static Optional<AuthType> parseAuthType(
             com.palantir.conjure.parser.services.AuthDefinition authDefinition) {
 
-        switch (authDefinition.type()) {
-            case HEADER:
-                return Optional.of(AuthType.header(HeaderAuthType.of()));
-            case COOKIE:
-                return Optional.of(AuthType.cookie(CookieAuthType.of(authDefinition.id())));
-            case NONE:
-                return Optional.empty();
-            default:
-                throw new ConjureIllegalArgumentException("Unrecognized auth type.");
-        }
+        return switch (authDefinition.type()) {
+            case HEADER -> Optional.of(AuthType.header(HeaderAuthType.of()));
+            case COOKIE -> Optional.of(AuthType.cookie(CookieAuthType.of(authDefinition.id())));
+            case NONE -> Optional.empty();
+            default -> throw new ConjureIllegalArgumentException("Unrecognized auth type.");
+        };
     }
 
     private static List<ArgumentDefinition> parseArgs(
@@ -526,7 +516,6 @@ public final class ConjureParserUtils {
         return resultBuilder.build();
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private static ParameterType parseParameterType(
             com.palantir.conjure.parser.services.ArgumentDefinition argumentDef,
             ArgumentName argName,
@@ -534,7 +523,7 @@ public final class ConjureParserUtils {
 
         Set<ArgumentName> args = HttpPathValidator.pathArgs(httpPath.get());
         switch (argumentDef.paramType()) {
-            case AUTO:
+            case AUTO -> {
                 // AUTO type
                 if (args.contains(argName)) {
                     // argument exists in request line -- it is a path arg
@@ -543,20 +532,24 @@ public final class ConjureParserUtils {
                     // argument does not exist in request line -- it is a body arg
                     return ParameterType.body(BodyParameterType.of());
                 }
-            case HEADER:
+            }
+            case HEADER -> {
                 String headerParamId =
                         argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.header(HeaderParameterType.of(ParameterId.of(headerParamId)));
-            case PATH:
+            }
+            case PATH -> {
                 return ParameterType.path(PathParameterType.of());
-            case BODY:
+            }
+            case BODY -> {
                 return ParameterType.body(BodyParameterType.of());
-            case QUERY:
+            }
+            case QUERY -> {
                 String queryParamId =
                         argumentDef.paramId().map(ParameterName::name).orElseGet(argName::get);
                 return ParameterType.query(QueryParameterType.of(ParameterId.of(queryParamId)));
-            default:
-                throw new ConjureIllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());
+            }
+            default -> throw new ConjureIllegalArgumentException("Unknown parameter type: " + argumentDef.paramType());
         }
     }
 
