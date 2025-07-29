@@ -16,6 +16,27 @@
 
 package com.palantir.conjure.defs;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.palantir.conjure.defs.ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver;
+import com.palantir.conjure.defs.ConjureTypeParserVisitor.ReferenceTypeResolver;
+import com.palantir.conjure.parser.types.TypesDefinition;
+import com.palantir.conjure.parser.types.names.Namespace;
+import com.palantir.conjure.parser.types.names.TypeName;
+import com.palantir.conjure.parser.types.reference.ForeignReferenceType;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 public class ConjureTypeParserVisitorTest {
-    // TODO(kkak)
+
+    @Test
+    void errorMessageIncludesTransitiveFileNameWhenResolvingForeignType() {
+        String conjureSourceFileName = "/test/conjure.yml";
+        ReferenceTypeResolver resolver = new ByParsedRepresentationTypeNameResolver(
+                TypesDefinition.builder().build(), Map.of(), Map.of(), conjureSourceFileName);
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(
+                        () -> resolver.resolve(ForeignReferenceType.of(Namespace.of("namespace"), TypeName.of("Type"))))
+                .withMessageContaining(conjureSourceFileName);
+    }
 }

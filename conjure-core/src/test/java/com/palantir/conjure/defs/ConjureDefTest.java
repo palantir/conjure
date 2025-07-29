@@ -141,4 +141,24 @@ public class ConjureDefTest {
                                                     .build()));
                 });
     }
+
+    @Test
+    void importFailureContainsTransitiveFileName() {
+        assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(
+                        ConjureParser.parseAnnotated(new File("src/test/resources/example-transitive-import.yml"))))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("example-missing-import.yml");
+    }
+
+    @Test
+    void nonTransitiveMissingImportDoesNotContainAdditionalFileName() {
+        assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(
+                        ConjureParser.parseAnnotated(new File("src/test/resources/example-missing-import.yml"))))
+                .isInstanceOf(ConjureRuntimeException.class)
+                .rootCause()
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Import not found for namespace: Namespace{name=imports}");
+    }
 }
