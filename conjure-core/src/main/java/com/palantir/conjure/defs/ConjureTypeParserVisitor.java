@@ -54,6 +54,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
         private final TypesDefinition types;
         private final Map<Namespace, String> importProviders;
         private final Map<String, AnnotatedConjureSourceFile> externalTypes;
+        private final Optional<String> conjureSourceFilePath;
 
         public ByParsedRepresentationTypeNameResolver(
                 TypesDefinition types,
@@ -62,6 +63,18 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
             this.types = types;
             this.importProviders = importProviders;
             this.externalTypes = externalTypes;
+            this.conjureSourceFilePath = Optional.empty();
+        }
+
+        ByParsedRepresentationTypeNameResolver(
+                TypesDefinition types,
+                Map<Namespace, String> importProviders,
+                Map<String, AnnotatedConjureSourceFile> externalTypes,
+                String conjureSourceFilePath) {
+            this.types = types;
+            this.importProviders = importProviders;
+            this.externalTypes = externalTypes;
+            this.conjureSourceFilePath = Optional.of(conjureSourceFilePath);
         }
 
         @Override
@@ -72,7 +85,13 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
         @Override
         public Type resolve(ForeignReferenceType reference) {
             String namespaceFile = importProviders.get(reference.namespace());
-            Preconditions.checkNotNull(namespaceFile, "Import not found for namespace: %s", reference.namespace());
+            Preconditions.checkNotNull(
+                    namespaceFile,
+                    "Import not found for namespace: %s%s",
+                    reference.namespace(),
+                    conjureSourceFilePath
+                            .map(file -> String.format(", encountered while processing transitive file: '%s'", file))
+                            .orElse(""));
             AnnotatedConjureSourceFile externalFile = externalTypes.get(namespaceFile);
             Preconditions.checkNotNull(
                     externalFile, "File not found for namespace: %s @ %s", reference.namespace(), namespaceFile);
