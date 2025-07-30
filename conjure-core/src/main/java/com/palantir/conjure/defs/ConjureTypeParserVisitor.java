@@ -90,7 +90,7 @@ public final class ConjureTypeParserVisitor implements ConjureTypeVisitor<Type> 
                     "Import not found for namespace: %s%s",
                     reference.namespace(),
                     conjureSourceFilePath
-                            .map(file -> String.format(", encountered while processing transitive file: '%s'", file))
+                            .map(file -> String.format(", encountered while processing imported file: '%s'", file))
                             .orElse(""));
             AnnotatedConjureSourceFile externalFile = externalTypes.get(namespaceFile);
             Preconditions.checkNotNull(
