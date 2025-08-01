@@ -327,7 +327,7 @@ public final class ConjureParserUtils {
             Map<Namespace, String> importProviders = annotatedConjureSourceFile.importProviders();
             ReferenceTypeResolver importTypeResolver =
                     new ConjureTypeParserVisitor.ByParsedRepresentationTypeNameResolver(
-                            conjureDef.types(), importProviders, externalTypes);
+                            conjureDef.types(), importProviders, externalTypes, pathKey);
             allDefinitions.putAll(parseObjects(conjureDef.types(), importTypeResolver));
             allDefinitions.putAll(
                     innerParseImportObjects(conjureDef.types().conjureImports(), externalTypes, loadedFiles));

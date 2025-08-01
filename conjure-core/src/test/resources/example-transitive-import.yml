@@ -1,0 +1,11 @@
+types:
+  conjure-imports:
+    imports: test-service.yml
+    transitive: example-missing-import.yml
+  definitions:
+    default-package: test.api.transitive
+    objects:
+      SimpleObjectWrapper:
+        fields:
+          one: imports.SimpleObject
+          two: transitive.SimpleObject

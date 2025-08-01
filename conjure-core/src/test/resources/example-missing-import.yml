@@ -1,0 +1,7 @@
+types:
+  definitions:
+    default-package: test.api.missing
+    objects:
+      SimpleObject:
+        fields:
+          value: imports.SimpleObject

@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Improves error messages for transitive conjure import errors, specifying
+    the file where the issue was encountered.
+  links:
+  - https://github.com/palantir/conjure/pull/1875
