@@ -69,15 +69,20 @@ public abstract class CliConfiguration {
     private static Collection<File> resolveInputFiles(File input) throws IOException {
         final Collection<File> inputFiles;
         if (input.isDirectory()) {
-            try (Stream<Path> fileStream = Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile())) {
+            try (Stream<Path> fileStream =
+                    Files.find(input.toPath(), 999, (path, bfa) -> bfa.isRegularFile() && isYamlFile(path.toFile()))) {
                 inputFiles = fileStream.map(Path::toFile).collect(Collectors.toList());
             }
-        } else if (input.isFile()) {
+        } else if (input.isFile() && isYamlFile(input)) {
             inputFiles = ImmutableList.of(input);
         } else {
-            throw new IOException("Input is not an existing file or directory: " + input);
+            throw new IOException("Input is not an existing YAML file or directory: " + input);
         }
         return inputFiles;
+    }
+
+    private static boolean isYamlFile(File file) {
+        return file.getName().endsWith(".yml") || file.getName().endsWith(".yaml");
     }
 
     public static final class Builder extends ImmutableCliConfiguration.Builder {}
