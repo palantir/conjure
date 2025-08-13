@@ -82,7 +82,7 @@ public abstract class CliConfiguration {
     }
 
     private static boolean isYamlFile(File file) {
-        return file.getName().endsWith(".yml") || file.getName().endsWith(".yaml");
+        return file.getName().endsWith(".yml");
     }
 
     public static final class Builder extends ImmutableCliConfiguration.Builder {}
