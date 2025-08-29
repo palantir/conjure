@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -260,5 +261,45 @@ public final class ConjureCliTest {
     public void doesNotThrowWhenCommandIsSuccessful() {
         String[] args = {"compile", "src/test/resources/test-service.yml", outputFile.getAbsolutePath()};
         ConjureCli.inProcessExecution(args);
+    }
+
+    @Test
+    public void ignoresNonYamlFilesInDirectory() throws IOException {
+        File.createTempFile("ignore", ".test", folder);
+        String[] args = {"compile", folder.getAbsolutePath(), outputFile.getAbsolutePath()};
+        CliConfiguration expectedConfiguration = CliConfiguration.builder()
+                .inputFiles(ImmutableList.of(inputFile))
+                .outputIrFile(outputFile)
+                .requireSafety(false)
+                .build();
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
+                .parseArgs(args)
+                .asCommandLineList()
+                .get(1)
+                .getCommand();
+        assertThat(cmd.getConfiguration()).isEqualTo(expectedConfiguration);
+    }
+
+    @Test
+    public void throwsIfSingleInputFileIsNotYaml() throws IOException {
+        File nonYamlInputFile = File.createTempFile("ignore", ".test", folder);
+        String[] args = {
+            "compile",
+            nonYamlInputFile.getAbsolutePath(),
+            outputFile.getAbsolutePath(),
+            "--extensions",
+            "{\"foo\": \"bar\"}"
+        };
+
+        ConjureCli.CompileCommand cmd = new CommandLine(new ConjureCli())
+                .parseArgs(args)
+                .asCommandLineList()
+                .get(1)
+                .getCommand();
+        assertThatThrownBy(cmd::getConfiguration)
+                .isInstanceOf(UncheckedIOException.class)
+                .hasMessageContaining("Failed to resolve input files")
+                .cause()
+                .hasMessageContaining("Input is not an existing YAML file or directory");
     }
 }
