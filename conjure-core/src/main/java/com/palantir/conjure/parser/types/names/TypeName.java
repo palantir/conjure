@@ -56,6 +56,6 @@ public abstract class TypeName {
 
     @JsonCreator
     public static TypeName of(String name) {
-        return ImmutableTypeName.builder().name(name).build();
+        return ImmutableTypeName.builder().name(Names.intern(name)).build();
     }
 }
