@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.19.2 (5 constraints: 8e530a18)
+com.fasterxml.jackson.core:jackson-annotations:2.19.2 (5 constraints: 93531918)
 
 com.fasterxml.jackson.core:jackson-core:2.19.2 (4 constraints: 895092f1)
 
-com.fasterxml.jackson.core:jackson-databind:2.19.2 (7 constraints: c070eaef)
+com.fasterxml.jackson.core:jackson-databind:2.19.2 (7 constraints: c570f9ef)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2 (1 constraints: 40054c3b)
 
@@ -28,19 +28,19 @@ com.palantir.conjure.java.api:errors:2.63.0 (1 constraints: 2310a7a9)
 
 com.palantir.ri:resource-identifier:2.11.0 (1 constraints: 1c108da9)
 
-com.palantir.safe-logging:logger:3.9.0 (2 constraints: 321c1dba)
+com.palantir.safe-logging:logger:3.9.0 (2 constraints: 371cf9ba)
 
 com.palantir.safe-logging:logger-slf4j:3.9.0 (1 constraints: 070e6e42)
 
 com.palantir.safe-logging:logger-spi:3.9.0 (2 constraints: 1d1e0c7c)
 
-com.palantir.safe-logging:preconditions:3.9.0 (6 constraints: 315e6956)
+com.palantir.safe-logging:preconditions:3.9.0 (6 constraints: 365e4557)
 
 com.palantir.safe-logging:safe-logging:3.9.0 (7 constraints: 8c706b7b)
 
 com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
 
-com.palantir.tokens:auth-tokens:3.18.0 (1 constraints: 2410a8a9)
+com.palantir.tokens:auth-tokens:3.19.0 (1 constraints: 2410a8a9)
 
 com.palantir.tritium:tritium-ids:0.104.0 (1 constraints: f80f86a6)
 
@@ -70,7 +70,7 @@ org.jetbrains:annotations:26.0.2 (3 constraints: 3826c998)
 
 org.jspecify:jspecify:1.0.0 (2 constraints: 6e19b7e8)
 
-org.slf4j:slf4j-api:2.0.17 (6 constraints: 754aeb35)
+org.slf4j:slf4j-api:2.0.17 (6 constraints: 6e4af234)
 
 org.slf4j:slf4j-simple:2.0.17 (1 constraints: 3c05323b)
 
