@@ -244,6 +244,7 @@ public final class ConjureCliTest {
         assertThat(outputFile).doesNotExist();
     }
 
+    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
