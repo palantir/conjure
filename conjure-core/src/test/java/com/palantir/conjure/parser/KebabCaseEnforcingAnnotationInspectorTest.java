@@ -38,6 +38,7 @@ public final class KebabCaseEnforcingAnnotationInspectorTest {
         }
     }
 
+    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void testValidDefinitionsCarryJsonPropertyAnnotationsOnSetters() throws Exception {
         assertThat(mapper.readValue("{\"foo-bar\": \"baz\"}", ValidTarget.class))
