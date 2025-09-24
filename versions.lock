@@ -12,19 +12,19 @@ com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.2 (1 constraints: 4005
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 
-com.google.errorprone:error_prone_annotations:2.36.0 (8 constraints: 3c6e9f41)
+com.google.errorprone:error_prone_annotations:2.41.0 (8 constraints: 386e443d)
 
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:guava:33.4.8-jre (3 constraints: fc2a3aa2)
+com.google.guava:guava:33.5.0-jre (3 constraints: f52a4f9f)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
-com.google.j2objc:j2objc-annotations:3.0.0 (1 constraints: 150aeab4)
+com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.55.0 (1 constraints: b007bd7e)
+com.palantir.conjure.java:conjure-lib:8.56.0 (1 constraints: b107c17e)
 
-com.palantir.conjure.java.api:errors:2.63.0 (1 constraints: 2310a7a9)
+com.palantir.conjure.java.api:errors:2.65.0 (1 constraints: 2510ada9)
 
 com.palantir.ri:resource-identifier:2.11.0 (1 constraints: 1c108da9)
 
@@ -40,7 +40,7 @@ com.palantir.safe-logging:safe-logging:3.9.0 (7 constraints: 8c706b7b)
 
 com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
 
-com.palantir.tokens:auth-tokens:3.19.0 (1 constraints: 2410a8a9)
+com.palantir.tokens:auth-tokens:3.19.0 (1 constraints: 2510aba9)
 
 com.palantir.tritium:tritium-ids:0.104.0 (1 constraints: f80f86a6)
 
@@ -54,7 +54,7 @@ javax.inject:javax.inject:1 (1 constraints: f410fcc2)
 
 javax.ws.rs:javax.ws.rs-api:2.1.1 (1 constraints: f410f2c2)
 
-org.apache.commons:commons-lang3:3.18.0 (2 constraints: 5f148876)
+org.apache.commons:commons-lang3:3.19.0 (2 constraints: 6014b576)
 
 org.eclipse.collections:eclipse-collections:13.0.0 (1 constraints: 1c1091a9)
 
@@ -88,9 +88,9 @@ com.networknt:json-schema-validator:1.0.73 (1 constraints: 3d05343b)
 
 junit:junit:4.13.2 (2 constraints: eb154ef7)
 
-net.bytebuddy:byte-buddy:1.17.6 (2 constraints: c716ff4f)
+net.bytebuddy:byte-buddy:1.17.7 (2 constraints: 9f161b3f)
 
-net.bytebuddy:byte-buddy-agent:1.17.6 (1 constraints: 490b4dde)
+net.bytebuddy:byte-buddy-agent:1.17.7 (1 constraints: 4a0b4ede)
 
 net.jqwik:jqwik:1.9.3 (1 constraints: 0f050e36)
 
@@ -108,7 +108,7 @@ net.minidev:json-smart:2.5.0 (1 constraints: 040d3219)
 
 org.apiguardian:apiguardian-api:1.1.2 (12 constraints: 0ba452e8)
 
-org.assertj:assertj-core:3.27.4 (1 constraints: 4205523b)
+org.assertj:assertj-core:3.27.6 (1 constraints: 4405543b)
 
 org.hamcrest:hamcrest:3.0 (1 constraints: 710b96d5)
 
@@ -130,7 +130,7 @@ org.junit.platform:junit-platform-launcher:1.13.4 (1 constraints: 3b05363b)
 
 org.junit.vintage:junit-vintage-engine:5.13.4 (1 constraints: 3f054e3b)
 
-org.mockito:mockito-core:5.19.0 (1 constraints: 41055c3b)
+org.mockito:mockito-core:5.20.0 (1 constraints: 3905453b)
 
 org.objenesis:objenesis:3.3 (1 constraints: b20a14bd)
 
