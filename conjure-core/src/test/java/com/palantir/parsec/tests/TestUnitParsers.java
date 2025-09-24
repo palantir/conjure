@@ -177,7 +177,7 @@ public final class TestUnitParsers {
                 .isEqualTo("abcdef");
     }
 
-    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
+    @SuppressWarnings({"for-rollout:StringConcatToTextBlock", "for-rollout:deprecation"})
     @Test
     public void testOrParserErrorPassthrough() throws ParseException {
         Parser<String> alwaysThrows = new Parser<String>() {
