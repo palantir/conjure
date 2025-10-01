@@ -69,7 +69,6 @@ public final class ConjureSpecTest {
         this.testCaseDef = testCaseDef;
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void testConjureSpec() {
         // test positive cases

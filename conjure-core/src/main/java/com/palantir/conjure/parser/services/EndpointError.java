@@ -44,7 +44,6 @@ public interface EndpointError {
         }
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     static EndpointError fromJson(Json json) {
         return ImmutableEndpointError.fromJson(json);

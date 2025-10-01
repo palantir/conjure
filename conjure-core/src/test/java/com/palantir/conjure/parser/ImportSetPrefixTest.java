@@ -28,7 +28,6 @@ public class ImportSetPrefixTest {
 
     @Test
     public void parsesImportsWithWrapperPrefixes() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition normalized =
                 Conjure.parse(ImmutableSet.of(new File("src/test/resources/import-set-prefix.yml")));
         assertThat(normalized.getErrors()).hasSize(1);

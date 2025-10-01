@@ -36,7 +36,6 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesImportedAliases() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/example-conjure-imports.yml")));
         assertThat(conjureDefinition.getTypes()).hasSize(3);
@@ -44,7 +43,6 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesRecursiveImportType() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/example-recursive-imports.yml")));
         assertThat(conjureDefinition.getTypes()).hasSize(1);
@@ -52,7 +50,6 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesCircularType_singleFile() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/example-circular.yml")));
         assertThat(conjureDefinition.getTypes()).hasSize(2);
@@ -60,7 +57,6 @@ public class ConjureDefTest {
 
     @Test
     public void resolvesCircularType_multiFile() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition =
                 ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(ImmutableList.of(
                         new File("src/test/resources/example-multi-file-circular-import-a.yml"),
@@ -69,7 +65,6 @@ public class ConjureDefTest {
     }
 
     // Test currently fails as it attempts to parse a TypeScript package name as a java package
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     @Ignore
     public void handlesNonJavaExternalType() {
@@ -79,13 +74,11 @@ public class ConjureDefTest {
 
     @Test
     public void namelessService() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/nameless-test-service.yml")));
         assertThat(conjureDefinition.getServices()).hasSize(1);
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void testThrowsWhenEndpointErrorDefinitionNotAReference() {
         assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(
@@ -97,7 +90,6 @@ public class ConjureDefTest {
                         + "error type: {type=INTEGER}");
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void testThrowsWhenEndpointErrorIsUndefined() {
         assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(ConjureParser.parseAnnotated(
@@ -110,7 +102,6 @@ public class ConjureDefTest {
 
     @Test
     public void testEndpointErrorsCanBeImported() {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition conjureDefinition = ConjureParserUtils.parseConjureDef(
                 ConjureParser.parseAnnotated(new File("src/test/resources/example-imported-endpoint-error.yml")));
 
@@ -151,7 +142,6 @@ public class ConjureDefTest {
                 });
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     void importFailureContainsTransitiveFileName() {
         assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(
@@ -162,7 +152,6 @@ public class ConjureDefTest {
                 .hasMessageContaining("example-missing-import.yml");
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     void nonTransitiveMissingImportDoesNotContainAdditionalFileName() {
         assertThatThrownBy(() -> ConjureParserUtils.parseConjureDef(

@@ -34,7 +34,6 @@ public class ReadmeTest {
     @TempDir
     public Path folder;
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void prove_readme_example_is_valid_conjure() throws IOException {
         Path path = folder.resolve("example1.yml");

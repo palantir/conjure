@@ -33,7 +33,6 @@ public class NormalizeDefinitionTest {
 
     @Test
     public void sort_types_services_and_errors() throws IOException {
-        @SuppressWarnings("for-rollout:deprecation")
         ConjureDefinition normalized = Conjure.parse(ImmutableSet.of(new File("src/test/resources/normalize-me.yml")));
 
         String actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(normalized);
