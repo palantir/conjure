@@ -52,6 +52,7 @@ public final class ParserCapturingJsonFactory extends JsonFactory {
     @SuppressWarnings("deprecation")
     @Override
     public JsonParser createParser(URL url) throws IOException, JsonParseException {
+        // Deprecated, but just calling the same method on the delegate as we're overriding
         return captureParser(delegate.createParser(url));
     }
 
