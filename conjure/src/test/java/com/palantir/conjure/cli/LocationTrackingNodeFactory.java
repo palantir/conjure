@@ -185,7 +185,9 @@ public final class LocationTrackingNodeFactory extends JsonNodeFactory {
         JsonLocation loc = parser.currentTokenLocation();
 
         // The YAML parser has already moved on to the next line if the token is an end-of-struct
-        if (parser instanceof YAMLParser && parser.currentToken().isStructEnd()) {
+        if (parser instanceof YAMLParser
+                && parser.currentToken() != null
+                && parser.currentToken().isStructEnd()) {
             loc = new JsonLocation(loc.contentReference(), loc.getCharOffset(), loc.getLineNr() - 1, loc.getColumnNr());
         }
 
