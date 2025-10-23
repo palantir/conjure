@@ -53,7 +53,7 @@ import picocli.CommandLine.ParseResult;
 public final class ConjureCli implements Runnable {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new Jdk8Module())
-            .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_ABSENT);
 
     public static void main(String[] args) {
         System.exit(prepareCommand().execute(args));
