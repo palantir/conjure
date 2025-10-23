@@ -49,6 +49,7 @@ public final class ParserCapturingJsonFactory extends JsonFactory {
         return captureParser(delegate.createParser(file));
     }
 
+    @SuppressWarnings("for-rollout:deprecation")
     @Override
     public JsonParser createParser(URL url) throws IOException, JsonParseException {
         return captureParser(delegate.createParser(url));

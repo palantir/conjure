@@ -51,6 +51,7 @@ import picocli.CommandLine.ParseResult;
         mixinStandardHelpOptions = true,
         subcommands = ConjureCli.CompileCommand.class)
 public final class ConjureCli implements Runnable {
+    @SuppressWarnings("for-rollout:deprecation")
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
