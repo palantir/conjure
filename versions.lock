@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 02584558)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 9a575da8)
 
 com.fasterxml.jackson.core:jackson-core:2.20.0 (4 constraints: 6b5059e4)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.0 (7 constraints: a77048d3)
+com.fasterxml.jackson.core:jackson-databind:2.20.0 (7 constraints: 9d702fd3)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0 (1 constraints: 3605333b)
 
@@ -40,7 +40,7 @@ com.palantir.safe-logging:safe-logging:3.9.0 (7 constraints: 8c706b7b)
 
 com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
 
-com.palantir.tokens:auth-tokens:3.19.0 (1 constraints: 2510aba9)
+com.palantir.tokens:auth-tokens:3.20.0 (1 constraints: 2510aba9)
 
 com.palantir.tritium:tritium-ids:0.104.0 (1 constraints: f80f86a6)
 
