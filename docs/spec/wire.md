@@ -340,7 +340,7 @@ Conjure Errors are serialized as JSON objects with the following keys:
 1. `errorCode` - the JSON string representation of one of the supported [Conjure error codes](/docs/spec/conjure_definitions.md#errorcode).
 1. `errorName` - a JSON string identifying the error, e.g. `Recipe:RecipeNotFound`.
 1. `errorInstanceId` - a JSON string containing the unique identifier, `uuid` type, for this error instance.
-1. `parameters` - a JSON map providing additional information regarding the nature of the error.
+1. `parameters` - a JSON map with string keys and JSON values, providing additional information regarding the nature of the error.
 
   Example error type definition:
   ```yaml
@@ -361,6 +361,14 @@ Conjure Errors are serialized as JSON objects with the following keys:
       "errorInstanceId": "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
       "parameters": {
           "name": "roasted broccoli with garlic"
+          "indicesSearched": ["recipes-main", "recipes-user-submitted", "recipes-seasonal"],
+          "suggestions": [{
+              "name": "roasted broccoli with lemon",
+              "similarity": 0.93
+          }, {
+              "name": "roasted broccolini with garlic"
+              "similarity": 0.89
+          }]
       }
   }
   ```
