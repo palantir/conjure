@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 9a575da8)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 32573422)
 
-com.fasterxml.jackson.core:jackson-core:2.20.0 (4 constraints: 6b5059e4)
+com.fasterxml.jackson.core:jackson-core:2.20.0 (4 constraints: 615040e4)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.0 (7 constraints: 9d702fd3)
+com.fasterxml.jackson.core:jackson-databind:2.20.0 (7 constraints: 9370b0cf)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0 (1 constraints: 3605333b)
 
@@ -22,7 +22,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.58.0 (1 constraints: b307c97e)
+com.palantir.conjure.java:conjure-lib:8.59.0 (1 constraints: b407cd7e)
 
 com.palantir.conjure.java.api:errors:2.65.0 (1 constraints: 2510ada9)
 
@@ -40,7 +40,7 @@ com.palantir.safe-logging:safe-logging:3.9.0 (7 constraints: 8c706b7b)
 
 com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
 
-com.palantir.tokens:auth-tokens:3.20.0 (1 constraints: 2510aba9)
+com.palantir.tokens:auth-tokens:3.20.0 (1 constraints: 1d1094a9)
 
 com.palantir.tritium:tritium-ids:0.104.0 (1 constraints: f80f86a6)
 
