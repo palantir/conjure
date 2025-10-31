@@ -17,9 +17,9 @@ org.apache.commons:commons-lang3 = 3.19.0
 org.assertj:* = 3.27.6
 org.hamcrest:hamcrest-core = 3.0
 org.immutables:value = 2.11.6
-org.junit.jupiter:* = 6.0.0
-org.junit.platform:* = 6.0.0
-org.junit.vintage:* = 6.0.0
+org.junit.jupiter:* = 6.0.1
+org.junit.platform:* = 6.0.1
+org.junit.vintage:* = 6.0.1
 org.mockito:* = 5.20.0
 org.slf4j:* = 2.0.17
 
