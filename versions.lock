@@ -70,7 +70,7 @@ org.jetbrains:annotations:26.0.2 (3 constraints: 3826c998)
 
 org.jspecify:jspecify:1.0.0 (9 constraints: 2490610d)
 
-org.slf4j:slf4j-api:2.0.17 (6 constraints: 6e4af234)
+org.slf4j:slf4j-api:2.0.17 (6 constraints: 744adc38)
 
 org.slf4j:slf4j-simple:2.0.17 (1 constraints: 3c05323b)
 
@@ -82,7 +82,7 @@ org.yaml:snakeyaml:2.4 (1 constraints: 3e178d10)
 
 com.ethlo.time:itu:1.7.0 (1 constraints: 7e0ff07d)
 
-com.jayway.jsonpath:json-path:2.9.0 (1 constraints: 0d051036)
+com.jayway.jsonpath:json-path:2.10.0 (1 constraints: 35052f3b)
 
 com.networknt:json-schema-validator:1.0.73 (1 constraints: 3d05343b)
 
@@ -102,9 +102,9 @@ net.jqwik:jqwik-time:1.9.3 (1 constraints: a007006d)
 
 net.jqwik:jqwik-web:1.9.3 (1 constraints: a007006d)
 
-net.minidev:accessors-smart:2.5.0 (1 constraints: 480a8cb8)
+net.minidev:accessors-smart:2.6.0 (1 constraints: 490a8fb8)
 
-net.minidev:json-smart:2.5.0 (1 constraints: 040d3219)
+net.minidev:json-smart:2.6.0 (1 constraints: 050d3519)
 
 org.apiguardian:apiguardian-api:1.1.2 (12 constraints: 0ba452e8)
 
@@ -136,4 +136,4 @@ org.objenesis:objenesis:3.3 (1 constraints: b20a14bd)
 
 org.opentest4j:opentest4j:1.3.0 (6 constraints: 7846fee1)
 
-org.ow2.asm:asm:9.3 (1 constraints: fb0bdde3)
+org.ow2.asm:asm:9.7.1 (1 constraints: 5e0c6cfc)
