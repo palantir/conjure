@@ -60,7 +60,6 @@ public class ConjureParserTest {
         ConjureParser.parse(new File("src/test/resources/example-recursive-imports.yml"));
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void duplicate_keys_fail_to_parse() throws Exception {
         assertThatThrownBy(() -> ConjureParser.parse(new File("src/test/resources/duplicate-keys.yml")))
