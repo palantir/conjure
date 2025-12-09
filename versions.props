@@ -20,7 +20,7 @@ org.immutables:value = 2.12.0
 org.junit.jupiter:* = 6.0.1
 org.junit.platform:* = 6.0.1
 org.junit.vintage:* = 6.0.1
-org.mockito:* = 5.20.0
+org.mockito:* = 5.21.0
 org.slf4j:* = 2.0.17
 
 # conflict resolution
