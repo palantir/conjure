@@ -2,9 +2,9 @@
 
 com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 32573422)
 
-com.fasterxml.jackson.core:jackson-core:2.20.1 (4 constraints: 64508ee5)
+com.fasterxml.jackson.core:jackson-core:2.20.1 (4 constraints: 65508fe5)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 96708ad2)
+com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8d702fd1)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1 (1 constraints: 3705343b)
 
@@ -16,15 +16,15 @@ com.google.errorprone:error_prone_annotations:2.41.0 (8 constraints: 656e1e85)
 
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:guava:33.5.0-jre (3 constraints: f52a4f9f)
+com.google.guava:guava:33.5.0-jre (3 constraints: ee2a2e9f)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.65.0 (1 constraints: b107c27e)
+com.palantir.conjure.java:conjure-lib:8.66.0 (1 constraints: b207c67e)
 
-com.palantir.conjure.java.api:errors:2.65.0 (1 constraints: 2510ada9)
+com.palantir.conjure.java.api:errors:2.67.0 (1 constraints: 2710b3a9)
 
 com.palantir.ri:resource-identifier:2.11.0 (1 constraints: 1c108da9)
 
@@ -42,7 +42,7 @@ com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
 
 com.palantir.tokens:auth-tokens:3.20.0 (1 constraints: 1d1094a9)
 
-com.palantir.tritium:tritium-ids:0.104.0 (1 constraints: f80f86a6)
+com.palantir.tritium:tritium-ids:0.117.0 (1 constraints: fc0f93a6)
 
 commons-io:commons-io:2.21.0 (1 constraints: 3705363b)
 
@@ -64,7 +64,7 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3 (1 constraints: ef10e7c2)
 
 org.glassfish.jersey.core:jersey-common:2.34 (1 constraints: dd04fd30)
 
-org.immutables:value:2.12.0 (2 constraints: 00158ec1)
+org.immutables:value:2.12.0 (2 constraints: 041592c1)
 
 org.jetbrains:annotations:26.0.2 (3 constraints: 3826c998)
 
