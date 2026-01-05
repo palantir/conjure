@@ -1,0 +1,4 @@
+version: 3
+schedules:
+  timer:
+    time_since_last_release: 28 days
