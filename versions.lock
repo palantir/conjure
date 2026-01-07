@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 32573422)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: cf562680)
 
 com.fasterxml.jackson.core:jackson-core:2.20.1 (4 constraints: 65508fe5)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8d702fd1)
+com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8e7030d1)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1 (1 constraints: 3705343b)
 
@@ -12,11 +12,11 @@ com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.1 (1 constraints: 3705
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 
-com.google.errorprone:error_prone_annotations:2.41.0 (8 constraints: 656e1e85)
+com.google.errorprone:error_prone_annotations:2.41.0 (8 constraints: 996d88f6)
 
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:guava:33.5.0-jre (3 constraints: ee2a2e9f)
+com.google.guava:guava:33.5.0-jre (3 constraints: 522b66e6)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -28,19 +28,19 @@ com.palantir.conjure.java.api:errors:2.67.0 (1 constraints: 2710b3a9)
 
 com.palantir.ri:resource-identifier:2.11.0 (1 constraints: 1c108da9)
 
-com.palantir.safe-logging:logger:3.9.0 (2 constraints: 371cf9ba)
+com.palantir.safe-logging:logger:3.10.0 (2 constraints: 371cf9ba)
 
-com.palantir.safe-logging:logger-slf4j:3.9.0 (1 constraints: 070e6e42)
+com.palantir.safe-logging:logger-slf4j:3.10.0 (1 constraints: 2f0e8750)
 
-com.palantir.safe-logging:logger-spi:3.9.0 (2 constraints: 1d1e0c7c)
+com.palantir.safe-logging:logger-spi:3.10.0 (2 constraints: 6d1ed4af)
 
-com.palantir.safe-logging:preconditions:3.9.0 (6 constraints: 365e4557)
+com.palantir.safe-logging:preconditions:3.10.0 (6 constraints: 3f5e395a)
 
-com.palantir.safe-logging:safe-logging:3.9.0 (7 constraints: 8c706b7b)
+com.palantir.safe-logging:safe-logging:3.10.0 (7 constraints: 0d712292)
 
-com.palantir.syntactic-paths:syntactic-paths:0.9.0 (1 constraints: 0b050636)
+com.palantir.syntactic-paths:syntactic-paths:0.12.0 (1 constraints: 3505293b)
 
-com.palantir.tokens:auth-tokens:3.20.0 (1 constraints: 1d1094a9)
+com.palantir.tokens:auth-tokens:3.21.0 (1 constraints: 1d1094a9)
 
 com.palantir.tritium:tritium-ids:0.117.0 (1 constraints: fc0f93a6)
 
