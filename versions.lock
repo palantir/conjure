@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: cf562680)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 695662ef)
 
 com.fasterxml.jackson.core:jackson-core:2.20.1 (4 constraints: 65508fe5)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8e7030d1)
+com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8f705ad1)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1 (1 constraints: 3705343b)
 
@@ -22,11 +22,11 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.67.0 (1 constraints: b307ca7e)
+com.palantir.conjure.java:conjure-lib:8.69.0 (1 constraints: b507d27e)
 
-com.palantir.conjure.java.api:errors:2.67.0 (1 constraints: 2710b3a9)
+com.palantir.conjure.java.api:errors:2.68.0 (1 constraints: 2810b6a9)
 
-com.palantir.ri:resource-identifier:2.11.0 (1 constraints: 1c108da9)
+com.palantir.ri:resource-identifier:2.12.0 (1 constraints: 1d1090a9)
 
 com.palantir.safe-logging:logger:3.10.0 (2 constraints: 371cf9ba)
 
@@ -34,15 +34,15 @@ com.palantir.safe-logging:logger-slf4j:3.10.0 (1 constraints: 2f0e8750)
 
 com.palantir.safe-logging:logger-spi:3.10.0 (2 constraints: 6d1ed4af)
 
-com.palantir.safe-logging:preconditions:3.10.0 (6 constraints: 3f5e395a)
+com.palantir.safe-logging:preconditions:3.10.0 (6 constraints: 675e178d)
 
-com.palantir.safe-logging:safe-logging:3.10.0 (7 constraints: 0d712292)
+com.palantir.safe-logging:safe-logging:3.10.0 (7 constraints: 3571c0cd)
 
 com.palantir.syntactic-paths:syntactic-paths:0.12.0 (1 constraints: 3505293b)
 
-com.palantir.tokens:auth-tokens:3.21.0 (1 constraints: 1d1094a9)
+com.palantir.tokens:auth-tokens:3.21.0 (1 constraints: 1e1097a9)
 
-com.palantir.tritium:tritium-ids:0.117.0 (1 constraints: fc0f93a6)
+com.palantir.tritium:tritium-ids:0.122.0 (1 constraints: f80f88a6)
 
 commons-io:commons-io:2.21.0 (1 constraints: 3705363b)
 
@@ -64,7 +64,7 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3 (1 constraints: ef10e7c2)
 
 org.glassfish.jersey.core:jersey-common:2.34 (1 constraints: dd04fd30)
 
-org.immutables:value:2.12.1 (2 constraints: 0515c1c1)
+org.immutables:value:2.12.1 (2 constraints: 0015bec1)
 
 org.jetbrains:annotations:26.0.2 (3 constraints: 3826c998)
 
