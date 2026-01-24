@@ -88,7 +88,7 @@ com.networknt:json-schema-validator:1.0.73 (1 constraints: 3d05343b)
 
 junit:junit:4.13.2 (2 constraints: eb154ef7)
 
-net.bytebuddy:byte-buddy:1.17.7 (2 constraints: 9f161b3f)
+net.bytebuddy:byte-buddy:1.18.3 (2 constraints: 9c16b43e)
 
 net.bytebuddy:byte-buddy-agent:1.17.7 (1 constraints: 4a0b4ede)
 
@@ -108,7 +108,7 @@ net.minidev:json-smart:2.6.0 (1 constraints: 050d3519)
 
 org.apiguardian:apiguardian-api:1.1.2 (12 constraints: 0ba452e8)
 
-org.assertj:assertj-core:3.27.6 (1 constraints: 4405543b)
+org.assertj:assertj-core:3.27.7 (1 constraints: 4505553b)
 
 org.hamcrest:hamcrest:3.0 (1 constraints: 710b96d5)
 
