@@ -35,7 +35,7 @@ buildscript {
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:4.2.0'
         classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.85.0'
-        classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0'
+        classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.27.0'
     }
 }
 
