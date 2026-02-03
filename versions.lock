@@ -1,14 +1,14 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: 695662ef)
+com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6b56fdf0)
 
-com.fasterxml.jackson.core:jackson-core:2.20.1 (4 constraints: 65508fe5)
+com.fasterxml.jackson.core:jackson-core:2.21.0 (4 constraints: 655095e5)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 8f705ad1)
+com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 8f7060d1)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.1 (1 constraints: 3705343b)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0 (1 constraints: 3705363b)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.1 (1 constraints: 3705343b)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.0 (1 constraints: 3705363b)
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 
