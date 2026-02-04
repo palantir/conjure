@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6b56fdf0)
+com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6d5626f1)
 
 com.fasterxml.jackson.core:jackson-core:2.21.0 (4 constraints: 655095e5)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 8f7060d1)
+com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 8f7062d1)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0 (1 constraints: 3705363b)
 
@@ -28,19 +28,19 @@ com.palantir.conjure.java.api:errors:2.68.0 (1 constraints: 2810b6a9)
 
 com.palantir.ri:resource-identifier:2.12.0 (1 constraints: 1d1090a9)
 
-com.palantir.safe-logging:logger:3.11.0 (2 constraints: 371cf9ba)
+com.palantir.safe-logging:logger:3.11.0 (2 constraints: 601c7acf)
 
 com.palantir.safe-logging:logger-slf4j:3.11.0 (1 constraints: 300e8a50)
 
 com.palantir.safe-logging:logger-spi:3.11.0 (2 constraints: 6f1e0ab0)
 
-com.palantir.safe-logging:preconditions:3.11.0 (6 constraints: 675e178d)
+com.palantir.safe-logging:preconditions:3.11.0 (6 constraints: b95e3f33)
 
-com.palantir.safe-logging:safe-logging:3.11.0 (7 constraints: 3871f8ce)
+com.palantir.safe-logging:safe-logging:3.11.0 (7 constraints: 61715440)
 
-com.palantir.syntactic-paths:syntactic-paths:0.12.0 (1 constraints: 3505293b)
+com.palantir.syntactic-paths:syntactic-paths:0.13.0 (1 constraints: 36052c3b)
 
-com.palantir.tokens:auth-tokens:3.21.0 (1 constraints: 1e1097a9)
+com.palantir.tokens:auth-tokens:3.22.0 (1 constraints: 1e1097a9)
 
 com.palantir.tritium:tritium-ids:0.122.0 (1 constraints: f80f88a6)
 
