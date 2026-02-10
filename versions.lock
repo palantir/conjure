@@ -1,10 +1,10 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6d5626f1)
+com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6f5609f2)
 
-com.fasterxml.jackson.core:jackson-core:2.21.0 (4 constraints: 655095e5)
+com.fasterxml.jackson.core:jackson-core:2.21.0 (4 constraints: 655097e5)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 8f7062d1)
+com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 8f7066d1)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.0 (1 constraints: 3705363b)
 
@@ -22,27 +22,27 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.69.0 (1 constraints: b507d27e)
+com.palantir.conjure.java:conjure-lib:8.70.0 (1 constraints: ad07b37e)
 
-com.palantir.conjure.java.api:errors:2.68.0 (1 constraints: 2810b6a9)
+com.palantir.conjure.java.api:errors:2.69.0 (1 constraints: 2910b9a9)
 
-com.palantir.ri:resource-identifier:2.12.0 (1 constraints: 1d1090a9)
+com.palantir.ri:resource-identifier:2.13.0 (1 constraints: 1e1093a9)
 
-com.palantir.safe-logging:logger:3.11.0 (2 constraints: 601c7acf)
+com.palantir.safe-logging:logger:3.11.0 (2 constraints: 891cefeb)
 
 com.palantir.safe-logging:logger-slf4j:3.11.0 (1 constraints: 300e8a50)
 
 com.palantir.safe-logging:logger-spi:3.11.0 (2 constraints: 6f1e0ab0)
 
-com.palantir.safe-logging:preconditions:3.11.0 (6 constraints: b95e3f33)
+com.palantir.safe-logging:preconditions:3.11.0 (6 constraints: 355f1e15)
 
-com.palantir.safe-logging:safe-logging:3.11.0 (7 constraints: 61715440)
+com.palantir.safe-logging:safe-logging:3.11.0 (7 constraints: b471d8d4)
 
 com.palantir.syntactic-paths:syntactic-paths:0.13.0 (1 constraints: 36052c3b)
 
-com.palantir.tokens:auth-tokens:3.22.0 (1 constraints: 1e1097a9)
+com.palantir.tokens:auth-tokens:3.22.0 (1 constraints: 1f109aa9)
 
-com.palantir.tritium:tritium-ids:0.122.0 (1 constraints: f80f88a6)
+com.palantir.tritium:tritium-ids:0.124.0 (1 constraints: fa0f8ea6)
 
 commons-io:commons-io:2.21.0 (1 constraints: 3705363b)
 
