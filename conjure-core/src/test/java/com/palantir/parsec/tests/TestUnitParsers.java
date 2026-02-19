@@ -177,7 +177,7 @@ public final class TestUnitParsers {
                 .isEqualTo("abcdef");
     }
 
-    @SuppressWarnings({"for-rollout:StringConcatToTextBlock", "for-rollout:deprecation"})
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     @Test
     public void testOrParserErrorPassthrough() throws ParseException {
         Parser<String> alwaysThrows = new Parser<String>() {
@@ -201,7 +201,7 @@ public final class TestUnitParsers {
                 .isInstanceOf(ParseException.class)
                 .hasMessage("bad thing\n" + "\"abcdef\"\n" + "^")
                 .hasCause(new IllegalStateException("bad thing"))
-                .getCause()
+                .cause()
                 .hasSuppressedException(new IllegalStateException("bad thing"));
     }
 

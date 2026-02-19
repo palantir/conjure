@@ -245,7 +245,6 @@ public final class ConjureCliTest {
         assertThat(outputFile).doesNotExist();
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Test
     public void throwsWhenInvalidDefinition() throws Exception {
         CliConfiguration configuration = CliConfiguration.builder()
@@ -254,7 +253,7 @@ public final class ConjureCliTest {
                 .requireSafety(false)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
-                .getRootCause()
+                .rootCause()
                 .isInstanceOf(MismatchedInputException.class);
     }
 
