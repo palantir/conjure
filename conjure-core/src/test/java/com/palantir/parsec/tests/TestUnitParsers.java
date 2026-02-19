@@ -201,7 +201,7 @@ public final class TestUnitParsers {
                 .isInstanceOf(ParseException.class)
                 .hasMessage("bad thing\n" + "\"abcdef\"\n" + "^")
                 .hasCause(new IllegalStateException("bad thing"))
-                .getCause()
+                .cause()
                 .hasSuppressedException(new IllegalStateException("bad thing"));
     }
 

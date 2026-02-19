@@ -253,7 +253,7 @@ public final class ConjureCliTest {
                 .requireSafety(false)
                 .build();
         assertThatThrownBy(() -> ConjureCli.CompileCommand.generate(configuration))
-                .getRootCause()
+                .rootCause()
                 .isInstanceOf(MismatchedInputException.class);
     }
 
