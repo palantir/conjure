@@ -82,7 +82,7 @@ org.yaml:snakeyaml:2.4 (1 constraints: 3e178d10)
 
 com.ethlo.time:itu:1.7.0 (1 constraints: 7e0ff07d)
 
-com.jayway.jsonpath:json-path:2.10.0 (1 constraints: 35052f3b)
+com.jayway.jsonpath:json-path:3.0.0 (1 constraints: 0505fa35)
 
 com.networknt:json-schema-validator:1.0.73 (1 constraints: 3d05343b)
 
