@@ -127,11 +127,13 @@ public final class ConjureParser {
                 .sourceFile(file)
                 // Hoist imports
                 .importProviders(parsed.types().conjureImports().entrySet().stream()
-                        .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue()
-                                .absoluteFile()
-                                .orElseThrow(() -> new SafeIllegalStateException(
-                                        "Absolute file MUST be resolved as part of parsing stage"))
-                                .getAbsolutePath())))
+                        .collect(Collectors.toMap(
+                                Entry::getKey,
+                                entry -> entry.getValue()
+                                        .absoluteFile()
+                                        .orElseThrow(() -> new SafeIllegalStateException(
+                                                "Absolute file MUST be resolved as part of parsing stage"))
+                                        .getAbsolutePath())))
                 .build();
     }
 

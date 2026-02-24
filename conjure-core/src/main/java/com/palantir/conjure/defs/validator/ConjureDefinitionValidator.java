@@ -143,8 +143,11 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
             // create mapping from object type name -> names of reference types that are fields of that type
             Multimap<TypeName, TypeName> typeToRefFields = HashMultimap.create();
 
-            definition.getTypes().forEach(type -> getReferenceType(type)
-                    .ifPresent(entry -> typeToRefFields.put(type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
+            definition
+                    .getTypes()
+                    .forEach(type -> getReferenceType(type)
+                            .ifPresent(
+                                    entry -> typeToRefFields.put(type.accept(TypeDefinitionVisitor.TYPE_NAME), entry)));
 
             for (TypeName name : typeToRefFields.keySet()) {
                 verifyTypeHasNoRecursiveDefinitions(name, typeToRefFields, new ArrayList<>());
@@ -454,48 +457,64 @@ public enum ConjureDefinitionValidator implements ConjureValidator<ConjureDefini
         public void validate(ConjureDefinition definition) {
             List<String> errors = new ArrayList<>();
 
-            definition.getTypes().forEach(type -> SafetyValidator.validate(type, safetyDeclarations)
-                    .forEach(errors::add));
+            definition
+                    .getTypes()
+                    .forEach(type ->
+                            SafetyValidator.validate(type, safetyDeclarations).forEach(errors::add));
 
-            definition.getServices().forEach(serviceDefinition -> serviceDefinition
-                    .getEndpoints()
-                    .forEach(endpointDefinition -> endpointDefinition.getArgs().forEach(argumentDefinition -> {
-                        SafetyValidator.validateDefinition(
-                                        endpointDefinition,
-                                        argumentDefinition.getArgName(),
-                                        argumentDefinition.getSafety(),
-                                        argumentDefinition.getType(),
-                                        safetyDeclarations)
-                                .map(message -> String.format(
-                                        "%s.%s(%s): %s",
-                                        serviceDefinition.getServiceName().getName(),
-                                        endpointDefinition.getEndpointName(),
-                                        argumentDefinition.getArgName(),
-                                        message))
-                                .forEach(errors::add);
+            definition
+                    .getServices()
+                    .forEach(serviceDefinition -> serviceDefinition
+                            .getEndpoints()
+                            .forEach(endpointDefinition -> endpointDefinition
+                                    .getArgs()
+                                    .forEach(argumentDefinition -> {
+                                        SafetyValidator.validateDefinition(
+                                                        endpointDefinition,
+                                                        argumentDefinition.getArgName(),
+                                                        argumentDefinition.getSafety(),
+                                                        argumentDefinition.getType(),
+                                                        safetyDeclarations)
+                                                .map(message -> String.format(
+                                                        "%s.%s(%s): %s",
+                                                        serviceDefinition
+                                                                .getServiceName()
+                                                                .getName(),
+                                                        endpointDefinition.getEndpointName(),
+                                                        argumentDefinition.getArgName(),
+                                                        message))
+                                                .forEach(errors::add);
 
-                        // In strict mode we don't allow legacy safety tags or markers
-                        if (safetyDeclarations.required()) {
-                            if (argumentDefinition.getTags().contains("safe")
-                                    || argumentDefinition.getTags().contains("unsafe")) {
-                                errors.add(String.format(
-                                        "%s.%s(%s): Safety tags have been replaced by the 'safety' field "
-                                                + "and are no longer allowed when 'requireSafety' is enabled",
-                                        serviceDefinition.getServiceName().getName(),
-                                        endpointDefinition.getEndpointName(),
-                                        argumentDefinition.getArgName()));
-                            }
-                            if (argumentDefinition.getMarkers().stream()
-                                    .anyMatch(LogSafetyConjureDefinitionValidator::isSafetyMarker)) {
-                                errors.add(String.format(
-                                        "%s.%s(%s): Safety markers have been replaced by the 'safety' field "
-                                                + "and are no longer allowed when 'requireSafety' is enabled",
-                                        serviceDefinition.getServiceName().getName(),
-                                        endpointDefinition.getEndpointName(),
-                                        argumentDefinition.getArgName()));
-                            }
-                        }
-                    })));
+                                        // In strict mode we don't allow legacy safety tags or markers
+                                        if (safetyDeclarations.required()) {
+                                            if (argumentDefinition.getTags().contains("safe")
+                                                    || argumentDefinition
+                                                            .getTags()
+                                                            .contains("unsafe")) {
+                                                errors.add(String.format(
+                                                        "%s.%s(%s): Safety tags have been replaced by the 'safety'"
+                                                            + " field and are no longer allowed when 'requireSafety'"
+                                                            + " is enabled",
+                                                        serviceDefinition
+                                                                .getServiceName()
+                                                                .getName(),
+                                                        endpointDefinition.getEndpointName(),
+                                                        argumentDefinition.getArgName()));
+                                            }
+                                            if (argumentDefinition.getMarkers().stream()
+                                                    .anyMatch(LogSafetyConjureDefinitionValidator::isSafetyMarker)) {
+                                                errors.add(String.format(
+                                                        "%s.%s(%s): Safety markers have been replaced by the 'safety'"
+                                                            + " field and are no longer allowed when 'requireSafety'"
+                                                            + " is enabled",
+                                                        serviceDefinition
+                                                                .getServiceName()
+                                                                .getName(),
+                                                        endpointDefinition.getEndpointName(),
+                                                        argumentDefinition.getArgName()));
+                                            }
+                                        }
+                                    })));
 
             if (!errors.isEmpty()) {
                 throw new ConjureIllegalStateException(String.join("\n", errors));
