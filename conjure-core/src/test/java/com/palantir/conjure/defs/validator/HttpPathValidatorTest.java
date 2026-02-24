@@ -41,6 +41,7 @@ public final class HttpPathValidatorTest {
         }
     }
 
+    @SuppressWarnings("for-rollout:FormatStringShouldUsePlaceholders")
     @Test
     public void testPathSegmentsMustObeySyntax() {
         for (PathSegmentTestCase currCase : new PathSegmentTestCase[] {
