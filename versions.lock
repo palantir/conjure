@@ -130,7 +130,7 @@ org.junit.platform:junit-platform-launcher:6.0.3 (1 constraints: 0b050c36)
 
 org.junit.vintage:junit-vintage-engine:6.0.3 (1 constraints: 0b050c36)
 
-org.mockito:mockito-core:5.21.0 (1 constraints: 3a05483b)
+org.mockito:mockito-core:5.22.0 (1 constraints: 3b054b3b)
 
 org.objenesis:objenesis:3.3 (1 constraints: b20a14bd)
 
