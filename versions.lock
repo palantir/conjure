@@ -22,7 +22,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.71.0 (1 constraints: ae07b77e)
+com.palantir.conjure.java:conjure-lib:8.72.0 (1 constraints: af07bb7e)
 
 com.palantir.conjure.java.api:errors:2.70.0 (1 constraints: 2110a2a9)
 
