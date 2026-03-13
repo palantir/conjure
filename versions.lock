@@ -40,7 +40,7 @@ com.palantir.safe-logging:safe-logging:3.12.0 (7 constraints: bb71e4d8)
 
 com.palantir.syntactic-paths:syntactic-paths:0.14.0 (1 constraints: 37052f3b)
 
-com.palantir.tokens:auth-tokens:3.23.0 (1 constraints: 20109da9)
+com.palantir.tokens:auth-tokens:4.0.0 (1 constraints: 20109da9)
 
 com.palantir.tritium:tritium-ids:0.125.0 (1 constraints: fb0f91a6)
 
@@ -68,7 +68,7 @@ org.immutables:value:2.12.1 (2 constraints: 0015bec1)
 
 org.jetbrains:annotations:26.1.0 (3 constraints: 36269a98)
 
-org.jspecify:jspecify:1.0.0 (9 constraints: 2490610d)
+org.jspecify:jspecify:1.0.0 (10 constraints: f39d0251)
 
 org.slf4j:slf4j-api:2.0.17 (6 constraints: 744adc38)
 
