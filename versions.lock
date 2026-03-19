@@ -28,19 +28,19 @@ com.palantir.conjure.java.api:errors:2.70.0 (1 constraints: 2110a2a9)
 
 com.palantir.ri:resource-identifier:2.14.0 (1 constraints: 1f1096a9)
 
-com.palantir.safe-logging:logger:3.12.0 (2 constraints: 8b1c1fec)
+com.palantir.safe-logging:logger:3.13.0 (2 constraints: 8b1c1fec)
 
-com.palantir.safe-logging:logger-slf4j:3.12.0 (1 constraints: 310e8d50)
+com.palantir.safe-logging:logger-slf4j:3.13.0 (1 constraints: 320e9050)
 
-com.palantir.safe-logging:logger-spi:3.12.0 (2 constraints: 711e40b0)
+com.palantir.safe-logging:logger-spi:3.13.0 (2 constraints: 731e76b0)
 
-com.palantir.safe-logging:preconditions:3.12.0 (6 constraints: 3b5fd017)
+com.palantir.safe-logging:preconditions:3.13.0 (6 constraints: 3b5fd017)
 
-com.palantir.safe-logging:safe-logging:3.12.0 (7 constraints: bb71e4d8)
+com.palantir.safe-logging:safe-logging:3.13.0 (7 constraints: be711fda)
 
 com.palantir.syntactic-paths:syntactic-paths:0.14.0 (1 constraints: 37052f3b)
 
-com.palantir.tokens:auth-tokens:4.0.0 (1 constraints: ec0f7499)
+com.palantir.tokens:auth-tokens:4.1.0 (1 constraints: ec0f7499)
 
 com.palantir.tritium:tritium-ids:0.125.0 (1 constraints: fb0f91a6)
 
