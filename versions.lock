@@ -34,11 +34,11 @@ com.palantir.safe-logging:logger-slf4j:3.13.0 (1 constraints: 320e9050)
 
 com.palantir.safe-logging:logger-spi:3.13.0 (2 constraints: 731e76b0)
 
-com.palantir.safe-logging:preconditions:3.13.0 (6 constraints: 3c5fb718)
+com.palantir.safe-logging:preconditions:3.13.0 (6 constraints: 3d5f0d19)
 
-com.palantir.safe-logging:safe-logging:3.13.0 (7 constraints: bf713cdb)
+com.palantir.safe-logging:safe-logging:3.13.0 (7 constraints: c0713fdb)
 
-com.palantir.syntactic-paths:syntactic-paths:0.14.0 (1 constraints: 37052f3b)
+com.palantir.syntactic-paths:syntactic-paths:0.15.0 (1 constraints: 3805323b)
 
 com.palantir.tokens:auth-tokens:4.2.0 (1 constraints: ee0f7a99)
 
