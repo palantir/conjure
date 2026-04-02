@@ -22,27 +22,27 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.75.0 (1 constraints: b207c77e)
+com.palantir.conjure.java:conjure-lib:8.76.0 (1 constraints: b307cb7e)
 
-com.palantir.conjure.java.api:errors:2.70.0 (1 constraints: 2110a2a9)
+com.palantir.conjure.java.api:errors:2.71.0 (1 constraints: 2210a5a9)
 
-com.palantir.ri:resource-identifier:2.14.0 (1 constraints: 1f1096a9)
+com.palantir.ri:resource-identifier:2.15.0 (1 constraints: 201099a9)
 
-com.palantir.safe-logging:logger:3.13.0 (2 constraints: 8b1c1fec)
+com.palantir.safe-logging:logger:3.13.0 (2 constraints: 8c1c22ec)
 
 com.palantir.safe-logging:logger-slf4j:3.13.0 (1 constraints: 320e9050)
 
 com.palantir.safe-logging:logger-spi:3.13.0 (2 constraints: 731e76b0)
 
-com.palantir.safe-logging:preconditions:3.13.0 (6 constraints: 3d5f0d19)
+com.palantir.safe-logging:preconditions:3.13.0 (6 constraints: 405f551a)
 
-com.palantir.safe-logging:safe-logging:3.13.0 (7 constraints: c0713fdb)
+com.palantir.safe-logging:safe-logging:3.13.0 (7 constraints: c271f0dc)
 
 com.palantir.syntactic-paths:syntactic-paths:0.15.0 (1 constraints: 3805323b)
 
 com.palantir.tokens:auth-tokens:4.2.0 (1 constraints: ee0f7a99)
 
-com.palantir.tritium:tritium-ids:0.125.0 (1 constraints: fb0f91a6)
+com.palantir.tritium:tritium-ids:0.126.0 (1 constraints: fc0f94a6)
 
 commons-io:commons-io:2.21.0 (1 constraints: 3705363b)
 
