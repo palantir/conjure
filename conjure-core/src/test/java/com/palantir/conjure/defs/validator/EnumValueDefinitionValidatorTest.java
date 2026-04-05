@@ -34,7 +34,6 @@ public final class EnumValueDefinitionValidatorTest {
     }
 
     @Test
-    @SuppressWarnings("CheckReturnValue")
     public void testFormat() {
         EnumValueDefinitionValidator.validateAll(
                 EnumValueDefinition.builder().value("FOO").build());
