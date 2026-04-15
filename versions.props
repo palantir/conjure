@@ -1,7 +1,7 @@
 com.fasterxml.jackson.*:* = 2.21.1
 com.fasterxml.jackson.core:jackson-annotations = 2.21
 com.google.code.findbugs:jsr305 = 3.0.2
-com.google.guava:guava = 33.5.0-jre
+com.google.guava:guava = 33.6.0-jre
 com.jayway.jsonpath:json-path = 3.0.0
 com.networknt:json-schema-validator = 1.0.73
 com.palantir.conjure.java:* = 8.76.0
