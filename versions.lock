@@ -44,7 +44,7 @@ com.palantir.tokens:auth-tokens:4.3.0 (1 constraints: ef0f7d99)
 
 com.palantir.tritium:tritium-ids:0.126.0 (1 constraints: fc0f94a6)
 
-commons-io:commons-io:2.21.0 (1 constraints: 3705363b)
+commons-io:commons-io:2.22.0 (1 constraints: 3805393b)
 
 info.picocli:picocli:4.7.7 (1 constraints: 14051b36)
 
