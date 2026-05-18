@@ -83,7 +83,6 @@ public final class EndpointDefinitionTest {
     }
 
     @Test
-    @SuppressWarnings("CheckReturnValue")
     public void testArgumentBodyTypeValidator() {
         EndpointDefinition.Builder definition = EndpointDefinition.builder()
                 .args(ImmutableList.of(ArgumentDefinition.builder()
