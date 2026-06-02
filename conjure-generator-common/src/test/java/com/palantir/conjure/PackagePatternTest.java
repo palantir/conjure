@@ -50,7 +50,7 @@ class PackagePatternTest {
     @Test
     void testValidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars("abcdefghijklmnopqrstuvwxyz0123456789.", 25))
+                .forAll(Generators.stringsFromChars("abcdefghijklmnopqrstuvwxyz0123456789.", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))
                             .as(input)
@@ -61,7 +61,7 @@ class PackagePatternTest {
     @Test
     void testInvalidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars(
+                .forAll(Generators.stringsFromChars(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))

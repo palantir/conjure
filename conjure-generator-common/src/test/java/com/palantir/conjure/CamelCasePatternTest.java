@@ -52,7 +52,7 @@ class CamelCasePatternTest {
     @Test
     void testValidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars(
+                .forAll(Generators.stringsFromChars(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))
@@ -64,7 +64,7 @@ class CamelCasePatternTest {
     @Test
     void testInvalidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars(
+                .forAll(Generators.stringsFromChars(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))
