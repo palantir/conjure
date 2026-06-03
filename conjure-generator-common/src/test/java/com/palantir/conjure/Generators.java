@@ -16,30 +16,22 @@
 
 package com.palantir.conjure;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.quicktheories.generators.SourceDSL.lists;
+
 import org.quicktheories.core.Gen;
 import org.quicktheories.generators.Generate;
-import org.quicktheories.generators.SourceDSL;
 
-final class PatternTestGenerators {
+final class Generators {
 
     static Gen<String> stringsFromChars(String validChars, int maxLength) {
-        List<Character> chars = new ArrayList<>(validChars.length());
-        for (int i = 0; i < validChars.length(); i++) {
-            chars.add(validChars.charAt(i));
-        }
-        return SourceDSL.lists()
-                .of(Generate.pick(chars))
-                .ofSizeBetween(0, maxLength)
-                .map(list -> {
-                    StringBuilder sb = new StringBuilder(list.size());
-                    for (Character c : list) {
-                        sb.append(c.charValue());
-                    }
-                    return sb.toString();
-                });
+        Gen<Character> characterGen =
+                Generate.pick(validChars.chars().mapToObj(c -> (char) c).toList());
+        return lists().of(characterGen).ofSizeBetween(0, maxLength).map(chars -> {
+            StringBuilder sb = new StringBuilder(chars.size());
+            chars.forEach(sb::append);
+            return sb.toString();
+        });
     }
 
-    private PatternTestGenerators() {}
+    private Generators() {}
 }

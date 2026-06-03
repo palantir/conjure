@@ -50,7 +50,7 @@ class EnumPatternTest {
     @Test
     void testValidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", 25))
+                .forAll(Generators.stringsFromChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))
                             .as(input)
@@ -61,7 +61,7 @@ class EnumPatternTest {
     @Test
     void testInvalidCharsMatch() {
         qt().withExamples(5000)
-                .forAll(PatternTestGenerators.stringsFromChars(
+                .forAll(Generators.stringsFromChars(
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.", 25))
                 .checkAssert(input -> {
                     assertThat(simplifiedPattern.matches(input))
