@@ -46,7 +46,6 @@ public final class ParamIdValidatorTest {
     private final DealiasingTypeVisitor dealiasingVisitor = new DealiasingTypeVisitor(ImmutableMap.of());
 
     @Test
-    @SuppressWarnings("CheckReturnValue")
     public void testValidNonHeader() {
         for (String paramId : ImmutableList.of("f", "foo", "fooBar", "fooBar1", "a1Foo234", "foo_bar", "foo-bar")) {
             assertThatEndpointValidation(ParameterType.query(QueryParameterType.of(ParameterId.of(paramId))))
@@ -55,7 +54,6 @@ public final class ParamIdValidatorTest {
     }
 
     @Test
-    @SuppressWarnings("CheckReturnValue")
     public void testValidHeader() {
         List<String> paramIds = ImmutableList.of(
                 HttpHeaders.AUTHORIZATION, HttpHeaders.X_XSS_PROTECTION, HttpHeaders.P3P, HttpHeaders.SET_COOKIE2);
