@@ -2,13 +2,13 @@
 
 com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6f5609f2)
 
-com.fasterxml.jackson.core:jackson-core:2.21.1 (4 constraints: 6950e6e6)
+com.fasterxml.jackson.core:jackson-core:2.21.4 (4 constraints: 7550d3ea)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.1 (7 constraints: 9570c3d4)
+com.fasterxml.jackson.core:jackson-databind:2.21.4 (7 constraints: 9e70bdda)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.1 (1 constraints: 3805373b)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4 (1 constraints: 3805373b)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.1 (1 constraints: 3805373b)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.4 (1 constraints: 3805373b)
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 
@@ -22,11 +22,11 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.79.0 (1 constraints: b607d77e)
+com.palantir.conjure.java:conjure-lib:8.80.0 (1 constraints: ae07b87e)
 
 com.palantir.conjure.java.api:errors:2.73.0 (1 constraints: 2410aba9)
 
-com.palantir.ri:resource-identifier:2.17.0 (1 constraints: 22109fa9)
+com.palantir.ri:resource-identifier:2.18.0 (1 constraints: 2310a2a9)
 
 com.palantir.safe-logging:logger:3.16.0 (2 constraints: 901cacec)
 
@@ -34,9 +34,9 @@ com.palantir.safe-logging:logger-slf4j:3.16.0 (1 constraints: 350e9950)
 
 com.palantir.safe-logging:logger-spi:3.16.0 (2 constraints: 791e18b1)
 
-com.palantir.safe-logging:preconditions:3.16.0 (6 constraints: 4b5f571f)
+com.palantir.safe-logging:preconditions:3.16.0 (6 constraints: 4d5fca20)
 
-com.palantir.safe-logging:safe-logging:3.16.0 (7 constraints: d27181e5)
+com.palantir.safe-logging:safe-logging:3.16.0 (7 constraints: d47160e7)
 
 com.palantir.syntactic-paths:syntactic-paths:0.17.0 (1 constraints: 3a05383b)
 
