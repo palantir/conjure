@@ -38,7 +38,7 @@ com.palantir.safe-logging:preconditions:3.16.0 (6 constraints: 4e5ff720)
 
 com.palantir.safe-logging:safe-logging:3.16.0 (7 constraints: d47160e7)
 
-com.palantir.syntactic-paths:syntactic-paths:0.17.0 (1 constraints: 3a05383b)
+com.palantir.syntactic-paths:syntactic-paths:0.18.0 (1 constraints: 3b053b3b)
 
 com.palantir.tokens:auth-tokens:4.6.0 (1 constraints: f10f8399)
 
