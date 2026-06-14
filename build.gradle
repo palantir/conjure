@@ -33,7 +33,7 @@ buildscript {
         classpath 'com.palantir.gradle.conjure:gradle-conjure:6.1.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:3.15.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:5.0.0'
-        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.9.0'
+        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.10.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.92.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.31.0'
     }
