@@ -114,11 +114,11 @@ org.junit.jupiter:junit-jupiter-params:6.1.1 (1 constraints: 050ece3b)
 
 org.junit.platform:junit-platform-commons:6.1.2 (2 constraints: d8207f4a)
 
-org.junit.platform:junit-platform-engine:6.1.2 (3 constraints: 6d339c22)
+org.junit.platform:junit-platform-engine:6.1.2 (3 constraints: 6e339d22)
 
 org.junit.platform:junit-platform-launcher:6.1.2 (1 constraints: 0b050e36)
 
-org.junit.vintage:junit-vintage-engine:6.1.1 (1 constraints: 0a050d36)
+org.junit.vintage:junit-vintage-engine:6.1.2 (1 constraints: 0b050e36)
 
 org.mockito:mockito-core:5.23.0 (1 constraints: 3c054e3b)
 
