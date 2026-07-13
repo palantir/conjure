@@ -22,11 +22,11 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.81.0 (1 constraints: af07bc7e)
+com.palantir.conjure.java:conjure-lib:8.82.0 (1 constraints: b007c07e)
 
-com.palantir.conjure.java.api:errors:2.74.0 (1 constraints: 2510aea9)
+com.palantir.conjure.java.api:errors:2.75.0 (1 constraints: 2610b1a9)
 
-com.palantir.ri:resource-identifier:2.19.0 (1 constraints: 2410a5a9)
+com.palantir.ri:resource-identifier:2.20.0 (1 constraints: 1c108ea9)
 
 com.palantir.safe-logging:logger:3.17.0 (2 constraints: 911cd9ec)
 
@@ -34,9 +34,9 @@ com.palantir.safe-logging:logger-slf4j:3.17.0 (1 constraints: 360e9c50)
 
 com.palantir.safe-logging:logger-spi:3.17.0 (2 constraints: 7b1e4eb1)
 
-com.palantir.safe-logging:preconditions:3.17.0 (6 constraints: 535fcf23)
+com.palantir.safe-logging:preconditions:3.17.0 (6 constraints: 555f1425)
 
-com.palantir.safe-logging:safe-logging:3.17.0 (7 constraints: dc716feb)
+com.palantir.safe-logging:safe-logging:3.17.0 (7 constraints: de7120ed)
 
 com.palantir.syntactic-paths:syntactic-paths:0.19.0 (1 constraints: 3c053e3b)
 
