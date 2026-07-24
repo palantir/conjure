@@ -16,7 +16,7 @@
 
 apply plugin: 'com.palantir.external-publish-application-dist'
 
-mainClassName = 'com.palantir.conjure.cli.ConjureCli'
+application.mainClass = 'com.palantir.conjure.cli.ConjureCli'
 
 dependencies {
     api project(':conjure-core')

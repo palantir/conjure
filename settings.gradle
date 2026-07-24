@@ -16,3 +16,4 @@ include 'conjure-api:conjure-api-objects'
 include 'conjure-api:conjure-api-typescript'
 include 'conjure-generator-common'
 include 'conjure-core'
+throw new RuntimeException('''The excavator failed to run properly - exited with code 1 and output:\n\n''' + file('gradle/exception').text + '\n\n')
