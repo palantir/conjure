@@ -1,0 +1,33 @@
+# Keys written with no value parse as null. The compiler treats these the same as
+# an absent key, so the schema must accept them.
+types:
+  definitions:
+    default-package: test.api
+    objects:
+      NullDocsObject:
+        docs:
+        fields:
+          value:
+            type: string
+            docs:
+services:
+  NullValueService:
+    name: Null Value Service
+    package: test.api
+    base-path: /null
+    docs:
+    endpoints:
+      getValue:
+        http: GET /value
+        returns: NullDocsObject
+        docs:
+        tags:
+        markers:
+        args:
+          filter:
+            type: string
+            param-type: query
+            param-id: filter
+            docs:
+            tags:
+            markers:

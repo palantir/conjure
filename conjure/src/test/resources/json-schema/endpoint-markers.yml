@@ -1,0 +1,23 @@
+types:
+  imports:
+    EndpointMarker:
+      base-type: any
+      external:
+        java: test.api.EndpointMarker
+  definitions:
+    default-package: test.api
+    objects:
+      MarkerObject:
+        fields:
+          value: string
+services:
+  MarkerService:
+    name: Marker Service
+    package: test.api
+    base-path: /markers
+    endpoints:
+      getMarkedObject:
+        http: GET /object
+        returns: MarkerObject
+        markers:
+          - EndpointMarker

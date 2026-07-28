@@ -52,6 +52,9 @@
         "external": {
           "$ref": "#/definitions/ExternalImportDefinition",
           "description": "The external types to reference."
+        },
+        "safety": {
+          "$ref": "#/definitions/LogSafety"
         }
       }
     },
@@ -128,7 +131,7 @@
     "TypeName": {
       "description": "Named types must be in PascalCase and be unique within a package.",
       "type": "string",
-      "pattern": "^([a-zA-Z]+[.])?[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$"
+      "pattern": "^([_a-zA-Z][_a-zA-Z0-9]*[.])?[A-Z][a-z0-9]+([A-Z][a-z0-9]+)*$"
     },
     "ContainerType": {
       "description": "Container types like optional<T>, list<T>, set<T> and map<K, V> can be referenced using their lowercase names, where variables like T, K and V can be substituted for a Conjure named type, a built-in or more container types:",
@@ -458,9 +461,22 @@
           "$ref": "#/definitions/DocString"
         },
         "tags": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "markers": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/ConjureType"
           },
           "uniqueItems": true
         }
@@ -489,14 +505,20 @@
           "$ref": "#/definitions/DocString"
         },
         "tags": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string"
           },
           "uniqueItems": true
         },
         "markers": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string"
           },
@@ -532,7 +554,10 @@
       ]
     },
     "DocString": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "LogSafety": {
       "enum": [

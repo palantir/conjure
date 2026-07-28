@@ -1,0 +1,13 @@
+types:
+  imports:
+    ExternalLong:
+      base-type: string
+      external:
+        java: java.lang.Long
+      safety: safe
+  definitions:
+    default-package: test.api
+    objects:
+      ExternalSafetyObject:
+        fields:
+          longField: ExternalLong

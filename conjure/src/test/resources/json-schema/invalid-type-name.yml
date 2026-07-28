@@ -1,0 +1,10 @@
+# Only the namespace prefix of the TypeName pattern was loosened. The PascalCase
+# portion must stay strict, because the compiler rejects consecutive capitals.
+types:
+  definitions:
+    default-package: test.api
+    objects:
+      HTTPConfig:
+        # SCHEMA(propertyNames): consecutive capitals are not PascalCase
+        fields:
+          value: string
