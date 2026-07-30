@@ -17,6 +17,7 @@
 package com.palantir.conjure.defs.validator;
 
 import com.palantir.conjure.defs.SafetyDeclarationRequirements;
+import com.palantir.conjure.exceptions.ConjureIllegalStateException;
 import com.palantir.conjure.spec.AliasDefinition;
 import com.palantir.conjure.spec.ConjureDefinition;
 import com.palantir.conjure.spec.EnumDefinition;
@@ -42,7 +43,6 @@ public final class ConjureIrValidator {
 
     private ConjureIrValidator() {}
 
-    /** Validates using {@link SafetyDeclarationRequirements#ALLOWED}. */
     public static void validate(ConjureDefinition definition) {
         validate(definition, SafetyDeclarationRequirements.ALLOWED);
     }
@@ -54,7 +54,8 @@ public final class ConjureIrValidator {
         definition.getTypes().forEach(type -> type.accept(TypeValidator.INSTANCE));
         definition.getErrors().forEach(error -> {
             PackageValidator.validate(error.getErrorName().getPackage());
-            // Field names/definitions must be validated before ErrorDefinitionValidator, which normalizes field
+            ErrorNamespaceValidator.validate(error.getNamespace());
+            // Field names/definitions should be validated before ErrorDefinitionValidator, which normalizes field
             // names via FieldNameValidator#toCase and assumes they already conform to the FieldName grammar.
             validateFields(error.getSafeArgs());
             validateFields(error.getUnsafeArgs());
@@ -72,7 +73,6 @@ public final class ConjureIrValidator {
         ConjureDefinitionValidator.validateAll(definition, safetyRequirements);
     }
 
-    /** Validates each field's name and definition, matching the checks the parser applies via its shared helper. */
     private static void validateFields(List<FieldDefinition> fields) {
         fields.forEach(field -> {
             FieldNameValidator.validate(field.getFieldName());
@@ -102,7 +102,7 @@ public final class ConjureIrValidator {
         public Void visitObject(ObjectDefinition value) {
             PackageValidator.validate(value.getTypeName().getPackage());
             TypeNameValidator.validate(value.getTypeName());
-            // Field names/definitions must be validated before ObjectDefinitionValidator, which normalizes field
+            // Field names/definitions should be validated before ObjectDefinitionValidator, which normalizes field
             // names via FieldNameValidator#toCase and assumes they already conform to the FieldName grammar.
             validateFields(value.getFields());
             ObjectDefinitionValidator.validate(value);
@@ -119,8 +119,8 @@ public final class ConjureIrValidator {
         }
 
         @Override
-        public Void visitUnknown(String _unknownType) {
-            return null;
+        public Void visitUnknown(String unknownType) {
+            throw new ConjureIllegalStateException("Unknown type: " + unknownType);
         }
     }
 }

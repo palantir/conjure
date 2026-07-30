@@ -49,163 +49,45 @@ import org.junit.jupiter.api.Test;
 
 public final class ConjureIrValidatorTest {
 
-    private static final TypeName ENUM_NAME = TypeName.of("Color", "com.example.product");
-
-    @Test
-    public void rejectsEnumValueOutsideGrammar() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
-                        .typeName(ENUM_NAME)
-                        .values(List.of(
-                                EnumValueDefinition.builder().value("RED").build(),
-                                EnumValueDefinition.builder().value("not valid").build()))
-                        .build())))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void rejectsInvalidTypeName() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
-                        .typeName(TypeName.of("invalid name", "com.example.product"))
-                        .values(List.of(
-                                EnumValueDefinition.builder().value("RED").build()))
-                        .build())))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
+    private static final String PACKAGE = "com.example.product";
+    private static final TypeName ENUM_NAME = TypeName.of("Color", PACKAGE);
 
     @Test
     public void acceptsValidDefinition() {
         ConjureDefinition definition = ConjureDefinition.builder()
                 .version(1)
-                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
-                        .typeName(ENUM_NAME)
-                        .values(List.of(
-                                EnumValueDefinition.builder().value("RED").build(),
-                                EnumValueDefinition.builder().value("GREEN").build()))
-                        .build())))
-                .build();
-
-        assertThatCode(() -> ConjureIrValidator.validate(definition)).doesNotThrowAnyException();
-    }
-
-    @Test
-    public void rejectsInvalidPackageName() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
-                        .typeName(TypeName.of("Color", "Foo"))
-                        .values(List.of(
-                                EnumValueDefinition.builder().value("RED").build()))
-                        .build())))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void rejectsInvalidFieldName() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(TypeName.of("Widget", "com.example.product"))
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("not valid"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .build())
-                        .build())))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void rejectsInvalidHttpPath() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .services(List.of(ServiceDefinition.builder()
-                        .serviceName(TypeName.of("WidgetService", "com.example.product"))
-                        .endpoints(EndpointDefinition.builder()
-                                .endpointName(EndpointName.of("getWidget"))
-                                .httpMethod(HttpMethod.GET)
-                                .httpPath(HttpPath.of("widget"))
-                                .build())
-                        .build()))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void acceptsValidDefinitionWithObjectAndService() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.object(ObjectDefinition.builder()
-                        .typeName(TypeName.of("Widget", "com.example.product"))
-                        .fields(FieldDefinition.builder()
-                                .fieldName(FieldName.of("displayName"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .build())
-                        .build())))
-                .services(List.of(ServiceDefinition.builder()
-                        .serviceName(TypeName.of("WidgetService", "com.example.product"))
-                        .endpoints(EndpointDefinition.builder()
-                                .endpointName(EndpointName.of("getWidget"))
-                                .httpMethod(HttpMethod.GET)
-                                .httpPath(HttpPath.of("/widget"))
-                                .build())
-                        .build()))
-                .build();
-
-        assertThatCode(() -> ConjureIrValidator.validate(definition)).doesNotThrowAnyException();
-    }
-
-    @Test
-    public void rejectsInvalidFieldNameInError() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
+                .types(List.of(
+                        TypeDefinition.enum_(EnumDefinition.builder()
+                                .typeName(ENUM_NAME)
+                                .values(List.of(
+                                        EnumValueDefinition.builder()
+                                                .value("RED")
+                                                .build(),
+                                        EnumValueDefinition.builder()
+                                                .value("GREEN")
+                                                .build()))
+                                .build()),
+                        TypeDefinition.object(ObjectDefinition.builder()
+                                .typeName(TypeName.of("Widget", PACKAGE))
+                                .fields(FieldDefinition.builder()
+                                        .fieldName(FieldName.of("displayName"))
+                                        .type(Type.primitive(PrimitiveType.STRING))
+                                        .build())
+                                .build()),
+                        TypeDefinition.union(UnionDefinition.builder()
+                                .typeName(TypeName.of("Shape", PACKAGE))
+                                .union(FieldDefinition.builder()
+                                        .fieldName(FieldName.of("circle"))
+                                        .type(Type.primitive(PrimitiveType.STRING))
+                                        .build())
+                                .build())))
                 .errors(List.of(ErrorDefinition.builder()
-                        .errorName(TypeName.of("WidgetError", "com.example.product"))
+                        .errorName(TypeName.of("WidgetError", PACKAGE))
                         .namespace(ErrorNamespace.of("Widget"))
                         .code(ErrorCode.INVALID_ARGUMENT)
-                        .safeArgs(FieldDefinition.builder()
-                                .fieldName(FieldName.of("not valid"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .build())
                         .build()))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void rejectsInvalidFieldNameInUnion() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
-                .types(List.of(TypeDefinition.union(UnionDefinition.builder()
-                        .typeName(TypeName.of("Widget", "com.example.product"))
-                        .union(FieldDefinition.builder()
-                                .fieldName(FieldName.of("not valid"))
-                                .type(Type.primitive(PrimitiveType.STRING))
-                                .build())
-                        .build())))
-                .build();
-
-        assertThatThrownBy(() -> ConjureIrValidator.validate(definition)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    public void acceptsValidDefinitionWithEndpointArgument() {
-        ConjureDefinition definition = ConjureDefinition.builder()
-                .version(1)
                 .services(List.of(ServiceDefinition.builder()
-                        .serviceName(TypeName.of("WidgetService", "com.example.product"))
+                        .serviceName(TypeName.of("WidgetService", PACKAGE))
                         .endpoints(EndpointDefinition.builder()
                                 .endpointName(EndpointName.of("getWidget"))
                                 .httpMethod(HttpMethod.GET)
@@ -221,12 +103,162 @@ public final class ConjureIrValidatorTest {
                 .build();
 
         assertThatCode(() -> ConjureIrValidator.validate(definition)).doesNotThrowAnyException();
+        assertThatCode(() -> ConjureIrValidator.validate(definition, SafetyDeclarationRequirements.ALLOWED))
+                .doesNotThrowAnyException();
+    }
+
+    // Type validation
+
+    @Test
+    public void rejectsInvalidPackageName() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
+                        .typeName(TypeName.of("Color", "Foo"))
+                        .values(List.of(
+                                EnumValueDefinition.builder().value("RED").build()))
+                        .build())))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Conjure package names must match pattern");
     }
 
     @Test
-    public void validateWithSafetyDeclarationRequirementsDoesNotThrow() {
+    public void rejectsInvalidTypeName() {
         ConjureDefinition definition = ConjureDefinition.builder()
                 .version(1)
+                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
+                        .typeName(TypeName.of("invalid name", PACKAGE))
+                        .values(List.of(
+                                EnumValueDefinition.builder().value("RED").build()))
+                        .build())))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("TypeNames must be a primitive type");
+    }
+
+    @Test
+    public void rejectsEnumValueOutsideGrammar() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
+                        .typeName(ENUM_NAME)
+                        .values(List.of(
+                                EnumValueDefinition.builder().value("RED").build(),
+                                EnumValueDefinition.builder().value("not valid").build()))
+                        .build())))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Enumeration values must match format");
+    }
+
+    @Test
+    public void rejectsInvalidObjectFieldName() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .types(List.of(TypeDefinition.object(ObjectDefinition.builder()
+                        .typeName(TypeName.of("Widget", PACKAGE))
+                        .fields(FieldDefinition.builder()
+                                .fieldName(FieldName.of("not valid"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .build())
+                        .build())))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must follow one of the following patterns");
+    }
+
+    @Test
+    public void rejectsInvalidUnionFieldName() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .types(List.of(TypeDefinition.union(UnionDefinition.builder()
+                        .typeName(TypeName.of("Widget", PACKAGE))
+                        .union(FieldDefinition.builder()
+                                .fieldName(FieldName.of("not valid"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .build())
+                        .build())))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must follow one of the following patterns");
+    }
+
+    // Error validation
+
+    @Test
+    public void rejectsInvalidErrorNamespace() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .errors(List.of(ErrorDefinition.builder()
+                        .errorName(TypeName.of("WidgetError", PACKAGE))
+                        .namespace(ErrorNamespace.of("invalidNamespace"))
+                        .code(ErrorCode.INVALID_ARGUMENT)
+                        .build()))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Namespace for errors must match pattern");
+    }
+
+    @Test
+    public void rejectsInvalidErrorFieldName() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .errors(List.of(ErrorDefinition.builder()
+                        .errorName(TypeName.of("WidgetError", PACKAGE))
+                        .namespace(ErrorNamespace.of("Widget"))
+                        .code(ErrorCode.INVALID_ARGUMENT)
+                        .safeArgs(FieldDefinition.builder()
+                                .fieldName(FieldName.of("not valid"))
+                                .type(Type.primitive(PrimitiveType.STRING))
+                                .build())
+                        .build()))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("must follow one of the following patterns");
+    }
+
+    // Service validation
+
+    @Test
+    public void rejectsInvalidHttpPath() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .services(List.of(ServiceDefinition.builder()
+                        .serviceName(TypeName.of("WidgetService", PACKAGE))
+                        .endpoints(EndpointDefinition.builder()
+                                .endpointName(EndpointName.of("getWidget"))
+                                .httpMethod(HttpMethod.GET)
+                                .httpPath(HttpPath.of("widget"))
+                                .build())
+                        .build()))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Conjure paths must be absolute");
+    }
+
+    // ConjureDefinitionValidator.validateAll
+
+    @Test
+    public void rejectsUnsupportedVersion() {
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(2)
                 .types(List.of(TypeDefinition.enum_(EnumDefinition.builder()
                         .typeName(ENUM_NAME)
                         .values(List.of(
@@ -234,7 +266,28 @@ public final class ConjureIrValidatorTest {
                         .build())))
                 .build();
 
-        assertThatCode(() -> ConjureIrValidator.validate(definition, SafetyDeclarationRequirements.ALLOWED))
-                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Definition version must be");
+    }
+
+    @Test
+    public void rejectsDuplicateServiceNames() {
+        ServiceDefinition service = ServiceDefinition.builder()
+                .serviceName(TypeName.of("WidgetService", PACKAGE))
+                .endpoints(EndpointDefinition.builder()
+                        .endpointName(EndpointName.of("getWidget"))
+                        .httpMethod(HttpMethod.GET)
+                        .httpPath(HttpPath.of("/widget"))
+                        .build())
+                .build();
+        ConjureDefinition definition = ConjureDefinition.builder()
+                .version(1)
+                .services(List.of(service, service))
+                .build();
+
+        assertThatThrownBy(() -> ConjureIrValidator.validate(definition))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Service names must be unique");
     }
 }
