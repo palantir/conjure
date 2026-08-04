@@ -1,14 +1,14 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.fasterxml.jackson.core:jackson-annotations:2.21 (6 constraints: 6f5609f2)
+com.fasterxml.jackson.core:jackson-annotations:2.22 (6 constraints: 715644f3)
 
-com.fasterxml.jackson.core:jackson-core:2.21.4 (4 constraints: 7550d3ea)
+com.fasterxml.jackson.core:jackson-core:2.22.1 (4 constraints: 6d503de8)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.4 (7 constraints: a770dade)
+com.fasterxml.jackson.core:jackson-databind:2.22.1 (7 constraints: a170e4da)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.4 (1 constraints: 3b053a3b)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.22.1 (1 constraints: 3b053a3b)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.4 (1 constraints: 3b053a3b)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.1 (1 constraints: 3b053a3b)
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 9e14e59e)
 
@@ -22,7 +22,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.83.0 (1 constraints: b107c47e)
+com.palantir.conjure.java:conjure-lib:8.84.0 (1 constraints: b207c87e)
 
 com.palantir.conjure.java.api:errors:2.76.0 (1 constraints: 2710b4a9)
 
