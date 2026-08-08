@@ -227,7 +227,6 @@ public final class ConjureCliTest {
     public void generatesCleanError_invalid_json() {
         String[] args = {"compile", "src/test/resources/invalid-json.yml", outputFile.getAbsolutePath()};
 
-        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String expectedErrorMessage = "src/test/resources/invalid-json.yml:\n"
                 + "Cannot build FieldDefinition, some of required attributes are not set [type]\n"
                 + "  @ types -> definitions -> objects -> InvalidJson -> union -> optionA\n"
