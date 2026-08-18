@@ -16,7 +16,7 @@ com.google.errorprone:error_prone_annotations:2.50.0 (8 constraints: a16db1fd)
 
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:guava:33.7.0-jre (3 constraints: 552b4be7)
+com.google.guava:guava:33.7.1-jre (3 constraints: 562bb8e7)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
