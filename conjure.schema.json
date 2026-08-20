@@ -461,20 +461,14 @@
           "$ref": "#/definitions/DocString"
         },
         "tags": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "items": {
             "type": "string"
           },
           "uniqueItems": true
         },
         "markers": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "items": {
             "$ref": "#/definitions/ConjureType"
           },
@@ -505,20 +499,14 @@
           "$ref": "#/definitions/DocString"
         },
         "tags": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "items": {
             "type": "string"
           },
           "uniqueItems": true
         },
         "markers": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "items": {
             "type": "string"
           },
@@ -554,10 +542,7 @@
       ]
     },
     "DocString": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string"
     },
     "LogSafety": {
       "enum": [

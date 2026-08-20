@@ -1,33 +1,29 @@
 # Keys written with no value parse as null. The compiler treats these the same as
-# an absent key, so the schema must accept them.
+# an absent key, but the schema is deliberately stricter: an empty key is not
+# something an author means to keep, so editors should flag it.
 types:
   definitions:
     default-package: test.api
     objects:
       NullDocsObject:
+        # SCHEMA(type): an empty docs key is not valid
         docs:
         fields:
-          value:
-            type: string
-            docs:
+          value: string
 services:
   NullValueService:
     name: Null Value Service
     package: test.api
     base-path: /null
+    # SCHEMA(type): an empty docs key is not valid
     docs:
     endpoints:
       getValue:
         http: GET /value
         returns: NullDocsObject
+        # SCHEMA(type): an empty docs key is not valid
         docs:
+        # SCHEMA(type): an empty tags key is not valid
         tags:
+        # SCHEMA(type): an empty markers key is not valid
         markers:
-        args:
-          filter:
-            type: string
-            param-type: query
-            param-id: filter
-            docs:
-            tags:
-            markers:
