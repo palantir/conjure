@@ -1,0 +1,12 @@
+# The namespace alias below contains a digit. The parser's Namespace pattern and
+# the conjure-imports pattern in this schema both allow it, so a type reference
+# qualified by such a namespace must be allowed too.
+types:
+  conjure-imports:
+    v2: ./imported-types.yml
+  definitions:
+    default-package: test.api
+    objects:
+      NamespacedReference:
+        fields:
+          importedField: v2.ImportedObject
