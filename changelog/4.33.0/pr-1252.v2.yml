@@ -1,6 +1,0 @@
-type: improvement
-improvement:
-  description: |-
-    Define JSON schema for the Conjure yaml format
-  links:
-  - https://github.com/palantir/conjure/pull/1252
