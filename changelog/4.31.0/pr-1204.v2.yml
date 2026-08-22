@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: The `--requireSafety` parameter disallows legacy safety formats
-  links:
-  - https://github.com/palantir/conjure/pull/1204
