@@ -283,7 +283,6 @@ public class ConjureParserTest {
             sj.add("    objects:");
             sj.add("      TestObject:");
             sj.add("        alias: string");
-            @SuppressWarnings("for-rollout:JdkObsolete")
             PrintWriter writer = new PrintWriter(file.toFile(), "UTF-8");
             writer.write(sj.toString());
             writer.close();
