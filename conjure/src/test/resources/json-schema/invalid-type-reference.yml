@@ -1,0 +1,23 @@
+# A namespace alias may contain digits, but it must still start with a letter or
+# an underscore and must not contain punctuation.
+types:
+  definitions:
+    default-package: test.api
+    objects:
+      ValidObject:
+        fields:
+          value: string
+services:
+  InvalidReferenceService:
+    name: Invalid Reference Service
+    package: test.api
+    base-path: /invalid
+    endpoints:
+      hyphenInNamespace:
+        http: GET /hyphen
+        # SCHEMA(pattern, enum): a namespace alias may not contain a hyphen
+        returns: v-5.ImportedObject
+      digitFirstNamespace:
+        http: GET /digit
+        # SCHEMA(pattern, enum): a namespace alias may not start with a digit
+        returns: 1v.ImportedObject
