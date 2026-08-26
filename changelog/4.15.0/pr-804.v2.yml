@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Includes binary and datetime in suggested built-in types in the error message of invalid type.
-  links:
-  - https://github.com/palantir/conjure/pull/804

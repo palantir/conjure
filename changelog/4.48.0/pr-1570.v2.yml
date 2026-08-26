@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: ServiceDefinition name field may be omitted
-  links:
-  - https://github.com/palantir/conjure/pull/1570

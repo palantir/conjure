@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Enforce that Conjure error definitions are unique
-  links:
-  - https://github.com/palantir/conjure/pull/1685

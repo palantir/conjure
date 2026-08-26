@@ -1,6 +1,0 @@
-type: fix
-fix:
-  description: Don't allow a union variant called `type` as we don't know how that
-    should be serialized.
-  links:
-  - https://github.com/palantir/conjure/pull/422

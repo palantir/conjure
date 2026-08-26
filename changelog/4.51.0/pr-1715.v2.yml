@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Avoid recomputing valid regexes String in FieldNameValidator.validate()
-  links:
-  - https://github.com/palantir/conjure/pull/1715
