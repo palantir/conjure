@@ -50,7 +50,6 @@ public enum ServiceDefinitionValidator implements ConjureValidator<ServiceDefini
 
     @com.google.errorprone.annotations.Immutable
     private static final class UniquePathMethodsValidator implements ConjureValidator<ServiceDefinition> {
-        @SuppressWarnings("for-rollout:FloggerArgumentToString")
         @Override
         public void validate(ServiceDefinition definition) {
             Multimap<String, String> pathToEndpoints = ArrayListMultimap.create();
