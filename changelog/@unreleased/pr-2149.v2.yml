@@ -1,0 +1,8 @@
+type: feature
+feature:
+  description: Add ConjureIrValidator, which validates an already-built ConjureDefinition
+    the way the compiler validates during parse (per-type identifier, field, package,
+    HTTP-path and endpoint validators plus the cross-cutting checks), so consumers of
+    compiled IR can enforce spec conformance without re-parsing.
+  links:
+  - https://github.com/palantir/conjure/pull/2149
