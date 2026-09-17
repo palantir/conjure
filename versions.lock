@@ -22,9 +22,9 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-com.palantir.conjure.java:conjure-lib:8.86.0 (1 constraints: b407d07e)
+com.palantir.conjure.java:conjure-lib:8.87.0 (1 constraints: b507d47e)
 
-com.palantir.conjure.java.api:errors:2.78.0 (1 constraints: 2910baa9)
+com.palantir.conjure.java.api:errors:2.79.0 (1 constraints: 2a10bda9)
 
 com.palantir.ri:resource-identifier:2.22.0 (1 constraints: 1e1094a9)
 
@@ -34,9 +34,9 @@ com.palantir.safe-logging:logger-slf4j:3.19.0 (1 constraints: 380ea250)
 
 com.palantir.safe-logging:logger-spi:3.19.0 (2 constraints: 7f1ebab1)
 
-com.palantir.safe-logging:preconditions:3.19.0 (6 constraints: 5c5fd728)
+com.palantir.safe-logging:preconditions:3.19.0 (6 constraints: 5d5f9029)
 
-com.palantir.safe-logging:safe-logging:3.19.0 (7 constraints: e97184f3)
+com.palantir.safe-logging:safe-logging:3.19.0 (7 constraints: ea7173f4)
 
 com.palantir.syntactic-paths:syntactic-paths:0.21.0 (1 constraints: 35052a3b)
 
@@ -64,7 +64,7 @@ org.glassfish.hk2:osgi-resource-locator:1.0.3 (1 constraints: ef10e7c2)
 
 org.glassfish.jersey.core:jersey-common:2.34 (1 constraints: dd04fd30)
 
-org.immutables:value:2.12.2 (2 constraints: 0215eec1)
+org.immutables:value:2.12.2 (1 constraints: 3905373b)
 
 org.jetbrains:annotations:26.1.0 (3 constraints: 36269a98)
 
