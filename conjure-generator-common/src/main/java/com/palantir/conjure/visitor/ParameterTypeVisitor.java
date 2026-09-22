@@ -24,14 +24,28 @@ import com.palantir.conjure.spec.QueryParameterType;
 
 public final class ParameterTypeVisitor {
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final QueryParameterTypeVisitor QUERY = new QueryParameterTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final HeaderParameterTypeVisitor HEADER = new HeaderParameterTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final BodyIsParameterType BODY = new BodyIsParameterType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final PathIsParameterType PATH = new PathIsParameterType();
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsBodyParameterType IS_BODY = new IsBodyParameterType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsPathParameterType IS_PATH = new IsPathParameterType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsHeaderParameterType IS_HEADER = new IsHeaderParameterType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsQueryParameterType IS_QUERY = new IsQueryParameterType();
 
     private ParameterTypeVisitor() {}
