@@ -27,15 +27,31 @@ public final class TypeDefinitionVisitor {
 
     private TypeDefinitionVisitor() {}
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final TypeNameVisitor TYPE_NAME = new TypeNameVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final AliasDefinitionVisitor ALIAS = new AliasDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final ObjectDefinitionVisitor OBJECT = new ObjectDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final EnumDefinitionVisitor ENUM = new EnumDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final UnionDefinitionVisitor UNION = new UnionDefinitionVisitor();
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsAliasDefinitionVisitor IS_ALIAS = new IsAliasDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsObjectDefinitionVisitor IS_OBJECT = new IsObjectDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsEnumDefinitionVisitor IS_ENUM = new IsEnumDefinitionVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsUnionDefinitionVisitor IS_UNION = new IsUnionDefinitionVisitor();
 
     private static final class TypeNameVisitor implements TypeDefinition.Visitor<TypeName> {

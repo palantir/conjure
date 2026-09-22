@@ -24,9 +24,13 @@ public final class AuthTypeVisitor {
 
     private AuthTypeVisitor() {}
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsHeaderAuthTypeVisitor IS_HEADER = new IsHeaderAuthTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsCookieAuthTypeVisitor IS_COOKIE = new IsCookieAuthTypeVisitor();
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final CookieAuthTypeVisitor COOKIE = new CookieAuthTypeVisitor();
 
     private static class DefaultAuthTypeVisitor<T> implements AuthType.Visitor<T> {

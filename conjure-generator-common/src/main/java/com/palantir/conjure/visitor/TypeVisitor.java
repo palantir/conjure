@@ -29,22 +29,49 @@ public final class TypeVisitor {
 
     private TypeVisitor() {}
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final PrimitiveTypeVisitor PRIMITIVE = new PrimitiveTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final MapTypeVisitor MAP = new MapTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final ListTypeVisitor LIST = new ListTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final SetTypeVisitor SET = new SetTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final OptionalTypeVisitor OPTIONAL = new OptionalTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final ReferenceTypeVisitor REFERENCE = new ReferenceTypeVisitor();
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsPrimitiveTypeVisitor IS_PRIMITIVE = new IsPrimitiveTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsOptionalTypeVisitor IS_OPTIONAL = new IsOptionalTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsListTypeVisitor IS_LIST = new IsListTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsSetTypeVisitor IS_SET = new IsSetTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsMapTypeVisitor IS_MAP = new IsMapTypeVisitor();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsReferenceTypeVisitor IS_REFERENCE = new IsReferenceTypeVisitor();
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsPrimitiveOrReferenceType IS_PRIMITIVE_OR_REFERENCE = new IsPrimitiveOrReferenceType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsBinaryType IS_BINARY = new IsBinaryType();
+
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     public static final IsAnyType IS_ANY = new IsAnyType();
 
     private static final class IsPrimitiveTypeVisitor extends IsTypeVisitor {

@@ -133,6 +133,7 @@ public final class ConjureCli implements Runnable {
         boolean isVerbose();
     }
 
+    @SuppressWarnings("for-rollout:ExposedPrivateType")
     @CommandLine.Command(
             name = "compile",
             description = "Generate Conjure IR from Conjure YML definitions.",
