@@ -25,8 +25,8 @@ buildscript {
     dependencies {
         classpath 'com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.29.0'
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.7.0'
-        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.82.0'
-        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.32.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.83.0'
+        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.35.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:2.2.0'
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.21.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:7.9.0'
