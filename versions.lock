@@ -40,7 +40,7 @@ com.palantir.safe-logging:safe-logging:3.20.0 (7 constraints: c47165e2)
 
 com.palantir.syntactic-paths:syntactic-paths:0.23.0 (1 constraints: 3705303b)
 
-com.palantir.tokens:auth-tokens:4.11.0 (1 constraints: 1d1096a9)
+com.palantir.tokens:auth-tokens:4.12.0 (1 constraints: 1d1096a9)
 
 com.palantir.tritium:tritium-ids:0.128.0 (1 constraints: fe0f9aa6)
 
