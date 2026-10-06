@@ -170,6 +170,9 @@ types:
           endpointName: EndpointName
           httpMethod: HttpMethod
           httpPath: HttpPath
+          routeBy:
+            type: list<string>
+            docs: Ordered routing selectors rooted at endpoint argument names, with dot-separated object fields.
           auth: optional<AuthType>
           args: list<ArgumentDefinition>
           returns: optional<Type>
