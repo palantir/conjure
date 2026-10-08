@@ -67,7 +67,8 @@ public enum EndpointDefinitionValidator implements ConjureContextualValidator<En
     PARAMETER_NAME(new ParameterNameValidator()),
     PARAM_ID(new ParamIdValidator()),
     NO_UNSUPPORTED_HTTP_METHOD(new NoUnsupportedHttpMethodValidator()),
-    NO_DUPLICATE_ENDPOINT_ERRORS(new NoDuplicateEndpointErrorsValidation());
+    NO_DUPLICATE_ENDPOINT_ERRORS(new NoDuplicateEndpointErrorsValidation()),
+    ROUTE_BY(new RouteByValidator());
 
     private static final Logger log = LoggerFactory.getLogger(EndpointDefinitionValidator.class);
 
