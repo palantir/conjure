@@ -16,6 +16,7 @@
 
 package com.palantir.conjure.parser.services;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.palantir.conjure.defs.ConjureImmutablesStyle;
 import com.palantir.conjure.parser.types.ConjureType;
@@ -39,6 +40,9 @@ public interface EndpointDefinition {
     Map<ParameterName, ArgumentDefinition> args();
 
     Set<String> tags();
+
+    @JsonProperty("route-by")
+    List<String> routeBy();
 
     Set<ConjureType> markers();
 
