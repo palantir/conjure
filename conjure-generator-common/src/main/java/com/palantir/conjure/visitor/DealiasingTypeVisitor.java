@@ -35,9 +35,20 @@ import java.util.Map;
 
 public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefinition, Type>> {
     private final Map<TypeName, TypeDefinition> objects;
+    private final boolean resolveExternalFallbacks;
 
     public DealiasingTypeVisitor(Map<TypeName, TypeDefinition> objects) {
+        this(objects, true);
+    }
+
+    private DealiasingTypeVisitor(Map<TypeName, TypeDefinition> objects, boolean resolveExternalFallbacks) {
         this.objects = objects;
+        this.resolveExternalFallbacks = resolveExternalFallbacks;
+    }
+
+    /** Returns a visitor which preserves external references while resolving aliases. */
+    public DealiasingTypeVisitor withoutExternalFallbacks() {
+        return new DealiasingTypeVisitor(objects, false);
     }
 
     /**
@@ -115,7 +126,7 @@ public final class DealiasingTypeVisitor implements Type.Visitor<Either<TypeDefi
 
     @Override
     public Either<TypeDefinition, Type> visitExternal(ExternalReference value) {
-        return dealias(value.getFallback());
+        return resolveExternalFallbacks ? dealias(value.getFallback()) : Either.right(Type.external(value));
     }
 
     @Override
