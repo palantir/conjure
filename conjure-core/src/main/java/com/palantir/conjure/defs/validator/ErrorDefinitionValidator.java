@@ -35,7 +35,7 @@ public final class ErrorDefinitionValidator {
         UNIQUE_FIELD_NAMES_VALIDATOR.validate(
                 Stream.concat(definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
                         .map(FieldDefinition::getFieldName)
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toList()));
         ImmutableList<FieldName> fieldsDeclaringSafety = Stream.concat(
                         definition.getSafeArgs().stream(), definition.getUnsafeArgs().stream())
                 .filter(arg -> arg.getSafety().isPresent())
