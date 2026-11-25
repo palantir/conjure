@@ -452,6 +452,7 @@ public final class ConjureParserUtils {
                 .endpointName(EndpointName.of(name))
                 .httpMethod(HttpMethod.valueOf(def.http().method()))
                 .httpPath(httpPath)
+                .routeBy(def.routeBy())
                 .auth(def.auth().map(ConjureParserUtils::parseAuthType).orElse(defaultAuth))
                 .args(parseArgs(def.args(), httpPath, typeResolver))
                 .tags(def.tags().stream()

@@ -460,6 +460,14 @@
         "deprecated": {
           "$ref": "#/definitions/DocString"
         },
+        "route-by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)*$"
+          },
+          "uniqueItems": true
+        },
         "tags": {
           "type": "array",
           "items": {

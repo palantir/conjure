@@ -362,6 +362,13 @@ args | Map[`string` &rarr; [ArgumentDefinition][]&nbsp;or&nbsp;[ConjureType][]] 
 docs | [DocString][] | Documentation for the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 deprecated | [DocString][] | Documentation for the deprecation of the endpoint. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 tags | Set[`string`] | Set of tags that serves as additional metadata for the endpoint.
+route-by | List[`string`] | Ordered routing-key selectors, for example `[tableRid, options.enrollmentRid]`. Each selector starts with a path or body argument name and may traverse object fields using dots. Leaves must be scalar values or enums, including aliases and optionals. Omitted or empty means no affinity routing. Selector order is significant; runtimes may use the composite key for best-effort node affinity.
+
+Routing selectors must be unique. `binary` fields within structured bodies and `bearertoken` values are supported,
+including aliases and optionals. An entire binary request body cannot be selected. Selectors cannot select `any`,
+external types, collections, objects, or unions as a key component. Optional intermediate objects are supported;
+an absent optional contributes an explicit absent component, distinct from an empty string. Header and query
+arguments cannot be selected.
 
 **Example:**
 ```yaml
