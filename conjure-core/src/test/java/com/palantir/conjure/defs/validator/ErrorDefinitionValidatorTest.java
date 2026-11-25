@@ -72,6 +72,26 @@ public class ErrorDefinitionValidatorTest {
         assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition2))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("ErrorDefinition must not contain duplicate field names (modulo case normalization): "
-                        + "foo-bar vs foo_bar");
+                        + "foo_bar vs foo-bar");
+    }
+
+    @Test
+    public void testUniqueArgNamesValidator_sameNameInSafeAndUnsafeArgs() {
+        FieldDefinition arg = FieldDefinition.builder()
+                .fieldName(FieldName.of("fooBar"))
+                .type(Type.primitive(PrimitiveType.STRING))
+                .build();
+        ErrorDefinition definition = ErrorDefinition.builder()
+                .errorName(TypeName.of("Foo", "package"))
+                .namespace(ErrorNamespace.of("Test"))
+                .code(ErrorCode.INVALID_ARGUMENT)
+                .safeArgs(arg)
+                .unsafeArgs(arg)
+                .build();
+
+        assertThatThrownBy(() -> ErrorDefinitionValidator.validate(definition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("ErrorDefinition must not contain duplicate field names (modulo case normalization): "
+                        + "fooBar vs fooBar");
     }
 }

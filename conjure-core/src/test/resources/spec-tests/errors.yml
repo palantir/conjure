@@ -47,3 +47,17 @@ negative:
                 message: optional<AliasTwo>
               unsafe-args:
                 exceptionCause: string
+  errorSameArgInSafeAndUnsafeArgs:
+    expected-error: 'ErrorDefinition must not contain duplicate field names (modulo case normalization): message vs message'
+    conjure:
+      types:
+        definitions:
+          default-package: test.api.errors
+          errors:
+            DuplicateArgError:
+              namespace: Test
+              code: INVALID_ARGUMENT
+              safe-args:
+                message: string
+              unsafe-args:
+                message: string
